@@ -1,0 +1,44 @@
+@startuml User
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+
+' Importamos conceptualmente el Result
+class "Result<A, E>" as Result
+
+' El Error específico para el nombre
+class UserErrorNameInvalid {
+    + code: string = "USER_NAME_INVALID"
+}
+
+' Value Object: Se encarga de su propia validación
+class UserName {
+    - value: string
+    - constructor(value: string)
+    + {static} create(value: string): Result<UserName, UserErrorNameInvalid>
+    + getValue(): string
+}
+
+' Entidad User
+class User {
+    - id: string
+    - name: UserName
+    - email: string
+    - roles: string[]
+    - createdAt: Date
+    + changeName(newName: UserName): void
+}
+
+' El repositorio (Contrato/Interfaz)
+interface UserRepository {
+    + save(user: User): Promise<Result<void, Error>>
+    + findById(id: string): Promise<Result<User, Error>>
+    + findAll(): Promise<Result<User[], Error>>
+}
+
+' Relaciones
+UserName ..> Result : "usa para validar"
+User "1" *-- "1" UserName : "tiene un"
+UserRepository ..> User : "gestiona"
+UserRepository ..> Result : "devuelve"
+
+@enduml

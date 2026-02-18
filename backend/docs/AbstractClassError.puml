@@ -1,0 +1,29 @@
+@startuml Clase AbstractClassError
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+
+abstract class AbstractClassError {
+  + name: string
+  + message: string
+  + date: Date
+  + {abstract} statusCode: number
+}
+
+class UserErrorRoleInvalid {
+  + code: string = "USER_ROLE_INVALID"
+  + statusCode: number = 403
+  + constructor(message: string)
+}
+
+class UserNotFoundError {
+  + code: string = "USER_NOT_FOUND"
+  + statusCode: number = 404
+  + constructor(userId: string)
+}
+
+' Relaciones de herencia
+UserErrorRoleInvalid --|> AbstractClassError
+UserNotFoundError --|> AbstractClassError
+
+note bottom of AbstractClassError : Todos los errores de dominio\ntienen fecha y nombre.
+@enduml

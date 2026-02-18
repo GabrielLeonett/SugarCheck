@@ -1,0 +1,14 @@
+@startuml Clase Result
+skinparam classAttributeIconSize 0
+
+' Definición de la clase Genérica Result
+class "Result<A, E>" as Result {
+    - isValid: boolean
+    - value: A
+    - error: E
+    + {static} ok(value: A): Result
+    + {static} fail(error: E): Result
+    + getValue(): value
+    + getError(): error
+}
+@enduml

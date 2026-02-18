@@ -1,0 +1,24 @@
+@startuml Class AbstractUseCase
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+
+' Definimos que es una interfaz o clase abstracta para todos los casos de uso
+abstract class AbstractUseCase<Input, Output> {
+  + {abstract} run(input: Input): Promise<Result<Output, Error>>
+}
+
+' Implementación específica para obtener usuarios
+class GetAllUserUseCase {
+  + run(): Promise<Result<User[], DomainError>>
+}
+
+' Relación de herencia (El caso de uso específico implementa la base)
+GetAllUserUseCase --|> AbstractUseCase
+
+note right of GetAllUserUseCase
+  Aquí es donde vive la orquestación.
+  Llama al repositorio y devuelve 
+  el Result.
+end note
+
+@enduml
