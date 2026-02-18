@@ -15,6 +15,12 @@ class UserErrorRoleInvalid {
   + constructor(message: string)
 }
 
+class UserErrorRoleInvalid {
+  + code: string = "USER_ROLE_INVALID"
+  + statusCode: number = 403
+  + constructor(message: string)
+}
+
 class UserNotFoundError {
   + code: string = "USER_NOT_FOUND"
   + statusCode: number = 404
