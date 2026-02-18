@@ -5,8 +5,8 @@ import { UserName } from '../core/UserName';
 import { UserEmail } from '../core/UserEmail';
 import { UserRoles } from '../core/UserRoles';
 import { UserCreatedAt } from '../core/UserCreatedAt';
-import { Result } from 'src/shared/result';
-import { ErrorAbstract } from 'src/shared/error-abstract';
+import { ErrorAbstract } from '../../shared/error-abstract';
+import { Result } from '../../shared/result';
 
 export class SaveUser {
   constructor(private readonly repository: UserRepository) {}

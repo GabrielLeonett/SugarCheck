@@ -1,16 +1,16 @@
 // src/user/infrastructure/PrismaUserRepository.ts
 import { Injectable } from '@nestjs/common';
-import { Result } from 'src/shared/result';
-import { ErrorAbstract } from 'src/shared/error-abstract';
-import { UserRepository } from 'src/user/core/UserRepository';
-import { PrismaService } from 'src/shared/prisma.service';
-import { User } from 'src/user/core/User';
-import { UserId } from 'src/user/core/UserId';
-import { UserEmail } from 'src/user/core/UserEmail';
-import { UserName } from 'src/user/core/UserName';
-import { UserRoles } from 'src/user/core/UserRoles';
-import { UserCreatedAt } from 'src/user/core/UserCreatedAt';
-import { DatabaseError } from 'src/shared/DatabaseError';
+import { User } from '../../core/User';
+import { Result } from '../../../shared/result';
+import { ErrorAbstract } from '../../../shared/error-abstract';
+import { DatabaseError } from '../../../shared/DatabaseError';
+import { UserRepository } from '../../core/UserRepository';
+import { PrismaService } from '../../../shared/prisma.service';
+import { UserId } from '../../core/value-objects/UserId';
+import { UserName } from '../../core/value-objects/UserName';
+import { UserEmail } from '../../core/value-objects/UserEmail';
+import { UserRoles } from '../../core/value-objects/UserRoles';
+import { UserCreatedAt } from '../../core/value-objects/UserCreatedAt';
 
 interface UserDB {
   id: string;

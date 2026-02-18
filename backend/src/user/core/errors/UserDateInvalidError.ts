@@ -1,4 +1,4 @@
-import { ErrorAbstract } from 'src/shared/error-abstract';
+import { ErrorAbstract } from '../../../shared/error-abstract';
 
 // 1. Error específico para fechas
 export class UserDateInvalidError extends ErrorAbstract {

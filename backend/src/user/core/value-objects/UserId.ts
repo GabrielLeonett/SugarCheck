@@ -1,5 +1,5 @@
-import { Result } from 'src/shared/result';
-import { UserIdInvalidError } from './errors/UserIdInvalidError';
+import { Result } from '../../../shared/result';
+import { UserIdInvalidError } from '../errors/UserIdInvalidError';
 
 export class UserId {
   public readonly value: string;

@@ -1,8 +1,8 @@
-import { ErrorAbstract } from 'src/shared/error-abstract';
 import { UserId } from '../core/UserId';
 import { UserRepository } from '../core/UserRepository';
 import { User } from '../core/User';
-import { Result } from 'src/shared/result';
+import { Result } from '../../shared/result';
+import { ErrorAbstract } from '../../shared/error-abstract';
 
 export class GetOneByIdUser {
   constructor(private readonly repository: UserRepository) {}

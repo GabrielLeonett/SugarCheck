@@ -1,10 +1,7 @@
-import { Result } from 'src/shared/result';
-import { UserNameInvalidError } from './errors/UserNameInvalidError';
+import { Result } from '../../../shared/result';
+import { UserNameInvalidError } from '../errors/UserNameInvalidError';
 
 export class UserName {
-  getValue(): string {
-    throw new Error('Method not implemented.');
-  }
   public readonly value: string;
   // El constructor recibe el valor y se lo pasa a la clase base
   private constructor(value: string) {

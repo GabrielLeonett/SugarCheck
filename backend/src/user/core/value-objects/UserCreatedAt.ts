@@ -1,5 +1,5 @@
-import { Result } from 'src/shared/result';
-import { UserDateInvalidError } from './errors/UserDateInvalidError';
+import { UserDateInvalidError } from '../errors/UserDateInvalidError';
+import { Result } from '../../../shared/result';
 
 export class UserCreatedAt {
   public readonly value: Date;

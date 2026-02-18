@@ -1,7 +1,7 @@
-import { Result } from 'src/shared/result';
 import { UserRepository } from '../core/UserRepository';
 import { User } from '../core/User';
-import { ErrorAbstract } from 'src/shared/error-abstract';
+import { ErrorAbstract } from '../../shared/error-abstract';
+import { Result } from '../../shared/result';
 
 export class GetAllUser {
   constructor(private readonly repository: UserRepository) {}

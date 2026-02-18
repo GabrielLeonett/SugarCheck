@@ -7,12 +7,12 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { DeleteUser } from 'src/user/application/DeleteUser';
-import { GetAllUser } from 'src/user/application/GetAllUser';
-import { GetOneByEmailUser } from 'src/user/application/GetOneByEmailUser';
-import { GetOneByIdUser } from 'src/user/application/GetOneByIdUser';
-import { SaveUser } from 'src/user/application/SaveUser';
 import type { CreateUserDTO } from './UserDTO';
+import { GetAllUser } from '../../application/GetAllUser';
+import { DeleteUser } from '../../application/DeleteUser';
+import { GetOneByIdUser } from '../../application/GetOneByIdUser';
+import { GetOneByEmailUser } from '../../application/GetOneByEmailUser';
+import { SaveUser } from '../../application/SaveUser';
 
 @Controller('user')
 export class UserController {

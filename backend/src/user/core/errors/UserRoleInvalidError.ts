@@ -1,4 +1,4 @@
-import { ErrorAbstract } from 'src/shared/error-abstract';
+import { ErrorAbstract } from "../../../shared/error-abstract";
 
 export class UserRoleInvalidError extends ErrorAbstract {
   constructor(message: string) {

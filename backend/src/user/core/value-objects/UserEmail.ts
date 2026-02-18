@@ -1,5 +1,5 @@
-import { Result } from 'src/shared/result';
-import { UserEmailInvalidError } from './errors/UserEmailInvalidError';
+import { Result } from '../../../shared/result';
+import { UserEmailInvalidError } from '../errors/UserEmailInvalidError';
 
 export class UserEmail {
   public readonly value: string;

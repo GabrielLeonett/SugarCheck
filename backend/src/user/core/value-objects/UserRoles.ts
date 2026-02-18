@@ -1,5 +1,5 @@
-import { Result } from 'src/shared/result';
-import { UserRoleInvalidError } from './errors/UserRoleInvalidError';
+import { Result } from '../../../shared/result';
+import { UserRoleInvalidError } from '../errors/UserRoleInvalidError';
 
 export type UserRoleType = 'Profesores' | 'Coordinadores' | 'Estudiantes';
 
