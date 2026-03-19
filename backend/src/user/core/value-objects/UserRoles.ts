@@ -1,7 +1,7 @@
 import { Result } from '../../../shared/result';
 import { UserRoleInvalidError } from '../errors/UserRoleInvalidError';
 
-export type UserRoleType = 'Profesores' | 'Coordinadores' | 'Estudiantes';
+export type UserRoleType = 'Guerrero' | 'Representante';
 
 export class UserRoles {
   public readonly value: string[];
@@ -12,7 +12,7 @@ export class UserRoles {
   public static create(
     values: string[],
   ): Result<UserRoles, UserRoleInvalidError> {
-    const validRoles: string[] = ['Profesores', 'Coordinadores', 'Estudiantes'];
+    const validRoles: string[] = ['Guerrero', 'Representante'];
 
     // 1. Validar que no sea un array vacío (regla de negocio opcional)
     if (!values || values.length === 0) {

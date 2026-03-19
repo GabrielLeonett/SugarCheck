@@ -7,18 +7,45 @@ import { SaveUser } from '../../application/SaveUser';
 import { GetOneByEmailUser } from '../../application/GetOneByEmailUser';
 import { GetOneByIdUser } from '../../application/GetOneByIdUser';
 import { DeleteUser } from '../../application/DeleteUser';
+import { UserRepository } from '../../core/UserRepository';
+import { BcryptHasher } from '../security/bcrypt-hasher';
 
 @Module({
   providers: [
     PrismaService,
-    GetAllUser, // Tus casos de uso
-    SaveUser,
-    GetOneByEmailUser,
-    GetOneByIdUser,
-    DeleteUser,
     {
-      provide: 'UserRepository', // Este es el Token que usas en @Inject('UserRepository')
+      provide: 'UserRepository',
       useClass: PrismaUserRepository,
+    },
+    {
+      provide: 'BcryptHasher',
+      useClass: BcryptHasher,
+    },
+    {
+      provide: 'GetAllUser',
+      useFactory: (repo: UserRepository) => new GetAllUser(repo),
+      inject: ['UserRepository'], // Inyecta el repo que definimos arriba
+    },
+    {
+      provide: 'SaveUser',
+      useFactory: (repo: UserRepository, hash: BcryptHasher) =>
+        new SaveUser(repo, hash),
+      inject: ['UserRepository', 'BcryptHasher'],
+    },
+    {
+      provide: 'GetOneByEmailUser',
+      useFactory: (repo: UserRepository) => new GetOneByEmailUser(repo),
+      inject: ['UserRepository'],
+    },
+    {
+      provide: 'GetOneByIdUser',
+      useFactory: (repo: UserRepository) => new GetOneByIdUser(repo),
+      inject: ['UserRepository'],
+    },
+    {
+      provide: 'DeleteUser',
+      useFactory: (repo: UserRepository) => new DeleteUser(repo),
+      inject: ['UserRepository'],
     },
   ],
   controllers: [UserController],

@@ -4,10 +4,11 @@ import {
   Delete,
   Get,
   HttpCode,
+  Inject,
   Param,
   Post,
 } from '@nestjs/common';
-import type { CreateUserDTO } from './UserDTO';
+import type { CreateUserDTO } from './dto/create-user.dto';
 import { GetAllUser } from '../../application/GetAllUser';
 import { DeleteUser } from '../../application/DeleteUser';
 import { GetOneByIdUser } from '../../application/GetOneByIdUser';
@@ -17,11 +18,12 @@ import { SaveUser } from '../../application/SaveUser';
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly getAllUser: GetAllUser,
-    private readonly deleteUser: DeleteUser,
-    private readonly getOneByIdUser: GetOneByIdUser,
+    @Inject('GetAllUser') private readonly getAllUser: GetAllUser,
+    @Inject('DeleteUser') private readonly deleteUser: DeleteUser,
+    @Inject('GetOneByIdUser') private readonly getOneByIdUser: GetOneByIdUser,
+    @Inject('GetOneByEmailUser')
     private readonly getOneByEmailUser: GetOneByEmailUser,
-    private readonly saveUser: SaveUser,
+    @Inject('SaveUser') private readonly saveUser: SaveUser,
   ) {}
 
   @Get()
@@ -57,10 +59,11 @@ export class UserController {
   async save(@Body() create: CreateUserDTO) {
     // Pasamos el objeto completo, más limpio y escalable
     const result = await this.saveUser.run(
-      create.id,
       create.name,
       create.email,
       create.roles,
+      create.fecha_nacimiento,
+      create.password,
     );
     if (!result.isValid) throw result.getError();
 

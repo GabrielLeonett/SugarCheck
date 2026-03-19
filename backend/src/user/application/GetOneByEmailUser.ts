@@ -1,8 +1,8 @@
-import { UserEmail } from '../core/UserEmail';
 import { UserRepository } from '../core/UserRepository';
 import { User } from '../core/User';
 import { ErrorAbstract } from '../../shared/error-abstract';
 import { Result } from '../../shared/result';
+import { UserEmail } from '../core/value-objects/UserEmail';
 
 export class GetOneByEmailUser {
   constructor(private readonly repository: UserRepository) {}
