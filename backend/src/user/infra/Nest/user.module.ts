@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common';
 import { PrismaUserRepository } from '../PrismaUserRepository/PrismaUserRepository';
 import { UserController } from './user.controller';
-import { PrismaService } from '../../../shared/prisma.service';
-import { GetAllUser } from '../../application/GetAllUser';
-import { SaveUser } from '../../application/SaveUser';
-import { GetOneByEmailUser } from '../../application/GetOneByEmailUser';
-import { GetOneByIdUser } from '../../application/GetOneByIdUser';
-import { DeleteUser } from '../../application/DeleteUser';
+import { PrismaService } from '../../../shared/infrastructure/prisma.service';
+import { GetAllUser } from '../../app/GetAllUser';
+import { SaveUser } from '../../app/SaveUser';
+import { GetOneByEmailUser } from '../../app/GetOneByEmailUser';
+import { GetOneByIdUser } from '../../app/GetOneByIdUser';
+import { DeleteUser } from '../../app/DeleteUser';
 import { UserRepository } from '../../core/UserRepository';
-import { BcryptHasher } from '../security/bcrypt-hasher';
+import { BcryptHasher } from '../../../shared/infrastructure/security/bcrypt-hasher';
+import { GenerateUUID } from '../../../shared/infrastructure/generate-uuid';
+import { GenerateUUIDInterface } from '../../../shared/application/ports/generate-uuid.interface';
+import { PasswordHasher } from '../../../shared/application/ports/password-hasher.interface';
 
 @Module({
   providers: [
@@ -22,15 +25,22 @@ import { BcryptHasher } from '../security/bcrypt-hasher';
       useClass: BcryptHasher,
     },
     {
+      provide: 'GenerateUUID',
+      useClass: GenerateUUID,
+    },
+    {
       provide: 'GetAllUser',
       useFactory: (repo: UserRepository) => new GetAllUser(repo),
       inject: ['UserRepository'], // Inyecta el repo que definimos arriba
     },
     {
       provide: 'SaveUser',
-      useFactory: (repo: UserRepository, hash: BcryptHasher) =>
-        new SaveUser(repo, hash),
-      inject: ['UserRepository', 'BcryptHasher'],
+      useFactory: (
+        repo: UserRepository,
+        hash: PasswordHasher,
+        generate: GenerateUUIDInterface,
+      ) => new SaveUser(repo, hash, generate),
+      inject: ['UserRepository', 'BcryptHasher', 'GenerateUUID'],
     },
     {
       provide: 'GetOneByEmailUser',
@@ -49,5 +59,6 @@ import { BcryptHasher } from '../security/bcrypt-hasher';
     },
   ],
   controllers: [UserController],
+  exports: ['GetOneByEmailUser', 'GetOneByIdUser'],
 })
 export class UserModule {}

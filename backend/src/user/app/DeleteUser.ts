@@ -6,8 +6,8 @@ import { UserId } from '../core/value-objects/UserId';
 export class DeleteUser {
   constructor(private readonly repository: UserRepository) {}
 
-  public async run(id: string): Promise<Result<void, ErrorAbstract>> {
-    const userIdResult = UserId.create(id);
+  public async run(data: { id: string }): Promise<Result<void, ErrorAbstract>> {
+    const userIdResult = UserId.create(data.id);
 
     if (!userIdResult.isValid) {
       return Result.fail(userIdResult.getError());
