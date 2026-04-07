@@ -6,7 +6,6 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 //import { doubleCsrf } from 'csrf-csrf';
 
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
@@ -38,7 +37,7 @@ async function bootstrap() {
     }),
   );
   app.use(cookieParser());
-  app.enableCors()
+  app.enableCors();
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

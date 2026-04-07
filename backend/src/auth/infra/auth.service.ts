@@ -8,7 +8,7 @@ export class AuthService {
   constructor(
     private readonly loginUser: LoginUser,
     private readonly refreshAccessToken: RefreshAccessToken,
-    private readonly Logout: Logout
+    private readonly Logout: Logout,
   ) {}
 
   async login(email: string, pass: string) {
@@ -19,7 +19,7 @@ export class AuthService {
     return await this.refreshAccessToken.run(token);
   }
 
-  async logout(){
+  async logout() {
     return await this.Logout.run();
   }
 }

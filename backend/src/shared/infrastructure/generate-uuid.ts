@@ -1,7 +1,7 @@
-import { GenerateUUIDInterface } from "../application/ports/generate-uuid.interface";
+import { GenerateUUIDInterface } from '../application/ports/generate-uuid.interface';
 
 export class GenerateUUID implements GenerateUUIDInterface {
-    run(): string {
-        return crypto.randomUUID().toString();
-    }
+  run(): string {
+    return crypto.randomUUID().toString();
+  }
 }

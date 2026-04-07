@@ -25,7 +25,7 @@ export class RolesGuard implements CanActivate {
     // 3. ROBUSTEZ: Validamos que el usuario exista y tenga roles
     // Si no hay usuario (porque olvidaste el AuthGuard) o no tiene el array de roles, denegamos.
     if (!user || !user.roles) {
-      return false; 
+      return false;
     }
 
     // 4. Verificación de permisos

@@ -7,9 +7,7 @@ import { UserId } from '../core/value-objects/UserId';
 export class GetOneByIdUser {
   constructor(private readonly repository: UserRepository) {}
 
-  public async run(data: {
-    id: string;
-  }): Promise<Result<User, ErrorAbstract>> {
+  public async run(data: { id: string }): Promise<Result<User, ErrorAbstract>> {
     const userIdResult = UserId.create(data.id);
 
     if (!userIdResult.isValid) {

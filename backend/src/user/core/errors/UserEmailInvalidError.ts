@@ -1,4 +1,4 @@
-import { ErrorAbstract } from "../../../shared/error-abstract";
+import { ErrorAbstract } from '../../../shared/error-abstract';
 
 // 1. Error específico para el Email
 export class UserEmailInvalidError extends ErrorAbstract {

@@ -38,7 +38,9 @@ export class PrismaUserRepository implements UserRepository {
       roles: UserRoles.create(raw.roles).getValue(),
       createdAt: UserCreatedAt.create(raw.createdAt).getValue(),
       password: UserPassword.create(raw.password).getValue(),
-      fechaNacimiento: UserFechaNacimiento.create(raw.fechaNacimiento).getValue(),
+      fechaNacimiento: UserFechaNacimiento.create(
+        raw.fechaNacimiento,
+      ).getValue(),
     });
   }
 
@@ -59,7 +61,9 @@ export class PrismaUserRepository implements UserRepository {
       const users = await this.prisma.user.findMany();
       return Result.ok(users.map((user) => this.toDomain(user)));
     } catch (error) {
-      return Result.fail(new DatabaseError('Error al obtener los usuarios de la base de datos'));
+      return Result.fail(
+        new DatabaseError('Error al obtener los usuarios de la base de datos'),
+      );
     }
   }
 
@@ -69,11 +73,18 @@ export class PrismaUserRepository implements UserRepository {
         where: { email: email.value },
       });
 
-      if (!user) return Result.fail(new UserNotFoundError(`Usuario con email ${email.value} no encontrado`));
+      if (!user)
+        return Result.fail(
+          new UserNotFoundError(
+            `Usuario con email ${email.value} no encontrado`,
+          ),
+        );
 
       return Result.ok(this.toDomain(user));
     } catch (error) {
-      return Result.fail(new DatabaseError('Error técnico al buscar por email'));
+      return Result.fail(
+        new DatabaseError('Error técnico al buscar por email'),
+      );
     }
   }
 
@@ -83,7 +94,10 @@ export class PrismaUserRepository implements UserRepository {
         where: { id: id.value },
       });
 
-      if (!user) return Result.fail(new UserNotFoundError(`Usuario con ID ${id.value} no encontrado`));
+      if (!user)
+        return Result.fail(
+          new UserNotFoundError(`Usuario con ID ${id.value} no encontrado`),
+        );
 
       return Result.ok(this.toDomain(user));
     } catch (error) {
@@ -94,11 +108,15 @@ export class PrismaUserRepository implements UserRepository {
   async save(user: User): Promise<Result<User, ErrorAbstract>> {
     try {
       const existingUser = await this.prisma.user.findUnique({
-        where: { email: user.email.value }
+        where: { email: user.email.value },
       });
 
       if (existingUser) {
-        return Result.fail(new UserAlreadyExists(`El email ${user.email.value} ya está registrado`));
+        return Result.fail(
+          new UserAlreadyExists(
+            `El email ${user.email.value} ya está registrado`,
+          ),
+        );
       }
 
       const savedUser = await this.prisma.user.create({
@@ -107,10 +125,17 @@ export class PrismaUserRepository implements UserRepository {
 
       return Result.ok(this.toDomain(savedUser));
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        return Result.fail(new UserAlreadyExists('El usuario ya existe en la base de datos'));
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        return Result.fail(
+          new UserAlreadyExists('El usuario ya existe en la base de datos'),
+        );
       }
-      return Result.fail(new DatabaseError('Error crítico al intentar guardar el usuario'));
+      return Result.fail(
+        new DatabaseError('Error crítico al intentar guardar el usuario'),
+      );
     }
   }
 
@@ -121,10 +146,17 @@ export class PrismaUserRepository implements UserRepository {
       });
       return Result.ok(undefined);
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return Result.fail(new UserNotFoundError('No se pudo eliminar: el usuario no existe'));
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        return Result.fail(
+          new UserNotFoundError('No se pudo eliminar: el usuario no existe'),
+        );
       }
-      return Result.fail(new DatabaseError('Error al intentar eliminar el usuario'));
+      return Result.fail(
+        new DatabaseError('Error al intentar eliminar el usuario'),
+      );
     }
   }
 }

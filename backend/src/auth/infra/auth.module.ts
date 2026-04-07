@@ -27,7 +27,7 @@ import { Logout } from '../app/LogoutUser';
       provide: 'BcryptHasher',
       useClass: BcryptHasher,
     },
-    LoginUser, 
+    LoginUser,
     RefreshAccessToken,
     Logout,
     AuthService,

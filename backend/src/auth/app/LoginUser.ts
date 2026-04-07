@@ -21,7 +21,6 @@ export class LoginUser {
   async run(
     dto: LoginDTO,
   ): Promise<Result<{ at: string; rt: string }, ErrorAbstract>> {
-    
     // 1. Buscar el usuario
     const userResult = await this.GetOneByEmailUser.run({ email: dto.email });
 
@@ -30,7 +29,11 @@ export class LoginUser {
      * No decimos "Usuario no encontrado" por seguridad, para evitar enumeración de cuentas.
      */
     if (!userResult.isValid) {
-      return Result.fail(new InvalidCredentialsError('El correo o la contraseña son incorrectos'));
+      return Result.fail(
+        new InvalidCredentialsError(
+          'El correo o la contraseña son incorrectos',
+        ),
+      );
     }
 
     const user = userResult.getValue();
@@ -38,7 +41,11 @@ export class LoginUser {
     // 2. Verificar estado de la cuenta (Opcional pero recomendado para EduFlow)
     // Supongamos que tu entidad User tiene una propiedad isActive o similar
     if (user._isActive && !user._isActive.value) {
-        return Result.fail(new AccountSuspendedError('Tu cuenta está suspendida. Contacta a soporte técnico.'));
+      return Result.fail(
+        new AccountSuspendedError(
+          'Tu cuenta está suspendida. Contacta a soporte técnico.',
+        ),
+      );
     }
 
     // 3. Comparar contraseñas
@@ -48,7 +55,11 @@ export class LoginUser {
     );
 
     if (!isMatch) {
-      return Result.fail(new InvalidCredentialsError('El correo o la contraseña son incorrectos'));
+      return Result.fail(
+        new InvalidCredentialsError(
+          'El correo o la contraseña son incorrectos',
+        ),
+      );
     }
 
     // 4. Generar Payload

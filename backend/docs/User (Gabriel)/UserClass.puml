@@ -1,0 +1,147 @@
+@startuml UserDomain
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+package "Shared" {
+    class "Result<T, E>" as Result
+    class ErrorAbstract
+    
+    enum Role {
+        Admin
+        Guerrero
+        Representante
+    }
+}
+
+package "Errors" {
+    class UserIdInvalidError
+    class UserNameInvalidError
+    class UserEmailInvalidError
+    class UserPasswordInvalidError
+    class UserRoleInvalidError
+    class UserDateInvalidError
+}
+
+package "Value Objects" {
+    class UserId {
+        + value: string
+        - constructor(value: string)
+        + {static} create(value: string): Result<UserId, UserIdInvalidError>
+    }
+
+    class UserName {
+        + value: string
+        - constructor(value: string)
+        + {static} create(value: string): Result<UserName, UserNameInvalidError>
+    }
+
+    class UserEmail {
+        + value: string
+        - constructor(value: string)
+        + {static} create(value: string): Result<UserEmail, UserEmailInvalidError>
+    }
+
+    class UserPassword {
+        + value: string
+        - constructor(value: string)
+        + {static} create(password: string): Result<UserPassword, UserPasswordInvalidError>
+        + equals(otherPassword: string): boolean
+    }
+
+    class UserRoles {
+        + value: string[]
+        - constructor(value: Role[])
+        + {static} create(values: string[]): Result<UserRoles, UserRoleInvalidError>
+        + hasRole(role: Role): boolean
+    }
+
+    class UserCreatedAt {
+        + value: Date
+        - constructor(value: Date)
+        + {static} create(value: Date | string | number): Result<UserCreatedAt, UserDateInvalidError>
+    }
+
+    class UserFechaNacimiento {
+        + value: Date
+        - constructor(value: Date)
+        + {static} create(value: Date | string | number): Result<UserFechaNacimiento, UserDateInvalidError>
+    }
+}
+
+package "Entity & Interfaces" {
+    interface UserProps {
+        + id: UserId
+        + name: UserName
+        + password: UserPassword
+        + email: UserEmail
+        + roles: UserRoles
+        + createdAt: UserCreatedAt
+        + fechaNacimiento: UserFechaNacimiento
+    }
+
+    interface UserPlain {
+        + id: string
+        + name: string
+        + password: string
+        + email: string
+        + roles: string[]
+        + createdAt: Date
+        + fechaNacimiento: Date
+    }
+
+    class User {
+        - _id: UserId
+        - _name: UserName
+        - _email: UserEmail
+        - _password: UserPassword
+        - _roles: UserRoles
+        - _createdAt: UserCreatedAt
+        - _fechaNacimiento: UserFechaNacimiento
+        
+        + constructor(props: UserProps)
+        + get id(): UserId
+        + get name(): UserName
+        + get email(): UserEmail
+        + get password(): UserPassword
+        + get roles(): UserRoles
+        + get createdAt(): UserCreatedAt
+        + get fechaNacimiento(): UserFechaNacimiento
+        + toPlain(): UserPlain
+    }
+}
+
+package "Infrastructure / Repository" {
+    interface UserRepository {
+        + getAll(): Promise<Result<User[], ErrorAbstract>>
+        + getOneById(id: UserId): Promise<Result<User, ErrorAbstract>>
+        + getOneByEmail(email: UserEmail): Promise<Result<User, ErrorAbstract>>
+        + save(user: User): Promise<Result<User, ErrorAbstract>>
+        + delete(id: UserId): Promise<Result<void, ErrorAbstract>>
+    }
+}
+
+' Relaciones de Composición (La Entidad User "está compuesta por" estos Value Objects)
+User "1" *-- "1" UserId
+User "1" *-- "1" UserName
+User "1" *-- "1" UserEmail
+User "1" *-- "1" UserPassword
+User "1" *-- "1" UserRoles
+User "1" *-- "1" UserCreatedAt
+User "1" *-- "1" UserFechaNacimiento
+
+' Dependencias de interfaces
+User ..> UserProps : "se construye con"
+User ..> UserPlain : "se transforma en"
+UserRoles ..> Role : "usa"
+
+' Dependencias del Repositorio
+UserRepository ..> User : "gestiona"
+UserRepository ..> UserId : "usa para búsqueda/borrado"
+UserRepository ..> UserEmail : "usa para búsqueda"
+
+' Nota para evitar colapsar el diagrama: 
+' Todos los VOs dependen de sus respectivos Errors y de la clase Result, 
+' pero se omiten las flechas directas hacia los errores para mantener la legibilidad.
+@enduml

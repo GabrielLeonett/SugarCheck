@@ -6,7 +6,9 @@ import { UserEmail } from '../core/value-objects/UserEmail';
 
 export class GetOneByEmailUser {
   constructor(private readonly repository: UserRepository) {}
-  public async run(data: {email: string}): Promise<Result<User, ErrorAbstract>> {
+  public async run(data: {
+    email: string;
+  }): Promise<Result<User, ErrorAbstract>> {
     const emailUser = UserEmail.create(data.email);
 
     if (!emailUser.isValid) {

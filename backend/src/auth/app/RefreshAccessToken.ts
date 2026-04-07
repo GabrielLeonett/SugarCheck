@@ -11,7 +11,7 @@ export class RefreshAccessToken {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    @Inject('GetOneByIdUser') 
+    @Inject('GetOneByIdUser')
     private readonly getUserById: GetOneByIdInterface,
   ) {}
 
@@ -26,11 +26,13 @@ export class RefreshAccessToken {
 
       // 2. Validar que el usuario aún exista y esté activo en el sistema
       const userResult = await this.getUserById.run({ id: payload.sub });
-      
+
       if (!userResult.isValid) {
         // Si el usuario ya no existe (ej. fue eliminado), el token ya no es válido
         return Result.fail(
-          new ExpiredTokenError('La sesión ya no es válida. Por favor, inicia sesión de nuevo.')
+          new ExpiredTokenError(
+            'La sesión ya no es válida. Por favor, inicia sesión de nuevo.',
+          ),
         );
       }
 
@@ -39,7 +41,9 @@ export class RefreshAccessToken {
       // Opcional: Validar si el usuario fue suspendido antes de refrescar
       if (user._isActive && !user._isActive.value) {
         return Result.fail(
-          new ExpiredTokenError('Tu cuenta ha sido desactivada. No se puede renovar la sesión.')
+          new ExpiredTokenError(
+            'Tu cuenta ha sido desactivada. No se puede renovar la sesión.',
+          ),
         );
       }
 
@@ -57,14 +61,13 @@ export class RefreshAccessToken {
       ]);
 
       return Result.ok({ at, rt });
-
     } catch (error) {
       /**
        * Si jwtService.verifyAsync falla (token expirado, mal firmado o alterado),
        * caemos aquí y devolvemos un error de dominio limpio.
        */
       return Result.fail(
-        new ExpiredTokenError('Tu sesión ha expirado o el token es inválido.')
+        new ExpiredTokenError('Tu sesión ha expirado o el token es inválido.'),
       );
     }
   }

@@ -1,4 +1,10 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
@@ -10,8 +16,8 @@ export class PrismaService
 {
   private readonly logger = new Logger(PrismaService.name);
 
-  constructor() {
-    const databaseUrl = process.env.DATABASE_URL;
+  constructor(config: ConfigService) {
+    const databaseUrl = config.get('DATABASE_URL');
 
     // Validación crítica de la variable de entorno
     if (!databaseUrl) {
@@ -20,11 +26,14 @@ export class PrismaService
       );
     }
 
+    // LÓGICA DE SSL DINÁMICA
+    const isLocal =
+      databaseUrl.includes('localhost') || databaseUrl.includes('127.0.0.1');
+
     const pool = new Pool({
       connectionString: databaseUrl,
-      ssl: {
-        rejectUnauthorized: false, // Útil para entornos como Render, Railway o AWS RDS
-      },
+      // Si es local, ssl es false. Si es nube, se activa.
+      ssl: isLocal ? false : { rejectUnauthorized: false },
     });
 
     const adapter = new PrismaPg(pool as any);
@@ -49,7 +58,9 @@ export class PrismaService
   async onModuleInit() {
     try {
       await this.$connect();
-      this.logger.log('✅ Conexión a la base de datos establecida correctamente.');
+      this.logger.log(
+        '✅ Conexión a la base de datos establecida correctamente.',
+      );
     } catch (error) {
       this.logger.error('❌ Error al conectar con la base de datos:', error);
       process.exit(1); // Detener la app si no hay DB (opcional, según tu flujo)
@@ -61,7 +72,10 @@ export class PrismaService
       await this.$disconnect();
       this.logger.log('🔌 Conexión a la base de datos cerrada.');
     } catch (error) {
-      this.logger.error('Error al cerrar la conexión a la base de datos:', error);
+      this.logger.error(
+        'Error al cerrar la conexión a la base de datos:',
+        error,
+      );
     }
   }
 }

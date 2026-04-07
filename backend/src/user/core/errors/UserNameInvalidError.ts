@@ -1,4 +1,4 @@
-import { ErrorAbstract } from "../../../shared/error-abstract";
+import { ErrorAbstract } from '../../../shared/error-abstract';
 
 // Definimos un error específico para este Value Object
 export class UserNameInvalidError extends ErrorAbstract {
