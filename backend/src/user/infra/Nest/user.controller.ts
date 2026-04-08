@@ -1,19 +1,29 @@
 import {
+  BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
   HttpCode,
   Inject,
+  NotFoundException,
   Param,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
-import type { CreateUserDTO } from './dto/create-user.dto';
-import { GetAllUser } from '../../application/GetAllUser';
-import { DeleteUser } from '../../application/DeleteUser';
-import { GetOneByIdUser } from '../../application/GetOneByIdUser';
-import { GetOneByEmailUser } from '../../application/GetOneByEmailUser';
-import { SaveUser } from '../../application/SaveUser';
+import { GetAllUser } from '../../app/GetAllUser';
+import { DeleteUser } from '../../app/DeleteUser';
+import { GetOneByIdUser } from '../../app/GetOneByIdUser';
+import { GetOneByEmailUser } from '../../app/GetOneByEmailUser';
+import { SaveUser } from '../../app/SaveUser';
+import { UserAlreadyExists } from '../../core/errors/UserAlreadyExists';
+import { ErrorAbstract } from '../../../shared/error-abstract';
+import { UserNotFoundError } from '../../core/errors/UserNotFoundError';
+import { FindUserIdDTO } from './DTOs/find-user-id.dto';
+import { FindUserEmailDTO } from './DTOs/find-user-email.dto';
+import { CreateUserDTO } from './DTOs/create-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -34,21 +44,45 @@ export class UserController {
     return result.getValue().map((user) => user.toPlain());
   }
 
-  // Diferenciamos las rutas para evitar colisiones
-  @Get('id/:id')
-  async getOneById(@Param('id') id: string) {
-    const result = await this.getOneByIdUser.run(id);
-    if (!result.isValid) throw result.getError();
+  @Get('/id/:id')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getOneById(@Param() params: FindUserIdDTO) {
+    const result = await this.getOneByIdUser.run(params);
+
+    if (!result.isValid) {
+      const error = result.getError();
+
+      if (error instanceof UserNotFoundError) {
+        throw new NotFoundException(error.message);
+      }
+
+      if (error instanceof ErrorAbstract) {
+        throw new BadRequestException(error.message);
+      }
+
+      throw error;
+    }
 
     const user = result.getValue();
-    if (!user) return [];
     return user.toPlain();
   }
 
-  @Get('email/:email')
-  async getOneByEmail(@Param('email') email: string) {
-    const result = await this.getOneByEmailUser.run(email);
-    if (!result.isValid) throw result.getError();
+  @Get('/email/:email')
+  async getOneByEmail(@Param() params: FindUserEmailDTO) {
+    const result = await this.getOneByEmailUser.run(params);
+    if (!result.isValid) {
+      const error = result.getError();
+
+      if (error instanceof UserNotFoundError) {
+        throw new NotFoundException(error.message);
+      }
+
+      if (error instanceof ErrorAbstract) {
+        throw new BadRequestException(error.message);
+      }
+
+      throw error;
+    }
 
     const user = result.getValue();
     if (!user) return [];
@@ -57,24 +91,42 @@ export class UserController {
 
   @Post()
   async save(@Body() create: CreateUserDTO) {
-    // Pasamos el objeto completo, más limpio y escalable
-    const result = await this.saveUser.run(
-      create.name,
-      create.email,
-      create.roles,
-      create.fecha_nacimiento,
-      create.password,
-    );
-    if (!result.isValid) throw result.getError();
+    const result = await this.saveUser.run(create);
+
+    if (!result.isValid) {
+      const error = result.getError();
+      if (error instanceof UserAlreadyExists) {
+        throw new ConflictException(error.message);
+      }
+
+      if (error instanceof ErrorAbstract) {
+        throw new BadRequestException(error.message);
+      }
+
+      throw error;
+    }
 
     return result.getValue().toPlain();
   }
 
   @Delete(':id')
   @HttpCode(204) // Estándar para borrado exitoso sin contenido
-  async delete(@Param('id') id: string) {
-    const result = await this.deleteUser.run(id);
-    if (!result.isValid) throw result.getError();
+  async delete(@Param('') param: FindUserIdDTO) {
+    const result = await this.deleteUser.run(param);
+
+    if (!result.isValid) {
+      const error = result.getError();
+
+      if (error instanceof UserNotFoundError) {
+        throw new NotFoundException(error.message);
+      }
+
+      if (error instanceof ErrorAbstract) {
+        throw new BadRequestException(error.message);
+      }
+
+      throw error;
+    }
 
     return; // No devolvemos nada
   }

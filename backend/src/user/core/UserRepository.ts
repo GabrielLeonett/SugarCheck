@@ -7,9 +7,9 @@ import { Result } from '../../shared/result';
 export interface UserRepository {
   getAll(): Promise<Result<User[], ErrorAbstract>>;
 
-  getOneById(id: UserId): Promise<Result<User | null, ErrorAbstract>>;
+  getOneById(id: UserId): Promise<Result<User, ErrorAbstract>>;
 
-  getOneByEmail(email: UserEmail): Promise<Result<User | null, ErrorAbstract>>;
+  getOneByEmail(email: UserEmail): Promise<Result<User, ErrorAbstract>>;
 
   save(user: User): Promise<Result<User, ErrorAbstract>>;
 

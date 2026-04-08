@@ -1,7 +1,7 @@
-import { ErrorAbstract } from "./error-abstract";
+import { ErrorAbstract } from './error-abstract';
 
 export class Result<T, E extends ErrorAbstract> {
-  public readonly isValid: boolean; 
+  public readonly isValid: boolean;
   private readonly value: T;
   private readonly error: E;
 
@@ -22,14 +22,18 @@ export class Result<T, E extends ErrorAbstract> {
 
   public getValue(): T {
     if (!this.isValid) {
-      throw new Error(`Intentaste acceder al valor, pero el resultado falló: ${this.error?.message}`);
+      throw new Error(
+        `Intentaste acceder al valor, pero el resultado falló: ${this.error?.message}`,
+      );
     }
     return this.value;
   }
 
   public getError(): E {
     if (this.isValid) {
-      throw new Error("Intentaste acceder al error, pero el resultado es exitoso.");
+      throw new Error(
+        'Intentaste acceder al error, pero el resultado es exitoso.',
+      );
     }
     return this.error;
   }

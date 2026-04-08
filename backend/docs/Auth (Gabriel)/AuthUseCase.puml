@@ -1,0 +1,35 @@
+@startuml AuthUseCase
+skinparam actorStyle awesome
+left to right direction
+
+actor "Usuario Anónimo" as Anon
+actor "Usuario Autenticado" as User
+actor "Sistema de Email" as Email <<Service>>
+
+package "Módulo de Autenticación (Auth)" {
+  usecase "Iniciar Sesión" as UC_Login
+  usecase "Registrarse" as UC_Register
+  usecase "Recuperar Contraseña" as UC_Forgot
+  usecase "Cerrar Sesión" as UC_Logout
+  usecase "Refrescar Token" as UC_Refresh
+  usecase "Validar Credenciales" as UC_Validate
+  usecase "Enviar Correo de Recuperación" as UC_SendEmail
+}
+
+' Relaciones del Usuario Anónimo
+Anon --> UC_Login
+Anon --> UC_Register
+Anon --> UC_Forgot
+
+' Relaciones del Usuario Autenticado
+User --> UC_Logout
+User --> UC_Refresh
+
+' Relaciones de Inclusión y Extensión
+UC_Login ..> UC_Validate : <<include>>
+UC_Forgot ..> UC_SendEmail : <<include>>
+
+' Interacción con sistemas externos
+UC_SendEmail --|> Email
+
+@enduml

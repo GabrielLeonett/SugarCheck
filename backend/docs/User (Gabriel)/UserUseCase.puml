@@ -1,0 +1,40 @@
+@startuml UserUseCases
+left to right direction
+skinparam monochrome true
+skinparam packageStyle rectangle
+
+actor "Administrador de Sistema" as Admin
+actor "Usuario" as UserActor
+
+rectangle "Gestión de Usuarios (User Domain)" {
+    usecase "Crear nuevo usuario" as UC1
+    usecase "Actualizar perfil" as UC2
+    usecase "Buscar usuario por Email/ID" as UC3
+    usecase "Listar todos los usuarios" as UC4
+    usecase "Eliminar cuenta" as UC5
+    usecase "Validar reglas de negocio (VOs)" as UC6
+}
+
+' Relaciones del Administrador
+Admin --> UC1
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+
+' Relaciones del Usuario (acciones sobre sí mismo)
+UserActor --> UC2
+UserActor --> UC3
+
+' Inclusiones (Reglas de negocio)
+' Cada vez que se crea o actualiza, se validan los Value Objects
+UC1 ..> UC6 : <<include>>
+UC2 ..> UC6 : <<include>>
+
+note right of UC6
+  Valida formato de Email,
+  longitud de nombre,
+  complejidad de password,
+  y roles permitidos.
+end note
+
+@enduml
