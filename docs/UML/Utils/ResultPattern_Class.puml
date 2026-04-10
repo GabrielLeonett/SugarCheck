@@ -1,4 +1,4 @@
-@startuml Clase Result
+@startuml ResultPattern_Class
 skinparam classAttributeIconSize 0
 
 ' Definición de la clase Genérica Result

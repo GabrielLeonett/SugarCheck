@@ -1,4 +1,4 @@
-@startuml UserObjectDiagram
+@startuml User_Object
 skinparam monochrome true
 skinparam linetype ortho
 

@@ -1,4 +1,4 @@
-@startuml Clase AbstractClassError
+@startuml AbstractError_Class
 skinparam classAttributeIconSize 0
 skinparam monochrome true
 
