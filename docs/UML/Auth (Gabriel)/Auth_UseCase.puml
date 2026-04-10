@@ -1,4 +1,4 @@
-@startuml AuthUseCase
+@startuml Auth_UseCase
 skinparam actorStyle awesome
 left to right direction
 

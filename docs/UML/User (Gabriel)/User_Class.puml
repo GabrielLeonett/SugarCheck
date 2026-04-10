@@ -1,4 +1,4 @@
-@startuml UserDomain
+@startuml User_Class
 skinparam classAttributeIconSize 0
 skinparam monochrome true
 skinparam packageStyle rectangle

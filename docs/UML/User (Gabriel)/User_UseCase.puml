@@ -1,4 +1,4 @@
-@startuml UserUseCases
+@startuml User_UseCase
 left to right direction
 skinparam monochrome true
 skinparam packageStyle rectangle
