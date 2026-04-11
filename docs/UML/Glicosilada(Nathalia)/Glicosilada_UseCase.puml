@@ -1,0 +1,44 @@
+@startuml Glicosilada_UseCase
+left to right direction
+skinparam monochrome true
+skinparam packageStyle rectangle
+
+actor "Paciente" as User
+actor "Sistema / Servicio de Alertas" as Sys
+
+rectangle "Módulo de Hemoglobina Glicosilada (HbA1c)" {
+    usecase "Registrar Resultado de Laboratorio" as UC1
+    usecase "Visualizar Historial y Tendencias" as UC2
+    usecase "Editar Registro de Laboratorio" as UC3
+    usecase "Eliminar Registro de Laboratorio" as UC4
+    usecase "Generar Recordatorio de Examen" as UC5
+    usecase "Validar Rangos y Cálculos (eAG)" as UC6
+}
+
+' Relaciones del Usuario
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+
+' Relaciones del Sistema (Actor de soporte para la automatización)
+Sys --> UC5
+
+' Inclusiones de lógica de negocio
+UC1 ..> UC6 : <<include>>
+UC3 ..> UC6 : <<include>>
+UC5 ..> UC2 : <<extend>>
+
+note right of UC6
+  Valida rangos (2% - 20%),
+  formato de fecha y
+  calcula el promedio eAG.
+end note
+
+note bottom of UC5
+  Se dispara automáticamente
+  cada 90 días basándose en
+  el último registro exitoso.
+end note
+
+@enduml
