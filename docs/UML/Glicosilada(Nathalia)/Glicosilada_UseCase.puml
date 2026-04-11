@@ -13,6 +13,7 @@ rectangle "Módulo de Hemoglobina Glicosilada (HbA1c)" {
     usecase "Eliminar Registro de Laboratorio" as UC4
     usecase "Generar Recordatorio de Examen" as UC5
     usecase "Validar Rangos y Cálculos (eAG)" as UC6
+
 }
 
 ' Relaciones del Usuario
