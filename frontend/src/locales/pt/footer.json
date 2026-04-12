@@ -1,0 +1,12 @@
+{
+  "title": "📞 Contato",
+  "subtitle": "Vamos Conversar!",
+  "description": "Estou procurando minha primeira oportunidade profissional como desenvolvedor. Se você tem um projeto interessante ou uma posição júnior disponível, adoraria conectar!",
+  "sendEmail": "Enviar Email",
+  "callWhatsApp": "Ligar ou WhatsApp",
+  "connectSocial": "Vamos Conectar nas Redes",
+  "github": "GitHub",
+  "linkedin": "LinkedIn",
+  "location": "Los Teques, Estado Miranda, Venezuela",
+  "copyright": "© {{year}} Gabriel Dayer Leonett Armas. Desenvolvido com React e Material UI."
+}
