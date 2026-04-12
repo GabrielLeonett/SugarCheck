@@ -1,0 +1,14 @@
+{
+  "welcome": "Welcome",
+  "description": "This is an amazing application",
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "form": {
+    "name": "Name",
+    "email": "Email",
+    "password": "Password"
+  }
+}

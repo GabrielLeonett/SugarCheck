@@ -1,0 +1,46 @@
+{
+    "react": {
+      "name": "React",
+      "description": "ユーザーインターフェース構築のためのJavaScriptライブラリ"
+    },
+    "nodejs": {
+      "name": "Node.js",
+      "description": "サーバーサイド実行のためのJavaScriptランタイム"
+    },
+    "javascript": {
+      "name": "JavaScript",
+      "description": "インタラクティブなWeb開発のためのプログラミング言語"
+    },
+    "postgresql": {
+      "name": "PostgreSQL",
+      "description": "オープンソースのリレーショナルデータベース管理システム"
+    },
+    "git": {
+      "name": "Git",
+      "description": "分散バージョン管理システム"
+    },
+    "htmlcss": {
+      "name": "HTML5/CSS3",
+      "description": "Web構造とスタイリングの基本言語"
+    },
+    "php": {
+      "name": "PHP",
+      "description": "サーバーサイドスクリプト言語"
+    },
+    "figma": {
+      "name": "Figma",
+      "description": "共同インターフェースデザインツール"
+    },
+    "levels": {
+      "beginner": "初心者",
+      "intermediate": "中級者",
+      "advanced": "上級者",
+      "expert": "エキスパート"
+    },
+    "experienceLabels": {
+      "years": "年の経験",
+      "projects": "プロジェクト",
+      "and": "および"
+    },
+    "experienceFormat": "{{years}}年の経験 • {{projects}}プロジェクト"
+}
