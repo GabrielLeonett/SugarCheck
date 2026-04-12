@@ -1,0 +1,12 @@
+{
+  "title": "📞 Contact",
+  "subtitle": "Let's Talk!",
+  "description": "I'm looking for my first professional opportunity as a developer. If you have an interesting project or a junior position available, I'd love to connect!",
+  "sendEmail": "Send Email",
+  "callWhatsApp": "Call or WhatsApp",
+  "connectSocial": "Let's Connect on Social Media",
+  "github": "GitHub",
+  "linkedin": "LinkedIn",
+  "location": "Los Teques, Miranda State, Venezuela",
+  "copyright": "© {{year}} Gabriel Dayer Leonett Armas. Built with React and Material UI."
+}

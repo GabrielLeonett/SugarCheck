@@ -1,0 +1,12 @@
+{
+  "title": "📞 お問い合わせ",
+  "subtitle": "お話ししましょう！",
+  "description": "開発者としての最初のプロフェッショナルな機会を探しています。面白いプロジェクトやジュニアポジションがありましたら、ぜひご連絡ください！",
+  "sendEmail": "メールを送信",
+  "callWhatsApp": "電話またはWhatsApp",
+  "connectSocial": "SNSでつながりましょう",
+  "github": "GitHub",
+  "linkedin": "LinkedIn",
+  "location": "ロステケス、ミランダ州、ベネズエラ",
+  "copyright": "© {{year}} Gabriel Dayer Leonett Armas. ReactとMaterial UIで構築。"
+}

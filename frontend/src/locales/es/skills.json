@@ -1,0 +1,46 @@
+{
+    "react": {
+      "name": "React",
+      "description": "Biblioteca de JavaScript para construir interfaces de usuario"
+    },
+    "nodejs": {
+      "name": "Node.js",
+      "description": "Entorno de ejecución para JavaScript del lado del servidor"
+    },
+    "javascript": {
+      "name": "JavaScript",
+      "description": "Lenguaje de programación para desarrollo web interactivo"
+    },
+    "postgresql": {
+      "name": "PostgreSQL",
+      "description": "Sistema de gestión de bases de datos relacional de código abierto"
+    },
+    "git": {
+      "name": "Git",
+      "description": "Sistema de control de versiones distribuido"
+    },
+    "htmlcss": {
+      "name": "HTML5/CSS3",
+      "description": "Lenguajes fundamentales para la estructura y estilo web"
+    },
+    "php": {
+      "name": "PHP",
+      "description": "Lenguaje de scripting del lado del servidor"
+    },
+    "figma": {
+      "name": "Figma",
+      "description": "Herramienta de diseño de interfaces colaborativa"
+    },
+    "levels": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado",
+      "expert": "Experto"
+    },
+    "experienceLabels": {
+      "years": "años",
+      "projects": "proyectos",
+      "and": "y"
+    },
+    "experienceFormat": "{{years}} años de experiencia • {{projects}} proyectos"
+  }
