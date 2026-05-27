@@ -93,48 +93,4 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
       );
     }
   }
-
-  // --- IMPLEMENTACIÓN DEL UPDATE SOLICITADO ---
-
-  async update(
-    id: UserId,
-    userConfig: Partial<Preference>,
-  ): Promise<Result<Preference, ErrorAbstract>> {
-    try {
-      // 1. Construimos el objeto de actualización solo con las propiedades provistas
-      const dataToUpdate: any = {};
-
-      if (userConfig.unitMeasure) {
-        dataToUpdate.unitMeasure = userConfig.unitMeasure.value;
-      }
-      if (userConfig.thresholds) {
-        dataToUpdate.thresholds = userConfig.thresholds.value;
-      }
-      if (userConfig.insulinRatios) {
-        dataToUpdate.insulinRatios = userConfig.insulinRatios;
-      }
-      if (userConfig.sensitivity) {
-        dataToUpdate.sensitivity = userConfig.sensitivity.value;
-      }
-
-      // Si no hay nada que actualizar, podríamos retornar un error o buscar la entidad actual
-      if (Object.keys(dataToUpdate).length === 0) {
-        return this.getOneById(id);
-      }
-
-      // 2. Ejecutamos el update en Prisma
-      const updatedPreference = await this.prisma.preference.update({
-        where: { userId: id.value },
-        data: dataToUpdate,
-      });
-
-      // 3. Retornamos la entidad actualizada
-      return Result.ok(this.toDomain(updatedPreference));
-    } catch (error) {
-
-      return Result.fail(
-        new DatabaseError('Error al actualizar las preferencias'),
-      );
-    }
-  }
 }

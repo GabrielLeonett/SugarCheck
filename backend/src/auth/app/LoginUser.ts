@@ -5,7 +5,6 @@ import { LoginDTO } from '../infra/DTOs/login.dto';
 import { Result } from '../../shared/result';
 import { ErrorAbstract } from '../../shared/error-abstract';
 import { InvalidCredentialsError } from '../core/errors/InvalidCredentialsError';
-import { AccountSuspendedError } from '../core/errors/AccountSuspendedError'; // Ejemplo adicional
 import type { GetOneByEmailInterface } from './ports/GetOneByEmailInterface';
 
 @Injectable()
@@ -20,8 +19,8 @@ export class LoginUser {
 
   async run(
     dto: LoginDTO,
-  ): Promise<Result<{ at: string; rt: string }, ErrorAbstract>> {
-    // 1. Buscar el usuario
+  ): Promise<Result<{ at: string; rt: string; user: any }, ErrorAbstract>> {
+    // 1. Buscar la entidad del usuario en la base de datos
     const userResult = await this.GetOneByEmailUser.run({ email: dto.email });
 
     /**
@@ -30,52 +29,47 @@ export class LoginUser {
      */
     if (!userResult.isValid) {
       return Result.fail(
-        new InvalidCredentialsError(
-          'El correo o la contraseña son incorrectos',
-        ),
+        new InvalidCredentialsError('Credenciales Invalidas'),
       );
     }
 
-    const user = userResult.getValue();
+    const user = userResult.getValue().toPlain();
 
-    // 2. Verificar estado de la cuenta (Opcional pero recomendado para EduFlow)
-    // Supongamos que tu entidad User tiene una propiedad isActive o similar
-    // if (user._isActive && !user._isActive.value) {
-    //   return Result.fail(
-    //     new AccountSuspendedError(
-    //       'Tu cuenta está suspendida. Contacta a soporte técnico.',
-    //     ),
-    //   );
-    // }
-
-    // 3. Comparar contraseñas
+    // 2. Comparar contraseñas usando el Value Object de la entidad antes de aplanar
     const isMatch = await this.Hasher.compare(
       dto.password,
-      user.password.value,
+      user.password,
     );
 
     if (!isMatch) {
       return Result.fail(
-        new InvalidCredentialsError(
-          'El correo o la contraseña son incorrectos',
-        ),
+        new InvalidCredentialsError('Credenciales Invalidas'),
       );
     }
 
-    // 4. Generar Payload
-    // Aquí podrías añadir una "tokenVersion" si decides implementarla luego
+
+    // 4. Generar Payload limpio para el ecosistema de JWT
     const payload = {
-      sub: user.id.value,
-      name: user.name.value,
-      roles: user.roles.value,
+      sub: user.id,
+      name: user.name,
+      roles: user.roles,
     };
 
-    // 5. Firmar Tokens
+    // 5. Firmar Tokens (Access Token y Refresh Token)
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: '15m' }),
       this.jwtService.signAsync(payload, { expiresIn: '7d' }),
     ]);
 
-    return Result.ok({ at, rt });
+    // 6. Retornar los tokens junto con la data mapeada del usuario
+    return Result.ok({ 
+      at, 
+      rt, 
+      user: { 
+        id: user.id, 
+        name: user.name, 
+        roles: user.roles 
+      } 
+    });
   }
 }

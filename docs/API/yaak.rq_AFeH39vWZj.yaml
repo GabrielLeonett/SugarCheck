@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_AvHqbK6EEn
-createdAt: 2026-05-17T23:16:06.057332200
-updatedAt: 2026-05-26T03:54:33.880520200
+id: rq_AFeH39vWZj
+createdAt: 2026-05-26T03:53:19.368693900
+updatedAt: 2026-05-26T03:55:10.139472
 workspaceId: wk_tWcQe25Qgb
 folderId: fl_oGE2bJHqn9
 authentication: {}
@@ -13,15 +13,11 @@ body:
       "password": "12345678",
       "email": "gabriellleonett6688@gmail.com"
     }
-bodyType: application/json
+bodyType: null
 description: ''
-headers:
-- enabled: true
-  name: Content-Type
-  value: application/json
-  id: WJV0AhMG99
+headers: []
 method: POST
-name: login
-sortPriority: 0.0
-url: http://localhost:3000/auth/login
+name: logout
+sortPriority: 0.001
+url: ${[ Localhost ]}auth/logout
 urlParameters: []

@@ -270,7 +270,7 @@ export const darkTheme = createTheme({
     },
     divider: "#333333",
     action: {
-      active: "95BFDF",
+      active: "#95BFDF",
       hover: "rgba(28, 117, 186, 0.08)",
       hoverOpacity: 0.08,
       selected: "rgba(28, 117, 186, 0.16)",
