@@ -1,0 +1,23 @@
+type: http_request
+model: http_request
+id: rq_AFeH39vWZj
+createdAt: 2026-05-26T03:53:19.368693900
+updatedAt: 2026-05-26T03:55:10.139472
+workspaceId: wk_tWcQe25Qgb
+folderId: fl_oGE2bJHqn9
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "password": "12345678",
+      "email": "gabriellleonett6688@gmail.com"
+    }
+bodyType: null
+description: ''
+headers: []
+method: POST
+name: logout
+sortPriority: 0.001
+url: ${[ Localhost ]}auth/logout
+urlParameters: []

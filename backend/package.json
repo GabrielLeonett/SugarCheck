@@ -39,6 +39,7 @@
     "csrf-csrf": "^4.0.3",
     "dotenv": "^17.3.1",
     "faker": "^6.6.6",
+    "firebase-admin": "^13.10.0",
     "helmet": "^8.1.0",
     "hono": "^4.12.8",
     "lodash": "^4.17.23",
@@ -71,5 +72,6 @@
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "~5.7.2"
-  }
+  },
+  "packageManager": "pnpm@11.3.0+sha512.2c403d6594527287672b1f7056343a1f7c3634036a67ffabfcc2b3d7595d843768f8787148d1b57cf7956c90606bbd192857c363af19e96d2d0ec9ec5741d215"
 }

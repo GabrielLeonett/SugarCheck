@@ -1,0 +1,22 @@
+type: http_request
+model: http_request
+id: rq_sQcVcwj9Vo
+createdAt: 2026-05-26T03:59:24.640329300
+updatedAt: 2026-05-26T04:23:13.532218300
+workspaceId: wk_tWcQe25Qgb
+folderId: fl_uLa5XZnwow
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Preference
+sortPriority: 0.0
+url: ${[ Localhost ]}preference
+urlParameters:
+- enabled: true
+  name: ''
+  value: ''
+  id: ZsMHSV8VE8

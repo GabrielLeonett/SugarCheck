@@ -1,13 +1,14 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PreferenceController } from './preference.controller';
 import { PrismaService } from '../../../shared/infrastructure/prisma.service';
 import { SavePreference } from '../../app/SavePreference';
-import { UpdatePreference } from '../../app/UpdatePreference';
 import { PreferenceRepository } from '../../core/PreferenceRepository';
 import { PrismaPreferenceRepository } from '../PrismaPreferenceRepository/PrismaPreferenceRepository';
 import { GetOneByIdPreference } from '../../app/GetOneByUserIdPreference';
+import { AuthModule } from '../../../auth/infra/auth.module';
 
 @Module({
+  imports: [forwardRef(() => AuthModule)],
   providers: [
     PrismaService,
     {
@@ -24,12 +25,8 @@ import { GetOneByIdPreference } from '../../app/GetOneByUserIdPreference';
       useFactory: (repo: PreferenceRepository) => new SavePreference(repo),
       inject: ['PreferenceRepository'],
     },
-    {
-      provide: 'UpdatePreference',
-      useFactory: (repo: PreferenceRepository) => new UpdatePreference(repo),
-      inject: ['PreferenceRepository'],
-    },
+
   ],
   controllers: [PreferenceController],
 })
-export class PreferenceModule {}
+export class PreferenceModule { }
