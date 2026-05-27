@@ -1,4 +1,4 @@
-import { Box, useTheme, Typography, TextField, Button, Link, Alert, CircularProgress } from "@mui/material";
+import { Box, useTheme, Typography, TextField, Button, Link, Alert } from "@mui/material";
 import { LogoGA } from "../components/ui/LogoGA";
 import LoginIcon from '@mui/icons-material/Login';
 import { useForm } from "react-hook-form";
@@ -7,6 +7,9 @@ import { useAuthStore } from "../stores/authStore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginSchema, type LoginData } from "../schemas/login";
+import type { AxiosError } from "axios";
+import type { BackendErrorResponse } from "../types/types";
+import axios from "axios";
 
 export default function Login() {
     const theme = useTheme();
@@ -16,7 +19,7 @@ export default function Login() {
     const navigate = useNavigate();
 
     // Estado local para manejar errores de autenticación del backend
-    const [authError, setAuthError] = useState(null);
+    const [authError, setAuthError] = useState<BackendErrorResponse | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // 2. Configuración de React Hook Form
@@ -30,19 +33,30 @@ export default function Login() {
         shouldFocusError: true,
     });
 
-    // 3. Manejador del submit
+
     const onSubmit = async (data: LoginData) => {
         setAuthError(null);
         setIsSubmitting(true);
-        try {
 
-            // data contiene { email, password } validados por Zod
+        try {
             await login(data.email, data.password);
-            navigate("/"); // Redirigir tras login exitoso
+            navigate("/");
         } catch (error) {
-            // Manejo de errores personalizados según la respuesta del backend
-            const message = error.response?.data?.message || "Error al iniciar sesión. Inténtalo de nuevo.";
-            setAuthError(message);
+            let message = "Error al iniciar sesión. Inténtalo de nuevo.";
+
+            // Comprobamos de manera segura si es un error de Axios
+            if (axios.isAxiosError(error)) {
+                // Tipamos el error con nuestra interfaz del backend
+                const axiosError = error as AxiosError<BackendErrorResponse>;
+
+                // Ahora TypeScript sabe EXACTAMENTE que data tiene .message
+                message = axiosError.response?.data?.message || message;
+            } else if (error instanceof Error) {
+                // Por si es un error nativo de JS (ej. problemas de red nativos)
+                message = error.message;
+            }
+
+            setAuthError({ message });
         } finally {
             setIsSubmitting(false);
         }
@@ -125,7 +139,7 @@ export default function Login() {
                         {/* Mostrar alertas de error del backend */}
                         {authError && (
                             <Alert severity="error" sx={{ mb: 2, textAlign: 'left' }}>
-                                {authError}
+                                {authError.message}
                             </Alert>
                         )}
 
@@ -216,8 +230,12 @@ export default function Login() {
                                     try {
                                         await loginWithProvider('google');
                                         navigate("/");
-                                    } catch (err: any) {
-                                        setAuthError(err.message);
+                                    } catch (err: unknown) {
+                                        if (axios.isAxiosError(err)) {
+                                            setAuthError({ message: err.response?.data.message || "Error desconocido" });
+                                        } else {
+                                            setAuthError({ message: "Error desconocido" });
+                                        }
                                     } finally {
                                         setIsSubmitting(false);
                                     }
@@ -244,8 +262,12 @@ export default function Login() {
                                     try {
                                         await loginWithProvider('facebook');
                                         navigate("/");
-                                    } catch (err: any) {
-                                        setAuthError(err.message);
+                                    } catch (err: unknown) {
+                                        if (axios.isAxiosError(err)) {
+                                            setAuthError({ message: err.response?.data.message || "Error desconocido" });
+                                        } else {
+                                            setAuthError({ message: "Error desconocido" });
+                                        }
                                     } finally {
                                         setIsSubmitting(false);
                                     }

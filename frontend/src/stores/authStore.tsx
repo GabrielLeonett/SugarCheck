@@ -79,9 +79,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: response.data.user, accessToken: response.data.accessToken });
 
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Error en login con ${providerName}:`, error);
-      const errorMessage = error.response?.data?.message || error.message || 'Error de autenticación';
+      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || (error as Error).message || 'Error de autenticación';
       throw new Error(errorMessage);
     }
   }
