@@ -71,6 +71,6 @@ import { AuthModule } from '../../../auth/infra/auth.module';
     },
   ],
   controllers: [UserController],
-  exports: ['GetOneByEmailUser', 'GetOneByIdUser'],
+  exports: ['GetOneByEmailUser', 'GetOneByIdUser', 'SaveUser'], // Exportamos los casos de uso que AuthModule necesita para validar usuarios
 })
 export class UserModule {}

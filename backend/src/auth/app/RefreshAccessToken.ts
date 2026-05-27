@@ -5,6 +5,7 @@ import { Result } from '../../shared/result';
 import { ErrorAbstract } from '../../shared/error-abstract';
 import { ExpiredTokenError } from '../core/errors/ExpiredTokenError';
 import type { GetOneByIdInterface } from './ports/GetOneByIdInterface';
+import { UserPlainInterface } from './ports/UserInterface';
 
 @Injectable()
 export class RefreshAccessToken {
@@ -17,14 +18,14 @@ export class RefreshAccessToken {
 
   async run(
     refreshToken: string,
-  ): Promise<Result<{ at: string; rt: string }, ErrorAbstract>> {
+  ): Promise<Result<{ at: string; rt: string; user: any }, ErrorAbstract>> {
     try {
       // 1. Verificar firma y expiración del token de refresco
       const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
 
-      // 2. Validar que el usuario aún exista y esté activo en el sistema
+      // 2. Validar que el usuario aún exista en el sistema
       const userResult = await this.getUserById.run({ id: payload.sub });
 
       if (!userResult.isValid) {
@@ -36,31 +37,37 @@ export class RefreshAccessToken {
         );
       }
 
-      const user = userResult.getValue();
+      const userEntity = userResult.getValue();
 
-      // Opcional: Validar si el usuario fue suspendido antes de refrescar
-      // if (user._isActive && !user._isActive.value) {
-      //   return Result.fail(
-      //     new ExpiredTokenError(
-      //       'Tu cuenta ha sido desactivada. No se puede renovar la sesión.',
-      //     ),
-      //   );
-      // }
+      // Opcional: Validar si el usuario fue suspendido antes de refrescar (usando la entidad de dominio si es necesario)
+      // if (userEntity._isActive && !userEntity._isActive.value) { ... }
 
-      // 3. Generar payload actualizado (obteniendo datos frescos de la base de datos)
+      // 3. Convertimos a datos planos para obtener la data fresca y desacoplada
+      const user: UserPlainInterface = userEntity.toPlain();
+
+      // 4. Generar payload actualizado con tipos primitivos limpios
       const newPayload = {
-        sub: user.id.value,
-        name: user.name.value,
-        roles: user.roles.value,
+        sub: user.id,
+        name: user.name,
+        roles: user.roles,
       };
 
-      // 4. Rotación de tokens (Estrategia de seguridad para EduFlow)
+      // 5. Rotación de tokens (Estrategia de seguridad para EduFlow)
       const [at, rt] = await Promise.all([
         this.jwtService.signAsync(newPayload, { expiresIn: '15m' }),
         this.jwtService.signAsync(newPayload, { expiresIn: '7d' }),
       ]);
 
-      return Result.ok({ at, rt });
+      // 6. Retornar los nuevos tokens y la info plana del usuario
+      return Result.ok({ 
+        at, 
+        rt, 
+        user: { 
+          id: user.id, 
+          name: user.name, 
+          roles: user.roles 
+        } 
+      });
     } catch (error) {
       /**
        * Si jwtService.verifyAsync falla (token expirado, mal firmado o alterado),
