@@ -69,7 +69,7 @@ export default function Login() {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            bgcolor: theme.palette.background.default || '#f5f5f5',
+            bgcolor: 'background.default',
             p: 3
         }}>
             {/* Contenedor de las dos tarjetas */}
