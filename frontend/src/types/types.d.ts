@@ -25,3 +25,10 @@ interface AuthContextType {
   logout: () => Promise<void>;
   refresh: () => Promise<string>;
 }
+
+// Define la estructura exacta que responde tu backend en errores
+interface BackendErrorResponse {
+  message: string;
+  statusCode?: number;
+  error?: string;
+}
