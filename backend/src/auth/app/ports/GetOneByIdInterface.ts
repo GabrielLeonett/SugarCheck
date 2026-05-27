@@ -1,7 +1,8 @@
 import { ErrorAbstract } from '../../../shared/error-abstract';
 import { Result } from '../../../shared/result';
-import { User } from '../../../user/core/User';
+import { UserInterface } from './UserInterface';
+
 
 export interface GetOneByIdInterface {
-  run(data: { id: string }): Promise<Result<User, ErrorAbstract>>;
+  run(data: { id: string }): Promise<Result<UserInterface, ErrorAbstract>>;
 }

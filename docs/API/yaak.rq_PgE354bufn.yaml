@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_o3EaGvDvDZ
-createdAt: 2026-05-17T17:35:12.813597700
-updatedAt: 2026-05-26T03:45:11.673154400
+id: rq_PgE354bufn
+createdAt: 2026-05-26T03:30:52.860829600
+updatedAt: 2026-05-26T03:46:57.937260700
 workspaceId: wk_tWcQe25Qgb
 folderId: fl_b6cMFYiLeT
 authentication: {}
@@ -23,7 +23,7 @@ headers:
   value: application/json
   id: 7Wtt0ztFz4
 method: POST
-name: Create warrior
-sortPriority: 1000.0
-url: ${[ Localhost ]}user/register
+name: Create admin
+sortPriority: 1000.001
+url: ${[ Localhost ]}user/admin
 urlParameters: []

@@ -8,10 +8,7 @@ import {
 } from 'class-validator';
 import { ThresholdsDTO, InsulinRatiosDTO } from './utils.dto';
 
-export class CreatePreferenceDTO {
-  @IsUUID('4', { message: 'El ID del usuario debe ser un UUID válido' })
-  @IsNotEmpty({ message: 'El ID del usuario es obligatorio' })
-  userId!: string;
+export class SavePreferenceDTO {
 
   @IsString({ message: 'La unidad de medida debe ser un texto' })
   @IsNotEmpty({ message: 'La unidad de medida es obligatoria' })

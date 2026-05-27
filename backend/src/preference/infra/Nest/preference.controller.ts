@@ -1,43 +1,44 @@
 import {
   Controller,
   Post,
-  Put,
   Body,
-  Param,
   HttpException,
   HttpStatus,
   Inject,
   Get,
-  UsePipes,
-  ValidationPipe,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { SavePreference } from '../../app/SavePreference';
-import { UpdatePreference } from '../../app/UpdatePreference';
-import { CreatePreferenceDTO } from './DTOs/create-performance.dto';
-import { UpdatePreferenceDTO } from './DTOs/update-preference.dto';
 import { GetOneByIdPreference } from '../../app/GetOneByUserIdPreference';
-import { FindUserIdDTO } from '../../../shared/infrastructure/DTOs/find-user-id.dto';
+import {  SavePreferenceDTO } from './DTOs/save-preference.dto';
+import { AuthGuard } from '../../../auth/infra/auth.guard';
 
 @Controller('preference')
+@UseGuards(AuthGuard) // <--- Protegemos TODO el controlador de una vez
 export class PreferenceController {
   constructor(
     @Inject('GetOneByIdPreference')
     private readonly getOneByIdPreferenceUseCase: GetOneByIdPreference,
     @Inject('SavePreference')
     private readonly savePreferenceUseCase: SavePreference,
-    @Inject('UpdatePreference')
-    private readonly updatePreferenceUseCase: UpdatePreference,
   ) {}
 
-  @Get(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  async getOneById(@Param('id') id: FindUserIdDTO) {
-    const result = await this.getOneByIdPreferenceUseCase.run(id);
+  /**
+   * OBTERNER PREFERENCIAS DEL USUARIO ACTUAL
+   * GET /preference
+   */
+  @Get()
+  async getOneById(@Request() req: any) {
+    const userId = req.user.sub; // Extraemos el ID del token de forma segura
+
+    // Pasamos el ID envuelto en la estructura que espera tu caso de uso (FindUserIdDTO)
+    const result = await this.getOneByIdPreferenceUseCase.run({ id: userId });
 
     if (!result.isValid) {
       throw new HttpException(
         result.getError().message,
-        HttpStatus.NOT_FOUND, // 404 es el código HTTP semánticamente correcto aquí
+        HttpStatus.NOT_FOUND,
       );
     }
 
@@ -47,17 +48,22 @@ export class PreferenceController {
     };
   }
 
+  /**
+   * CREAR PREFERENCIAS DEL USUARIO ACTUAL
+   * POST /preference
+   */
   @Post()
-  async create(@Body() body: CreatePreferenceDTO) {
+  async save(@Request() req: any, @Body() body: SavePreferenceDTO) {
+    const userId = req.user.sub; 
+
     const result = await this.savePreferenceUseCase.run(
-      body.userId,
+      userId, 
       body.unitMeasure,
       body.thresholds,
       body.insulinRatios,
       body.sensitivity,
     );
 
-    // Si la validación de los Value Objects falla, retornamos un 400 Bad Request
     if (!result.isValid) {
       throw new HttpException(
         result.getError().message,
@@ -65,26 +71,8 @@ export class PreferenceController {
       );
     }
 
-    // Retornamos el valor mapeado o directamente la entidad (NestJS la serializa a JSON)
     return {
       message: 'Preferencias guardadas exitosamente',
-      data: result.getValue(),
-    };
-  }
-
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() body: UpdatePreferenceDTO) {
-    const result = await this.updatePreferenceUseCase.run(id, body);
-
-    if (!result.isValid) {
-      throw new HttpException(
-        result.getError().message,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    return {
-      message: 'Preferencias actualizadas exitosamente',
       data: result.getValue(),
     };
   }

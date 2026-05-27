@@ -1,7 +1,7 @@
 import { ErrorAbstract } from '../../../shared/error-abstract';
 import { Result } from '../../../shared/result';
-import { User } from '../../../user/core/User';
+import { UserInterface } from './UserInterface';
 
 export interface GetOneByEmailInterface {
-  run(data: { email: string }): Promise<Result<User, ErrorAbstract>>;
+  run(data: { email: string }): Promise<Result<UserInterface, ErrorAbstract>>;
 }

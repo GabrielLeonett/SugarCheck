@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_mktGsbhMLe
 createdAt: 2026-05-17T17:35:13.787103800
-updatedAt: 2026-05-20T22:46:11.379601400
+updatedAt: 2026-05-26T03:43:47.353633200
 workspaceId: wk_tWcQe25Qgb
 folderId: fl_b6cMFYiLeT
 authentication: {}
@@ -14,13 +14,13 @@ headers: []
 method: DELETE
 name: Delete
 sortPriority: 5000.0
-url: ${[ onlineserver ]}/user/:id
+url: ${[ Localhost ]}user/:id
 urlParameters:
 - enabled: true
   name: :id
-  value: 75ccea20-05f6-48fe-a71f-6a0fadea70ef
+  value: 370f3550-5993-4dea-8e5f-737068967079
   id: H99TjbzPVU
 - enabled: true
   name: ''
   value: ''
-  id: ZXfanwEFWH
+  id: A0mNMiG5Fq
