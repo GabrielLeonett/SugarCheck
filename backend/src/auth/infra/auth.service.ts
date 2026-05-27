@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { LoginUser } from '../app/LoginUser';
 import { RefreshAccessToken } from '../app/RefreshAccessToken';
 import { Logout } from '../app/LogoutUser';
+import { LoginFirebaseUser } from '../app/LoginFirebaseUser';
 
 @Injectable()
 export class AuthService {
@@ -9,7 +10,8 @@ export class AuthService {
     private readonly loginUser: LoginUser,
     private readonly refreshAccessToken: RefreshAccessToken,
     private readonly Logout: Logout,
-  ) {}
+    private readonly LoginFirebaseUser: LoginFirebaseUser,
+  ) { }
 
   async login(email: string, pass: string) {
     return await this.loginUser.run({ email, password: pass });
@@ -21,5 +23,17 @@ export class AuthService {
 
   async logout() {
     return await this.Logout.run();
+  }
+
+  async loginFirebaseUser({
+    email,
+    name,
+    firebaseUid
+  }: {
+    email: string,
+    name: string,
+    firebaseUid: string,
+  }) {
+    return await this.LoginFirebaseUser.run({ email, name, firebaseUid });
   }
 }
