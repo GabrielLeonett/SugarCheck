@@ -7,6 +7,7 @@ import Home from "./features/Home";
 import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
+import ForgotPassword from "./features/OlvidoContrasena";
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
@@ -41,7 +42,7 @@ function App() {
           </Route>
           <Route element={<PublicRoute/>}>
             <Route path='/login' element={<Login />} />
-            <Route path='/olvidoContrasena' element={<OlvidoContrasena />} />
+            <Route path='/olvidoContrasena' element={<ForgotPassword />} />
             <Route path='/register' element={<Register />} />
           </Route>
           </Routes>
