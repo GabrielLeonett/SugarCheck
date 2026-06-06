@@ -5,6 +5,7 @@ import { useAuthStore } from './stores/authStore';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import Home from "./features/home";
 import Login from "./features/login";
+import OlvidoContrasena from "./features/olvidoContrasena";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
             <Route index element={<Home />} />
           </Route>
           <Route path='/login' element={<Login />} />
+          <Route path='/olvidoContrasena' element={<OlvidoContrasena />} />
         </Routes>
       </Router>
     </ThemeWrapperContext>
