@@ -6,45 +6,20 @@ import LanguageDetector from "i18next-browser-languagedetector";
 // Importar traducciones (agregar footer)
 import enCommon from "../locales/en/common.json";
 import enNav from "../locales/en/nav.json";
-import enHero from "../locales/en/hero.json";
-import enSkills from "../locales/en/skills.json";
-import enFooter from "../locales/en/footer.json";
 
-import esHero from "../locales/es/hero.json";
-import esSkills from "../locales/es/skills.json";
-import esFooter from "../locales/es/footer.json";
+import esNav from "../locales/es/nav.json";
 
-import ptHero from "../locales/pt/hero.json";
-import ptSkills from "../locales/pt/skills.json";
-import ptFooter from "../locales/pt/footer.json";
+import ptNav from "../locales/pt/nav.json";
 
-import jaHero from "../locales/ja/hero.json";
-import jaSkills from "../locales/ja/skills.json";
-import jaFooter from "../locales/ja/footer.json";
+import jaNav from "../locales/ja/nav.json";
 
+
+// Agrupa tus recursos por idioma para facilitar la lectura
 const resources = {
-  en: {
-    common: enCommon,
-    nav: enNav,
-    hero: enHero,
-    skills: enSkills,
-    footer: enFooter,
-  },
-  es: {
-    hero: esHero,
-    skills: esSkills,
-    footer: esFooter,
-  },
-  pt: {
-    hero: ptHero,
-    skills: ptSkills,
-    footer: ptFooter,
-  },
-  ja: {
-    hero: jaHero,
-    skills: jaSkills,
-    footer: jaFooter,
-  },
+  en: { common: enCommon, nav: enNav },
+  es: { nav: esNav },
+  pt: { nav: ptNav },
+  ja: { nav: jaNav },
 };
 
 i18n
@@ -53,8 +28,8 @@ i18n
   .init({
     resources,
     fallbackLng: "es",
+    ns: ["common", "nav"],
     defaultNS: "common",
-    ns: ["common", "nav", "hero", "skills", "footer"], // Agregar footer
     interpolation: {
       escapeValue: false,
     },
