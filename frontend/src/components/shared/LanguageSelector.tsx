@@ -15,9 +15,9 @@ import useLanguage from "../../hooks/useLanguage";
 const LanguageSelector = ({ variant = "icon" }) => {
   const { currentLanguage, currentLanguageInfo, changeLanguage, languages } =
     useLanguage();
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const handleClick = (event) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 

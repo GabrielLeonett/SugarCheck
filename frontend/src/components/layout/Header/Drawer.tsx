@@ -53,6 +53,7 @@ export default function DrawerAppBar({ drawerOpen, handleDrawerToggle, handleNav
                         <ListItem key={item.name} disablePadding sx={{ mb: 1 }}>
                             <ListItemButton
                                 onClick={() => {
+                                    if (!item.href) return;
                                     handleNavClick(item.href);
                                     handleDrawerToggle();
                                 }}
