@@ -1,8 +1,17 @@
 export interface NavItem {
   name: string;
-  // Usamos Template Literal Types para asegurar que siempre sea un ancla de ID
-  href: `#${string}`;
+  href?: `/${string}`; // Hacemos href opcional para permitir menús que solo despliegan
+  icon?: React.ReactNode;
 }
+
+export interface NavItemWithSubmenu {
+  name: string;
+  submenu: NavItem[];
+  icon?: React.ReactNode;
+  href?: never; // Asegura que no se pueda poner un href si hay un submenu
+}
+
+export type NavItemType = NavItem | NavItemWithSubmenu;
 
 interface ThemeContextType {
   isDarkMode: boolean;
