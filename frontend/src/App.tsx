@@ -3,10 +3,10 @@ import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
 import ProtectedRoute from './components/shared/ProtectedRoute';
-import Home from "./features/home";
-import Login from "./features/login";
-import OlvidoContrasena from "./features/olvidoContrasena";
-
+import Home from "./features/Home";
+import Login from "./features/Login";
+import { PublicRoute } from "./components/shared/PublicRoute";
+import Register from "./features/Register";
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
@@ -39,11 +39,14 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route index element={<Home />} />
           </Route>
-          <Route path='/login' element={<Login />} />
-          <Route path='/olvidoContrasena' element={<OlvidoContrasena />} />
-        </Routes>
-      </Router>
-    </ThemeWrapperContext>
+          <Route element={<PublicRoute/>}>
+            <Route path='/login' element={<Login />} />
+            <Route path='/olvidoContrasena' element={<OlvidoContrasena />} />
+            <Route path='/register' element={<Register />} />
+          </Route>
+          </Routes>
+        </Router>
+      </ThemeWrapperContext>
     </Suspense>
   );
 }
