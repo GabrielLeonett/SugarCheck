@@ -10,6 +10,7 @@ import { loginSchema, type LoginData } from "../schemas/login";
 import type { AxiosError } from "axios";
 import type { BackendErrorResponse } from "../types/types";
 import axios from "axios";
+import ImagenBienvenida from '../assets/bienvenida-guerrero.png';
 
 export default function Login() {
     const theme = useTheme();
@@ -19,8 +20,8 @@ export default function Login() {
     const navigate = useNavigate();
 
     // Estado local para manejar errores de autenticación del backend
-    const [authError, setAuthError] = useState<BackendErrorResponse | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [authError, setAuthError] = useState<BackendErrorResponse | null>(null); // Guarda los mensajes de error
+    const [isSubmitting, setIsSubmitting] = useState(false); // Para saber si la peticion esta en curso
 
     // 2. Configuración de React Hook Form
     const {
@@ -40,13 +41,13 @@ export default function Login() {
 
         try {
             await login(data.email, data.password);
-            navigate("/");
+            navigate("/"); // Intenta loguear y si sale bien redirige al inicio
         } catch (error) {
             let message = "Error al iniciar sesión. Inténtalo de nuevo.";
 
             // Comprobamos de manera segura si es un error de Axios
             if (axios.isAxiosError(error)) {
-                // Tipamos el error con nuestra interfaz del backend
+                // Tipamos el error con la interfaz del backend
                 const axiosError = error as AxiosError<BackendErrorResponse>;
 
                 // Ahora TypeScript sabe EXACTAMENTE que data tiene .message
@@ -96,9 +97,22 @@ export default function Login() {
                     boxShadow: 3,
                     minHeight: '500px',
                 }}>
+                    <Box 
+                        component="img"
+                        src={ImagenBienvenida}
+                        alt="Ilustración de Bienvenida"
+                        sx={{
+                            width:'100%',
+                            maxWidth: '250px',
+                            height: 'auto',
+                            mb: 1,
+
+                        }}
+                    />
                     <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
                         ¡Bienvenido, Guerrero!
                     </Typography>
+
                     <Typography variant="body1" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
                         Prepárate para la batalla de hoy. Entra a tu panel, asegura tu bienestar y mantente firme en la zona segura.
                     </Typography>
@@ -224,7 +238,7 @@ export default function Login() {
                                 disabled={isSubmitting}
                                 onClick={async (e) => {
                                     e.preventDefault();
-                                    e.stopPropagation(); // 👈 CRÍTICO: Evita que el click interactúe con el <form> o los Inputs de MUI
+                                    e.stopPropagation(); //CRÍTICO: Evita que el click interactúe con el <form> o los Inputs de MUI
                                     setAuthError(null);
                                     setIsSubmitting(true);
                                     try {
@@ -256,7 +270,7 @@ export default function Login() {
                                 disabled={isSubmitting}
                                 onClick={async (e) => {
                                     e.preventDefault();
-                                    e.stopPropagation(); // 👈 CRÍTICO
+                                    e.stopPropagation(); // CRÍTICO
                                     setAuthError(null);
                                     setIsSubmitting(true);
                                     try {
@@ -283,7 +297,7 @@ export default function Login() {
                         </Box>
 
                         <Box sx={{ textAlign: 'center' }}>
-                            <Link href="#" sx={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                            <Link href="/olvidoContrasena" sx={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
                                 ¿Olvidaste tu contraseña?
                             </Link>
                         </Box>
