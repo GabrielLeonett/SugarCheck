@@ -4,10 +4,10 @@ import LockResetIcon from '@mui/icons-material/LockReset'; // Icono adecuado par
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { z } from "zod"; // Creamos un esquema rápido aquí o puedes importarlo de tus schemas
 import axios from "axios";
 import type { AxiosError } from "axios";
+import { api } from '../api/axios';
 import type { BackendErrorResponse } from "../types/types";
 import ImagenOlvidoContrasena from '../assets/olvido-contrasena-guerrero.png';
 
@@ -20,7 +20,6 @@ type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPassword() {
     const theme = useTheme();
-    const navigate = useNavigate();
 
     // Estados locales para el feedback del usuario
     const [authError, setAuthError] = useState<BackendErrorResponse | null>(null);
@@ -45,17 +44,25 @@ export default function ForgotPassword() {
         setIsSubmitting(true);
 
         try {
-            // Aquí llamarías a tu servicio o tienda global, por ejemplo:
-            // await axios.post("/api/auth/forgot-password", { email: data.email });
+            // Hacemos el POST usando la instancia "api" que ya tiene configurada la baseURL
+            // Ajusta '/auth/forgot-password' según el endpoint exacto de tu backend
+            const response = await api.post("/auth/forgot-password", { email: data.email });
             
-            setSuccessMessage("Se ha enviado un correo de recuperación si la cuenta existe.");
+            // Si tu backend retorna un mensaje de éxito dinámico, puedes usar: response.data.message
+            setSuccessMessage(response.data?.message || "Se ha enviado un correo de recuperación si la cuenta existe.");
             
         } catch (error) {
             let message = "Error al procesar la solicitud. Inténtalo de nuevo.";
+            
+            // Seguimos usando el 'axios' global para validar la naturaleza del error
             if (axios.isAxiosError(error)) {
                 const axiosError = error as AxiosError<BackendErrorResponse>;
+                // Extraemos limpiamente el mensaje estructurado de tu backend
                 message = axiosError.response?.data?.message || message;
+            } else if (error instanceof Error) {
+                message = error.message;
             }
+
             setAuthError({ message });
         } finally {
             setIsSubmitting(false);
@@ -107,7 +114,7 @@ export default function ForgotPassword() {
                     </Typography>
                     
                     <Typography variant="body2" sx={{ mt: 'auto' }}>
-                        <Link href="/login" sx={{ color: '#314656' , textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                        <Link href="/login" sx={{ color: 'rgb(92, 102, 125)' , textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
                             Volver a Iniciar Sesión
                         </Link>
                     </Typography>
