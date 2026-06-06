@@ -3,8 +3,10 @@ import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
 import ProtectedRoute from './components/shared/ProtectedRoute';
-import Home from "./features/home";
-import Login from "./features/login";
+import Home from "./features/Home";
+import Login from "./features/Login";
+import { PublicRoute } from "./components/shared/PublicRoute";
+import Register from "./features/Register";
 
 
 function App() {
@@ -31,17 +33,20 @@ function App() {
   }
   return (
     <Suspense fallback={<div>Cargando...</div>}>
-    <ThemeWrapperContext>
-      <Router>
-        <Routes>
-          {/* Rutas Protegidas */}
-          <Route element={<ProtectedRoute />}>
-            <Route index element={<Home />} />
-          </Route>
-          <Route path='/login' element={<Login />} />
-        </Routes>
-      </Router>
-    </ThemeWrapperContext>
+      <ThemeWrapperContext>
+        <Router>
+          <Routes>
+            {/* Rutas Protegidas */}
+            <Route element={<ProtectedRoute />}>
+              <Route index element={<Home />} />
+            </Route>
+            <Route element={<PublicRoute />}>
+              <Route path='/login' element={<Login />} />
+              <Route path='/register' element={<Register />} />
+            </Route>
+          </Routes>
+        </Router>
+      </ThemeWrapperContext>
     </Suspense>
   );
 }
