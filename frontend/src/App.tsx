@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
 import ProtectedRoute from './components/shared/ProtectedRoute';
@@ -30,6 +30,7 @@ function App() {
     return <div>Cargando aplicación...</div>; // O un spinner estético
   }
   return (
+    <Suspense fallback={<div>Cargando...</div>}>
     <ThemeWrapperContext>
       <Router>
         <Routes>
@@ -41,6 +42,7 @@ function App() {
         </Routes>
       </Router>
     </ThemeWrapperContext>
+    </Suspense>
   );
 }
 

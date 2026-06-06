@@ -166,7 +166,7 @@ export const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#1C75BA",
+      main: "#7AAFD7",
       light: "#95BFDF",
       dark: "#314656",
       contrastText: "#ffffff",
@@ -208,7 +208,7 @@ export const lightTheme = createTheme({
     },
     divider: "#e2e8f0",
     action: {
-      active: "#1C75BA",
+      active: "#7AAFD7",
       hover: "rgba(28, 117, 186, 0.04)",
       hoverOpacity: 0.04,
       selected: "rgba(28, 117, 186, 0.08)",
