@@ -1,10 +1,10 @@
 import * as React from "react";
-import { IconButton, AppBar, Box, Toolbar, Typography, Avatar } from "@mui/material";
+import { IconButton, AppBar, Box, Toolbar, Typography, Avatar, Badge } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import HomeIcon from "@mui/icons-material/Home";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import LanguageSelector from "../../shared/LanguageSelector";
+import NotificationIcon from "@mui/icons-material/Notifications";
 import type { NavItemType, NavItemWithSubmenu } from "../../../types/types";
 // ✅ Import correcto del contexto
 import { ThemeContext } from "../../../contexts/ThemeContext"; // Ajusta la ruta según tu estructura
@@ -14,12 +14,14 @@ import DrawerAppBar from "./Drawer";
 import { MenuSubItemComp } from "../../ui/MenuSubItemComp";
 import NavBarItem from "../../ui/NavBarItem";
 import { useAuthStore } from "../../../stores/authStore";
+import ProfileNavBar from "../../ui/Cards/ProfileNavBar";
 
 function Navbar() {
   const user = useAuthStore((state) => state.user);
   const { t } = useLanguage("nav");
   // ✅ Corrección: usar isDarkMode en lugar de theme
   const { isDarkMode, toggleTheme } = React.useContext(ThemeContext);
+  const [profileMenuOpen, setProfileMenuOpen] = React.useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const navItems: NavItemType[] = [{ name: t("inicio"), href: "/", icon: <HomeIcon /> }, {
@@ -126,26 +128,23 @@ function Navbar() {
           <Box
             sx={{
               display: { xs: "none", md: "flex" },
-              gap: 3,
+              justifyContent: "center",
               alignItems: "center",
+              gap: 4,
+              p: 1,
             }}
           >
-            <IconButton
-              onClick={toggleTheme}
-              sx={{
-                color: "text.primary",
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            >
-              {/* ✅ Usar isDarkMode correctamente */}
-              {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
-
-            <LanguageSelector />
-
-            <Avatar alt="User"  children={userInitials} />
+            <Badge badgeContent={4} color="secondary">
+              <NotificationIcon />
+            </Badge>
+            <Avatar alt="User" children={userInitials} sx={{
+              "&:hover": {
+                backgroundColor: "action.hover",
+                borderRadius: 1,
+                cursor: "pointer", // Opcional, para indicar que es interactivo
+              },
+            }}
+              onClick={() => setProfileMenuOpen(!profileMenuOpen)} />
           </Box>
 
           {/* Menú hamburguesa */}
@@ -177,7 +176,7 @@ function Navbar() {
       </AppBar >
 
       {/* Drawer móvil */}
-      <DrawerAppBar
+      < DrawerAppBar
         drawerOpen={drawerOpen}
         handleDrawerToggle={handleDrawerToggle}
         handleNavClick={handleNavClick}
@@ -185,6 +184,8 @@ function Navbar() {
       />
 
       <Toolbar />
+
+      <ProfileNavBar open={profileMenuOpen}></ProfileNavBar>
     </>
   );
 }
