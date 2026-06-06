@@ -8,7 +8,6 @@ import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
 
-
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
   const setLoading = useAuthStore((state) => state.setLoading);
@@ -33,17 +32,18 @@ function App() {
   }
   return (
     <Suspense fallback={<div>Cargando...</div>}>
-      <ThemeWrapperContext>
-        <Router>
-          <Routes>
-            {/* Rutas Protegidas */}
-            <Route element={<ProtectedRoute />}>
-              <Route index element={<Home />} />
-            </Route>
-            <Route element={<PublicRoute />}>
-              <Route path='/login' element={<Login />} />
-              <Route path='/register' element={<Register />} />
-            </Route>
+    <ThemeWrapperContext>
+      <Router>
+        <Routes>
+          {/* Rutas Protegidas */}
+          <Route element={<ProtectedRoute />}>
+            <Route index element={<Home />} />
+          </Route>
+          <Route element={<PublicRoute/>}>
+            <Route path='/login' element={<Login />} />
+            <Route path='/olvidoContrasena' element={<OlvidoContrasena />} />
+            <Route path='/register' element={<Register />} />
+          </Route>
           </Routes>
         </Router>
       </ThemeWrapperContext>
