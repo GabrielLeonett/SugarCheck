@@ -7,8 +7,8 @@ import JA from "../assets/icons/JA.svg";
 import EN_US from "../assets/icons/EN-US.svg";
 import PT from "../assets/icons/PT.svg";
 
-const useLanguage = () => {
-  const { i18n, t } = useTranslation();
+const useLanguage = (ns?: string) => {
+  const { i18n, t } = useTranslation(ns);
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language || "es");
 
   // Memoizar la función para evitar recreaciones innecesarias
@@ -23,26 +23,28 @@ const useLanguage = () => {
 
   // Sincronizar el idioma cuando cambia en i18n
   useEffect(() => {
-    const handleLanguageChanged = () => {
-      setCurrentLanguage(i18n.language);
-    };
-
-    // Escuchar cambios de idioma
-    i18n.on("languageChanged", handleLanguageChanged);
-
-    // Configurar idioma inicial si no está establecido
     const savedLanguage = localStorage.getItem("i18nextLng");
-    if (savedLanguage && savedLanguage !== i18n.language) {
+    const currentI18nLang = i18n.language;
+
+    // Si hay un idioma guardado y es diferente al actual
+    if (savedLanguage && savedLanguage !== currentI18nLang) {
       changeLanguage(savedLanguage);
     }
 
-    // Establecer atributo lang para accesibilidad
-    document.documentElement.lang = i18n.language;
+    // Siempre actualizar el estado con el idioma actual de i18n
+    setCurrentLanguage(i18n.language);
+
+    const handleLanguageChanged = (lng:string) => {
+      setCurrentLanguage(lng);
+      document.documentElement.lang = lng;
+    };
+
+    i18n.on("languageChanged", handleLanguageChanged);
 
     return () => {
       i18n.off("languageChanged", handleLanguageChanged);
     };
-  }, [i18n, changeLanguage]);
+  }, [i18n]); // Removido changeLanguage de dependencias para evitar loops
 
   // Configuración de idiomas disponibles
   const languages = useMemo(
@@ -104,6 +106,7 @@ const useLanguage = () => {
     languages,
     isLanguageAvailable,
     t, // Atajo para traducciones
+    language: i18n.language, // Exponer el idioma actual de i18n por si es necesario
   };
 };
 
