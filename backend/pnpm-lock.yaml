@@ -39,7 +39,7 @@ importers:
         specifier: ^7.5.0
         version: 7.8.0
       '@prisma/client':
-        specifier: ^7.5.0
+        specifier: ^7.8.0
         version: 7.8.0(prisma@6.19.3(typescript@5.7.3))(typescript@5.7.3)
       bcrypt:
         specifier: ^6.0.0
