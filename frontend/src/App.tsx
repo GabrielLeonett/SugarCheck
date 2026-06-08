@@ -3,11 +3,11 @@ import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
 import ProtectedRoute from './components/shared/ProtectedRoute';
-import Home from "./features/dsakfjafdsjksdfjl";
-import Login from "./features/dfkjalfsdadfsjl";
+import Home from "./features/Home";
+import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
-import ForgotPassword from "./features/dfkjlashjdskfala";
+import ForgotPassword from "./features/ForgotPassword";
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
