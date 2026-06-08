@@ -1,3 +1,5 @@
+![Dashboard de Guerreros Azules](Dashboard.png)
+
 # 🛡️ Guerreros Azules
 
 **Guerreros Azules** es una aplicación móvil diseñada para transformar el manejo de la diabetes infantil en una aventura épica. A través de la gamificación y una interfaz amigable, ayudamos a los niños a llevar un registro de su salud mientras se sienten como verdaderos héroes, y brindamos a los padres las herramientas necesarias para monitorear y configurar el tratamiento.
