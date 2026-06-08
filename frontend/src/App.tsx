@@ -8,6 +8,8 @@ import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
 import ForgotPassword from "./features/ForgotPassword";
+import Insulina from "./features/insulina"
+import "./App.css";
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
@@ -39,6 +41,7 @@ function App() {
           {/* Rutas Protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route index element={<Home />} />
+            <Route path='/insulina' element={<Insulina />} />
           </Route>
           <Route element={<PublicRoute/>}>
             <Route path='/login' element={<Login />} />

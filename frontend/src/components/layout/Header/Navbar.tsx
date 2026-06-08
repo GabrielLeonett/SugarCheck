@@ -6,6 +6,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import NotificationIcon from "@mui/icons-material/Notifications";
 import type { NavItemType, NavItemWithSubmenu } from "../../../types/types";
+
 // ✅ Import correcto del contexto
 import { ThemeContext } from "../../../contexts/ThemeContext"; // Ajusta la ruta según tu estructura
 import useLanguage from "../../../hooks/useLanguage";
@@ -23,7 +24,6 @@ function Navbar() {
   const { isDarkMode, toggleTheme } = React.useContext(ThemeContext);
   const [profileMenuOpen, setProfileMenuOpen] = React.useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-
   const navItems: NavItemType[] = [{ name: t("inicio"), href: "/", icon: <HomeIcon /> }, {
     name: t("bitacora"), submenu: [
       { name: t("controlDeGlucemia"), href: "/bitacora/control-de-glucemia" },
