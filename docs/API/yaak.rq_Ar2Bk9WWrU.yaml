@@ -1,0 +1,40 @@
+type: http_request
+model: http_request
+id: rq_Ar2Bk9WWrU
+createdAt: 2026-05-26T04:04:20.638351600
+updatedAt: 2026-05-26T04:23:22.975637300
+workspaceId: wk_tWcQe25Qgb
+folderId: fl_uLa5XZnwow
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "unitMeasure": "mg/dL",
+      "thresholds": {
+        "hypo": 90,
+        "hiper": 160
+      },
+      "insulinRatios": {
+        "breakfast": 100,
+        "lunch": 100,
+        "dinner": 100
+      },
+      "sensitivity": 1,
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: C8wBxTu3tP
+method: POST
+name: Save preference
+sortPriority: 0.001
+url: ${[ Localhost ]}preference
+urlParameters:
+- enabled: true
+  name: ''
+  value: ''
+  id: Ugu9Ub3r8G

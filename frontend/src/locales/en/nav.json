@@ -1,0 +1,12 @@
+{
+  "inicio": "Home",
+  "bitacora": "Logbook",
+  "controlDeGlucemia": "Blood Glucose Tracking",
+  "dosisDeInsulina": "Insulin Dosage",
+  "condicionFisica": "Physical Condition",
+  "analisis": "Analysis",
+  "analisisDeDatos": "Data Analysis",
+  "agente": "Agent",
+  "consultarAlOraculo": "Consult the Oracle",
+  "rutaDelGuerrero": "Warrior's Path"
+}
