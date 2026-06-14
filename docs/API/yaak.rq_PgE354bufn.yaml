@@ -1,0 +1,29 @@
+type: http_request
+model: http_request
+id: rq_PgE354bufn
+createdAt: 2026-05-26T03:30:52.860829600
+updatedAt: 2026-05-26T03:46:57.937260700
+workspaceId: wk_tWcQe25Qgb
+folderId: fl_b6cMFYiLeT
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "name": "${[ faker.person.fullName() ]}",
+      "password": "${[ faker.string.hexadecimal(options=b64'e21pbjogMTB9') ]}",
+      "email": "${[ faker.internet.email() ]}",
+      "fechaNacimiento": ${[ faker.date.birthdate() ]}
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: 7Wtt0ztFz4
+method: POST
+name: Create admin
+sortPriority: 1000.001
+url: ${[ Localhost ]}user/admin
+urlParameters: []

@@ -1,0 +1,96 @@
+@startuml Glicosilada_Class
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+package "Shared" {
+    class "Result<T, E>" as Result
+    class ErrorAbstract
+}
+
+package "Errors" {
+    class GlicosiladaIdInvalidError
+    class GlicosiladaValorInvalidError
+    class GlicosiladaEAGInvalidError
+    class GlicosiladaDateInvalidError
+}
+
+package "Value Objects" {
+    class GlicosiladaId {
+        + value: string
+        - constructor(value: string)
+        + {static} create(value: string): Result<GlicosiladaId, GlicosiladaIdInvalidError>
+    }
+
+    class GlicosiladaValor {
+        + value: float
+        - constructor(value: float)
+        + {static} create(value: float): Result<GlicosiladaValor, GlicosiladaValorInvalidError>
+    }
+
+    class GlicosiladaEAG {
+        + value: float
+        - constructor(value: float)
+        + {static} create(value: float): Result<GlicosiladaEAG, GlicosiladaEAGInvalidError>
+    }
+}
+
+package "Entity & Interfaces" {
+    interface GlicosiladaProps {
+        + id: GlicosiladaId
+        + usuario_id: UserId
+        + valor_porcentaje: GlicosiladaValor
+        + eAG: GlicosiladaEAG
+        + fecha_examen: Date
+        + created_at: Date
+    }
+
+    interface GlicosiladaPlain {
+        + id: string
+        + usuario_id: string
+        + valor_porcentaje: float
+        + eAG: float
+        + fecha_examen: Date
+        + created_at: Date
+    }
+
+    class Glicosilada {
+        - _id: GlicosiladaId
+        - _usuario_id: UserId
+        - _valor_porcentaje: GlicosiladaValor
+        - _eAG: GlicosiladaEAG
+        - _fecha_examen: Date
+        - _created_at: Date
+        
+        + constructor(props: GlicosiladaProps)
+        + get id(): GlicosiladaId
+        + get usuario_id(): UserId
+        + get valor_porcentaje(): GlicosiladaValor
+        + get eAG(): GlicosiladaEAG
+        + get fecha_examen(): Date
+        + get created_at(): Date
+        + toPlain(): GlicosiladaPlain
+    }
+}
+
+package "Infrastructure / Repository" {
+    interface GlicosiladaRepository {
+        + save(data: Glicosilada): Promise<Result<Glicosilada, ErrorAbstract>>
+        + findAllByUserId(id: UserId): Promise<Result<Glicosilada[], ErrorAbstract>>
+        + delete(id: GlicosiladaId): Promise<Result<void, ErrorAbstract>>
+    }
+}
+
+' Relaciones de Composición
+Glicosilada "1" *-- "1" GlicosiladaId
+Glicosilada "1" *-- "1" GlicosiladaValor
+Glicosilada "1" *-- "1" GlicosiladaEAG
+
+' Dependencias
+Glicosilada ..> GlicosiladaProps : "se construye con"
+Glicosilada ..> GlicosiladaPlain : "se transforma en"
+GlicosiladaRepository ..> Glicosilada : "gestiona"
+
+
+@enduml

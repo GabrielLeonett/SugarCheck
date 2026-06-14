@@ -1,0 +1,94 @@
+@startuml PreferenciasConfig_Class
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+package "Shared" {
+    class "Result<T, E>" as Result
+    class ErrorAbstract
+}
+
+package "Errors" {
+    class ConfigUnitInvalidError
+    class ThresholdInvalidError
+    class RatioInvalidError
+    class SensitivityInvalidError
+}
+
+package "Value Objects (Config)" {
+    class UnitMeasure {
+        + value: string (mg/dL | mmol/L)
+        + {static} create(value: string): Result<UnitMeasure, ConfigUnitInvalidError>
+    }
+
+    class Thresholds {
+        + hypo: int
+        + hyper: int
+        - constructor(hypo, hyper)
+        + {static} create(hypo: int, hyper: int): Result<Thresholds, ThresholdInvalidError>
+    }
+
+    class InsulinRatios {
+        + breakfast: float
+        + lunch: float
+        + dinner: float
+        + {static} create(b, l, d): Result<InsulinRatios, RatioInvalidError>
+    }
+
+    class SensitivityFactor {
+        + value: int
+        + {static} create(value: int): Result<SensitivityFactor, SensitivityInvalidError>
+    }
+}
+
+package "Entity & Interfaces" {
+    interface ConfigProps {
+        + userId: UserId
+        + unit: UnitMeasure
+        + thresholds: Thresholds
+        + ratios: InsulinRatios
+        + sensitivity: SensitivityFactor
+    }
+
+    interface ConfigPlain {
+        + userId: string
+        + unit: string
+        + thresholds: { hypo: number, hyper: number }
+        + ratios: { breakfast: number, lunch: number, dinner: number }
+        + sensitivity: number
+    }
+
+    class UserConfig {
+        - _userId: UserId
+        - _unit: UnitMeasure
+        - _thresholds: Thresholds
+        - _ratios: InsulinRatios
+        - _sensitivity: SensitivityFactor
+
+        + constructor(props: ConfigProps)
+        + get userId(): UserId
+        + get unit(): UnitMeasure
+        + toPlain(): ConfigPlain
+    }
+}
+
+package "Domain / Repository" {
+    interface UserConfigRepository {
+        + getByUserId(id: UserId): Promise<Result<UserConfig, ErrorAbstract>>
+        + save(config: UserConfig): Promise<Result<UserConfig, ErrorAbstract>>
+        + update(config: UserConfig): Promise<Result<UserConfig, ErrorAbstract>>
+    }
+}
+
+' Relaciones
+UserConfig "1" *-- "1" UnitMeasure
+UserConfig "1" *-- "1" Thresholds
+UserConfig "1" *-- "1" InsulinRatios
+UserConfig "1" *-- "1" SensitivityFactor
+
+UserConfig ..> ConfigProps : "usa"
+UserConfig ..> ConfigPlain : "exporta"
+UserConfigRepository ..> UserConfig : "persiste"
+
+@enduml

@@ -1,0 +1,8 @@
+allowBuilds:
+  '@firebase/util': false
+  '@nestjs/core': false
+  '@prisma/engines': false
+  bcrypt: false
+  prisma: false
+  protobufjs: false
+  unrs-resolver: false
