@@ -1,52 +1,88 @@
 import { createTheme } from "@mui/material/styles";
 
-// 1. Definimos los colores primarios compartidos en un objeto limpio
-const primaryPalette = {
-  main: "#7aafd7",
-  light: "#afcfe7",
-  dark: "#3d586c",
-  contrastText: "#ffffff",
-  50: "#f2f7fb",
-  100: "#e4eff7",
-  200: "#d7e7f3",
-  300: "#cadfef",
-  400: "#afcfe7",
-  500: "#7aafd7",
-  600: "#6e9ec2",
-  700: "#557b97",
-  800: "#3d586c",
-  900: "#18232b",
-};
-
-// 2. Base de configuración común (sin la paleta para evitar colisiones)
-const baseThemeConfig = {
+const baseTheme = {
   typography: {
     fontFamily: '"Poppins", "Arial", sans-serif',
-    h1: { fontSize: "3rem", fontWeight: 700, lineHeight: 1.2 },
-    h2: { fontSize: "2.5rem", fontWeight: 700, lineHeight: 1.2 },
-    h3: { fontSize: "2rem", fontWeight: 700, lineHeight: 1.2 },
-    h4: { fontSize: "1.75rem", fontWeight: 700, lineHeight: 1.2 },
-    h5: { fontSize: "1.5rem", fontWeight: 700, lineHeight: 1.2 },
-    h6: { fontSize: "1.25rem", fontWeight: 700, lineHeight: 1.2 },
-    subtitle1: { fontSize: "1.125rem", fontWeight: 600, lineHeight: 1.4 },
-    subtitle2: { fontSize: "1rem", fontWeight: 600, lineHeight: 1.4 },
-    body1: { fontSize: "1rem", fontWeight: 400, lineHeight: 1.5 },
-    body2: { fontSize: "0.875rem", fontWeight: 400, lineHeight: 1.5 },
-    button: { fontSize: "0.875rem", fontWeight: 500, lineHeight: 1.5, textTransform: "none" as const },
-    caption: { fontSize: "0.75rem", fontWeight: 400, lineHeight: 1.4 },
-    overline: { fontSize: "0.625rem", fontWeight: 500, lineHeight: 1.4, textTransform: "uppercase" as const },
+    h1: {
+      fontSize: 88,
+      fontWeight: 700,
+      lineHeight: 1.2,
+    },
+    h2: {
+      fontSize: 57,
+      fontWeight: 700,
+      lineHeight: 1.2,
+    },
+    h3: {
+      fontSize: 48,
+      fontWeight: 700,
+      lineHeight: 1.2,
+    },
+    h4: {
+      fontSize: 34,
+      fontWeight: 700,
+      lineHeight: 1.2,
+    },
+    h5: {
+      fontSize: 23,
+      fontWeight: 700,
+      lineHeight: 1.2,
+    },
+    h6: {
+      fontSize: 20,
+      fontWeight: 700,
+      lineHeight: 1.2,
+    },
+    subtitle1: {
+      fontSize: 15,
+      fontWeight: 600,
+      lineHeight: 1.4,
+    },
+    subtitle2: {
+      fontSize: 14,
+      fontWeight: 600,
+      lineHeight: 1.4,
+    },
+    body1: {
+      fontSize: 16,
+      fontWeight: 400,
+      lineHeight: 1.5,
+    },
+    body2: {
+      fontSize: 14,
+      fontWeight: 400,
+      lineHeight: 1.5,
+    },
+    button: {
+      fontSize: 14,
+      fontWeight: 500,
+      lineHeight: 1.5,
+      textTransform: "none",
+    },
+    caption: {
+      fontSize: 12,
+      fontWeight: 400,
+      lineHeight: 1.4,
+    },
+    overline: {
+      fontSize: 11,
+      fontWeight: 500,
+      lineHeight: 1.4,
+      textTransform: "uppercase",
+    },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 8, // 8px es más estándar que 2
   },
-  spacing: 8,
+  spacing: 8, // 8px unidad base (default de MUI)
+
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         "@font-face": {
           fontFamily: "Poppins",
           fontStyle: "normal",
-          fontDisplay: "swap" as const,
+          fontDisplay: "swap",
           fontWeight: "400",
           src: `
             local('Poppins'),
@@ -54,15 +90,19 @@ const baseThemeConfig = {
             url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap')
           `,
         },
-        html: { scrollBehavior: "smooth" as const },
-        body: { transition: "background-color 0.3s ease, color 0.3s ease" },
+        html: {
+          scrollBehavior: "smooth",
+        },
+        body: {
+          transition: "background-color 0.3s ease, color 0.3s ease",
+        },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
           borderRadius: 8,
-          textTransform: "none" as const,
+          textTransform: "none",
           fontWeight: 500,
           padding: "8px 16px",
           fontSize: "0.875rem",
@@ -76,7 +116,9 @@ const baseThemeConfig = {
           },
         },
         outlined: {
-          "&:hover": { transform: "translateY(-1px)" },
+          "&:hover": {
+            transform: "translateY(-1px)",
+          },
         },
       },
     },
@@ -104,29 +146,73 @@ const baseThemeConfig = {
     },
     MuiAppBar: {
       styleOverrides: {
-        root: { boxShadow: "0px 2px 8px rgba(0,0,0,0.05)" },
+        root: {
+          boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
+        },
       },
     },
     MuiDrawer: {
       styleOverrides: {
-        paper: { borderRadius: "16px 0 0 16px" },
+        paper: {
+          borderRadius: "16px 0 0 16px",
+        },
       },
     },
   },
 };
 
-// 3. Tema Claro Completado
 export const lightTheme = createTheme({
-  ...baseThemeConfig,
+  ...baseTheme,
   palette: {
     mode: "light",
-    primary: primaryPalette, // Inyectamos la paleta aquí
-    success: { main: "#2e7d32", light: "#4caf50", dark: "#1b5e20" },
-    error: { main: "#d32f2f", light: "#ef5350", dark: "#c62828" },
-    warning: { main: "#ed6c02", light: "#ff9800", dark: "#e65100" },
-    info: { main: "#0288d1", light: "#03a9f4", dark: "#01579b" },
-    background: { default: "#E4EFF7", paper: "#ffffff" },
-    text: { primary: "#1a202c", secondary: "#4a5568", disabled: "#a0aec0" },
+    primary: {
+      // Propiedades principales de MUI
+      main: "#7aafd7",          // Tu color base original
+      light: "#afcfe7",         // Equivalente al paso 400 (Clarito)
+      dark: "#3d586c",          // Equivalente al paso 500 de sombras (Oscuro)
+      contrastText: "#ffffff",  // Contraste blanco ideal para este tono de azul
+
+      // Mapeo completo de la escala numérica (Tints y Shades)
+      50: "#f2f7fb",   // tint 900
+      100: "#e4eff7",  // tint 800
+      200: "#d7e7f3",  // tint 700
+      300: "#cadfef",  // tint 600
+      400: "#afcfe7",  // tint 400
+      500: "#7aafd7",  // BASE (main)
+      600: "#6e9ec2",  // shade 100
+      700: "#557b97",  // shade 300
+      800: "#3d586c",  // shade 500
+      900: "#18232b",  // shade 800
+    },
+    success: {
+      main: "#2e7d32",
+      light: "#4caf50",
+      dark: "#1b5e20",
+    },
+    error: {
+      main: "#d32f2f",
+      light: "#ef5350",
+      dark: "#c62828",
+    },
+    warning: {
+      main: "#ed6c02",
+      light: "#ff9800",
+      dark: "#e65100",
+    },
+    info: {
+      main: "#0288d1",
+      light: "#03a9f4",
+      dark: "#01579b",
+    },
+    background: {
+      default: "#E4EFF7",
+      paper: "#ffffff",
+    },
+    text: {
+      primary: "#1a202c",
+      secondary: "#4a5568",
+      disabled: "#a0aec0",
+    },
     divider: "#e2e8f0",
     action: {
       active: "#7AAFD7",
@@ -144,18 +230,58 @@ export const lightTheme = createTheme({
   },
 });
 
-// 4. Tema Oscuro Completado
 export const darkTheme = createTheme({
-  ...baseThemeConfig,
+  ...baseTheme,
   palette: {
     mode: "dark",
-    primary: primaryPalette, // Inyectamos la paleta aquí también
-    success: { main: "#2e7d32", light: "#4caf50", dark: "#1b5e20" },
-    error: { main: "#f44336", light: "#ef5350", dark: "#c62828" },
-    warning: { main: "#ff9800", light: "#ffb74d", dark: "#f57c00" },
-    info: { main: "#29b6f6", light: "#4fc3f7", dark: "#0288d1" },
-    background: { default: "#121212", paper: "#1E1E1E" },
-    text: { primary: "#ffffff", secondary: "#b0b0b0", disabled: "#666666" },
+    primary: {
+      // Propiedades principales de MUI
+      main: "#7aafd7",          // Tu color base original
+      light: "#afcfe7",         // Equivalente al paso 400 (Clarito)
+      dark: "#3d586c",          // Equivalente al paso 500 de sombras (Oscuro)
+      contrastText: "#ffffff",  // Contraste blanco ideal para este tono de azul
+
+      // Mapeo completo de la escala numérica (Tints y Shades)
+      50: "#f2f7fb",   // tint 900
+      100: "#e4eff7",  // tint 800
+      200: "#d7e7f3",  // tint 700
+      300: "#cadfef",  // tint 600
+      400: "#afcfe7",  // tint 400
+      500: "#7aafd7",  // BASE (main)
+      600: "#6e9ec2",  // shade 100
+      700: "#557b97",  // shade 300
+      800: "#3d586c",  // shade 500
+      900: "#18232b",  // shade 800
+    },
+    success: {
+      main: "#2e7d32",
+      light: "#4caf50",
+      dark: "#1b5e20",
+    },
+    error: {
+      main: "#f44336",
+      light: "#ef5350",
+      dark: "#c62828",
+    },
+    warning: {
+      main: "#ff9800",
+      light: "#ffb74d",
+      dark: "#f57c00",
+    },
+    info: {
+      main: "#29b6f6",
+      light: "#4fc3f7",
+      dark: "#0288d1",
+    },
+    background: {
+      default: "#121212",
+      paper: "#1E1E1E",
+    },
+    text: {
+      primary: "#ffffff",
+      secondary: "#b0b0b0",
+      disabled: "#666666",
+    },
     divider: "#333333",
     action: {
       active: "#95BFDF",
