@@ -40,6 +40,7 @@ function App() {
           {/* Rutas Protegidas */}
           <Route element={<ProtectedRoute />}>
             <Route index element={<Home />} />
+            <Route path='/bitacora/control-de-glucosa' element={<Glucosa />} />
           </Route>
           <Route element={<PublicRoute/>}>
             <Route path='/login' element={<Login />} />
