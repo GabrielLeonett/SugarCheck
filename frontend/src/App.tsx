@@ -47,6 +47,7 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path='/olvidoContrasena' element={<ForgotPassword />} />
             <Route path='/register' element={<Register />} />
+            <Route path= '/MonitoreoFisico' element={<PhysicalMonitoringPage />} />
           </Route>
           </Routes>
         </Router>

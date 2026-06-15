@@ -1,4 +1,4 @@
-import { Box, Card, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import ExitIcon from "@mui/icons-material/ExitToApp"; // Icono para cerrar sesión
@@ -8,9 +8,11 @@ import { ThemeContext } from '../../../contexts/ThemeContext.tsx';
 import { useAuthStore } from '../../../stores/authStore.tsx';
 import LanguageSelector from '../../shared/LanguageSelector.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
+import { CardBase } from './CardBase.tsx';
 interface ProfileNavBarProps {
     open?: boolean;
 }
+
 export default function ProfileNavBar({ open }: ProfileNavBarProps) {
     const user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
@@ -18,7 +20,7 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
     const { t } = useLanguage("common");
     if (!open) return null;
     return (
-        <Card
+        <CardBase
             sx={{
                 width: 320, // Un ancho fijo más común para menús tipo "popover"
                 open: open ? 1 : 0,
@@ -29,7 +31,8 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
                 boxShadow: 3,
                 position: 'absolute', // Asegúrate de posicionarlo correctamente si es un menú
                 right: 16,
-                top: 70
+                top: 70,
+                bgcolor: 'primary.50'
             }}
             elevation={3}
         >
@@ -81,6 +84,6 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
                     </Box>
                 ))}
             </Stack>
-        </Card>
+        </CardBase>
     )
 }
