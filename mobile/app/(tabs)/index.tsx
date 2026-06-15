@@ -4,6 +4,17 @@ import { ThemedView } from "@/components/themed-view";
 import { Card } from "@/components/card";
 
 export default function HomeScreen() {
+
+  // Las escrituras en WatermelonDB SIEMPRE deben envolverse en un bloque `write`
+  const crearTestTodo = async () => {
+    await database.write(async () => {
+      const nuevoTodo = await database.get('todos').create(todo => {
+        todo.text = '¡WatermelonDB está vivito y coleando!'
+        todo.isCompleted = false
+      })
+      console.log('Registro guardado localmente:', nuevoTodo)
+    })
+  }
   return (
     <ThemedView style={styles.mainContainer}>
       <ThemedText type="title">Home</ThemedText>
