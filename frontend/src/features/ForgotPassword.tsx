@@ -103,7 +103,6 @@ export default function ForgotPassword() {
                     boxShadow: 3,
                     minHeight: '300px',
                 }}>
-                    {/* Mantienes tu imagen aquí arriba si lo deseas */}
                     <Box component="img" src={ImagenOlvidoContrasena} sx={{ width: '100%', maxWidth: '220px', height: 'auto', mb: 2, borderRadius: 2 }} />
 
                     <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
