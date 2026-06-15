@@ -1,9 +1,7 @@
-import { Platform, StyleSheet } from 'react-native';
-import { HelloWave } from '@/components/hello-wave';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
-import { database } from '@/src/database';
+import { StyleSheet, View } from "react-native"; // Cambiamos Host/Card por View
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Card } from "@/components/card";
 
 export default function HomeScreen() {
 
@@ -18,83 +16,62 @@ export default function HomeScreen() {
     })
   }
   return (
-    <ThemedView>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
+    <ThemedView style={styles.mainContainer}>
+      <ThemedText type="title">Home</ThemedText>
+      
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
+        <ThemedText type="subtitle">Hola, Guerrero Gabriel!</ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
+      {/* Sustituimos la Columna y los Cards por Views con estilo */}
+      <View style={styles.column}>
+        
+        {/* Simulación de Elevated Card */}
+        <Card style={[styles.card, styles.elevated]}>
+          <ThemedText>Ultima Glicemia</ThemedText>
+          <ThemedText>Cronometro de Seguridad</ThemedText>
+        </Card>
+
+        {/* Simulación de Outlined Card */}
+        <Card style={[styles.card, styles.outlined]}>
+          <ThemedText>Registro del Dia</ThemedText>
+        </Card>
+
+      </View>
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  mainContainer: {
+    flex: 1,
+    padding: 16,
+    marginTop: 40,
   },
   stepContainer: {
     gap: 8,
-    marginBottom: 8,
+    marginBottom: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  column: {
+    gap: 12, // Esto hace lo mismo que "spacedBy"
+  },
+  card: {
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+  },
+  elevated: {
+    // Sombra para Android
+    elevation: 4,
+    // Sombra para iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  outlined: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    backgroundColor: 'transparent',
   },
 });
