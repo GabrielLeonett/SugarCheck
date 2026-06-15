@@ -1,11 +1,9 @@
 import { Button, Typography } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type { NavItemWithSubmenu } from "../../types/types";
 
 export default function NavBarItem({ item }: { item: NavItemWithSubmenu }) {
     const navigate = useNavigate();
-    const location = useLocation();
-    const isActive = location.pathname === item.href;
     return (
         <Button
             key={item.name}
@@ -13,14 +11,14 @@ export default function NavBarItem({ item }: { item: NavItemWithSubmenu }) {
             onClick={() => item.href && navigate(item.href)}
             startIcon={item.icon}
             sx={{
-                bgcolor: isActive ? "primary.main" : "primary.light",
+                bgcolor: "primary.main",
                 color: "text.primary",
                 borderRadius: "4px",
                 px: 2,
                 py: 1,
                 textTransform: "none",
                 "&:hover": {
-                    bgcolor: "primary.main", // Ajusta el color al pasar el mouse
+                    bgcolor: "primary.light", // Ajusta el color al pasar el mouse
                     opacity: 0.9
                 }
             }}

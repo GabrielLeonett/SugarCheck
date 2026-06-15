@@ -118,7 +118,7 @@ export default function Login() {
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 'auto' }}>
                         ¿Aún no tienes cuenta?{' '}
-                        <Link href="/register" sx={{ color: theme.palette.primary.dark , fontWeight: 'bold', textDecoration: 'none' }}>
+                        <Link href="#" sx={{ color: theme.palette.primary.dark , fontWeight: 'bold', textDecoration: 'none' }}>
                             Registrarse
                         </Link>
                     </Typography>
@@ -297,7 +297,7 @@ export default function Login() {
                         </Box>
 
                         <Box sx={{ textAlign: 'center' }}>
-                            <Link href='/olvidoContrasena' sx={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                            <Link href="/olvidoContrasena" sx={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
                                 ¿Olvidaste tu contraseña?
                             </Link>
                         </Box>
