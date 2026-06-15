@@ -8,7 +8,7 @@ import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
 import ForgotPassword from "./features/ForgotPassword";
-import Glucosa from "./features/ControldeGlucosa";
+import PhysicalMonitoringPage from "./features/pagesIMC/MonitoreoFisicoPage";
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
@@ -46,6 +46,7 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path='/olvidoContrasena' element={<ForgotPassword />} />
             <Route path='/register' element={<Register />} />
+            <Route path= '/MonitoreoFisico' element={<PhysicalMonitoringPage />} />
           </Route>
           </Routes>
         </Router>
