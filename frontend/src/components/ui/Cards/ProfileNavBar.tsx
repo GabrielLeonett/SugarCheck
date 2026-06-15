@@ -32,8 +32,7 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
                 position: 'absolute', // Asegúrate de posicionarlo correctamente si es un menú
                 right: 16,
                 top: 70,
-                bgcolor: 'primary.50',
-                zIndex:999
+                bgcolor: 'primary.50'
             }}
             elevation={3}
         >
