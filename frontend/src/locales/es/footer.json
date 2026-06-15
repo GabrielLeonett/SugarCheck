@@ -1,12 +1,7 @@
 {
-  "title": "📞 Contacto",
-  "subtitle": "¡Hablemos!",
-  "description": "Estoy buscando mi primera oportunidad profesional como desarrollador. Si tienes un proyecto interesante o una posición junior disponible, ¡me encantaría conectar!",
-  "sendEmail": "Enviar Email",
-  "callWhatsApp": "Llamar o WhatsApp",
-  "connectSocial": "Conectemos en Redes",
-  "github": "GitHub",
-  "linkedin": "LinkedIn",
-  "location": "Los Teques, Estado Miranda, Venezuela",
-  "copyright": "© {{year}} Gabriel Dayer Leonett Armas. Desarrollado con React y Material UI."
+  "privacidad": "Privacidad",
+  "terminos": "Términos",
+  "soporte": "Soporte",
+  "version": "v.1.0.0",
+  "rights": "Desarrollado para la Asociación Civil Guerreros Azules. Todos los derechos reservados."
 }
