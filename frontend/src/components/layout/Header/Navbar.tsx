@@ -26,21 +26,21 @@ function Navbar() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const navItems: NavItemType[] = [{ name: t("inicio"), href: "/", icon: <HomeIcon /> }, {
     name: t("bitacora"), submenu: [
-      { name: t("Control de Glucosa"), href: "/bitacora/control-de-glucosa" },
+      { name: t("controlDeGlucemia"), href: "/bitacora/control-de-glucemia" },
       { name: t("dosisDeInsulina"), href: "/bitacora/registro-de-alimentos" },
       { name: t("condicionFisica"), href: "/bitacora/registro-de-ejercicio" }]
     , icon: <MenuIcon />
   }, {
     name: t("analisis"), submenu: [
-      { name: t("analisisDeDatos"), href: "/bitacora/control" },
-      { name: t("dosisDeInsulina"), href: "/bitacora/registro" },
-      { name: t("condicionFisica"), href: "/bitacora/registro" }]
+      { name: t("analisisDeDatos"), href: "/bitacora/control-de-glucemia" },
+      { name: t("dosisDeInsulina"), href: "/bitacora/registro-de-alimentos" },
+      { name: t("condicionFisica"), href: "/bitacora/registro-de-ejercicio" }]
     , icon: <MenuIcon />
   },
   {
     name: t("agente"), submenu: [
-      { name: t("consultarAlOraculo"), href: "/bitacora/control" },
-      { name: t("rutaDelGuerrero"), href: "/bitacora/registro" },
+      { name: t("consultarAlOraculo"), href: "/bitacora/control-de-glucemia" },
+      { name: t("rutaDelGuerrero"), href: "/bitacora/registro-de-alimentos" },
     ]
     , icon: <MenuIcon />
   }];
