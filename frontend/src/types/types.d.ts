@@ -22,6 +22,7 @@ interface User {
   sub: number;
   name: string;
   email: string;
+  role:string;
 }
 
 interface AuthContextType {
