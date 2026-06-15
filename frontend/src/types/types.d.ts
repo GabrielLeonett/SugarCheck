@@ -41,3 +41,20 @@ interface BackendErrorResponse {
   statusCode?: number;
   error?: string;
 }
+
+export type MeasurementState = 'Bajo peso' | 'Normal' | 'Sobrepeso';
+
+export interface PhysicalRecord {
+  id: string;
+  fecha: string; // Formato DD/MM/AAAA
+  peso: number;  // kg
+  estatura: number; // cm
+  imc: number;
+  estado: MeasurementState;
+}
+
+export interface PhysicalEvolution {
+  pesoDiff: number;       // ej: -1.3
+  estaturaDiff: number;   // ej: 2.5
+  fechaReferencia: string;
+}
