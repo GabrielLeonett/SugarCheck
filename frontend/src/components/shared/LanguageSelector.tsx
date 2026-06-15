@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
   Menu,
   Box,
@@ -13,9 +13,9 @@ import LanguageIcon from "@mui/icons-material/Language";
 import useLanguage from "../../hooks/useLanguage";
 
 const LanguageSelector = ({ variant = "icon" }) => {
-  const { currentLanguage, changeLanguage, languages, currentLanguageInfo } =
+  const { currentLanguage, currentLanguageInfo, changeLanguage, languages } =
     useLanguage();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -29,12 +29,6 @@ const LanguageSelector = ({ variant = "icon" }) => {
     changeLanguage(languageCode);
     handleClose();
   };
-
-  // Usar currentLanguageInfo del hook en lugar de recalcular
-  const currentLangInfo = useMemo(
-    () => currentLanguageInfo || languages[0],
-    [currentLanguageInfo, languages],
-  );
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -54,7 +48,7 @@ const LanguageSelector = ({ variant = "icon" }) => {
           aria-haspopup="true"
           aria-expanded={isMenuOpen ? "true" : undefined}
         >
-          {currentLangInfo.name}
+          {currentLanguageInfo?.name}
         </Button>
         <Menu
           id="language-menu"
@@ -120,22 +114,26 @@ const LanguageSelector = ({ variant = "icon" }) => {
             key={language.code}
             onClick={() => handleLanguageSelect(language.code)}
             selected={currentLanguage === language.code}
+            sx={{
+              backgroundColor: currentLanguage === language.code ? 'action.selected' : 'inherit',
+              display: "flex",
+              justifyContent: "space-between"
+            }}
             dense
-            aria-current={currentLanguage === language.code ? "true" : "false"}
           >
             <Box
               component="span"
               sx={{
                 display: "flex",
                 alignItems: "center",
-                width: "100%",
+                flex: 1,
               }}
             >
               {language.icon && (
                 <Box
                   component="img"
                   src={language.icon}
-                  alt=""
+                  alt={language.name}
                   sx={{
                     width: 20,
                     height: 20,

@@ -17,11 +17,6 @@ export class CreateUserDTO {
   @IsEmail({}, { message: 'El formato del correo es incorrecto' })
   email!: string;
 
-  @IsArray({ message: 'Roles debe ser un arreglo' })
-  @IsString({ each: true, message: 'Cada rol debe ser un texto' })
-  @IsOptional()
-  roles!: string[];
-
   @IsNotEmpty({ message: 'La fecha de nacimiento es obligatoria' })
   @IsDate({ message: 'Debe ser una fecha válida (ISO 8601)' })
   @Type(() => Date) // Esto garantiza que en el Caso de Uso sea un objeto Date real
