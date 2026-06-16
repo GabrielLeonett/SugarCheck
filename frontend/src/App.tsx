@@ -36,20 +36,25 @@ function App() {
   }
   return (
     <Suspense fallback={<div>Cargando...</div>}>
-    <ThemeWrapperContext>
-      <Router>
-        <Routes>
-          {/* Rutas Protegidas */}
-          <Route element={<ProtectedRoute />}>
-            <Route index element={<Home />} />
-          </Route>
-          <Route element={<PublicRoute/>}>
-            <Route path='/login' element={<Login />} />
-            <Route path='/olvidoContrasena' element={<ForgotPassword />} />
-            <Route path='/register' element={<Register />} />
-            <Route path= '/MonitoreoFisico' element={<PhysicalMonitoringPage />} />
-            <Route path= '/MonitoreoFisico' element={<Insulina />} />
-          </Route>
+      <ThemeWrapperContext>
+        <Router>
+          <Routes>
+            {/* Rutas Protegidas */}
+            <Route element={<ProtectedRoute />}>
+              <Route index element={<Home />} />
+              {/* Quitamos la barra inicial en los hijos */}
+              <Route path="bitacora">
+                <Route path="monitoreo-fisico" element={<PhysicalMonitoringPage />} />
+                <Route path="dosis-insulina" element={<Insulina />} />
+              </Route>
+            </Route>
+
+            {/* Rutas Públicas */}
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/olvidoContrasena" element={<ForgotPassword />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
           </Routes>
         </Router>
       </ThemeWrapperContext>
