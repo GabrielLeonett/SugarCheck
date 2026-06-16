@@ -8,7 +8,8 @@ import { ThemeContext } from '../../../contexts/ThemeContext.tsx';
 import { useAuthStore } from '../../../stores/authStore.tsx';
 import LanguageSelector from '../../shared/LanguageSelector.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
-import { CardBase } from './CardBase.tsx';
+import CardBase from './cardBase.tsx'
+
 interface ProfileNavBarProps {
     open?: boolean;
 }

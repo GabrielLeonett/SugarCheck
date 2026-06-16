@@ -4,7 +4,7 @@ import Navbar from '../components/layout/Header/Navbar.tsx';
 import { useAuthStore } from '../stores/authStore.tsx';
 import { ButtonBase } from '../components/ui/Buttons/ButtonBase.tsx';
 import AddIcon from '@mui/icons-material/Add';
-import { CardBase } from '../components/ui/Cards/CardBase.tsx';
+import CardBase from '../components/ui/Cards/CardBase.tsx';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { LineChart } from '@mui/x-charts/LineChart';
 
