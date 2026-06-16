@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, PaperProps, styled } from '@mui/material';
+import { Paper, type PaperProps, styled } from '@mui/material';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   backgroundColor: '#FFFFFF',
