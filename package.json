@@ -1,0 +1,37 @@
+{
+  "name": "sugarcheck-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo para el proyecto de SugarCheck",
+  "main": "index.js",
+  "workspaces": [
+    "backend",
+    "frontend",
+    "mobile",
+    "packages/*" 
+  ],
+    "scripts": {
+    "dev:backend": "pnpm --filter backend start:dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:mobile": "pnpm --filter mobile start",
+    "prisma:generate": "pnpm --filter backend prisma:generate",
+    "migrate:dev": "pnpm --filter backend migrate:dev",
+    "build:all": "pnpm -r build",
+    "test:all": "pnpm -r test"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GabrielLeonett/sugarcheck.git"
+  },
+  "keywords": ["monorepo", "nodejs", "react", "nestjs", "react-native"],
+  "author": "Gabriel Leonett",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GabrielLeonett/sugarcheck/issues"
+  },
+  "homepage": "https://github.com/GabrielLeonett/sugarcheck#readme"
+}

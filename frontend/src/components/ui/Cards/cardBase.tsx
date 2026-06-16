@@ -1,42 +1,61 @@
-import React from 'react';
-import { 
-  Card, 
-  CardHeader, 
-  CardMedia, 
-  CardContent, 
-  CardActions, 
-  Typography 
+import {
+  Card,
+  CardHeader,
+  CardMedia,
+  CardContent,
+  CardActions,
+  Typography
 } from '@mui/material';
+import type { ReactNode } from 'react';
+import type { CardProps, SxProps, Theme } from '@mui/material';
+
+export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | 'subtitle'> {
+  title?: ReactNode;
+  subtitle?: ReactNode;
+  image?: string;
+  imageHeight?: string | number;
+  avatar?: ReactNode;
+  headerAction?: ReactNode;
+  actions?: ReactNode;
+  children?: ReactNode;
+  
+  // Configuraciones de estilo express
+  variant?: 'elevation' | 'outlined';
+  elevation?: number;
+  bgColor?: string;
+  borderColor?: string;
+  sx?: SxProps<Theme>;
+}
 
 export default function CustomCard({
+  variant = 'elevation',
+  elevation = 1,
+  bgColor = 'background.paper',
+  borderColor,
   title,
   subtitle,
-  image,
-  imageHeight = '140',
   avatar,
   headerAction,
-  actions,
+  image,
+  imageHeight = '140',
   children,
-  // Configuraciones de estilo express
-  variant = 'elevation', // 'elevation' o 'outlined'
-  elevation = 1,         // Intensidad de la sombra (0 a 24)
-  bgColor = 'background.paper', // Color de fondo personalizado
-  borderColor,           // Color del borde (si usas variant="outlined")
-  sx = {},               // Para estilos extra desde afuera
-  ...props               // Cualquier otra prop nativa de MUI Card
-}) {
+  actions,
+  sx = {},
+  ...rest // Limpia el objeto: contiene solo props nativas de MUI (onClick, etc.)
+}: CustomCardProps) {
+  
   return (
-    <Card 
+    <Card
       variant={variant}
       elevation={variant === 'elevation' ? elevation : 0}
-      sx={{ 
-        maxWidth: 345, 
+      sx={{
+        maxWidth: 345,
         bgcolor: bgColor,
         borderRadius: 2,
         ...(variant === 'outlined' && borderColor && { borderColor: borderColor }),
-        ...sx // Permite sobrescribir estilos desde el componente padre
+        ...sx 
       }}
-      {...props} // Pasa props nativas (como onClick, component, etc.)
+      {...rest} // Seguro de usar, ya no inyecta basura al HTML
     >
       {/* Renderiza el header solo si hay título, subtítulo o avatar */}
       {(title || subtitle || avatar || headerAction) && (
@@ -54,7 +73,7 @@ export default function CustomCard({
           component="img"
           height={imageHeight}
           image={image}
-          alt={title || "card image"}
+          alt={typeof title === 'string' ? title : "card image"}
         />
       )}
 
@@ -66,7 +85,7 @@ export default function CustomCard({
               {children}
             </Typography>
           ) : (
-            children // Si pasas JSX personalizado, lo renderiza directamente
+            children 
           )}
         </CardContent>
       )}
