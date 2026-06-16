@@ -24,23 +24,24 @@ function Navbar() {
   const { isDarkMode, toggleTheme } = React.useContext(ThemeContext);
   const [profileMenuOpen, setProfileMenuOpen] = React.useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  
   const navItems: NavItemType[] = [{ name: t("inicio"), href: "/", icon: <HomeIcon /> }, {
     name: t("bitacora"), submenu: [
-      { name: t("Control de Glucosa"), href: "/bitacora/control-de-glucosa" },
-      { name: t("dosisDeInsulina"), href: "/bitacora/registro-de-alimentos" },
-      { name: t("condicionFisica"), href: "/bitacora/registro-de-ejercicio" }]
+      { name: t("controlDeGlucemia"), href: "/bitacora/control-de-glucemia" },
+      { name: t("dosisDeInsulina"), href: "/bitacora/dosis-insulina" },
+      { name: t("condicionFisica"), href: "/bitacora/monitoreo-fisico" }]
     , icon: <MenuIcon />
   }, {
     name: t("analisis"), submenu: [
-      { name: t("analisisDeDatos"), href: "/bitacora/control" },
-      { name: t("dosisDeInsulina"), href: "/bitacora/registro" },
-      { name: t("condicionFisica"), href: "/bitacora/registro" }]
+      { name: t("analisisDeDatos"), href: "/analisis/control-de-glucemia" },
+      { name: t("dosisDeInsulina"), href: "/analisis/registro-de-alimentos" },
+      { name: t("condicionFisica"), href: "/analisis/registro-de-ejercicio" }]
     , icon: <MenuIcon />
   },
   {
     name: t("agente"), submenu: [
-      { name: t("consultarAlOraculo"), href: "/bitacora/control" },
-      { name: t("rutaDelGuerrero"), href: "/bitacora/registro" },
+      { name: t("consultarAlOraculo"), href: "/agente/control-de-glucemia" },
+      { name: t("rutaDelGuerrero"), href: "/agente/registro-de-alimentos" },
     ]
     , icon: <MenuIcon />
   }];

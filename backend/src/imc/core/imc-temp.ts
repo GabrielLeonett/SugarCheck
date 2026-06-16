@@ -1,4 +1,4 @@
-import { UserId } from "../../user/core/value-objects/UserId";
+import { UserId } from "../../shared/core/value-objects/UserId";
 import { ImcAltura } from "./value-objects/imcAltura"; // Corregido CapitalCase
 import { ImcPeso } from "./value-objects/imcPeso";     // Corregido CapitalCase
 
