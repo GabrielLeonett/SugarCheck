@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, InputAdornment, Grid, styled } from '@mui/material';
-import { Button } from '../../../components/ui/Button/Button';
 import CheckIcon from '@mui/icons-material/Check';
+import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
 
 interface RegisterMeasurementModalProps {
   onClose: () => void;
@@ -106,9 +106,9 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
 
       {/* Botón de Guardado */}
       <Box display="flex" justifyContent="center">
-        <Button variant="primary" type="submit" startIcon={<CheckIcon />}>
+        <ButtonBase variant="primary" type="submit" startIcon={<CheckIcon />}>
           Registrar Medidas
-        </Button>
+        </ButtonBase>
       </Box>
     </Box>
   );
