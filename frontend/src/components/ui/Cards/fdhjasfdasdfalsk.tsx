@@ -18,7 +18,7 @@ export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | '
   headerAction?: ReactNode;
   actions?: ReactNode;
   children?: ReactNode;
-  
+
   // Configuraciones de estilo express
   variant?: 'elevation' | 'outlined';
   elevation?: number;
@@ -27,11 +27,9 @@ export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | '
   sx?: SxProps<Theme>;
 }
 
-export default function CustomCard({
+export function CardBase({
   variant = 'elevation',
   elevation = 1,
-  bgColor = 'background.paper',
-  borderColor,
   title,
   subtitle,
   avatar,
@@ -40,22 +38,12 @@ export default function CustomCard({
   imageHeight = '140',
   children,
   actions,
-  sx = {},
-  ...rest // Limpia el objeto: contiene solo props nativas de MUI (onClick, etc.)
 }: CustomCardProps) {
-  
+
   return (
     <Card
       variant={variant}
       elevation={variant === 'elevation' ? elevation : 0}
-      sx={{
-        maxWidth: 345,
-        bgcolor: bgColor,
-        borderRadius: 2,
-        ...(variant === 'outlined' && borderColor && { borderColor: borderColor }),
-        ...sx 
-      }}
-      {...rest} // Seguro de usar, ya no inyecta basura al HTML
     >
       {/* Renderiza el header solo si hay título, subtítulo o avatar */}
       {(title || subtitle || avatar || headerAction) && (
@@ -85,7 +73,7 @@ export default function CustomCard({
               {children}
             </Typography>
           ) : (
-            children 
+            children
           )}
         </CardContent>
       )}
