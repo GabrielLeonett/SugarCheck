@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { Card } from '../../../components/ui/Cards/Card';
 import { ProgressBar } from '../../../components/ui/ProgressBar';
 import type { PhysicalEvolution } from '../../../types/types';
+import { CardBase } from '../../../components/ui/Cards/fdhjasfdasdfalsk'
 
 interface MetricCardProps {
   type: 'balance' | 'evolution';
@@ -30,11 +30,11 @@ const bigValueSx = (color = '#2ECC71') => ({
 export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc = 0, evolutionData }) => {
   if (type === 'balance') {
     return (
-      <Card sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 4 }}>
+      <CardBase sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 4 }}>
         <Typography sx={titleSx}>Balance de Fortaleza Física</Typography>
         <Typography sx={bigValueSx()}>{currentImc.toFixed(1)}</Typography>
         <ProgressBar value={currentImc} />
-      </Card>
+      </CardBase>
     );
   }
 
@@ -42,7 +42,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc = 0, ev
   const tallaSign = evolutionData && evolutionData.estaturaDiff > 0 ? '+' : '';
 
   return (
-    <Card sx={{ py: 4 }}>
+    <CardBase sx={{ py: 4 }}>
       <Typography sx={titleSx}>Evolución Física</Typography>
       <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', my: 2 }}>
         <Box sx={{ textAlign: 'center' }}>
@@ -65,6 +65,6 @@ export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc = 0, ev
       <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', color: '#95A5A6', mt: 3 }}>
         Evolución con respecto al registro anterior ({evolutionData?.fechaReferencia}).
       </Typography>
-    </Card>
+    </CardBase>
   );
 };
