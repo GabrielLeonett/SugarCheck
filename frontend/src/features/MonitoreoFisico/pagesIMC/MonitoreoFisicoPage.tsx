@@ -3,9 +3,7 @@ import { Box, Typography, Grid } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 // UI Components
-import { Button } from '../../../components/ui/Button/Button';
 import { Modal } from '../../../components/ui/Modals/Modals';
-import { Card } from '../../../components/ui/Cards/Card';
 
 // Feature Components
 import { MetricCard } from '../componentsIMC/MetricCard';
@@ -13,6 +11,8 @@ import { HistoryTable } from '../componentsIMC/HistoriaTabla';
 import { HistoryChart } from '../componentsIMC/TablaHistoria';
 import { RegisterMeasurementModal } from '../componentsIMC/RegistrarMedidaModal';
 import type { PhysicalRecord, PhysicalEvolution } from '../../../types/types';
+import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
+import { CardBase } from '../../../components/ui/Cards/fdhjasfdasdfalsk';
 
 // Mock inicial basado exactamente en la data visual de tu imagen
 const INITIAL_RECORDS: PhysicalRecord[] = [
@@ -84,14 +84,13 @@ export const PhysicalMonitoringPage: React.FC = () => {
         <Grid container spacing={4}>
           {/* COLUMNA IZQUIERDA (Estrecha: Métmeras y acciones) */}
           <Grid sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Button 
-              variant="dark" 
+            <ButtonBase 
               startIcon={<AddIcon />} 
               onClick={handleOpenModal}
               fullWidth
             >
               Registrar Nuevas Medidas
-            </Button>
+            </ButtonBase>
             
             <MetricCard type="balance" currentImc={currentImc} />
             
@@ -100,10 +99,10 @@ export const PhysicalMonitoringPage: React.FC = () => {
 
           {/* COLUMNA DERECHA (Ancha: Gráfico e Historial) */}
           <Grid >
-            <Card>
+            <CardBase>
               <HistoryChart records={records} />
               <HistoryTable records={records} />
-            </Card>
+            </CardBase>
           </Grid>
         </Grid>
       </Box>
