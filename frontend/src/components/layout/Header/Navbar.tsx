@@ -27,7 +27,7 @@ function Navbar() {
   
   const navItems: NavItemType[] = [{ name: t("inicio"), href: "/", icon: <HomeIcon /> }, {
     name: t("bitacora"), submenu: [
-      { name: t("controlDeGlucemia"), href: "/bitacora/control-de-glucemia" },
+      { name: t("controlDeGlucemia"), href: "/bitacora/control-glucosa" },
       { name: t("dosisDeInsulina"), href: "/bitacora/dosis-insulina" },
       { name: t("condicionFisica"), href: "/bitacora/monitoreo-fisico" }]
     , icon: <MenuIcon />

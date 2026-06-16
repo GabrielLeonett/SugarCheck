@@ -9,6 +9,7 @@ import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
 import ForgotPassword from "./features/ForgotPassword";
 import Insulina from "./features/insulina"
+import Glucosa from "./features/ControldeGlucosa"
 import "./App.css";
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 
@@ -44,6 +45,7 @@ function App() {
               <Route index element={<Home />} />
               {/* Quitamos la barra inicial en los hijos */}
               <Route path="bitacora">
+                <Route path="control-glucosa" element={<Glucosa />} />
                 <Route path="monitoreo-fisico" element={<PhysicalMonitoringPage />} />
                 <Route path="dosis-insulina" element={<Insulina />} />
               </Route>
