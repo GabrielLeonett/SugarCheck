@@ -1,0 +1,9 @@
+// src/imc/domain/repositories/ImcRepository.ts
+import { Imc } from "./IMC-temp";
+import { UserId } from "../../shared/core/value-objects/UserId";
+
+export interface ImcRepository {
+  save(imc: Imc): Promise<void>;
+  findByUserId(userId: UserId): Promise<Imc[]>;
+  findLatestByUserId(userId: UserId): Promise<Imc | null>;
+}
