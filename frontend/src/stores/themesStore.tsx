@@ -104,12 +104,16 @@ const baseThemeConfig = {
     },
     MuiAppBar: {
       styleOverrides: {
-        root: { boxShadow: "0px 2px 8px rgba(0,0,0,0.05)" },
+        root: {
+          boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
+        },
       },
     },
     MuiDrawer: {
       styleOverrides: {
-        paper: { borderRadius: "16px 0 0 16px" },
+        paper: {
+          borderRadius: "16px 0 0 16px",
+        },
       },
     },
   },
