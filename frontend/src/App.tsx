@@ -12,7 +12,6 @@ import Insulina from "./features/insulina"
 import "./App.css";
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 import "./App.css";
-import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
