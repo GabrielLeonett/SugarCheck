@@ -4,9 +4,9 @@ import Navbar from '../components/layout/Header/Navbar.tsx';
 import { useAuthStore } from '../stores/authStore.tsx';
 import { ButtonBase } from '../components/ui/Buttons/ButtonBase.tsx';
 import AddIcon from '@mui/icons-material/Add';
-import CardBase from '../components/ui/Cards/CardBase-tem.tsx';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { LineChart } from '@mui/x-charts/LineChart';
+import { CardBase } from '../components/ui/Cards/fdhjasfdasdfalsk.tsx';
 
 const MAX = 100;
 const MIN = 0;
