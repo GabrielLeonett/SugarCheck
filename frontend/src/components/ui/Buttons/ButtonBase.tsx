@@ -1,17 +1,12 @@
 import { Button, type ButtonProps } from "@mui/material";
 
-export function ButtonBase({ children, ...props }: ButtonProps) {
+export function ButtonBase({ children, variant = 'contained', ...props }: ButtonProps) {
   return (
     <Button
-      variant="contained" // Puedes dejar uno por defecto (contained, outlined o text)
+      variant={variant}
       {...props}
       sx={{
         // 2. Estilos base por defecto para tus botones
-        borderRadius: "8px",
-        textTransform: "none", // Evita que el texto salga siempre en mayúsculas
-        fontWeight: 500,
-        padding: "8px 16px",
-        fontSize: "0.875rem",
         transition: "all 0.2s ease",
 
         // Si usas el botón 'contained', podemos heredar tus sombras dinámicas de hover

@@ -118,7 +118,7 @@ export default function Login() {
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 'auto' }}>
                         ¿Aún no tienes cuenta?{' '}
-                        <Link href="#" sx={{ color: theme.palette.primary.dark , fontWeight: 'bold', textDecoration: 'none' }}>
+                        <Link href="/register" sx={{ color: theme.palette.primary.dark , fontWeight: 'bold', textDecoration: 'none' }}>
                             Registrarse
                         </Link>
                     </Typography>
