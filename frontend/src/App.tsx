@@ -3,8 +3,8 @@ import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
 import ProtectedRoute from './components/shared/ProtectedRoute';
-import Home from "./features/Home";
-import Login from "./features/Login";
+import Home from "./features/dsakfjafdsjksdfjl";
+import Login from "./features/dfkjalfsdadfsjl";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
 import ForgotPassword from "./features/ForgotPassword";
@@ -12,6 +12,7 @@ import Insulina from "./features/insulina"
 import "./App.css";
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 import "./App.css";
+import Glucosa from "./features/ControldeGlucosa";
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
@@ -45,6 +46,7 @@ function App() {
               <Route index element={<Home />} />
               {/* Quitamos la barra inicial en los hijos */}
               <Route path="bitacora">
+                <Route path="control-glucosa" element={<Glucosa />} />
                 <Route path="monitoreo-fisico" element={<PhysicalMonitoringPage />} />
                 <Route path="dosis-insulina" element={<Insulina />} />
               </Route>

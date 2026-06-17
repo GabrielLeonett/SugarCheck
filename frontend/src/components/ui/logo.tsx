@@ -1,9 +1,6 @@
-import { useNavigate } from "react-router-dom";
-
 export function Logo() {
-    const navigate = useNavigate(); 
     return (
-        <svg width="40" height="40" viewBox="0 0 123 132" fill="none" onClick={() => navigate("/")} style={{ cursor: "pointer" }} xmlns="http://www.w3.org/2000/svg">
+        <svg width="40" height="40" viewBox="0 0 123 132" fill="none" style={{ cursor: "pointer" }} xmlns="http://www.w3.org/2000/svg">
             <rect x="0.5" y="0.5" width="122" height="131" rx="25" fill="#E7E3E0" stroke="#B6A996" strokeLinejoin="bevel" />
             <path d="M61 27.5C58.5 27.5 35.506 63 35.5 77.5C35.4965 86 38.897 92.7037 43.9893 97.5C50.8903 104 56.6897 104 61 104C69.5108 104 77 99.5591 79.5 97.5C82 95.4409 87.5 89.9999 87.5 77.5C87.5 65.0001 63.5 27.5 61 27.5Z" fill="#5866AD" stroke="#2D2F71" strokeWidth="2" />
             <path d="M61.5107 76.9999C64.6391 76.9999 70 76.4999 70 76.4999C70 76.4999 68.5 79.4999 67 80.9999C65.5 82.4999 63 82.9999 61.5 82.9999C60 82.9999 55.5 81.9999 54.5 79.9999C53.5 77.9999 53 76.4999 53 76.4999C53 76.4999 58.3824 76.9999 61.5107 76.9999Z" fill="#282D6C" />

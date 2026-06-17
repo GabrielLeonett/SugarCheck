@@ -1,69 +1,24 @@
-import * as React from "react";
 import { IconButton, AppBar, Box, Toolbar, Typography, Avatar, Badge } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import HomeIcon from "@mui/icons-material/Home";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import NotificationIcon from "@mui/icons-material/Notifications";
-import type { NavItemType, NavItemWithSubmenu } from "../../../types/types";
+import type { NavItemWithSubmenu } from "../../../types/types";
 
 // ✅ Import correcto del contexto
-import { ThemeContext } from "../../../contexts/ThemeContext"; // Ajusta la ruta según tu estructura
-import useLanguage from "../../../hooks/useLanguage";
 import { Logo } from "../../ui/logo";
 import DrawerAppBar from "./Drawer";
 import { MenuSubItemComp } from "../../ui/MenuSubItemComp";
 import NavBarItem from "../../ui/NavBarItem";
-import { useAuthStore } from "../../../stores/authStore";
 import ProfileNavBar from "../../ui/Cards/ProfileNavBar";
+import { useNavbar } from "../../../hooks/useNavbar";
 
 function Navbar() {
-  const user = useAuthStore((state) => state.user);
-  const { t } = useLanguage("nav");
-  // ✅ Corrección: usar isDarkMode en lugar de theme
-  const { isDarkMode, toggleTheme } = React.useContext(ThemeContext);
-  const [profileMenuOpen, setProfileMenuOpen] = React.useState(false);
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  
-  const navItems: NavItemType[] = [{ name: t("inicio"), href: "/", icon: <HomeIcon /> }, {
-    name: t("bitacora"), submenu: [
-      { name: t("controlDeGlucemia"), href: "/bitacora/control-glucosa" },
-      { name: t("dosisDeInsulina"), href: "/bitacora/dosis-insulina" },
-      { name: t("condicionFisica"), href: "/bitacora/monitoreo-fisico" }]
-    , icon: <MenuIcon />
-  }, {
-    name: t("analisis"), submenu: [
-      { name: t("analisisDeDatos"), href: "/analisis/control-de-glucemia" },
-      { name: t("dosisDeInsulina"), href: "/analisis/registro-de-alimentos" },
-      { name: t("condicionFisica"), href: "/analisis/registro-de-ejercicio" }]
-    , icon: <MenuIcon />
-  },
-  {
-    name: t("agente"), submenu: [
-      { name: t("consultarAlOraculo"), href: "/agente/control-de-glucemia" },
-      { name: t("rutaDelGuerrero"), href: "/agente/registro-de-alimentos" },
-    ]
-    , icon: <MenuIcon />
-  }];
-
-  const handleDrawerToggle = () => {
-    setDrawerOpen(!drawerOpen);
-  };
-
-  const handleNavClick = (href: string) => {
-    setDrawerOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
-  const userInitials = React.useMemo(() => {
-    if (!user) return "";
-    const names = user.name.split(" ");
-    console.log("User Name:", user.name);
-    const initials = names.map(name => name[0]).join("");
-    return initials.toUpperCase();
-  }, [user])
+  const {
+    isDarkMode, toggleTheme,
+    profileMenuOpen, setProfileMenuOpen, navItems,
+    handleDrawerToggle, handleNavClick, userInitials, drawerOpen
+  } = useNavbar();
 
   return (
     <>
@@ -79,11 +34,11 @@ function Navbar() {
             backgroundColor: "primary.light",
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box component={'a'} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none' }} href="/">
             <Logo />
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography
-                variant="subtitle1"
+                variant="h6"
                 component={"a"}
                 href="#"
                 sx={{
