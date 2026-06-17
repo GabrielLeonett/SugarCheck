@@ -1,8 +1,8 @@
 import { Button, Typography } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
-import type { NavItemWithSubmenu } from "../../types/types";
+import type { NavItem } from "../../types/types";
 
-export default function NavBarItem({ item }: { item: NavItemWithSubmenu }) {
+export default function NavBarItem({ item }: { item: NavItem }) {
     const navigate = useNavigate();
     const location = useLocation();
     const isActive = location.pathname === item.href;

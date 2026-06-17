@@ -5,7 +5,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import HomeIcon from "@mui/icons-material/Home";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import NotificationIcon from "@mui/icons-material/Notifications";
-import type { NavItemType, NavItemWithSubmenu } from "../../../types/types";
+import type { NavItemType, NavItemWithSubmenu, NavItem } from "../../../types/types";
 // ✅ Import correcto del contexto
 import { ThemeContext } from "../../../contexts/ThemeContext"; // Ajusta la ruta según tu estructura
 import useLanguage from "../../../hooks/useLanguage";
@@ -26,22 +26,22 @@ function Navbar() {
 
   const navItems: NavItemType[] = [{ name: t("inicio"), href: "/", icon: <HomeIcon /> }, {
     name: t("bitacora"), submenu: [
-      { name: t("Control de Glucosa"), href: "/bitacora/control-de-glucosa" },
+      { name: t("controlDeGlucemia"), href: "/bitacora/control-de-glucosa" },
       { name: t("dosisDeInsulina"), href: "/bitacora/registro-de-alimentos" },
-      { name: t("condicionFisica"), href: "/bitacora/registro-de-ejercicio" }]
+      { name: t("condicionFisica"), href: "/bitacora/registro-de-ejercicio" }] as NavItem[]
     , icon: <MenuIcon />
   }, {
     name: t("analisis"), submenu: [
       { name: t("analisisDeDatos"), href: "/bitacora/control" },
       { name: t("dosisDeInsulina"), href: "/bitacora/registro" },
-      { name: t("condicionFisica"), href: "/bitacora/registro" }]
+      { name: t("condicionFisica"), href: "/bitacora/registro" }] as NavItem[]
     , icon: <MenuIcon />
   },
   {
     name: t("agente"), submenu: [
       { name: t("consultarAlOraculo"), href: "/bitacora/control" },
       { name: t("rutaDelGuerrero"), href: "/bitacora/registro" },
-    ]
+    ] as NavItem[]
     , icon: <MenuIcon />
   }];
 
@@ -120,7 +120,7 @@ function Navbar() {
               "submenu" in item ? (
                 <MenuSubItemComp key={item.name} item={item as NavItemWithSubmenu} />
               ) : (
-                <NavBarItem key={item.name} item={item as NavItemWithSubmenu} />
+                <NavBarItem key={item.name} item={item} />
               )
             ))}
           </Box>

@@ -4,14 +4,18 @@ export function CardBase({ children, ...props }: CardProps) {
     return (
         <Card
             {...props}
-            sx={{
-                bgcolor: 'primary.200',
-                color: 'black',
-                borderRadius: "12px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                padding: 3,
-                ...(typeof props.sx === 'object' ? props.sx : {})
-            }}
+            sx={[
+                (theme) => ({
+                    bgcolor: theme.palette.mode === 'dark' ? 'background.paper' : 'primary.200',
+                    color: theme.palette.mode === 'dark' ? 'text.primary' : 'black',
+                    borderRadius: "12px",
+                    boxShadow: theme.palette.mode === 'dark'
+                        ? "0 4px 12px rgba(0,0,0,0.5)"
+                        : "0 4px 12px rgba(0,0,0,0.1)",
+                    padding: 3,
+                }),
+                ...(Array.isArray(props.sx) ? props.sx : props.sx ? [props.sx] : [])
+            ]}
         >
             {children}
         </Card>
