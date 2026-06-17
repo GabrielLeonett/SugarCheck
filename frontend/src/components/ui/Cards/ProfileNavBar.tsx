@@ -8,7 +8,9 @@ import { ThemeContext } from '../../../contexts/ThemeContext.tsx';
 import { useAuthStore } from '../../../stores/authStore.tsx';
 import LanguageSelector from '../../shared/LanguageSelector.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
-import { CardBase } from './CardBase.tsx';
+import { CardBase } from './fdhjasfdasdfalsk.tsx';
+
+
 interface ProfileNavBarProps {
     open?: boolean;
 }
@@ -29,10 +31,14 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
                 p: 2,
                 borderRadius: 2,
                 boxShadow: 3,
-                position: 'absolute', // Asegúrate de posicionarlo correctamente si es un menú
+                position: 'fixed', // Asegúrate de posicionarlo correctamente si es un menú
                 right: 16,
                 top: 70,
+<<<<<<< HEAD
                 bgcolor: (theme) => theme.palette.mode === 'dark' ? 'background.paper' : 'primary.50'
+=======
+                zIndex:999
+>>>>>>> ab6175847f74da8fd798768baaa0d5bb3f27029e
             }}
             elevation={3}
         >

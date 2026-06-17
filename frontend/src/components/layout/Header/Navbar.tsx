@@ -1,22 +1,24 @@
-import * as React from "react";
 import { IconButton, AppBar, Box, Toolbar, Typography, Avatar, Badge } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import HomeIcon from "@mui/icons-material/Home";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import NotificationIcon from "@mui/icons-material/Notifications";
+<<<<<<< HEAD
 import type { NavItemType, NavItemWithSubmenu, NavItem } from "../../../types/types";
+=======
+import type { NavItemWithSubmenu } from "../../../types/types";
+
+>>>>>>> ab6175847f74da8fd798768baaa0d5bb3f27029e
 // ✅ Import correcto del contexto
-import { ThemeContext } from "../../../contexts/ThemeContext"; // Ajusta la ruta según tu estructura
-import useLanguage from "../../../hooks/useLanguage";
 import { Logo } from "../../ui/logo";
 import DrawerAppBar from "./Drawer";
 import { MenuSubItemComp } from "../../ui/MenuSubItemComp";
 import NavBarItem from "../../ui/NavBarItem";
-import { useAuthStore } from "../../../stores/authStore";
 import ProfileNavBar from "../../ui/Cards/ProfileNavBar";
+import { useNavbar } from "../../../hooks/useNavbar";
 
 function Navbar() {
+<<<<<<< HEAD
   const user = useAuthStore((state) => state.user);
   const { t } = useLanguage("nav");
   // ✅ Corrección: usar isDarkMode en lugar de theme
@@ -63,6 +65,13 @@ function Navbar() {
     const initials = names.map(name => name[0]).join("");
     return initials.toUpperCase();
   }, [user])
+=======
+  const {
+    isDarkMode, toggleTheme,
+    profileMenuOpen, setProfileMenuOpen, navItems,
+    handleDrawerToggle, handleNavClick, userInitials, drawerOpen
+  } = useNavbar();
+>>>>>>> ab6175847f74da8fd798768baaa0d5bb3f27029e
 
   return (
     <>
@@ -78,11 +87,11 @@ function Navbar() {
             backgroundColor: "primary.light",
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box component={'a'} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none' }} href="/">
             <Logo />
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography
-                variant="subtitle1"
+                variant="h6"
                 component={"a"}
                 href="#"
                 sx={{

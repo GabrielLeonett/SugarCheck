@@ -3,11 +3,15 @@ import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
 import ProtectedRoute from './components/shared/ProtectedRoute';
-import Home from "./features/Home";
-import Login from "./features/Login";
+import Home from "./features/dsakfjafdsjksdfjl";
+import Login from "./features/dfkjalfsdadfsjl";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
 import ForgotPassword from "./features/ForgotPassword";
+import Insulina from "./features/insulina"
+import "./App.css";
+import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
+import "./App.css";
 import Glucosa from "./features/ControldeGlucosa";
 
 function App() {
@@ -34,19 +38,26 @@ function App() {
   }
   return (
     <Suspense fallback={<div>Cargando...</div>}>
-    <ThemeWrapperContext>
-      <Router>
-        <Routes>
-          {/* Rutas Protegidas */}
-          <Route element={<ProtectedRoute />}>
-            <Route index element={<Home />} />
-            <Route path='/bitacora/control-de-glucosa' element={<Glucosa />} />
-          </Route>
-          <Route element={<PublicRoute/>}>
-            <Route path='/login' element={<Login />} />
-            <Route path='/olvidoContrasena' element={<ForgotPassword />} />
-            <Route path='/register' element={<Register />} />
-          </Route>
+      <ThemeWrapperContext>
+        <Router>
+          <Routes>
+            {/* Rutas Protegidas */}
+            <Route element={<ProtectedRoute />}>
+              <Route index element={<Home />} />
+              {/* Quitamos la barra inicial en los hijos */}
+              <Route path="bitacora">
+                <Route path="control-glucosa" element={<Glucosa />} />
+                <Route path="monitoreo-fisico" element={<PhysicalMonitoringPage />} />
+                <Route path="dosis-insulina" element={<Insulina />} />
+              </Route>
+            </Route>
+
+            {/* Rutas Públicas */}
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/olvidoContrasena" element={<ForgotPassword />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
           </Routes>
         </Router>
       </ThemeWrapperContext>

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Footer from '../components/layout/Footer/Footer.tsx';
 import Navbar from '../components/layout/Header/Navbar.tsx';
-import { CardBase } from '../components/ui/Cards/CardBase.tsx';
 import { ButtonBase } from '../components/ui/Buttons/ButtonBase.tsx';
 import AddIcon from '@mui/icons-material/Add';
 import {
@@ -29,6 +28,7 @@ import {
   ButtonGroup
 } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
+import { CardBase } from '../components/ui/Cards/fdhjasfdasdfalsk.tsx';
 
 // TIPOS
 interface GlucosaRegistro {

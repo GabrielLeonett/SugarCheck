@@ -297,7 +297,7 @@ export default function Login() {
                         </Box>
 
                         <Box sx={{ textAlign: 'center' }}>
-                            <Link href='/olvidoContrasena' sx={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                            <Link href="/olvidoContrasena" sx={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
                                 ¿Olvidaste tu contraseña?
                             </Link>
                         </Box>
