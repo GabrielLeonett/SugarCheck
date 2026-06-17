@@ -21,20 +21,20 @@ const primaryPalette = {
 // 2. Base de configuración común (sin la paleta para evitar colisiones)
 const baseThemeConfig = {
   typography: {
-    fontFamily: '"Poppins", "Arial", sans-serif',
-    h1: { fontSize: "3rem", fontWeight: 700, lineHeight: 1.2 },
-    h2: { fontSize: "2.5rem", fontWeight: 700, lineHeight: 1.2 },
-    h3: { fontSize: "2rem", fontWeight: 700, lineHeight: 1.2 },
-    h4: { fontSize: "1.75rem", fontWeight: 700, lineHeight: 1.2 },
-    h5: { fontSize: "1.5rem", fontWeight: 700, lineHeight: 1.2 },
-    h6: { fontSize: "1.25rem", fontWeight: 700, lineHeight: 1.2 },
-    subtitle1: { fontSize: "1.125rem", fontWeight: 600, lineHeight: 1.4 },
-    subtitle2: { fontSize: "1rem", fontWeight: 600, lineHeight: 1.4 },
-    body1: { fontSize: "1rem", fontWeight: 400, lineHeight: 1.5 },
-    body2: { fontSize: "0.875rem", fontWeight: 400, lineHeight: 1.5 },
-    button: { fontSize: "0.875rem", fontWeight: 500, lineHeight: 1.5, textTransform: "none" as const },
-    caption: { fontSize: "0.75rem", fontWeight: 400, lineHeight: 1.4 },
-    overline: { fontSize: "0.625rem", fontWeight: 500, lineHeight: 1.4, textTransform: "uppercase" as const },
+    fontFamily: '"Poppins", sans-serif',
+    h1: { fontSize: 88, fontWeight: 700, lineHeight: 1.2, letterSpacing: 1.5 },
+    h2: { fontSize: 57, fontWeight: 700, lineHeight: 1.2, letterSpacing: 0.5 },
+    h3: { fontSize: 48, fontWeight: 700, lineHeight: 1.2, letterSpacing: 0 },
+    h4: { fontSize: 34, fontWeight: 700, lineHeight: 1.2, letterSpacing: 0.25 },
+    h5: { fontSize: 23, fontWeight: 700, lineHeight: 1.2, letterSpacing: 0 },
+    h6: { fontSize: 20, fontWeight: 700, lineHeight: 1.2, letterSpacing: 0.25 },
+    subtitle1: { fontSize: 15, fontWeight: 600, lineHeight: 1.4, letterSpacing: 0.15 },
+    subtitle2: { fontSize: 14, fontWeight: 600, lineHeight: 1.4, letterSpacing: 0.1 },
+    body1: { fontSize: 16, fontWeight: 400, lineHeight: 1.5, letterSpacing: 0.05 },
+    body2: { fontSize: 14, fontWeight: 400, lineHeight: 1.5, letterSpacing: 0.25 },
+    button: { fontSize: 14, fontWeight: 500, lineHeight: 1.5, textTransform: "none" as const, letterSpacing: 1.25 },
+    caption: { fontSize: 12, fontWeight: 400, lineHeight: 1.4, letterSpacing: 0.4 },
+    overline: { fontSize: 12, fontWeight: 500, lineHeight: 1.4, textTransform: "uppercase" as const, letterSpacing: 2 },
   },
   shape: {
     borderRadius: 8,
@@ -46,13 +46,6 @@ const baseThemeConfig = {
         "@font-face": {
           fontFamily: "Poppins",
           fontStyle: "normal",
-          fontDisplay: "swap" as const,
-          fontWeight: "400",
-          src: `
-            local('Poppins'),
-            local('Poppins-Regular'),
-            url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap')
-          `,
         },
         html: { scrollBehavior: "smooth" as const },
         body: { transition: "background-color 0.3s ease, color 0.3s ease" },
@@ -61,11 +54,11 @@ const baseThemeConfig = {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 12,
           textTransform: "none" as const,
           fontWeight: 500,
-          padding: "8px 16px",
-          fontSize: "0.875rem",
+          padding: "12px",
+          fontSize: 14,
           transition: "all 0.2s ease",
         },
         contained: {

@@ -38,12 +38,14 @@ export function CardBase({
   imageHeight = '140',
   children,
   actions,
+  sx
 }: CustomCardProps) {
 
   return (
     <Card
       variant={variant}
       elevation={variant === 'elevation' ? elevation : 0}
+      sx={sx}
     >
       {/* Renderiza el header solo si hay título, subtítulo o avatar */}
       {(title || subtitle || avatar || headerAction) && (
