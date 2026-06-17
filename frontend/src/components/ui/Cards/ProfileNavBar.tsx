@@ -31,10 +31,10 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
                 p: 2,
                 borderRadius: 2,
                 boxShadow: 3,
-                position: 'absolute', // Asegúrate de posicionarlo correctamente si es un menú
+                position: 'fixed', // Asegúrate de posicionarlo correctamente si es un menú
                 right: 16,
                 top: 70,
-                bgcolor: 'primary.50'
+                zIndex:999
             }}
             elevation={3}
         >

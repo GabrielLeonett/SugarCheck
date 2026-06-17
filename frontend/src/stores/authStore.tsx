@@ -3,7 +3,7 @@ import { api } from '../api/axios';
 import type { User } from '../types/types.js';
 import { authFirebase } from '../config/firebase.js';
 // ➔ CORREGIDO: Importamos los proveedores necesarios de Firebase
-import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, signOut } from 'firebase/auth';
 
 interface AuthState {
   user: User | null;
@@ -32,10 +32,16 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     try {
+      // 1. Cerrar sesión en Firebase pasándole tu instancia 'authFirebase'
+      await signOut(authFirebase);
+
+      // 2. Destruir la sesión/cookies en tu backend de NestJS
       await api.post('/auth/logout', {}, { withCredentials: true });
+
     } catch (error) {
-      console.error("Error al cerrar sesión en el servidor", error);
+      console.error("Error durante el proceso de cierre de sesión:", error);
     } finally {
+      // 3. Pase lo que pase en la red, limpiamos el estado global de Zustand
       set({ user: null, accessToken: null });
     }
   },
@@ -60,7 +66,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       // 2. Abrir el popup del navegador para que el usuario inicie sesión
       const userCredential = await signInWithPopup(authFirebase, provider);
-      
+
       // 3. Extraer el IdToken de Google/Facebook verificado por Firebase
       const firebaseToken = await userCredential.user.getIdToken();
 
