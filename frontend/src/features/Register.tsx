@@ -54,8 +54,6 @@ export default function Register() {
                     boxShadow: 3,
                     minHeight: '550px',
                 }}>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
-                    </Typography>
                     <Typography variant="body1" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 'auto' }}>
