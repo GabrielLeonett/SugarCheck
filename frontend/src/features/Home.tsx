@@ -27,18 +27,11 @@ export default function Home() {
   const user = useAuthStore((state) => state.user);
 
   const ObtenerDiasOrdenados = () => {
-    // Obtenemos el índice actual (ajustado para que Lunes=0, Domingo=6)
-    // Date.getDay() devuelve 0 para domingo, así que ajustamos:
     const hoy = new Date().getDay();
     const indiceActual = hoy;
-
-    // Dividimos el arreglo en dos partes y las unimos
-    // Parte 1: desde el día actual hasta el final
-    // Parte 2: desde el inicio hasta el día anterior al actual
     return [...Dias.slice(indiceActual), ...Dias.slice(0, indiceActual)];
   }
 
-  console.log(ObtenerDiasOrdenados())
   return (<>
     <Navbar />
     <Box sx={{
@@ -49,9 +42,10 @@ export default function Home() {
         display: 'flex',
         justifyContent: 'space-between',
         alignContent: 'center',
+        my: 10
       }}>
         <Typography variant='h3' component={'h3'}>
-          Hola, Guerrero {user?.name}
+          !Hola, Guerrero {user?.name.split(' ')[0]}¡
         </Typography>
         <Box sx={{
           display: 'flex',
@@ -64,24 +58,20 @@ export default function Home() {
 
         </Box>
       </Box>
-      <Grid container spacing={2} sx={{
-        mt: 5
-      }}>
+      <Grid container spacing={2} sx={{ mt: 5 }}>
+        {/* FILA 1: TARJETAS SUPERIORES (Tamaño 4 cada una) */}
         <Grid size={4}>
-          <CardBase sx={{ display: 'flex', flexDirection: 'column', justifyItems: 'center', alignItems: 'center' }}>
+          <CardBase sx={{
+            height: '100%', // CORREGIDO: Ahora esta tarjeta también se estira al 100% de la fila
+          }}>
             <Typography variant='h5' component={'h5'} sx={{ color: 'primary.main' }}>
               Última Batalla
             </Typography>
-            <Box sx={{
-              display: 'flex', flexDirection: 'row', justifyContent: 'center', my: 3
-            }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', my: 3 }}>
               <Typography variant='h1' component={'h1'} sx={{ color: 'success.light' }}>
                 120
               </Typography>
-              <Box sx={{
-                mx: 3,
-                display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
-              }}>
+              <Box sx={{ mx: 3, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                 <ArrowDropUpIcon sx={{ color: 'success.light' }} />
                 <Typography variant='subtitle1' component={'aside'} sx={{ color: 'success.light' }}>
                   mg/dL
@@ -93,14 +83,15 @@ export default function Home() {
             </Typography>
           </CardBase>
         </Grid>
+
         <Grid size={4}>
-          <CardBase sx={{ display: 'flex', flexDirection: 'column', justifyItems: 'center', alignItems: 'center' }}>
+          <CardBase sx={{
+            height: '100%',
+          }}>
             <Typography variant='h5' component={'h5'} sx={{ color: 'primary.main' }}>
               Cronómetro de Seguridad
             </Typography>
-            <Box sx={{
-              display: 'flex', flexDirection: 'row', justifyContent: 'center', my: 3, gap: 2
-            }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', my: 3, gap: 2 }}>
               <Typography variant='subtitle1' component={'p'} sx={{ width: '2rem', textAlign: 'center', mr: 3 }}>
                 Última Insulina Rápida
               </Typography>
@@ -113,12 +104,15 @@ export default function Home() {
             </Typography>
           </CardBase>
         </Grid>
+
         <Grid size={4}>
-          <CardBase sx={{ display: 'flex', flexDirection: 'column', justifyItems: 'center', alignItems: 'center' }}>
+          <CardBase sx={{
+            height: '100%',
+          }}>
             <Typography variant='h5' component={'h5'} sx={{ color: 'primary.main' }}>
               Dominio de la Zona Segura
             </Typography>
-            <Typography variant='h1' component={'h1'} sx={{ color: 'error.light' }}>
+            <Typography variant='h1' component={'h1'} sx={{ color: 'error.light', my: 1.5 }}>
               45%
             </Typography>
             <Typography variant='subtitle2' component={'aside'} sx={{ color: 'error.light' }}>
@@ -126,9 +120,14 @@ export default function Home() {
             </Typography>
           </CardBase>
         </Grid>
+
+        {/* FILA 2: HISTORIAL Y BALANCE (Tamaño 8 y 4) */}
         <Grid size={8}>
-          <CardBase sx={{ display: 'flex', flexDirection: 'column', justifyItems: 'center', alignItems: 'center' }}>
-            <Typography variant='h5' component={'h5'} sx={{ color: 'primary.main' }}>
+          <CardBase sx={{
+            height: '100%',
+            p: 2
+          }}>
+            <Typography variant='h5' component={'h5'} sx={{ color: 'primary.main', mb: 2 }}>
               Historial de Batallas
             </Typography>
 
@@ -137,7 +136,6 @@ export default function Home() {
                 data: ObtenerDiasOrdenados(),
                 scaleType: 'band'
               }]}
-              // Quitamos 'data' de yAxis y usamos min/max
               yAxis={[{
                 min: 0,
                 max: 120,
@@ -153,16 +151,15 @@ export default function Home() {
             />
           </CardBase>
         </Grid>
+
         <Grid size={4}>
-          <CardBase
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center', // Corregido: Centrado del eje principal (vertical)
-              alignItems: 'center',     // Centrado del eje secundario (horizontal)
-              gap: 1.5                  // Añade un espacio uniforme y limpio entre elementos
-            }}
-          >
+          <CardBase sx={{
+            height: '100%', // Mantiene la misma altura que el LineChart de al lado,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            gap: 1.5
+          }}>
             <Typography variant='h5' component='h5' sx={{ color: 'primary.main', textAlign: 'center' }}>
               Balance de Fortaleza Física
             </Typography>
@@ -181,20 +178,18 @@ export default function Home() {
               min={MIN}
               max={MAX}
               sx={{
-                width: '100%', // Asegura que el slider ocupe todo el ancho disponible de la tarjeta
-                my: 1          // Margen vertical extra para que respire el diseño
+                width: '100%',
+                my: 1
               }}
               slotProps={{
                 rail: {
                   sx: {
                     opacity: 0.7,
-                    height: 6, // Le da un poco más de grosor para que luzca el gradiente
-                    // Corregido: Se usa backgroundImage para gradientes, no bgcolor
+                    height: 6,
                     backgroundImage: 'linear-gradient(90deg,rgba(0, 136, 255, 1) 0%, rgba(76, 175, 80, 1) 50%, rgba(251, 140, 0, 1) 100%)'
                   }
                 },
                 track: {
-                  // Si quieres que la barra que arrastra sea transparente para no tapar tu gradiente:
                   sx: { bgcolor: 'transparent' }
                 }
               }}
