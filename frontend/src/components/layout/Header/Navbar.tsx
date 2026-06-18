@@ -6,7 +6,7 @@ import NotificationIcon from "@mui/icons-material/Notifications";
 import type { NavItemWithSubmenu } from "../../../types/types";
 
 // ✅ Import correcto del contexto
-import { Logo } from "../../ui/logo";
+import { Logo } from "../../ui/fasdafdafd";
 import DrawerAppBar from "./Drawer";
 import { MenuSubItemComp } from "../../ui/MenuSubItemComp";
 import NavBarItem from "../../ui/NavBarItem";
@@ -19,7 +19,8 @@ function Navbar() {
     profileMenuOpen, setProfileMenuOpen, navItems,
     handleDrawerToggle, handleNavClick, userInitials, drawerOpen
   } = useNavbar();
-
+ 
+  // no mira esto tiene un hook especial
   return (
     <>
       <AppBar
