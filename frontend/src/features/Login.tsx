@@ -86,7 +86,6 @@ export default function Login() {
                 {/* Columna izquierda - Bienvenida */}
                 <Box sx={{
                     flex: 1,
-                    bgcolor: theme.palette.primary.light,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
@@ -118,7 +117,7 @@ export default function Login() {
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 'auto' }}>
                         ¿Aún no tienes cuenta?{' '}
-                        <Link href="/register" sx={{ color: theme.palette.primary.dark , fontWeight: 'bold', textDecoration: 'none' }}>
+                        <Link href="/register" sx={{ fontWeight: 'bold', textDecoration: 'none' }}>
                             Registrarse
                         </Link>
                     </Typography>
@@ -142,8 +141,8 @@ export default function Login() {
                     }}
                 >
                     <Box sx={{ maxWidth: '350px', width: '100%', textAlign: 'center' }}>
-                        <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
-                        <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+                        <LoginIcon sx={{ fontSize: 50, mb: 1 }} />
+                        <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
                             Iniciar Sesión
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
@@ -174,7 +173,6 @@ export default function Login() {
                                     '& fieldset': { borderColor: errors.email ? 'error.main' : 'rgba(255,255,255,0.3)' }
                                 },
                                 '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-                                '& .MuiInputBase-input': { color: 'white' },
                                 '& .MuiFormHelperText-root': { color: theme.palette.error.light }
                             }}
                         />
@@ -197,7 +195,6 @@ export default function Login() {
                                     '& fieldset': { borderColor: errors.password ? 'error.main' : 'rgba(255,255,255,0.3)' }
                                 },
                                 '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-                                '& .MuiInputBase-input': { color: 'white' },
                                 '& .MuiFormHelperText-root': { color: theme.palette.error.light }
                             }}
                         />
@@ -211,8 +208,7 @@ export default function Login() {
                             sx={{
                                 mb: 2,
                                 py: 1,
-                                bgcolor: 'white',
-                                color: theme.palette.primary.main,
+                                bgcolor: theme.palette.primary.main,
                                 '&:hover': { bgcolor: '#f5f5f5' }
                             }}
                         >
@@ -255,9 +251,8 @@ export default function Login() {
                                     }
                                 }}
                                 sx={{
-                                    color: 'white',
-                                    borderColor: 'rgba(255,255,255,0.3)',
-                                    '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.05)' }
+                                                                        borderColor: 'rgba(255,255,255,0.3)',
+                                    '&:hover': { borderbgcolor: 'rgba(255,255,255,0.05)' }
                                 }}
                             >
                                 Google
@@ -287,9 +282,8 @@ export default function Login() {
                                     }
                                 }}
                                 sx={{
-                                    color: 'white',
-                                    borderColor: 'rgba(255,255,255,0.3)',
-                                    '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.05)' }
+                                                                        borderColor: 'rgba(255,255,255,0.3)',
+                                    '&:hover': { borderbgcolor: 'rgba(255,255,255,0.05)' }
                                 }}
                             >
                                 Facebook

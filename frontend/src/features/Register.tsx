@@ -1,6 +1,11 @@
 import { useState } from 'react';
-import { Box, useTheme, Typography, Button, Link} from "@mui/material";
+import { Box, useTheme, Typography, Link, Stepper, Step, StepLabel } from "@mui/material";
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { LogoGA } from "../components/ui/LogoGA";
+import { ButtonBase } from '../components/ui/Buttons/ButtonBase';
+
+const ButtonSteps = [<ArrowBackIosIcon />, 1, 2, 3, <ArrowForwardIosIcon />]
 
 export default function Register() {
     const theme = useTheme();
@@ -13,7 +18,7 @@ export default function Register() {
 
 
     return (
-        <Box sx={{ 
+        <Box sx={{
             minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
@@ -22,8 +27,8 @@ export default function Register() {
             bgcolor: theme.palette.background.default || '#f5f5f5',
             p: 3
         }}>
-            <Box sx={{ 
-                display: 'flex', 
+            <Box sx={{
+                display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
                 maxWidth: '1000px',
@@ -31,11 +36,11 @@ export default function Register() {
             }}>
             </Box>
 
-            <Box sx={{ 
-                display: 'flex', 
-                flexDirection: 'row', 
-                gap: 4, 
-                justifyContent: 'center', 
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: 4,
+                justifyContent: 'center',
                 alignItems: 'stretch',
                 maxWidth: '1000px',
                 width: '100%'
@@ -43,7 +48,6 @@ export default function Register() {
                 {/* Columna izquierda - Mensajes dinámicos */}
                 <Box sx={{
                     flex: 1,
-                    bgcolor: theme.palette.primary.light,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
@@ -54,7 +58,18 @@ export default function Register() {
                     boxShadow: 3,
                     minHeight: '550px',
                 }}>
+                    <Stepper activeStep={1} alternativeLabel>
+                        {ButtonSteps.map((label) => (
+                            <Step key={label}>
+                                <StepLabel>{label}</StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                    <Typography variant="h5" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
+                        ¡Únete a la batalla, Guerrero!
+                    </Typography>
                     <Typography variant="body1" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
+                        Estás a unos pocos pasos de iniciar tu gran viaje. Registra tus datos básicos para forjar tu perfil en nuestra orden.
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 'auto' }}>
                         ¿Ya tienes cuenta?{' '}
@@ -78,9 +93,9 @@ export default function Register() {
                     minHeight: '550px',
                 }}>
                     <Box sx={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
-                        
+
                         <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
-                            <Button
+                            <ButtonBase
                                 fullWidth
                                 variant="outlined"
                                 onClick={handleBack}
@@ -94,9 +109,9 @@ export default function Register() {
                                 }}
                             >
                                 Atrás
-                            </Button>
-                            
-                            <Button
+                            </ButtonBase>
+
+                            <ButtonBase
                                 fullWidth
                                 variant="contained"
                                 sx={{
@@ -107,17 +122,17 @@ export default function Register() {
                                 }}
                             >
                                 {activeStep === 2 ? 'Finalizar Registro' : 'Siguiente Paso'}
-                            </Button>
+                            </ButtonBase>
                         </Box>
                     </Box>
                 </Box>
             </Box>
 
             {/* Footer */}
-            <Box sx={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center', 
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
                 mt: 5,
                 pt: 2
             }}>
