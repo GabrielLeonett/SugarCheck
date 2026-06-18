@@ -6,7 +6,7 @@ import NotificationIcon from "@mui/icons-material/Notifications";
 import type { NavItemWithSubmenu } from "../../../types/types";
 
 // ✅ Import correcto del contexto
-import { Logo } from "../../ui/logo";
+import { Logo } from "../../ui/Logo";
 import DrawerAppBar from "./Drawer";
 import { MenuSubItemComp } from "../../ui/MenuSubItemComp";
 import NavBarItem from "../../ui/NavBarItem";
@@ -19,7 +19,8 @@ function Navbar() {
     profileMenuOpen, setProfileMenuOpen, navItems,
     handleDrawerToggle, handleNavClick, userInitials, drawerOpen
   } = useNavbar();
-
+ 
+  // no mira esto tiene un hook especial
   return (
     <>
       <AppBar
@@ -31,7 +32,6 @@ function Navbar() {
             justifyContent: "space-between",
             alignItems: "center",
             px: { xs: 2, sm: 3, md: 4 },
-            backgroundColor: "primary.light",
           }}
         >
           <Box component={'a'} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none' }} href="/">

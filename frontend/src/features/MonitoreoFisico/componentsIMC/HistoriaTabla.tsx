@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Box, Chip, styled } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Box, styled } from '@mui/material';
 import type { PhysicalRecord, MeasurementState } from "../../../types/types";
 
 interface HistoryTableProps {

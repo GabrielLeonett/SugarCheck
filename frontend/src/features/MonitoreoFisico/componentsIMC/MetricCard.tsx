@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { ProgressBar } from '../../../components/ui/ProgressBar';
 import type { PhysicalEvolution } from '../../../types/types';
-import { CardBase } from '../../../components/ui/Cards/fdhjasfdasdfalsk'
+import { CardBase } from '../../../components/ui/Cards/CardBase'
 
 interface MetricCardProps {
   type: 'balance' | 'evolution';
