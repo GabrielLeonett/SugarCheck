@@ -1,0 +1,19 @@
+{
+  "welcomeTitle": "Bem-vindo, Guerreiro!",
+  "welcomeDescription": "Prepare-se para a batalha de hoje. Entre no seu painel, garanta o seu bem-estar e mantenha-se firme na zona segura.",
+  "noAccount": "Ainda não tem uma conta?",
+  "registerLink": "Cadastrar-se",
+  "formTitle": "Iniciar Sessão",
+  "formSubtitle": "Insira suas credenciais para acessar",
+  "emailLabel": "E-mail",
+  "passwordLabel": "Senha",
+  "submitButton": "Entrar",
+  "submittingButton": "Carregando...",
+  "oauthDivider": "Ou continuar com",
+  "forgotPassword": "Esqueceu sua senha?",
+  "sponsoredBy": "Patrocinado por",
+  "errors": {
+    "defaultBackendError": "Erro ao iniciar sessão. Tente novamente.",
+    "unknownError": "Erro desconhecido"
+  }
+}

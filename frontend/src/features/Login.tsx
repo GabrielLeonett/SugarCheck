@@ -10,20 +10,26 @@ import { loginSchema, type LoginData } from "../schemas/login";
 import type { AxiosError } from "axios";
 import type { BackendErrorResponse } from "../types/types";
 import axios from "axios";
-import ImagenBienvenida from '../assets/bienvenida-guerrero.png';
+import GlucoSaludando from '../assets/gluco-saludo.png';
+import { ConfigRow } from "../components/ui/ConfigRow";
+import useLanguage from "../hooks/useLanguage";
+import { CardBase } from "../components/ui/Cards/CardBase";
 
 export default function Login() {
     const theme = useTheme();
     const login = useAuthStore((state) => state.login);
     const loginWithProvider = useAuthStore((state) => state.loginWithProvider);
 
+    // Cambiado al namespace 'login' para cargar las llaves correctas
+    const { t } = useLanguage("login");
+
     const navigate = useNavigate();
 
     // Estado local para manejar errores de autenticación del backend
-    const [authError, setAuthError] = useState<BackendErrorResponse | null>(null); // Guarda los mensajes de error
-    const [isSubmitting, setIsSubmitting] = useState(false); // Para saber si la peticion esta en curso
+    const [authError, setAuthError] = useState<BackendErrorResponse | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 2. Configuración de React Hook Form
+    // Configuración de React Hook Form
     const {
         register,
         handleSubmit,
@@ -34,26 +40,21 @@ export default function Login() {
         shouldFocusError: true,
     });
 
-
     const onSubmit = async (data: LoginData) => {
         setAuthError(null);
         setIsSubmitting(true);
 
         try {
             await login(data.email, data.password);
-            navigate("/"); // Intenta loguear y si sale bien redirige al inicio
+            navigate("/");
         } catch (error) {
-            let message = "Error al iniciar sesión. Inténtalo de nuevo.";
+            // Error por defecto traducido
+            let message = t("errors.defaultBackendError");
 
-            // Comprobamos de manera segura si es un error de Axios
             if (axios.isAxiosError(error)) {
-                // Tipamos el error con la interfaz del backend
                 const axiosError = error as AxiosError<BackendErrorResponse>;
-
-                // Ahora TypeScript sabe EXACTAMENTE que data tiene .message
                 message = axiosError.response?.data?.message || message;
             } else if (error instanceof Error) {
-                // Por si es un error nativo de JS (ej. problemas de red nativos)
                 message = error.message;
             }
 
@@ -62,6 +63,7 @@ export default function Login() {
             setIsSubmitting(false);
         }
     };
+    console.log(t('welcomeTitle'))
 
     return (
         <Box sx={{
@@ -71,12 +73,11 @@ export default function Login() {
             justifyContent: 'center',
             alignItems: 'center',
             bgcolor: 'background.default',
-            p: 3
         }}>
             {/* Contenedor de las dos tarjetas */}
             <Box sx={{
                 display: 'flex',
-                flexDirection: { xs: 'column', md: 'row' }, // Responsivo para móviles
+                flexDirection: { xs: 'column', md: 'row' },
                 gap: 4,
                 justifyContent: 'center',
                 alignItems: 'stretch',
@@ -84,44 +85,42 @@ export default function Login() {
                 width: '100%'
             }}>
                 {/* Columna izquierda - Bienvenida */}
-                <Box sx={{
+                <CardBase elevation={5} sx={{
                     flex: 1,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    p: 4,
+                    p: 2,
                     textAlign: 'center',
                     borderRadius: 3,
-                    boxShadow: 3,
                     minHeight: '500px',
                 }}>
-                    <Box 
+                    <Box
                         component="img"
-                        src={ImagenBienvenida}
+                        src={GlucoSaludando}
                         alt="Ilustración de Bienvenida"
                         sx={{
-                            width:'100%',
-                            maxWidth: '250px',
+                            width: '160px',
                             height: 'auto',
                             mb: 1,
-
                         }}
                     />
                     <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
-                        ¡Bienvenido, Guerrero!
+                        {t("welcomeTitle")}
                     </Typography>
 
                     <Typography variant="body1" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
-                        Prepárate para la batalla de hoy. Entra a tu panel, asegura tu bienestar y mantente firme en la zona segura.
+                        {t("welcomeDescription")}
                     </Typography>
+
                     <Typography variant="body2" sx={{ mt: 'auto' }}>
-                        ¿Aún no tienes cuenta?{' '}
+                        {t("noAccount")}{' '}
                         <Link href="/register" sx={{ fontWeight: 'bold', textDecoration: 'none' }}>
-                            Registrarse
+                            {t("registerLink")}
                         </Link>
                     </Typography>
-                </Box>
+                </CardBase>
 
                 {/* Columna derecha - Formulario encapsulado en un tag <form> */}
                 <Box
@@ -143,10 +142,10 @@ export default function Login() {
                     <Box sx={{ maxWidth: '350px', width: '100%', textAlign: 'center' }}>
                         <LoginIcon sx={{ fontSize: 50, mb: 1 }} />
                         <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                            Iniciar Sesión
+                            {t("formTitle")}
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
-                            Ingresa tus credenciales para acceder
+                            {t("formSubtitle")}
                         </Typography>
 
                         {/* Mostrar alertas de error del backend */}
@@ -160,7 +159,7 @@ export default function Login() {
                         <TextField
                             {...register("email")}
                             fullWidth
-                            label="Correo electrónico"
+                            label={t("emailLabel")}
                             variant="outlined"
                             size="small"
                             error={!!errors.email}
@@ -181,7 +180,7 @@ export default function Login() {
                         <TextField
                             {...register("password")}
                             fullWidth
-                            label="Contraseña"
+                            label={t("passwordLabel")}
                             type="password"
                             variant="outlined"
                             size="small"
@@ -199,12 +198,12 @@ export default function Login() {
                             }}
                         />
 
-                        {/* 1. BOTÓN PRINCIPAL CORREGIDO */}
+                        {/* BOTÓN PRINCIPAL */}
                         <Button
                             type="submit"
                             fullWidth
                             variant="contained"
-                            disabled={isSubmitting} // Se deshabilita visualmente, pero no destruye el nodo de texto
+                            disabled={isSubmitting}
                             sx={{
                                 mb: 2,
                                 py: 1,
@@ -212,20 +211,19 @@ export default function Login() {
                                 '&:hover': { bgcolor: '#f5f5f5' }
                             }}
                         >
-                            {/* Dejamos el texto fijo para evitar que cambie el DOM interno drásticamente en el submit */}
-                            {isSubmitting ? "Cargando..." : "Ingresar"}
+                            {isSubmitting ? t("submittingButton") : t("submitButton")}
                         </Button>
 
                         {/* Divisor */}
                         <Box sx={{ display: 'flex', alignItems: 'center', my: 2, width: '100%' }}>
                             <Box sx={{ flexGrow: 1, height: '1px', bgcolor: 'rgba(255,255,255,0.2)' }} />
                             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', px: 2, whiteSpace: 'nowrap' }}>
-                                O continuar con
+                                {t("oauthDivider")}
                             </Typography>
                             <Box sx={{ flexGrow: 1, height: '1px', bgcolor: 'rgba(255,255,255,0.2)' }} />
                         </Box>
 
-                        {/* 2. BOTONES SOCIALES CON STOP PROPAGATION */}
+                        {/* BOTONES SOCIALES */}
                         <Box sx={{ display: 'flex', gap: 2, mb: 3, width: '100%' }}>
                             {/* Botón Google */}
                             <Button
@@ -234,7 +232,7 @@ export default function Login() {
                                 disabled={isSubmitting}
                                 onClick={async (e) => {
                                     e.preventDefault();
-                                    e.stopPropagation(); //CRÍTICO: Evita que el click interactúe con el <form> o los Inputs de MUI
+                                    e.stopPropagation();
                                     setAuthError(null);
                                     setIsSubmitting(true);
                                     try {
@@ -242,16 +240,16 @@ export default function Login() {
                                         navigate("/");
                                     } catch (err: unknown) {
                                         if (axios.isAxiosError(err)) {
-                                            setAuthError({ message: err.response?.data.message || "Error desconocido" });
+                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError") });
                                         } else {
-                                            setAuthError({ message: "Error desconocido" });
+                                            setAuthError({ message: t("errors.unknownError") });
                                         }
                                     } finally {
                                         setIsSubmitting(false);
                                     }
                                 }}
                                 sx={{
-                                                                        borderColor: 'rgba(255,255,255,0.3)',
+                                    borderColor: 'rgba(255,255,255,0.3)',
                                     '&:hover': { borderbgcolor: 'rgba(255,255,255,0.05)' }
                                 }}
                             >
@@ -265,7 +263,7 @@ export default function Login() {
                                 disabled={isSubmitting}
                                 onClick={async (e) => {
                                     e.preventDefault();
-                                    e.stopPropagation(); // CRÍTICO
+                                    e.stopPropagation();
                                     setAuthError(null);
                                     setIsSubmitting(true);
                                     try {
@@ -273,16 +271,16 @@ export default function Login() {
                                         navigate("/");
                                     } catch (err: unknown) {
                                         if (axios.isAxiosError(err)) {
-                                            setAuthError({ message: err.response?.data.message || "Error desconocido" });
+                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError") });
                                         } else {
-                                            setAuthError({ message: "Error desconocido" });
+                                            setAuthError({ message: t("errors.unknownError") });
                                         }
                                     } finally {
                                         setIsSubmitting(false);
                                     }
                                 }}
                                 sx={{
-                                                                        borderColor: 'rgba(255,255,255,0.3)',
+                                    borderColor: 'rgba(255,255,255,0.3)',
                                     '&:hover': { borderbgcolor: 'rgba(255,255,255,0.05)' }
                                 }}
                             >
@@ -292,7 +290,7 @@ export default function Login() {
 
                         <Box sx={{ textAlign: 'center' }}>
                             <Link href="/olvidoContrasena" sx={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-                                ¿Olvidaste tu contraseña?
+                                {t("forgotPassword")}
                             </Link>
                         </Box>
                     </Box>
@@ -305,12 +303,19 @@ export default function Login() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 mt: 5,
-                pt: 2
+                gap: 2
             }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-                    Patrocinado por
-                </Typography>
-                <LogoGA />
+                <ConfigRow />
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                        {t("sponsoredBy")}
+                    </Typography>
+                    <LogoGA />
+                </Box>
             </Box>
         </Box>
     );
