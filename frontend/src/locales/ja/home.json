@@ -1,0 +1,43 @@
+{
+    "welcomeMessage": "こんにちは、戦士 {name}！",
+    "actions": {
+        "registerGlucose": "血糖値を記録",
+        "applyInsulin": "インスリンを記録",
+        "registerWeight": "体重・身長を記録"
+    },
+    "cards": {
+        "lastBattle": {
+            "title": "前回のバトル",
+            "unit": "mg/dL",
+            "timeLabel": "{time}前 (昼食後)"
+        },
+        "securityTimer": {
+            "title": "セキュリティタイマー",
+            "description": "最終追加インスリン",
+            "alertMessage": "シールドが消耗しています"
+        },
+        "safeZone": {
+            "title": "セーフゾーン支配率",
+            "alertMessage": "低数値です。記録を確認し、対策してください"
+        },
+        "battleHistory": {
+            "title": "バトル履歴"
+        },
+        "physicalBalance": {
+            "title": "フィジカル強度のバランス",
+            "statusHealthy": "健康的な状態",
+            "statusUnderweight": "低体重",
+            "statusNormal": "標準",
+            "statusOverweight": "肥満（過体重）"
+        }
+    },
+    "days": {
+        "monday": "月曜日",
+        "tuesday": "火曜日",
+        "wednesday": "水曜日",
+        "thursday": "木曜日",
+        "friday": "金曜日",
+        "saturday": "土曜日",
+        "sunday": "日曜日"
+    }
+}

@@ -43,7 +43,7 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!peso || !estatura || !dd || !mm || !aaaa) return;
-    
+
     onSave({
       peso: parseFloat(peso),
       estatura: parseFloat(estatura),
@@ -53,11 +53,11 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} p={1}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ p: 1 }}>
       <ModalTitle>Registrar Nuevas Medidas</ModalTitle>
 
       {/* Input Peso */}
-      <Box mb={2.5}>
+      <Box sx={{ mb: 2.5 }}>
         <FormLabel>Peso</FormLabel>
         <StyledTextField
           fullWidth
@@ -73,7 +73,7 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
       </Box>
 
       {/* Input Talla */}
-      <Box mb={2.5}>
+      <Box sx={{ mb: 5 }}>
         <FormLabel>Talla</FormLabel>
         <StyledTextField
           fullWidth
@@ -89,24 +89,24 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
       </Box>
 
       {/* Input Fecha Compuesta */}
-      <Box mb={4}>
+      <Box sx={{ mb: 4 }}>
         <FormLabel>Fecha</FormLabel>
         <Grid container spacing={1.5}>
-          <Grid item xs={3.5}>
-            <StyledTextField placeholder="DD" size="small" value={dd} onChange={(e) => setDd(e.target.value)} inputProps={{ maxLength: 2, style: { textAlign: 'center' } }} />
+          <Grid size={3.5}>
+            <StyledTextField placeholder="DD" size="small" value={dd} onChange={(e) => setDd(e.target.value)} />
           </Grid>
-          <Grid item xs={3.5}>
-            <StyledTextField placeholder="MM" size="small" value={mm} onChange={(e) => setMm(e.target.value)} inputProps={{ maxLength: 2, style: { textAlign: 'center' } }} />
+          <Grid size={3.5}>
+            <StyledTextField placeholder="MM" size="small" value={mm} onChange={(e) => setMm(e.target.value)} />
           </Grid>
-          <Grid item xs={5}>
-            <StyledTextField placeholder="YYYY" size="small" value={aaaa} onChange={(e) => setAaaa(e.target.value)} inputProps={{ maxLength: 4, style: { textAlign: 'center' } }} />
+          <Grid size={5}>
+            <StyledTextField placeholder="YYYY" size="small" value={aaaa} onChange={(e) => setAaaa(e.target.value)} />
           </Grid>
         </Grid>
       </Box>
 
       {/* Botón de Guardado */}
-      <Box display="flex" justifyContent="center">
-        <ButtonBase variant="primary" type="submit" startIcon={<CheckIcon />}>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <ButtonBase type="submit" startIcon={<CheckIcon />}>
           Registrar Medidas
         </ButtonBase>
       </Box>

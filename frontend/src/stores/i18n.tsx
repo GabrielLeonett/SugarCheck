@@ -7,26 +7,34 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import enCommon from "../locales/en/common.json";
 import enFooter from "../locales/en/footer.json";
 import enNav from "../locales/en/nav.json";
+import enLogin from "../locales/en/login.json";
+import enHome from "../locales/en/home.json";
 
 import esCommon from "../locales/es/common.json";
 import esFooter from "../locales/es/footer.json";
 import esNav from "../locales/es/nav.json";
+import esLogin from "../locales/es/login.json";
+import esHome from "../locales/es/home.json";
 
 import ptCommon from "../locales/pt/common.json";
 import ptFooter from "../locales/pt/footer.json";
 import ptNav from "../locales/pt/nav.json";
+import ptLogin from "../locales/pt/login.json";
+import ptHome from "../locales/pt/home.json";
 
 import jaCommon from "../locales/ja/common.json";
 import jaFooter from "../locales/ja/footer.json";
 import jaNav from "../locales/ja/nav.json";
+import jaLogin from "../locales/ja/login.json";
+import jaHome from "../locales/ja/home.json";
 
 
 // Agrupa tus recursos por idioma para facilitar la lectura
 const resources = {
-  en: { common: enCommon, nav: enNav, footer: enFooter },
-  es: { common: esCommon, nav: esNav, footer: esFooter },
-  pt: { common: ptCommon, nav: ptNav, footer: ptFooter },
-  ja: { common: jaCommon, nav: jaNav, footer: jaFooter },
+  en: { common: enCommon, nav: enNav, footer: enFooter, login: enLogin, home: enHome },
+  es: { common: esCommon, nav: esNav, footer: esFooter, login: esLogin, home: esHome },
+  pt: { common: ptCommon, nav: ptNav, footer: ptFooter, login: ptLogin, home: ptHome },
+  ja: { common: jaCommon, nav: jaNav, footer: jaFooter, login: jaLogin, home: jaHome },
 };
 
 i18n
@@ -35,7 +43,7 @@ i18n
   .init({
     resources,
     fallbackLng: "es",
-    ns: ["common", "nav", "footer"],
+    ns: ["common", "nav", "footer", "login", "home"],
     defaultNS: "common",
     interpolation: {
       escapeValue: false,

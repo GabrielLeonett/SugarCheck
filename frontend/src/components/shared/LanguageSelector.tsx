@@ -1,20 +1,9 @@
 import React, { useState } from "react";
-import {
-  Menu,
-  Box,
-  MenuItem,
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-  Button,
-  Typography,
-} from "@mui/material";
-import LanguageIcon from "@mui/icons-material/Language";
+import { Menu, Box, MenuItem, IconButton, Typography } from "@mui/material";
 import useLanguage from "../../hooks/useLanguage";
 
-const LanguageSelector = ({ variant = "icon" }) => {
-  const { currentLanguage, currentLanguageInfo, changeLanguage, languages } =
-    useLanguage();
+const LanguageSelector = () => {
+  const { currentLanguage, currentLanguageInfo, changeLanguage, languages } = useLanguage();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -32,51 +21,6 @@ const LanguageSelector = ({ variant = "icon" }) => {
 
   const isMenuOpen = Boolean(anchorEl);
 
-  if (variant === "button") {
-    return (
-      <>
-        <Button
-          startIcon={<LanguageIcon />}
-          onClick={handleClick}
-          sx={{
-            color: "text.primary",
-            textTransform: "none",
-            fontWeight: 500,
-            minWidth: "auto",
-          }}
-          aria-controls={isMenuOpen ? "language-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={isMenuOpen ? "true" : undefined}
-        >
-          {currentLanguageInfo?.name}
-        </Button>
-        <Menu
-          id="language-menu"
-          anchorEl={anchorEl}
-          open={isMenuOpen}
-          onClose={handleClose}
-        >
-          {languages.map((language) => (
-            <MenuItem
-              key={language.code}
-              onClick={() => handleLanguageSelect(language.code)}
-              selected={currentLanguage === language.code}
-              aria-current={
-                currentLanguage === language.code ? "true" : "false"
-              }
-            >
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <Typography variant="h6">{language.flag}</Typography>
-              </ListItemIcon>
-              <ListItemText primary={language.name} />
-            </MenuItem>
-          ))}
-        </Menu>
-      </>
-    );
-  }
-
-  // Variante icon (default)
   return (
     <>
       <IconButton
@@ -93,8 +37,25 @@ const LanguageSelector = ({ variant = "icon" }) => {
         aria-haspopup="true"
         aria-expanded={isMenuOpen ? "true" : undefined}
       >
-        <LanguageIcon />
+        {/* CORREGIDO: El icono es una ruta string de SVG, se debe renderizar en una etiqueta de imagen */}
+        {currentLanguageInfo?.icon ? (
+          <Box
+            component="img"
+            src={currentLanguageInfo.icon}
+            alt={currentLanguageInfo.name}
+            sx={{
+              width: 30,
+              height: 30,
+              borderRadius: "2px",
+              objectFit: "contain",
+            }}
+          />
+        ) : (
+          /* Fallback con el emoji de la bandera por si el SVG no carga */
+          <Typography variant="body2">{currentLanguageInfo?.flag}</Typography>
+        )}
       </IconButton>
+
       <Menu
         id="language-icon-menu"
         anchorEl={anchorEl}
@@ -108,6 +69,8 @@ const LanguageSelector = ({ variant = "icon" }) => {
           vertical: "top",
           horizontal: "right",
         }}
+        // Previene comportamientos extraños de padding en menús con elementos densos
+        disableScrollLock
       >
         {languages.map((language) => (
           <MenuItem
@@ -115,9 +78,10 @@ const LanguageSelector = ({ variant = "icon" }) => {
             onClick={() => handleLanguageSelect(language.code)}
             selected={currentLanguage === language.code}
             sx={{
-              backgroundColor: currentLanguage === language.code ? 'action.selected' : 'inherit',
               display: "flex",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              gap: 2,
+              px: 2,
             }}
             dense
           >
@@ -135,18 +99,20 @@ const LanguageSelector = ({ variant = "icon" }) => {
                   src={language.icon}
                   alt={language.name}
                   sx={{
-                    width: 20,
-                    height: 20,
+                    width: 18,
+                    height: 18,
                     mr: 1.5,
                     borderRadius: "2px",
                     objectFit: "contain",
                   }}
                 />
               )}
+              {/* Nota: Dejé el flag por si quieres mantener ambos, 
+                  pero si ya usas el SVG (icon), podrías borrar esta línea de la bandera en emoji */}
               <Typography variant="body2" component="span" sx={{ mr: 1.5 }}>
                 {language.flag}
               </Typography>
-              <Typography variant="body2" component="span">
+              <Typography variant="body2" component="span" sx={{ fontWeight: currentLanguage === language.code ? 'bold' : 'normal' }}>
                 {language.name}
               </Typography>
             </Box>
