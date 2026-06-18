@@ -1,0 +1,43 @@
+{
+    "welcomeMessage": "¡Hola, Guerrero {name}!",
+    "actions": {
+        "registerGlucose": "Registrar Glucosa",
+        "applyInsulin": "Aplicar Insulina",
+        "registerWeight": "Registrar Peso/Talla"
+    },
+    "cards": {
+        "lastBattle": {
+            "title": "Última Batalla",
+            "unit": "mg/dL",
+            "timeLabel": "Hace {time} (Post-almuerzo)"
+        },
+        "securityTimer": {
+            "title": "Cronómetro de Seguridad",
+            "description": "Última Insulina Rápida",
+            "alertMessage": "El escudo se está agotando"
+        },
+        "safeZone": {
+            "title": "Dominio de la Zona Segura",
+            "alertMessage": "Niveles bajos. Revisa tus registros y actúa"
+        },
+        "battleHistory": {
+            "title": "Historial de Batallas"
+        },
+        "physicalBalance": {
+            "title": "Balance de Fortaleza Física",
+            "statusHealthy": "Condición saludable",
+            "statusUnderweight": "Bajo peso",
+            "statusNormal": "Normal",
+            "statusOverweight": "Sobrepeso"
+        }
+    },
+    "days": {
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miercoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sabado",
+        "sunday": "Domingo"
+    }
+}

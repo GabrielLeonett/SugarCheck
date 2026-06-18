@@ -44,7 +44,7 @@ const useLanguage = (ns?: string) => {
     return () => {
       i18n.off("languageChanged", handleLanguageChanged);
     };
-  }, [i18n]); // Removido changeLanguage de dependencias para evitar loops
+  }, [i18n, changeLanguage]); // Removido changeLanguage de dependencias para evitar loops
 
   // Configuración de idiomas disponibles
   const languages = useMemo(
