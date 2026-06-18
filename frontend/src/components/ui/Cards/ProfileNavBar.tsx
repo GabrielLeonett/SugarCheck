@@ -1,14 +1,10 @@
-import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
-import LightModeIcon from "@mui/icons-material/LightMode";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import ExitIcon from "@mui/icons-material/ExitToApp"; // Icono para cerrar sesión
 import ChangeIcon from "@mui/icons-material/ChangeCircle"; // Icono para cerrar sesión
-import React from 'react';
-import { ThemeContext } from '../../../contexts/ThemeContext.tsx';
 import { useAuthStore } from '../../../stores/authStore.tsx';
-import LanguageSelector from '../../shared/LanguageSelector.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
-import { CardBase } from './fdhjasfdasdfalsk.tsx';
+import { CardBase } from './CardBase.tsx';
+import { ConfigRow } from '../ConfigRow.tsx';
 
 
 interface ProfileNavBarProps {
@@ -18,7 +14,7 @@ interface ProfileNavBarProps {
 export default function ProfileNavBar({ open }: ProfileNavBarProps) {
     const user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
-    const { isDarkMode, toggleTheme } = React.useContext(ThemeContext);
+
     const { t } = useLanguage("common");
     if (!open) return null;
     return (
@@ -48,15 +44,7 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
             <Divider sx={{ my: 1 }} />
 
             {/* Ajustes: Tema y Idioma */}
-            <Stack sx={{ direction: "row", justifyContent: "space-between", alignItems: "center", px: 1, py: 0.5 }}>
-                <Typography variant="body2" color="text.secondary">{t("configuracion")}</Typography>
-                <Box>
-                    <IconButton onClick={toggleTheme} size="small">
-                        {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-                    </IconButton>
-                    <LanguageSelector />
-                </Box>
-            </Stack>
+            <ConfigRow/>
 
             <Divider sx={{ my: 1 }} />
 
