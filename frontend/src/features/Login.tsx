@@ -1,4 +1,4 @@
-import { Box, useTheme, Typography, TextField, Button, Link, Alert } from "@mui/material";
+import { Box, useTheme, Typography, TextField, Link, Alert, Button } from "@mui/material";
 import { LogoGA } from "../components/ui/LogoGA";
 import LoginIcon from '@mui/icons-material/Login';
 import { useForm } from "react-hook-form";
@@ -14,6 +14,11 @@ import GlucoSaludando from '../assets/gluco-saludo.png';
 import { ConfigRow } from "../components/ui/ConfigRow";
 import useLanguage from "../hooks/useLanguage";
 import { CardBase } from "../components/ui/Cards/CardBase";
+import { ButtonBase } from "../components/ui/Buttons/ButtonBase";
+
+//Svgs
+import FacebookIcon from '../assets/icons/facebook.svg'
+import GoogleIcon from '../assets/icons/google.svg'
 
 export default function Login() {
     const theme = useTheme();
@@ -199,7 +204,7 @@ export default function Login() {
                         />
 
                         {/* BOTÓN PRINCIPAL */}
-                        <Button
+                        <ButtonBase
                             type="submit"
                             fullWidth
                             variant="contained"
@@ -212,7 +217,7 @@ export default function Login() {
                             }}
                         >
                             {isSubmitting ? t("submittingButton") : t("submitButton")}
-                        </Button>
+                        </ButtonBase>
 
                         {/* Divisor */}
                         <Box sx={{ display: 'flex', alignItems: 'center', my: 2, width: '100%' }}>
@@ -225,9 +230,11 @@ export default function Login() {
 
                         {/* BOTONES SOCIALES */}
                         <Box sx={{ display: 'flex', gap: 2, mb: 3, width: '100%' }}>
+
                             {/* Botón Google */}
                             <Button
                                 fullWidth
+                                startIcon={<img src={GoogleIcon} alt="Google" style={{ width: 20, height: 20 }} />}
                                 variant="outlined"
                                 disabled={isSubmitting}
                                 onClick={async (e) => {
@@ -249,8 +256,15 @@ export default function Login() {
                                     }
                                 }}
                                 sx={{
-                                    borderColor: 'rgba(255,255,255,0.3)',
-                                    '&:hover': { borderbgcolor: 'rgba(255,255,255,0.05)' }
+                                    backgroundColor: '#ffffff',
+                                    color: '#1f1f1f',
+                                    borderColor: '#747775',
+                                    textTransform: 'none',
+                                    fontWeight: 500,
+                                    '&:hover': {
+                                        backgroundColor: '#f7f8f8',
+                                        borderColor: '#747775',
+                                    }
                                 }}
                             >
                                 Google
@@ -259,7 +273,8 @@ export default function Login() {
                             {/* Botón Facebook */}
                             <Button
                                 fullWidth
-                                variant="outlined"
+                                startIcon={<img src={FacebookIcon} alt="Facebook" style={{ width: 20, height: 20 }} />}
+                                variant="contained"
                                 disabled={isSubmitting}
                                 onClick={async (e) => {
                                     e.preventDefault();
@@ -280,8 +295,15 @@ export default function Login() {
                                     }
                                 }}
                                 sx={{
-                                    borderColor: 'rgba(255,255,255,0.3)',
-                                    '&:hover': { borderbgcolor: 'rgba(255,255,255,0.05)' }
+                                    backgroundColor: '#1877F2',
+                                    color: '#ffffff',
+                                    textTransform: 'none',
+                                    fontWeight: 500,
+                                    boxShadow: 'none',
+                                    '&:hover': {
+                                        backgroundColor: '#166FE5',
+                                        boxShadow: 'none',
+                                    }
                                 }}
                             >
                                 Facebook
