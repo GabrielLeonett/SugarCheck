@@ -1,0 +1,19 @@
+{
+  "welcomeTitle": "ようこそ、戦士よ！",
+  "welcomeDescription": "今日の戦いに備えましょう。ダッシュボードにログインし、体調を整え、安全圏を死守してください。",
+  "noAccount": "アカウントをお持ちでないですか？",
+  "registerLink": "新規登録",
+  "formTitle": "ログイン",
+  "formSubtitle": "資格情報を入力してアクセスしてください",
+  "emailLabel": "メールアドレス",
+  "passwordLabel": "パスワード",
+  "submitButton": "ログイン",
+  "submittingButton": "読み込み中...",
+  "oauthDivider": "または以下で続ける",
+  "forgotPassword": "パスワードをお忘れですか？",
+  "sponsoredBy": "提供：",
+  "errors": {
+    "defaultBackendError": "ログインに失敗しました。もう一度お試しください。",
+    "unknownError": "不明なエラー"
+  }
+}
