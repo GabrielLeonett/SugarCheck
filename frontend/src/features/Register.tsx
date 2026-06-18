@@ -60,7 +60,7 @@ export default function Register() {
                 }}>
                     <Stepper activeStep={1} alternativeLabel>
                         {ButtonSteps.map((label) => (
-                            <Step key={label}>
+                            <Step>
                                 <StepLabel>{label}</StepLabel>
                             </Step>
                         ))}
