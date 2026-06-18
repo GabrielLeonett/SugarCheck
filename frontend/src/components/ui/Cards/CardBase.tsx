@@ -45,7 +45,7 @@ export function CardBase({
     <Card
       variant={variant}
       elevation={variant === 'elevation' ? elevation : 0}
-      sx={sx}
+      sx={{ ...sx}}
     >
       {/* Renderiza el header solo si hay título, subtítulo o avatar */}
       {(title || subtitle || avatar || headerAction) && (

@@ -30,7 +30,7 @@ import {
 
 // Importamos componentes nativos de MUI X-Charts
 import { LineChart } from '@mui/x-charts/LineChart';
-import { CardBase } from '../components/ui/Cards/fdhjasfdasdfalsk.tsx';
+import { CardBase } from '../components/ui/Cards/CardBase.tsx';
 
 // --- ESTRUCTURA DE DATOS SIMULADOS ---
 const historialGlucosaMock = [

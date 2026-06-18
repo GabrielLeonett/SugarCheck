@@ -1,0 +1,19 @@
+{
+  "welcomeTitle": "Welcome, Warrior!",
+  "welcomeDescription": "Prepare for today's battle. Log into your dashboard, secure your well-being, and stand firm in the safe zone.",
+  "noAccount": "Don't have an account yet?",
+  "registerLink": "Sign Up",
+  "formTitle": "Sign In",
+  "formSubtitle": "Enter your credentials to gain access",
+  "emailLabel": "Email address",
+  "passwordLabel": "Password",
+  "submitButton": "Sign In",
+  "submittingButton": "Loading...",
+  "oauthDivider": "Or continue with",
+  "forgotPassword": "Forgot your password?",
+  "sponsoredBy": "Sponsored by",
+  "errors": {
+    "defaultBackendError": "Error signing in. Please try again.",
+    "unknownError": "Unknown error"
+  }
+}
