@@ -8,12 +8,11 @@ import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
 import Insulina from "./features/insulina"
-import "./App.css";
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
-import "./App.css";
 import Glucosa from "./features/ControldeGlucosa";
 import ForgotPassword from "./features/ForgotPassword";
 import { Camino } from "./features/Camino";
+import "./App.css";
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
