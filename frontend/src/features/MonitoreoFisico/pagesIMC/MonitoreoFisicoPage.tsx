@@ -12,7 +12,7 @@ import { HistoryChart } from '../componentsIMC/TablaHistoria';
 import { RegisterMeasurementModal } from '../componentsIMC/RegistrarMedidaModal';
 import type { PhysicalRecord, PhysicalEvolution } from '../../../types/types';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
-import { CardBase } from '../../../components/ui/Cards/fdhjasfdasdfalsk';
+import { CardBase } from '../../../components/ui/Cards/CardBase';
 
 // Mock inicial basado exactamente en la data visual de tu imagen
 const INITIAL_RECORDS: PhysicalRecord[] = [
