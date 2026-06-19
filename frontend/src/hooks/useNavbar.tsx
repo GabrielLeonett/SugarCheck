@@ -30,7 +30,7 @@ export function useNavbar() {
     {
         name: t("agente"), submenu: [
             { name: t("consultarAlOraculo"), href: "/agente/control-de-go-de-lucemia" }, 
-            { name: t("rutaDelGuerrero"), href: "/agente/registralimentos" },
+            { name: t("rutaDelGuerrero"), href: "/agente/camino" },
         ]
         , icon: <MenuIcon />
     }];
