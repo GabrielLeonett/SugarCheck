@@ -11,7 +11,7 @@ import Insulina from "./features/insulina"
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 import Glucosa from "./features/ControldeGlucosa";
 import ForgotPassword from "./features/ForgotPassword";
-import { Camino } from "./features/Camino";
+import { Camino } from "./features/Camino/Camino";
 import "./App.css";
 
 function App() {
