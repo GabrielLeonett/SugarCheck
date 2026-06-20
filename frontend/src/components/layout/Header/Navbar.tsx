@@ -12,8 +12,10 @@ import { MenuSubItemComp } from "../../ui/MenuSubItemComp";
 import NavBarItem from "../../ui/NavBarItem";
 import ProfileNavBar from "../../ui/Cards/ProfileNavBar";
 import { useNavbar } from "../../../hooks/useNavbar";
+import { useProfileAvatar } from "../../../hooks/useProfileAvatar";
 
 function Navbar() {
+  const {avatarSelected} = useProfileAvatar();
   const {
     isDarkMode, toggleTheme,
     profileMenuOpen, setProfileMenuOpen, navItems,
@@ -93,7 +95,7 @@ function Navbar() {
             <Badge badgeContent={4} color="secondary">
               <NotificationIcon />
             </Badge>
-            <Avatar alt="User" children={userInitials} sx={{
+            <Avatar alt="User" src={avatarSelected} children={userInitials} sx={{
               "&:hover": {
                 backgroundColor: "action.hover",
                 borderRadius: 1,
