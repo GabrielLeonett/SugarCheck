@@ -66,7 +66,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       // 2. Abrir el popup del navegador para que el usuario inicie sesión
       const userCredential = await signInWithPopup(authFirebase, provider);
-
+      
       // 3. Extraer el IdToken de Google/Facebook verificado por Firebase
       const firebaseToken = await userCredential.user.getIdToken();
 
@@ -76,9 +76,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         { token: firebaseToken },
         { withCredentials: true }
       );
-
-      // ➔ COLOCA ESTE LOG PARA REVISAR LA RESPUESTA REAL
-      console.log("Datos crudos del backend:", response.data);
 
       // Si el backend devuelve por ejemplo { data: { user, accessToken } } en vez de { user, accessToken } directo,
       // tu set() actual va a fallar silenciosamente guardando campos vacíos.
