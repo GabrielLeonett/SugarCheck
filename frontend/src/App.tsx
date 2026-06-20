@@ -13,6 +13,7 @@ import Glucosa from "./features/ControldeGlucosa";
 import ForgotPassword from "./features/ForgotPassword";
 import { Camino } from "./features/Camino";
 import "./App.css";
+import { Profile } from "./features/Profile/Profile";
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
@@ -44,13 +45,14 @@ function App() {
             {/* Rutas Protegidas */}
             <Route element={<ProtectedRoute />}> si aqui mira
               <Route index element={<Home />} />
+              <Route path="perfil" element={<Profile />} />
               {/* Quitamos la barra inicial en los hijos */}
-              <Route path="bitacora"> 
+              <Route path="bitacora">
                 <Route path="control-glucosa" element={<Glucosa />} />
                 <Route path="monitoreo-fisico" element={<PhysicalMonitoringPage />} />
                 <Route path="dosis-insulina" element={<Insulina />} />
               </Route>
-              <Route path="agente"> 
+              <Route path="agente">
                 <Route path="camino" element={<Camino />} />
               </Route>
             </Route>
