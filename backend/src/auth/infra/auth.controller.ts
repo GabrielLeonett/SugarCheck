@@ -20,15 +20,24 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly firebaseAdminService: FirebaseAdminService,
-  ) {}
+  ) { }
 
-  // Constante para no repetir la configuración de la cookie
-  private readonly cookieOptions = {
+  // 1. Configuración para el Access Token (Vida corta)
+  private readonly cookieOptionsAccessToken = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict' as const,
+    maxAge: 15 * 60 * 1000, // 15 minutos
+    path: '/',
+  };
+
+  // 2. Configuración para el Refresh Token (Vida larga)
+  private readonly cookieOptionsRefreshToken = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict' as const,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
-    path: '/', // ➔ CAMBIADO A '/' para evitar líos al limpiar o interceptar desde cualquier ruta
+    path: '/',
   };
 
   @Post('login')
@@ -47,7 +56,8 @@ export class AuthController {
     const { at, rt, user } = result.getValue();
 
     // Guardamos el Refresh Token en la cookie usando las opciones centralizadas
-    response.cookie('refresh_token', rt, this.cookieOptions);
+    response.cookie('access_token', at, this.cookieOptionsAccessToken);
+    response.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
 
     return {
       message: 'Login exitoso',
@@ -68,7 +78,7 @@ export class AuthController {
     const { at, rt, user } = result.getValue();
 
     // Renovamos la cookie
-    res.cookie('refresh_token', rt, this.cookieOptions);
+    res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
 
     return {
       message: 'Token renovado',
@@ -114,7 +124,8 @@ export class AuthController {
     const result = await this.authService.loginFirebaseUser({ email, name, firebaseUid });
     const { at, rt, user } = result.getValue();
 
-    res.cookie('refresh_token', rt, this.cookieOptions);
+    res.cookie('access_token', at, this.cookieOptionsRefreshToken);
+    res.cookie('refresh_token', rt, this.cookieOptionsAccessToken);
 
     return {
       message: 'Login con Firebase exitoso', // Ajustado el mensaje para que sea semántico
