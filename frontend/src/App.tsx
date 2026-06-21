@@ -9,7 +9,7 @@ import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
 import Insulina from "./features/insulina"
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
-import Glucosa from "./features/ControldeGlucosa";
+import Glucosa from "./features/ControlDeGlucosa/ControlDeGlucosaPage";
 import ForgotPassword from "./features/ForgotPassword";
 import { Camino } from "./features/Camino";
 import "./App.css";
