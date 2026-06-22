@@ -1,0 +1,53 @@
+{
+  "titleMonitoreo": "血糖値 de 日常管理",
+  "btnRegistrar": "新しい測定値を登録",
+  "modal": {
+    "title": "新しい測定値を登録",
+    "labelNivel": "血糖値 (mg/dL)",
+    "labelContexto": "測定の状況",
+    "labelFecha": "日付",
+    "labelHora": "時間",
+    "btnGuardar": "測定値を保存",
+    "contextos": {
+      "ayunas": "空腹時",
+      "despuesComer": "食後",
+      "controlGeneral": "一般管理"
+    }
+  },
+  "zonaSegura": {
+    "title": "目標範囲内時間（セーフゾーン）",
+    "caption": "目標範囲内時間",
+    "alertaBaja": "低血糖。記録を確認し、対処してください",
+    "alertaNormal": "目標範囲内の安定した状態です",
+    "alertaAlta": "高血糖。状態を観察し、対処してください"
+  },
+  "frecuenciaAlertas": {
+    "title": "アラートの頻度",
+    "hiperglucemias": "高血糖",
+    "hipoglucemias": "低血糖",
+    "enRango": "目標範囲内"
+  },
+  "grafico": {
+    "title": "血糖値の推移",
+    "labelSerie": "数値 (mg/dL)",
+    "sinDatos": "グラフ化するデータがありません",
+    "filtros": {
+      "hoy": "今日",
+      "semana": "今週",
+      "mes": "今月"
+    }
+  },
+  "tabla": {
+    "title": "記録履歴",
+    "headers": {
+      "hora": "時間",
+      "nivel": "数値 (mg/dL)",
+      "contexto": "状況",
+      "estado": "状態"
+    },
+    "sinDatos": "この期間の記録はありません。",
+    "paginacion": {
+      "filasPorPagina": "ページあたりの行数:"
+    }
+  }
+}
