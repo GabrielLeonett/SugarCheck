@@ -2,11 +2,11 @@ type: http_request
 model: http_request
 id: rq_Ar2Bk9WWrU
 createdAt: 2026-05-26T04:04:20.638351600
-updatedAt: 2026-06-20T17:48:14.114550300
+updatedAt: 2026-06-20T18:30:15.325207300
 workspaceId: wk_tWcQe25Qgb
 folderId: fl_uLa5XZnwow
 authentication: {}
-authenticationType: null
+authenticationType: none
 body:
   text: |-
     {
@@ -28,10 +28,14 @@ body:
 bodyType: application/json
 description: ''
 headers:
-- enabled: true
+- enabled: false
   name: Content-Type
   value: application/json
   id: C8wBxTu3tP
+- enabled: true
+  name: ''
+  value: ''
+  id: 42YMJs7ArR
 method: POST
 name: Save preference
 sortPriority: 0.001
@@ -42,11 +46,11 @@ urlParameters:
   value: ''
   id: Ugu9Ub3r8G
 settingSendCookies:
-  enabled: false
-  value: true
+  enabled: true
+  value: false
 settingStoreCookies:
-  enabled: false
-  value: true
+  enabled: true
+  value: false
 settingValidateCertificates:
   enabled: false
   value: true
