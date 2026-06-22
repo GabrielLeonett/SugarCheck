@@ -20,13 +20,7 @@ export function useNavbar() {
             { name: t("dosisDeInsulina"), href: "/bitacora/dosis-insulina" },
             { name: t("condicionFisica"), href: "/bitacora/monitoreo-fisico" }]
         , icon: <MenuIcon />
-    }, {
-        name: t("analisis"), submenu: [
-            { name: t("analisisDeDatos"), href: "/analisis/control-de-glucemia" }, 
-            { name: t("dosisDeInsulina"), href: "/analisis/registro-de-alimentos" },
-            { name: t("condicionFisica"), href: "/analisis/registro-de-ejercicio" }]
-        , icon: <MenuIcon />
-    },
+    }, 
     {
         name: t("agente"), submenu: [
             { name: t("consultarAlOraculo"), href: "/agente/control-de-go-de-lucemia" }, 

@@ -43,7 +43,7 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() data: LoginDTO,
-    @Res({ passthrough: true }) response: Response,
+    @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.login(data.email, data.password);
     if (!result.isValid) {
@@ -56,8 +56,8 @@ export class AuthController {
     const { at, rt, user } = result.getValue();
 
     // Guardamos el Refresh Token en la cookie usando las opciones centralizadas
-    response.cookie('access_token', at, this.cookieOptionsAccessToken);
-    response.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
+    res.cookie('access_token', at, this.cookieOptionsAccessToken);
+    res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
 
     return {
       message: 'Login exitoso',
@@ -78,6 +78,7 @@ export class AuthController {
     const { at, rt, user } = result.getValue();
 
     // Renovamos la cookie
+    res.cookie('access_token', at, this.cookieOptionsAccessToken);
     res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
 
     return {
@@ -124,8 +125,8 @@ export class AuthController {
     const result = await this.authService.loginFirebaseUser({ email, name, firebaseUid });
     const { at, rt, user } = result.getValue();
 
-    res.cookie('access_token', at, this.cookieOptionsRefreshToken);
-    res.cookie('refresh_token', rt, this.cookieOptionsAccessToken);
+    res.cookie('access_token', at, this.cookieOptionsAccessToken);
+    res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
 
     return {
       message: 'Login con Firebase exitoso', // Ajustado el mensaje para que sea semántico

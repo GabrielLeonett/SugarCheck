@@ -58,3 +58,9 @@ export interface PhysicalEvolution {
   estaturaDiff: number;   // ej: 2.5
   fechaReferencia: string;
 }
+
+export interface BackendErrorsApi {
+  message: string,
+  error: string,
+  statusCode: number
+}
