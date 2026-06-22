@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api } from '../api/axios';
+import { apiPrivate } from '../apis/axios.js';
 import type { User } from '../types/types.js';
 import { authFirebase } from '../config/firebase.js';
 // ➔ CORREGIDO: Importamos los proveedores necesarios de Firebase
@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setLoading: (loading: boolean) => set({ isAuthLoading: loading }),
 
   login: async (email, password) => {
-    const response = await api.post('/auth/login', { email, password }, { withCredentials: true });
+    const response = await apiPrivate.post('/auth/login', { email, password }, { withCredentials: true });
     set({ user: response.data.user, accessToken: response.data.accessToken });
   },
 
@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       await signOut(authFirebase);
 
       // 2. Destruir la sesión/cookies en tu backend de NestJS
-      await api.post('/auth/logout', {}, { withCredentials: true });
+      await apiPrivate.post('/auth/logout', {}, { withCredentials: true });
 
     } catch (error) {
       console.error("Error durante el proceso de cierre de sesión:", error);
@@ -48,7 +48,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   refresh: async () => {
     try {
-      const response = await api.post('/auth/refresh', {}, { withCredentials: true });
+      const response = await apiPrivate.post('/auth/refresh', {}, { withCredentials: true });
       set({ user: response.data.user, accessToken: response.data.accessToken });
       return response.data.accessToken;
     } catch (error) {
@@ -66,19 +66,16 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       // 2. Abrir el popup del navegador para que el usuario inicie sesión
       const userCredential = await signInWithPopup(authFirebase, provider);
-
+      
       // 3. Extraer el IdToken de Google/Facebook verificado por Firebase
       const firebaseToken = await userCredential.user.getIdToken();
 
       // 4. Mandárselo a tu NestJS
-      const response = await api.post(
+      const response = await apiPrivate.post(
         '/auth/firebase-login',
         { token: firebaseToken },
         { withCredentials: true }
       );
-
-      // ➔ COLOCA ESTE LOG PARA REVISAR LA RESPUESTA REAL
-      console.log("Datos crudos del backend:", response.data);
 
       // Si el backend devuelve por ejemplo { data: { user, accessToken } } en vez de { user, accessToken } directo,
       // tu set() actual va a fallar silenciosamente guardando campos vacíos.
