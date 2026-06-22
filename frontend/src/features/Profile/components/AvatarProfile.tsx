@@ -12,7 +12,7 @@ import GlucoMedico from '../../../assets/profile/GlucoMedico.png';
 import GlucoPintor from '../../../assets/profile/GlucoPintor.png';
 import GlucoPolicia from '../../../assets/profile/GlucoPolicia.png';
 import GlucoMago from '../../../assets/profile/GucloMago.png'; // Corregido typo en la importación (Guclo -> Gluco)
-import { useProfileAvatar } from "../../../hooks/useProfileAvatar";
+import { usePreferenceConfig } from "../../../hooks/usePreferenceConfig";
 
 // Exportamos el array por si necesitas renderizar la lista en un componente de selección
 const ImagesProfile = [
@@ -47,7 +47,8 @@ const AvatarSelectedSx = {
 };
 
 export function AvatarProfile() {
-    const { avatarSelected, changeAvatar } = useProfileAvatar()
+    const { preference, changeAvatar } = usePreferenceConfig()
+    
     const [openAvatarEdit, setOpenAvatarEdit] = React.useState<boolean>(false);
 
     const handleOpenModalAvatarEdit = () => {
@@ -67,7 +68,7 @@ export function AvatarProfile() {
                 }}
             >
                 <Avatar
-                    src={avatarSelected} // Ahora cambia dinámicamente con el estado
+                    src={preference?.profileImg} // Ahora cambia dinámicamente con el estado
                     alt="Perfil actual"
                     sx={{
                         width: '100%',
@@ -128,7 +129,7 @@ export function AvatarProfile() {
                                         src={img}
                                         alt={`Opción ${index}`}
                                         onClick={() => { changeAvatar(img) }} // Guarda la selección temporal en el estado
-                                        sx={img === avatarSelected ? AvatarSelectedSx : AvatarNormalSx}
+                                        sx={img === preference?.profileImg ? AvatarSelectedSx : AvatarNormalSx}
                                     />
                                 </Grid>
                             );

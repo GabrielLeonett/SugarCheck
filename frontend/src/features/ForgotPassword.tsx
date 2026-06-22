@@ -7,7 +7,7 @@ import { useState } from "react";
 import { z } from "zod"; // Creamos un esquema rápido aquí o puedes importarlo de tus schemas
 import axios from "axios";
 import type { AxiosError } from "axios";
-import { api } from '../api/axios';
+import { apiPrivate } from '../apis/axios';
 import type { BackendErrorResponse } from "../types/types";
 import GlucoOlvido from '../assets/gluco-olvido.png';
 import { CardBase } from "../components/ui/Cards/CardBase";
@@ -39,16 +39,16 @@ export default function ForgotPassword() {
         shouldFocusError: true,
     });
 
-    // 3. Función de envío a la API
+    // 3. Función de envío a la apiPrivate
     const onSubmit = async (data: ForgotPasswordData) => {
         setAuthError(null);
         setSuccessMessage(null);
         setIsSubmitting(true);
 
         try {
-            // Hacemos el POST usando la instancia "api" que ya tiene configurada la baseURL
+            // Hacemos el POST usando la instancia "apiPrivate" que ya tiene configurada la baseURL
             // Ajusta '/auth/forgot-password' según el endpoint exacto de tu backend
-            const response = await api.post("/auth/forgot-password", { email: data.email });
+            const response = await apiPrivate.post("/auth/forgot-password", { email: data.email });
 
             // Si tu backend retorna un mensaje de éxito dinámico, puedes usar: response.data.message
             setSuccessMessage(response.data?.message || "Se ha enviado un correo de recuperación si la cuenta existe.");
