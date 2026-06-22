@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_sQcVcwj9Vo
 createdAt: 2026-05-26T03:59:24.640329300
-updatedAt: 2026-05-26T04:23:13.532218300
+updatedAt: 2026-06-20T17:32:20.106077300
 workspaceId: wk_tWcQe25Qgb
 folderId: fl_uLa5XZnwow
 authentication: {}
@@ -20,3 +20,18 @@ urlParameters:
   name: ''
   value: ''
   id: ZsMHSV8VE8
+settingSendCookies:
+  enabled: false
+  value: true
+settingStoreCookies:
+  enabled: false
+  value: true
+settingValidateCertificates:
+  enabled: false
+  value: true
+settingFollowRedirects:
+  enabled: false
+  value: true
+settingRequestTimeout:
+  enabled: false
+  value: 0
