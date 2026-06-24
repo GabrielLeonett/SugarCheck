@@ -8,9 +8,9 @@
     "backend",
     "frontend",
     "mobile",
-    "packages/*" 
+    "packages/*"
   ],
-    "scripts": {
+  "scripts": {
     "dev:backend": "pnpm --filter backend start:dev",
     "dev:frontend": "pnpm --filter frontend dev",
     "dev:mobile": "pnpm --filter mobile start",
@@ -27,11 +27,18 @@
     "type": "git",
     "url": "git+https://github.com/GabrielLeonett/sugarcheck.git"
   },
-  "keywords": ["monorepo", "nodejs", "react", "nestjs", "react-native"],
+  "keywords": [
+    "monorepo",
+    "nodejs",
+    "react",
+    "nestjs",
+    "react-native"
+  ],
   "author": "Gabriel Leonett",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/GabrielLeonett/sugarcheck/issues"
   },
-  "homepage": "https://github.com/GabrielLeonett/sugarcheck#readme"
+  "homepage": "https://github.com/GabrielLeonett/sugarcheck#readme",
+  "packageManager": "pnpm@11.9.0+sha512.bd682d5d03fe525ef7c9fd6780c6884d1e756ac4c9c9fe00c538782824310dcf90e3ddc4f53835f06dfaebd5085e41855e0bcbb3b60de2ac5bbab89e5036f03b"
 }
