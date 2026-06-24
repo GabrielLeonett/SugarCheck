@@ -81,7 +81,7 @@ export const PhysicalMonitoringPage: React.FC = () => {
             marginBottom: '32px',
           }}
         >
-          Monitoreo de la Fortaleza Física
+          Monitoreo de la Fortaleza Física.
         </Typography>
 
         <Grid container spacing={4}>
