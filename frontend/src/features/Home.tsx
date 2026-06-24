@@ -1,4 +1,5 @@
 import { Box, Grid, Slider, Typography } from '@mui/material';
+import { useState } from 'react';
 import Footer from '../components/layout/Footer/Footer.tsx';
 import Navbar from '../components/layout/Header/Navbar.tsx';
 import { useAuthStore } from '../stores/authStore.tsx';
@@ -8,6 +9,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { CardBase } from '../components/ui/Cards/CardBase.tsx';
 import useLanguage from '../hooks/useLanguage.tsx';
+import ModalGlucosaForm from '../components/shared/ModalGlucosaForm.tsx';
 
 const MAX = 100;
 const MIN = 0;
@@ -17,6 +19,41 @@ export default function Home() {
 
   // Inicializamos el hook con el namespace 'home'
   const { t } = useLanguage("home");
+
+  const obtenerFechaActual = () => {
+    const hoy = new Date();
+    const offset = hoy.getTimezoneOffset();
+    const fechaLocal = new Date(hoy.getTime() - offset * 60 * 1000);
+    return fechaLocal.toISOString().split('T')[0];
+  };
+
+  const obtenerHoraActual = () => {
+    const ahora = new Date();
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    return `${horas}:${minutos}`;
+  };
+
+  const [openGlucosaModal, setOpenGlucosaModal] = useState(false);
+  const [nivelGlucosa, setNivelGlucosa] = useState('');
+  const [contextoGlucosa, setContextoGlucosa] = useState('');
+  const [fechaGlucosa, setFechaGlucosa] = useState(obtenerFechaActual());
+  const [horaGlucosa, setHoraGlucosa] = useState(obtenerHoraActual());
+
+  const handleOpenGlucosaModal = () => {
+    setFechaGlucosa(obtenerFechaActual());
+    setHoraGlucosa(obtenerHoraActual());
+    setOpenGlucosaModal(true);
+  };
+
+  const handleCloseGlucosaModal = () => {
+    setOpenGlucosaModal(false);
+  };
+
+  const handleSaveGlucosaModal = () => {
+    // Aquí puedes hacer la lógica para guardar el registro.
+    setOpenGlucosaModal(false);
+  };
 
   // Reconstruimos el array de días usando las llaves del JSON
   const Dias = [
@@ -50,11 +87,25 @@ export default function Home() {
             {t("welcomeMessage").replace("{name}", user?.name.split(' ')[0] || "")}
           </Typography>
           <Box sx={{ display: 'flex', gap: 4 }}>
-            <ButtonBase startIcon={<AddIcon />}>{t("actions.registerGlucose")}</ButtonBase>
+            <ButtonBase onClick={handleOpenGlucosaModal} startIcon={<AddIcon />}>{t("actions.registerGlucose")}</ButtonBase>
             <ButtonBase startIcon={<AddIcon />}>{t("actions.applyInsulin")}</ButtonBase>
             <ButtonBase startIcon={<AddIcon />}>{t("actions.registerWeight")}</ButtonBase>
           </Box>
         </Box>
+
+        <ModalGlucosaForm
+          open={openGlucosaModal}
+          onClose={handleCloseGlucosaModal}
+          nivelGlucosa={nivelGlucosa}
+          onNivelGlucosaChange={setNivelGlucosa}
+          contexto={contextoGlucosa}
+          onContextoChange={setContextoGlucosa}
+          fecha={fechaGlucosa}
+          onFechaChange={setFechaGlucosa}
+          hora={horaGlucosa}
+          onHoraChange={setHoraGlucosa}
+          onSave={handleSaveGlucosaModal}
+        />
 
         <Grid container spacing={4} sx={{ mt: 5 }}>
           {/* Tarjeta: Última Batalla */}

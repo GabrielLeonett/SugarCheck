@@ -20,10 +20,13 @@ model User {
 
 model Preference {
   userId        String   @id 
+  profileImg    String   @default("../../../assets/profile/GlucoAstro.png")
   unitMeasure   String
   thresholds    Json     
   insulinRatios Json
   sensitivity   Float    
+  locale        String   @default("es")
+  theme         String   @default("system")
 
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

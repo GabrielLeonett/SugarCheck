@@ -4,10 +4,6 @@ import { useAuthStore } from '../stores/authStore';
 // Evita errores de compilación en entornos donde "process" no está tipado
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || ''; // Tu backend
 
-export const api = axios.create({
-  baseURL: BASE_URL,
-});
-
 export const apiPrivate = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
@@ -48,3 +44,4 @@ apiPrivate.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
