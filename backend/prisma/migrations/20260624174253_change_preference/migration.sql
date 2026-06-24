@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE "Preference" ALTER COLUMN "unitMeasure" DROP DEFAULT,
+ALTER COLUMN "thresholds" DROP DEFAULT,
+ALTER COLUMN "insulinRatios" DROP DEFAULT,
+ALTER COLUMN "sensitivity" DROP DEFAULT,
+ALTER COLUMN "profileImg" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "roles" DROP DEFAULT;
