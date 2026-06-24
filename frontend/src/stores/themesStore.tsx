@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, type ThemeOptions } from "@mui/material/styles";
 
 // 1. Paleta Primaria optimizada para Modo Claro (Mayor contraste y legibilidad)
 const lightPrimary = {
@@ -37,7 +37,7 @@ const darkPrimary = {
 };
 
 // 3. Base de configuración común
-const baseThemeConfig = {
+const baseThemeConfig:ThemeOptions  = {
   typography: {
     fontFamily: '"Poppins", sans-serif',
     h1: { fontSize: 88, fontWeight: 700, lineHeight: 1.2, letterSpacing: 1.5 },

@@ -10,13 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@base-ui/react": "^1.6.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.4.0",
     "@mui/icons-material": "^9.0.0",
     "@mui/material": "^9.0.0",
     "@mui/x-charts": "^9.5.0",
+    "@mui/x-date-pickers": "^9.6.0",
     "axios": "^1.16.1",
+    "dayjs": "^1.11.21",
     "firebase": "^12.13.0",
     "i18next": "^26.0.4",
     "i18next-browser-languagedetector": "^8.2.1",
