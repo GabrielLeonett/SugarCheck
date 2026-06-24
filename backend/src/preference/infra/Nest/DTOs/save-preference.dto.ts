@@ -33,12 +33,4 @@ export class SavePreferenceDTO {
   @IsNumber({}, { message: 'El factor de sensibilidad debe ser un número' })
   @IsNotEmpty({ message: 'El factor de sensibilidad es obligatorio' })
   sensitivity!: number;
-
-  @IsString({ message: 'El idioma debe ser un texto' })
-  @IsNotEmpty({ message: 'El idioma es obligatorio' })
-  locale!: string;
-
-  @IsString({ message: 'El tema debe ser un texto' })
-  @IsNotEmpty({ message: 'El tema es obligatorio' })
-  theme!: string;
 }
