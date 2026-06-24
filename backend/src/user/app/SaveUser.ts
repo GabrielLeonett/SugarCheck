@@ -11,13 +11,30 @@ import { UserFechaNacimiento } from '../core/value-objects/UserFechaNacimiento';
 import { PasswordHasher } from '../../shared/application/ports/password-hasher.interface';
 import { UserPassword } from '../core/value-objects/UserPassword';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
+import { SavePreference } from '../../preference/app/SavePreference';
+
+const BasePreference = {
+  unitMeasure: "mg/dL",
+  profileImg: "../../../assets/profile/GlucoAstro.png",
+  thresholds: {
+    hypo: 90,
+    hiper: 160
+  },
+  insulinRatios: {
+    breakfast: 100,
+    lunch: 100,
+    dinner: 100
+  },
+  sensitivity: 1
+};
 
 export class SaveUser {
   constructor(
     private readonly repository: UserRepository,
     private readonly passwordHasher: PasswordHasher,
     private readonly generateUUID: GenerateUUIDInterface,
-  ) {}
+    private readonly savePreference: SavePreference,
+  ) { }
 
   public async run(data: {
     name: string;
@@ -26,6 +43,8 @@ export class SaveUser {
     fechaNacimiento: Date;
     password: string;
   }): Promise<Result<User, ErrorAbstract>> {
+    
+    // 1. Validaciones y Creación de Value Objects
     const id = await this.generateUUID.run();
     const idRes = UserId.create(id);
     if (!idRes.isValid) return Result.fail(idRes.getError());
@@ -39,20 +58,17 @@ export class SaveUser {
     const roleRes = UserRoles.create(data.roles);
     if (!roleRes.isValid) return Result.fail(roleRes.getError());
 
-    // La fecha de creación normalmente la generamos nosotros en el registro
     const dateRes = UserCreatedAt.create(new Date());
     if (!dateRes.isValid) return Result.fail(dateRes.getError());
 
     const FechaNacimientoRes = UserFechaNacimiento.create(data.fechaNacimiento);
-    if (!FechaNacimientoRes.isValid)
-      return Result.fail(FechaNacimientoRes.getError());
+    if (!FechaNacimientoRes.isValid) return Result.fail(FechaNacimientoRes.getError());
 
     const hashedPass = await this.passwordHasher.hash(data.password);
-
     const passwordRes = UserPassword.create(hashedPass);
     if (!passwordRes.isValid) return Result.fail(passwordRes.getError());
 
-    // 2. Si llegamos aquí, todos son válidos. Creamos la Entidad.
+    // 2. Instanciación de la Entidad de Dominio User
     const user = new User({
       id: idRes.getValue(),
       name: nameRes.getValue(),
@@ -63,7 +79,30 @@ export class SaveUser {
       password: passwordRes.getValue(),
     });
 
-    // 3. Persistimos en la base de datos a través del repositorio
-    return await this.repository.save(user);
+    // ➔ 3. PERSISTENCIA EN BD: Guardamos primero el usuario para satisfacer la FK
+    const userSaveResult = await this.repository.save(user);
+
+    // Si el guardado del usuario en PostgreSQL falla, detenemos el proceso inmediatamente
+    if (!userSaveResult.isValid) {
+      return userSaveResult;
+    }
+
+    // ➔ 4. PERSISTENCIA EN BD SEGUNDARIA: Ahora que el usuario existe, guardamos sus preferencias
+    const preferenceResult = await this.savePreference.run(
+      idRes.getValue().value, // Extrae el string primitivo del UUID
+      BasePreference.profileImg,
+      BasePreference.unitMeasure,
+      BasePreference.thresholds,
+      BasePreference.insulinRatios,
+      BasePreference.sensitivity
+    );
+
+    // Si las preferencias fallan (por validación interna o error de Prisma)
+    if (!preferenceResult.isValid) {
+      return Result.fail(preferenceResult.getError());
+    }
+
+    // 5. Todo salió perfecto, devolvemos el resultado exitoso del usuario
+    return userSaveResult;
   }
 }
