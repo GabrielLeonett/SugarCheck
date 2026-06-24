@@ -9,15 +9,13 @@ import { Thresholds } from '../../core/value-objects/Thresholds';
 import { InsulinRatios } from '../../core/value-objects/InsulinRatios';
 import { SensitivityFactor } from '../../core/value-objects/SensitivityFactor';
 import { ProfileImg } from '../../core/value-objects/ProfileImg';
-import { Locale } from '../../core/value-objects/Locale';
-import { Theme } from '../../core/value-objects/Theme';
 import { ErrorAbstract } from '../../../shared/error-abstract';
 import { Result } from '../../../shared/result';
 import { DatabaseError } from '../../../shared/DatabaseError';
 
 @Injectable()
 export class PrismaPreferenceRepository implements PreferenceRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   // --- MAPPERS ---
 
@@ -33,9 +31,7 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
         raw.insulinRatios.lunch,
         raw.insulinRatios.dinner,
       ).getValue(),
-      sensitivity: SensitivityFactor.create(raw.sensitivity).getValue(),
-      locale: Locale.create(raw.locale).getValue(),
-      theme: Theme.create(raw.theme).getValue(),
+      sensitivity: SensitivityFactor.create(raw.sensitivity).getValue()
     });
   }
 
@@ -50,9 +46,7 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
         lunch: preference.insulinRatios.lunch,
         dinner: preference.insulinRatios.dinner,
       },
-      sensitivity: preference.sensitivity.value,
-      locale: preference.locale.value,
-      theme: preference.theme.value,
+      sensitivity: preference.sensitivity.value
     };
   }
 
