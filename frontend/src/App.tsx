@@ -37,13 +37,14 @@ function App() {
   if (isAuthLoading) {
     return <div>Cargando aplicación...</div>; // O un spinner estético
   }
+
   return (
     <Suspense fallback={<div>Cargando...</div>}>
       <ThemeWrapperContext>
         <Router>
           <Routes>
             {/* Rutas Protegidas */}
-            <Route element={<ProtectedRoute />}> si aqui mira
+            <Route element={<ProtectedRoute />}>
               <Route index element={<Home />} />
               <Route path="perfil" element={<Profile />} />
               {/* Quitamos la barra inicial en los hijos */}
