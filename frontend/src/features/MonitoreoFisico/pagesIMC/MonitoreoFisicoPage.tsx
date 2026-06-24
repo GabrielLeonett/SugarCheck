@@ -13,6 +13,8 @@ import { RegisterMeasurementModal } from '../componentsIMC/RegistrarMedidaModal'
 import type { PhysicalRecord, PhysicalEvolution } from '../../../types/types';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
 import { CardBase } from '../../../components/ui/Cards/CardBase';
+import Navbar from '../../../components/layout/Header/Navbar';
+import Footer from '../../../components/layout/Footer/Footer';
 
 // Mock inicial basado exactamente en la data visual de tu imagen
 const INITIAL_RECORDS: PhysicalRecord[] = [
@@ -67,6 +69,7 @@ export const PhysicalMonitoringPage: React.FC = () => {
         padding: '40px 24px',
       }}
     >
+      <Navbar/>
       <Box sx={{ maxWidth: '1200px', margin: '0 auto' }}>
         <Typography
           variant="h1"
@@ -111,6 +114,7 @@ export const PhysicalMonitoringPage: React.FC = () => {
       <Modal open={isModalOpen} onClose={handleCloseModal}>
         <RegisterMeasurementModal onClose={handleCloseModal} onSave={handleSaveMeasurement} />
       </Modal>
+      <Footer/>
     </Box>
   );
 };

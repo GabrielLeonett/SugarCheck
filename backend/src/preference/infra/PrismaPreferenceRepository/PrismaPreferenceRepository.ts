@@ -8,18 +8,12 @@ import { UnitMeasure } from '../../core/value-objects/UnitMeasure';
 import { Thresholds } from '../../core/value-objects/Thresholds';
 import { InsulinRatios } from '../../core/value-objects/InsulinRatios';
 import { SensitivityFactor } from '../../core/value-objects/SensitivityFactor';
+import { ProfileImg } from '../../core/value-objects/ProfileImg';
+import { Locale } from '../../core/value-objects/Locale';
+import { Theme } from '../../core/value-objects/Theme';
 import { ErrorAbstract } from '../../../shared/error-abstract';
 import { Result } from '../../../shared/result';
 import { DatabaseError } from '../../../shared/DatabaseError';
-
-// Interfaz que refleja tu modelo en Prisma (asumiendo campos JSON para los objetos anidados)
-interface PreferenceDB {
-  userId: string;
-  unitMeasure: string;
-  thresholds: Prisma.JsonValue;
-  insulinRatios: Prisma.JsonValue;
-  sensitivity: number;
-}
 
 @Injectable()
 export class PrismaPreferenceRepository implements PreferenceRepository {
@@ -28,32 +22,37 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
   // --- MAPPERS ---
 
   private toDomain(raw: any): Preference {
-    const id = UserId.create(raw.userId).getValue();
-    const unitMeasure = UnitMeasure.create(raw.unitMeasure).getValue();
-    const thresholds = Thresholds.create(raw.thresholds as any).getValue();
-    const insulinRatios = InsulinRatios.create(
-      raw.insulinRatios.breakfast,
-      raw.insulinRatios.lunch,
-      raw.insulinRatios.dinner,
-    ).getValue();
-    const sensitivity = SensitivityFactor.create(raw.sensitivity).getValue();
-
+    // Nota: Aquí se asume que los VO tienen métodos estáticos create que retornan un Result
     return new Preference({
-      userId: id,
-      unitMeasure,
-      thresholds,
-      insulinRatios,
-      sensitivity,
+      userId: UserId.create(raw.userId).getValue(),
+      profileImg: ProfileImg.create(raw.profileImg).getValue(),
+      unitMeasure: UnitMeasure.create(raw.unitMeasure).getValue(),
+      thresholds: Thresholds.create(raw.thresholds).getValue(),
+      insulinRatios: InsulinRatios.create(
+        raw.insulinRatios.breakfast,
+        raw.insulinRatios.lunch,
+        raw.insulinRatios.dinner,
+      ).getValue(),
+      sensitivity: SensitivityFactor.create(raw.sensitivity).getValue(),
+      locale: Locale.create(raw.locale).getValue(),
+      theme: Theme.create(raw.theme).getValue(),
     });
   }
 
   private toPersistence(preference: Preference): any {
     return {
       userId: preference.userId.value,
+      profileImg: preference.profileImg.value,
       unitMeasure: preference.unitMeasure.value,
       thresholds: preference.thresholds.value,
-      insulinRatios: preference.insulinRatios,
+      insulinRatios: {
+        breakfast: preference.insulinRatios.breakfast,
+        lunch: preference.insulinRatios.lunch,
+        dinner: preference.insulinRatios.dinner,
+      },
       sensitivity: preference.sensitivity.value,
+      locale: preference.locale.value,
+      theme: preference.theme.value,
     };
   }
 
@@ -61,10 +60,13 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
 
   async getOneById(id: UserId): Promise<Result<Preference, ErrorAbstract>> {
     try {
-      // Usamos userId como llave primaria o identificador único
       const preference = await this.prisma.preference.findUnique({
         where: { userId: id.value },
       });
+
+      if (!preference) {
+        return Result.fail(new DatabaseError('Preferencia no encontrada'));
+      }
 
       return Result.ok(this.toDomain(preference));
     } catch (error) {
@@ -78,12 +80,11 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
     preference: Preference,
   ): Promise<Result<Preference, ErrorAbstract>> {
     try {
-      // Usamos upsert: Si no existe la crea, si existe la ignora o actualiza
-      // Esto es ideal para configuraciones 1 a 1 con el usuario.
+      const data = this.toPersistence(preference);
       const savedPreference = await this.prisma.preference.upsert({
-        where: { userId: preference.userId.value },
-        update: this.toPersistence(preference),
-        create: this.toPersistence(preference),
+        where: { userId: data.userId },
+        update: data,
+        create: data,
       });
 
       return Result.ok(this.toDomain(savedPreference));
