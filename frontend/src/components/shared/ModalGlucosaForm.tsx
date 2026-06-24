@@ -10,6 +10,7 @@ import {
   Grid, 
   Button 
 } from '@mui/material';
+import useLanguage from '../../hooks/useLanguage';
 
 interface ModalGlucosaFormProps {
   open: boolean;
@@ -38,6 +39,8 @@ export default function ModalGlucosaForm({
   onHoraChange,
   onSave
 }: ModalGlucosaFormProps) {
+  const { t } = useLanguage("glucemia");
+
   return (
     <Modal open={open} onClose={onClose} aria-labelledby="modal-glucose-title">
       <Box sx={{ 
@@ -47,30 +50,31 @@ export default function ModalGlucosaForm({
         bgcolor: 'background.paper', borderRadius: 2, boxShadow: 24, p: 4 
       }}>
         <Typography id="modal-glucose-title" variant="h6" component="h2" color="primary.dark" sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}>
-          Registrar Nueva Medición
+          {t('modal.title')}
         </Typography>
 
         <TextField 
           fullWidth 
           margin="normal" 
           id="glucose-level" 
-          label="Nivel de Glucosa (mg/dL)" 
+          label={t('modal.labelNivel')} 
           type="number" 
           value={nivelGlucosa}
           onChange={(e) => onNivelGlucosaChange(e.target.value)}
         />
 
         <FormControl fullWidth margin="normal">
-          <InputLabel id="contexto-medicion-label">Contexto de la Medición</InputLabel>
+          <InputLabel id="contexto-medicion-label">{t('modal.labelContexto')}</InputLabel>
           <Select
             labelId="contexto-medicion-label"
             value={contexto}
-            label="Contexto de la Medición"
+            label={t('modal.labelContexto')}
             onChange={(e) => onContextoChange(e.target.value)}
           >
-            <MenuItem value="Ayunas">En Ayunas</MenuItem>
-            <MenuItem value="Después de Comer">Después de Comer</MenuItem>
-            <MenuItem value="Control General">Control General</MenuItem>
+            {/* Es una buena práctica mantener el "value" original en la base de datos y traducir solo el texto visible */}
+            <MenuItem value="Ayunas">{t('modal.contextos.ayunas')}</MenuItem>
+            <MenuItem value="Después de Comer">{t('modal.contextos.despuesComer')}</MenuItem>
+            <MenuItem value="Control General">{t('modal.contextos.controlGeneral')}</MenuItem>
           </Select>
         </FormControl>
 
@@ -78,7 +82,7 @@ export default function ModalGlucosaForm({
           <Grid size={{ xs: 7 }}>
             <TextField
               fullWidth
-              label="Fecha"
+              label={t('modal.labelFecha')}
               type="date"
               slotProps={{ inputLabel: { shrink: true } }}
               value={fecha}
@@ -88,7 +92,7 @@ export default function ModalGlucosaForm({
           <Grid size={{ xs: 5 }}>
             <TextField
               fullWidth
-              label="Hora"
+              label={t('modal.labelHora')}
               type="time"
               slotProps={{ inputLabel: { shrink: true } }}
               value={hora}
@@ -98,7 +102,7 @@ export default function ModalGlucosaForm({
         </Grid>
 
         <Button onClick={onSave} sx={{ mt: 3, py: 1 }} variant="contained" color="primary" fullWidth>
-          Guardar Medición
+          {t('modal.btnGuardar')}
         </Button>
       </Box>
     </Modal>
