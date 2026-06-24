@@ -1,0 +1,53 @@
+{
+  "titleMonitoreo": "Daily Glucose Monitoring",
+  "btnRegistrar": "Register New Measurement",
+  "modal": {
+    "title": "Register New Measurement",
+    "labelNivel": "Glucose Level (mg/dL)",
+    "labelContexto": "Measurement Context",
+    "labelFecha": "Date",
+    "labelHora": "Time",
+    "btnGuardar": "Save Measurement",
+    "contextos": {
+      "ayunas": "Fasting",
+      "despuesComer": "After Eating",
+      "controlGeneral": "General Control"
+    }
+  },
+  "zonaSegura": {
+    "title": "Time in Range (Target Zone)",
+    "caption": "Time in range",
+    "alertaBaja": "Low levels. Review your logs and take action",
+    "alertaNormal": "Stable levels within safe range",
+    "alertaAlta": "High levels. Monitor your situation and take action"
+  },
+  "frecuenciaAlertas": {
+    "title": "Alert Frequency",
+    "hiperglucemias": "Hyperglycemia",
+    "hipoglucemias": "Hypoglycemia",
+    "enRango": "Within target range"
+  },
+  "grafico": {
+    "title": "Blood Glucose Evolution",
+    "labelSerie": "Level (mg/dL)",
+    "sinDatos": "No records to plot",
+    "filtros": {
+      "hoy": "Today",
+      "semana": "Week",
+      "mes": "Month"
+    }
+  },
+  "tabla": {
+    "title": "Records History",
+    "headers": {
+      "hora": "Time",
+      "nivel": "Level (mg/dL)",
+      "contexto": "Context",
+      "estado": "Status"
+    },
+    "sinDatos": "No records for this time period.",
+    "paginacion": {
+      "filasPorPagina": "Rows per page:"
+    }
+  }
+}
