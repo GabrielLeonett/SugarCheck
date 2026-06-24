@@ -1,0 +1,39 @@
+{
+  "titleHistorial": "糖化ヘモグロビン（HbA1c）履歴",
+  "btnRegistrar": "検査結果を登録",
+  "modal": {
+    "title": "HbA1c結果の登録",
+    "labelResultado": "検査結果 (%)",
+    "labelFecha": "分析日",
+    "btnGuardar": "結果を保存"
+  },
+  "ultimoResultado": {
+    "title": "最新の結果",
+    "estimado": "推定eAG: {{valor}} mg/dL",
+    "enRango": "目標範囲内",
+    "fueraRango": "目標範囲外"
+  },
+  "grafico": {
+    "title": "HbA1cの推移",
+    "labelSerie": "結果 (%)",
+    "sinDatos": "この期間の検査はありません",
+    "filtros": {
+      "trimestre": "四半期",
+      "año": "年",
+      "todos": "すべて"
+    }
+  },
+  "tabla": {
+    "title": "検査履歴",
+    "headers": {
+      "fecha": "検査日",
+      "resultado": "結果 (HbA1c)",
+      "estimado": "推定平均値",
+      "estado": "状態"
+    },
+    "sinDatos": "選択された範囲に検査結果がありません。",
+    "paginacion": {
+      "filasPorPagina": "ページあたりの行数:"
+    }
+  }
+}
