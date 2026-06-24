@@ -9,8 +9,6 @@ import { SensitivityFactor } from '../core/value-objects/SensitivityFactor';
 import { Thresholds } from '../core/value-objects/Thresholds';
 // Importaciones nuevas
 import { ProfileImg } from '../core/value-objects/ProfileImg';
-import { Locale } from '../core/value-objects/Locale';
-import { Theme } from '../core/value-objects/Theme';
 
 export class SavePreference {
   constructor(private readonly repository: PreferenceRepository) {}
@@ -21,9 +19,7 @@ export class SavePreference {
     unitMeasure: string,
     thresholds: { hypo: number; hiper: number },
     insulinRatios: { breakfast: number; lunch: number; dinner: number },
-    sensitivity: number,
-    locale: string, // Nuevo
-    theme: string, // Nuevo
+    sensitivity: number
   ): Promise<Result<Preference, ErrorAbstract>> {
     
     // 1. Crear Value Objects
@@ -49,12 +45,6 @@ export class SavePreference {
     const sensitivityRes = SensitivityFactor.create(sensitivity);
     if (!sensitivityRes.isValid) return Result.fail(sensitivityRes.getError());
 
-    const localeRes = Locale.create(locale);
-    if (!localeRes.isValid) return Result.fail(localeRes.getError());
-
-    const themeRes = Theme.create(theme);
-    if (!themeRes.isValid) return Result.fail(themeRes.getError());
-
     // 2. Instanciar Entidad
     const preference = new Preference({
       userId: idRes.getValue(),
@@ -62,9 +52,7 @@ export class SavePreference {
       unitMeasure: unitMeasureRes.getValue(),
       thresholds: thresholdsRes.getValue(),
       insulinRatios: insulinRatiosRes.getValue(),
-      sensitivity: sensitivityRes.getValue(),
-      locale: localeRes.getValue(),
-      theme: themeRes.getValue(),
+      sensitivity: sensitivityRes.getValue()
     });
 
     // 3. Persistir

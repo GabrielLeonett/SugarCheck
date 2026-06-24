@@ -1,0 +1,39 @@
+{
+  "titleHistorial": "Histórico de Hemoglobina Glicada (HbA1c)",
+  "btnRegistrar": "Registrar Resultado de Laboratório",
+  "modal": {
+    "title": "Registrar Resultado de HbA1c",
+    "labelResultado": "Resultado do Laboratório (%)",
+    "labelFecha": "Data da Análise",
+    "btnGuardar": "Salvar Resultado"
+  },
+  "ultimoResultado": {
+    "title": "Último Resultado",
+    "estimado": "eAG estimada: {{valor}} mg/dL",
+    "enRango": "Dentro da Meta",
+    "fueraRango": "Fora da Meta"
+  },
+  "grafico": {
+    "title": "Evolução da HbA1c",
+    "labelSerie": "Resultado (%)",
+    "sinDatos": "Nenhum exame neste período",
+    "filtros": {
+      "trimestre": "Trimestre",
+      "año": "Ano",
+      "todos": "Todos"
+    }
+  },
+  "tabla": {
+    "title": "Histórico de Laboratórios",
+    "headers": {
+      "fecha": "Data do Exame",
+      "resultado": "Resultado (HbA1c)",
+      "estimado": "Média Estimada",
+      "estado": "Status"
+    },
+    "sinDatos": "Nenhum exame no intervalo selecionado.",
+    "paginacion": {
+      "filasPorPagina": "Linhas por página:"
+    }
+  }
+}

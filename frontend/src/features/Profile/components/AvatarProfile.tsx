@@ -48,7 +48,8 @@ const AvatarSelectedSx = {
 
 export function AvatarProfile() {
     const { preference, changeAvatar } = usePreferenceConfig()
-    
+    console.log(preference?.profileImg)
+
     const [openAvatarEdit, setOpenAvatarEdit] = React.useState<boolean>(false);
 
     const handleOpenModalAvatarEdit = () => {
