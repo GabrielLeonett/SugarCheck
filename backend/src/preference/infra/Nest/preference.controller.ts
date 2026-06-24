@@ -63,8 +63,6 @@ export class PreferenceController {
       body.thresholds,
       body.insulinRatios,
       body.sensitivity,
-      body.locale,
-      body.theme
     );
 
     if (!result.isValid) {
