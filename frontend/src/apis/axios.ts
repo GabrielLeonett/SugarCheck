@@ -1,13 +1,17 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
 
-// Evita errores de compilación en entornos donde "process" no está tipado
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || ''; // Tu backend
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export const apiPrivate = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
+});
+
+export const apiPublic = axios.create({
+  baseURL: BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
 });
 
 // Interceptor de Petición: Inyecta el token dinámicamente desde el store
@@ -28,10 +32,14 @@ apiPrivate.interceptors.response.use(
   async (error) => {
     const prevRequest = error?.config;
 
-    if (error?.response?.status === 401 && !prevRequest?.sent) {
+    // No reintentar si la petición que falló es el propio refresh (evita bucle infinito)
+    if (
+      error?.response?.status === 401 &&
+      !prevRequest?.sent &&
+      !prevRequest?.url?.includes('/auth/refresh')
+    ) {
       prevRequest.sent = true;
       try {
-        // Llamamos directamente a la acción del store para refrescar
         const refreshFunction = useAuthStore.getState().refresh;
         const newAccessToken = await refreshFunction();
 
