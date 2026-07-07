@@ -70,19 +70,19 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
             </Modal>
 
             {/* Último Resultado */}
-            <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, textAlign: "center" }}>
                 {t('ultimoResultado.title')}
               </Typography>
-              <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "success.light" }}>
+              <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "success.light", textAlign: "center" }}>
                 {/* Supongo que este valor vendrá de tu hook en un entorno real, por ahora dejo el estático formateado */}
                 {dataHook.ultimoResultadoHbA1c ? `${dataHook.ultimoResultadoHbA1c}%` : "6.8%"}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center" }}>
                 {/* Interpolación dinámica del eAG estimado */}
                 {t('ultimoResultado.estimado', { valor: dataHook.ultimoEag || 148 })}
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "success.light" }}>
+              <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "success.light", textAlign: "center" }}>
                 {/* Ejemplo de condicional dinámico usando las claves de traducción */}
                 {dataHook.enRangoObjetivo !== false ? t('ultimoResultado.enRango') : t('ultimoResultado.fueraRango')}
               </Typography>
@@ -142,7 +142,7 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
               {t('tabla.title')}
             </Typography>
 
-            <TableContainer component={Paper} variant="outlined" sx={{ mb: 1, border: 'none' }}>
+            <TableContainer component={Paper} variant="outlined" sx={{ mb: 1, borderColor: 'divider' }}>
               <Table size="small" aria-label="tabla de hba1c">
                 <TableHead sx={{ bgcolor: 'primary.main' }}>
                   <TableRow>
