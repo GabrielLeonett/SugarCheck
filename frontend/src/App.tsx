@@ -18,11 +18,14 @@ import { Profile } from "./features/Profile/Profile";
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
   const setLoading = useAuthStore((state) => state.setLoading);
+  const user = useAuthStore((state) => state.user);
   const isAuthLoading = useAuthStore((state) => state.isAuthLoading);
 
   useEffect(() => {
     const verifySession = async () => {
       try {
+        // En tus componentes que hacen fetch:
+        if (!user) return; // <--- ESTO EVITA LA PETICIÓN SI NO HAY SESIÓN
         await refresh();
       } catch (err) {
         console.log("Sin sesión previa activa.");
@@ -32,7 +35,7 @@ function App() {
     };
 
     verifySession();
-  }, [refresh, setLoading]);
+  }, [refresh, setLoading, user]);
 
   if (isAuthLoading) {
     return <div>Cargando aplicación...</div>; // O un spinner estético
