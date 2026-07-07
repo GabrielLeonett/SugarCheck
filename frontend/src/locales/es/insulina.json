@@ -1,0 +1,12 @@
+{
+  "monitoreoDiarioDeInsulina": "Monitoreo Diario de Insulina",
+  "registrarRapida": "Registrar Aplicación de Dosis Rápida",
+  "registrarLenta": "Registrar Aplicación de Dosis Lenta",
+  "cronometroSeguridad": "Cronómetro de Seguridad",
+  "ultimaDosisRapida": "Última dosis Insulina Rápida",
+  "escudoAgotando": "El escudo se está agotando",
+  "unidadesTotalesDia": "Unidades Totales del Día",
+  "esquemaCorrector": "Esquema Corrector",
+  "mgDl": "mg/dL",
+  "uiBolus": "UI de Bolus"
+}

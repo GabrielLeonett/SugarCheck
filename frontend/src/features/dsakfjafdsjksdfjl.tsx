@@ -137,8 +137,8 @@ export default function Home() {
                 scaleType: 'band'
               }]}
               yAxis={[{
-                min: 0,
-                max: 120,
+                min: MIN,
+                max: MAX,
               }]}
               series={[
                 {

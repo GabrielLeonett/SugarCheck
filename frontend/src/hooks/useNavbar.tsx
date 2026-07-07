@@ -29,7 +29,7 @@ export function useNavbar() {
     },
     {
         name: t("agente"), submenu: [
-            { name: t("consultarAlOraculo"), href: "/agente/control-de-glucemia" },
+            { name: t("consultarAlOraculo"), href: "/agente/oraculo-chat" },
             { name: t("rutaDelGuerrero"), href: "/agente/registro-de-alimentos" },
         ]
         , icon: <MenuIcon />
