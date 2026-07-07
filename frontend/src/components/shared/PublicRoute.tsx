@@ -1,9 +1,8 @@
-// components/shared/PublicRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuthStore } from "../../stores/authStore";
 
 export const PublicRoute = () => {
-    const user = useAuthStore((state) => state.user);
+    const accessToken = useAuthStore((state) => state.accessToken);
 
-    return user ? <Navigate to="/" replace /> : <Outlet />;
+    return accessToken ? <Navigate to="/" replace /> : <Outlet />;
 };
