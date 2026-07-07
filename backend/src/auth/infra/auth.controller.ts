@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDTO } from './DTOs/login.dto';
@@ -14,31 +16,33 @@ import type { Response, Request } from 'express';
 import { InvalidCredentialsError } from '../core/errors/InvalidCredentialsError';
 import { FirebaseAdminService } from './firebase-admin.service';
 import { LoginFirebaseDTO } from './DTOs/login-firebase.dto';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly firebaseAdminService: FirebaseAdminService,
-  ) { }
+  ) {}
 
-  // 1. Configuración para el Access Token (Vida corta)
-  private readonly cookieOptionsAccessToken = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict' as const,
-    maxAge: 15 * 60 * 1000, // 15 minutos
-    path: '/',
-  };
+  private readonly isProduction = process.env.NODE_ENV === 'production';
 
-  // 2. Configuración para el Refresh Token (Vida larga)
-  private readonly cookieOptionsRefreshToken = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict' as const,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
-    path: '/',
-  };
+  // Configuración centralizada de cookies
+  private getCookieOptions(maxAge: number) {
+    return {
+      httpOnly: true,
+      secure: this.isProduction,
+      sameSite: this.isProduction ? 'strict' as const : 'lax' as const,
+      maxAge,
+      path: '/',
+    };
+  }
+
+  // Access Token: 15 minutos
+  private readonly cookieOptionsAccessToken = this.getCookieOptions(15 * 60 * 1000);
+  
+  // Refresh Token: 7 días
+  private readonly cookieOptionsRefreshToken = this.getCookieOptions(7 * 24 * 60 * 60 * 1000);
 
   @Post('login')
   async login(
@@ -46,23 +50,26 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.login(data.email, data.password);
+    
     if (!result.isValid) {
       const error = result.getError();
       if (error instanceof InvalidCredentialsError) {
         throw new UnauthorizedException(error.message);
       }
+      throw new UnauthorizedException('Error de autenticación');
     }
 
     const { at, rt, user } = result.getValue();
 
-    // Guardamos el Refresh Token en la cookie usando las opciones centralizadas
+    // Guardar tokens en cookies
     res.cookie('access_token', at, this.cookieOptionsAccessToken);
     res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
 
     return {
       message: 'Login exitoso',
       user,
-      accessToken: at,
+      // NO enviar tokens en el body si ya están en cookies
+      // accessToken: at, // ❌ Eliminar esto por seguridad
     };
   }
 
@@ -71,37 +78,59 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const token = req.cookies['refresh_token'];
-    if (!token) throw new UnauthorizedException('No hay token de refresco');
+    const oldRefreshToken = req.cookies['refresh_token'];
+    
+    if (!oldRefreshToken) {
+      // Limpiar cualquier cookie residual
+      res.clearCookie('access_token', { path: '/' });
+      res.clearCookie('refresh_token', { path: '/' });
+      throw new UnauthorizedException('No hay token de refresco');
+    }
 
-    const result = await this.authService.refreshToken(token);
-    const { at, rt, user } = result.getValue();
+    try {
+      // El servicio debe invalidar el refresh token antiguo
+      const result = await this.authService.refreshToken(oldRefreshToken);
+      const { at, rt, user } = result.getValue();
 
-    // Renovamos la cookie
-    res.cookie('access_token', at, this.cookieOptionsAccessToken);
-    res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
+      // Renovar ambas cookies
+      res.cookie('access_token', at, this.cookieOptionsAccessToken);
+      res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
 
-    return {
-      message: 'Token renovado',
-      user,
-      accessToken: at,
-    };
+      return {
+        message: 'Token renovado',
+        user,
+        // NO enviar tokens en el body
+      };
+    } catch (error) {
+      // Si el refresh token es inválido, limpiar cookies
+      res.clearCookie('access_token', { path: '/' });
+      res.clearCookie('refresh_token', { path: '/' });
+      throw new UnauthorizedException('Token de refresco inválido o expirado');
+    }
   }
 
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
-    await this.authService.logout();
+  async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies['refresh_token'];
+    
+    // Invalidar refresh token en el servidor si existe
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
 
-    // ➔ CORREGIDO: Para borrar una cookie, las opciones de 'path' y 'domain' DEBEN ser idénticas a cuando se creó
-    res.clearCookie('refresh_token', {
+    // Limpiar TODAS las cookies de autenticación
+    const clearCookieOptions = {
       httpOnly: true,
-      maxAge: 0,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/', // Si mantienes '/auth/refresh' arriba, aquí también debes poner '/auth/refresh'
-    });
+      secure: this.isProduction,
+      sameSite: this.isProduction ? 'strict' as const : 'lax' as const,
+      path: '/',
+    };
 
-    // Nota: Como no estás guardando 'access_token' en cookies (sino en la memoria del cliente), no hace falta borrarlo aquí.
+    res.clearCookie('access_token', clearCookieOptions);
+    res.clearCookie('refresh_token', clearCookieOptions);
 
     return { message: 'Sesión cerrada exitosamente' };
   }
@@ -118,20 +147,23 @@ export class AuthController {
       throw new UnauthorizedException('Token de Firebase inválido o expirado');
     }
 
-    const firebaseUid = decodedToken.uid;
-    const email = decodedToken.email;
-    const name = decodedToken.name;
-
-    const result = await this.authService.loginFirebaseUser({ email, name, firebaseUid });
+    const { uid, email, name } = decodedToken;
+    const result = await this.authService.loginFirebaseUser({ 
+      email, 
+      name, 
+      firebaseUid: uid 
+    });
+    
     const { at, rt, user } = result.getValue();
 
     res.cookie('access_token', at, this.cookieOptionsAccessToken);
     res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
 
     return {
-      message: 'Login con Firebase exitoso', // Ajustado el mensaje para que sea semántico
+      message: 'Login con Firebase exitoso',
       user,
-      accessToken: at,
+      // NO enviar tokens en el body
     };
   }
+
 }
