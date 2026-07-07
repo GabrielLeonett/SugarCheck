@@ -68,8 +68,7 @@ export class AuthController {
     return {
       message: 'Login exitoso',
       user,
-      // NO enviar tokens en el body si ya están en cookies
-      // accessToken: at, // ❌ Eliminar esto por seguridad
+      accessToken: at,
     };
   }
 
@@ -99,7 +98,7 @@ export class AuthController {
       return {
         message: 'Token renovado',
         user,
-        // NO enviar tokens en el body
+        accessToken: at,
       };
     } catch (error) {
       // Si el refresh token es inválido, limpiar cookies
@@ -118,7 +117,7 @@ export class AuthController {
     
     // Invalidar refresh token en el servidor si existe
     if (refreshToken) {
-      await this.authService.logout(refreshToken);
+      await this.authService.logout();
     }
 
     // Limpiar TODAS las cookies de autenticación
@@ -162,7 +161,7 @@ export class AuthController {
     return {
       message: 'Login con Firebase exitoso',
       user,
-      // NO enviar tokens en el body
+      accessToken: at,
     };
   }
 
