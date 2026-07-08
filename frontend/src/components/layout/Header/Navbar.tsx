@@ -6,20 +6,25 @@ import NotificationIcon from "@mui/icons-material/Notifications";
 import type { NavItemWithSubmenu } from "../../../types/types";
 
 // ✅ Import correcto del contexto
-import { Logo } from "../../ui/logo";
+import { Logo } from "../../ui/Logo";
 import DrawerAppBar from "./Drawer";
 import { MenuSubItemComp } from "../../ui/MenuSubItemComp";
 import NavBarItem from "../../ui/NavBarItem";
 import ProfileNavBar from "../../ui/Cards/ProfileNavBar";
 import { useNavbar } from "../../../hooks/useNavbar";
+import { usePreferenceConfig } from "../../../hooks/usePreferenceConfig";
+
 
 function Navbar() {
+  const {preference} = usePreferenceConfig();
+
   const {
     isDarkMode, toggleTheme,
     profileMenuOpen, setProfileMenuOpen, navItems,
     handleDrawerToggle, handleNavClick, userInitials, drawerOpen
   } = useNavbar();
-
+ 
+  // no mira esto tiene un hook especial
   return (
     <>
       <AppBar
@@ -31,7 +36,6 @@ function Navbar() {
             justifyContent: "space-between",
             alignItems: "center",
             px: { xs: 2, sm: 3, md: 4 },
-            backgroundColor: "primary.light",
           }}
         >
           <Box component={'a'} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none' }} href="/">
@@ -93,7 +97,7 @@ function Navbar() {
             <Badge badgeContent={4} color="secondary">
               <NotificationIcon />
             </Badge>
-            <Avatar alt="User" children={userInitials} sx={{
+            <Avatar alt="User" src={preference?.profileImg} children={userInitials} sx={{
               "&:hover": {
                 backgroundColor: "action.hover",
                 borderRadius: 1,

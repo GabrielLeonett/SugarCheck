@@ -49,7 +49,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ value }) => {
   const percentage = Math.min(Math.max(((value - minImc) / (maxImc - minImc)) * 100, 0), 100);
 
   return (
-    <Box width="100%">
+    <Box sx={{width:'100%'}}>
       <TrackContainer>
         <Segment bg="#3498DB" /> {/* Bajo Peso */}
         <Segment bg="#2ECC71" /> {/* Normal */}

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { SavePreference } from '../../app/SavePreference';
 import { GetOneByIdPreference } from '../../app/GetOneByUserIdPreference';
-import {  SavePreferenceDTO } from './DTOs/save-preference.dto';
+import { SavePreferenceDTO } from './DTOs/save-preference.dto';
 import { AuthGuard } from '../../../auth/infra/auth.guard';
 
 @Controller('preference')
@@ -22,7 +22,7 @@ export class PreferenceController {
     private readonly getOneByIdPreferenceUseCase: GetOneByIdPreference,
     @Inject('SavePreference')
     private readonly savePreferenceUseCase: SavePreference,
-  ) {}
+  ) { }
 
   /**
    * OBTERNER PREFERENCIAS DEL USUARIO ACTUAL
@@ -44,7 +44,7 @@ export class PreferenceController {
 
     return {
       message: 'Preferencias obtenidas exitosamente',
-      data: result.getValue(),
+      data: result.getValue().toPlain(),
     };
   }
 
@@ -54,10 +54,11 @@ export class PreferenceController {
    */
   @Post()
   async save(@Request() req: any, @Body() body: SavePreferenceDTO) {
-    const userId = req.user.sub; 
+    const userId = req.user.sub;
 
     const result = await this.savePreferenceUseCase.run(
-      userId, 
+      userId,
+      body.profileImg,
       body.unitMeasure,
       body.thresholds,
       body.insulinRatios,
@@ -73,7 +74,7 @@ export class PreferenceController {
 
     return {
       message: 'Preferencias guardadas exitosamente',
-      data: result.getValue(),
+      data: result.getValue().toPlain(),
     };
   }
 }

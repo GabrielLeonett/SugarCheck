@@ -1,0 +1,53 @@
+{
+  "titleMonitoreo": "Monitoramento Diário de Glicose",
+  "btnRegistrar": "Registrar Nova Medição",
+  "modal": {
+    "title": "Registrar Nova Medição",
+    "labelNivel": "Nível de Glicose (mg/dL)",
+    "labelContexto": "Contexto da Medição",
+    "labelFecha": "Data",
+    "labelHora": "Hora",
+    "btnGuardar": "Salvar Medição",
+    "contextos": {
+      "ayunas": "Em Jejum",
+      "despuesComer": "Depois de Comer",
+      "controlGeneral": "Controle Geral"
+    }
+  },
+  "zonaSegura": {
+    "title": "Tempo no Alvo (Zona Segura)",
+    "caption": "Tempo no intervalo",
+    "alertaBaja": "Níveis baixos. Revise seus registros e aja",
+    "alertaNormal": "Níveis estáveis dentro da faixa segura",
+    "alertaAlta": "Níveis altos. Monitore sua situação e aja"
+  },
+  "frecuenciaAlertas": {
+    "title": "Frequência de Alertas",
+    "hiperglucemias": "Hiperglicemias",
+    "hipoglucemias": "Hipoglicemias",
+    "enRango": "Na meta objetivo"
+  },
+  "grafico": {
+    "title": "Evolução da Glicemia",
+    "labelSerie": "Nível (mg/dL)",
+    "sinDatos": "Nenhum registro para gerar o gráfico",
+    "filtros": {
+      "hoy": "Hoje",
+      "semana": "Semana",
+      "mes": "Mês"
+    }
+  },
+  "tabla": {
+    "title": "Histórico de Registros",
+    "headers": {
+      "hora": "Hora",
+      "nivel": "Nível (mg/dL)",
+      "contexto": "Contexto",
+      "estado": "Status"
+    },
+    "sinDatos": "Nenhum registro para este período de tempo.",
+    "paginacion": {
+      "filasPorPagina": "Linhas por página:"
+    }
+  }
+}

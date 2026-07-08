@@ -14,10 +14,14 @@ import { GenerateUUIDInterface } from '../../../shared/application/ports/generat
 import { PasswordHasher } from '../../../shared/application/ports/password-hasher.interface';
 import { UpdateUser } from '../../app/UpdateUser';
 import { AuthModule } from '../../../auth/infra/auth.module';
+import { SavePreference } from '../../../preference/app/SavePreference';
+import { PreferenceModule } from '../../../preference/infra/Nest/preference.module';
 
 @Module({
-  // ➔ Rompemos el bucle envolviendo AuthModule en forwardRef
-  imports: [forwardRef(() => AuthModule)], 
+  imports: [
+    forwardRef(() => AuthModule),
+    PreferenceModule, // 👈 1. IMPORTAMOS el módulo para tener acceso a 'SavePreference'
+  ],
   providers: [
     PrismaService,
     {
@@ -43,8 +47,10 @@ import { AuthModule } from '../../../auth/infra/auth.module';
         repo: UserRepository,
         hash: PasswordHasher,
         generate: GenerateUUIDInterface,
-      ) => new SaveUser(repo, hash, generate),
-      inject: ['UserRepository', 'BcryptHasher', 'GenerateUUID'],
+        savePreference: SavePreference,
+      ) => new SaveUser(repo, hash, generate, savePreference),
+      // 👈 2. NestJS buscará 'SavePreference' porque su módulo lo exporta formalmente
+      inject: ['UserRepository', 'BcryptHasher', 'GenerateUUID', 'SavePreference'],
     },
     {
       provide: 'UpdateUser',
@@ -71,6 +77,6 @@ import { AuthModule } from '../../../auth/infra/auth.module';
     },
   ],
   controllers: [UserController],
-  exports: ['GetOneByEmailUser', 'GetOneByIdUser', 'SaveUser'], // Exportamos los casos de uso que AuthModule necesita para validar usuarios
+  exports: ['GetOneByEmailUser', 'GetOneByIdUser', 'SaveUser'],
 })
-export class UserModule {}
+export class UserModule { }
