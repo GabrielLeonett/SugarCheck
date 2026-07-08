@@ -1,0 +1,12 @@
+{
+  "monitoreoDiarioDeInsulina": "毎日のインスリン監視",
+  "registrarRapida": "速効型インスリン投与を登録",
+  "registrarLenta": "遅効型インスリン投与を登録",
+  "cronometroSeguridad": "安全タイマー",
+  "ultimaDosisRapida": "最後の速効型インスリン投与",
+  "escudoAgotando": "シールドが切れかけています",
+  "unidadesTotalesDia": "今日の総投与量",
+  "esquemaCorrector": "補正スキーム",
+  "mgDl": "mg/dL",
+  "uiBolus": "ボーラスUI"
+}

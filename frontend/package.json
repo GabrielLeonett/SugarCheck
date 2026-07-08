@@ -17,7 +17,10 @@
     "@mui/icons-material": "^9.0.0",
     "@mui/material": "^9.0.0",
     "@mui/x-charts": "^9.5.0",
+<<<<<<< HEAD
+=======
     "@mui/x-date-pickers": "^9.6.0",
+>>>>>>> 4df533bce7f4bdf0172f34d73e2bdbdb5fe6c12b
     "axios": "^1.16.1",
     "dayjs": "^1.11.21",
     "firebase": "^12.13.0",
