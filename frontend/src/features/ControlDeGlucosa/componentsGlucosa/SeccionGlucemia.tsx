@@ -10,9 +10,11 @@ import ModalGlucosaForm from '../../../components/shared/ModalGlucosaForm.tsx';
 import { obtenerColorEstado } from '../../../hooks/useGlucosaData.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 
+import type { GlucosaData } from '../../../schemas/glucosa';
+
 interface SeccionGlucemiaProps {
-  dataHook: any; // Tipar de acuerdo a tu retorno de useGlucosaData si es necesario
-  onSaveGlucosa: () => void;
+  dataHook: any;
+  onSaveGlucosa: (data: GlucosaData) => void;
 }
 
 export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProps) {
@@ -32,18 +34,9 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
               {t('btnRegistrar')}
             </ButtonBase>
 
-            {/* MODAL DE GLUCOSA COMPARTIDO */}
             <ModalGlucosaForm 
               open={dataHook.openGlucosa}
               onClose={dataHook.handleCloseGlucosa}
-              nivelGlucosa={dataHook.nivelGlucosaInput}
-              onNivelGlucosaChange={dataHook.setNivelGlucosaInput}
-              contexto={dataHook.contexto}
-              onContextoChange={dataHook.setContexto}
-              fecha={dataHook.fechaGlucosa}
-              onFechaChange={dataHook.setFechaGlucosa}
-              hora={dataHook.hora}
-              onHoraChange={dataHook.setHora}
               onSave={onSaveGlucosa}
             />
 

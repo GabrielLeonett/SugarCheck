@@ -4,7 +4,6 @@ import LockResetIcon from '@mui/icons-material/LockReset'; // Icono adecuado par
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { z } from "zod"; // Creamos un esquema rápido aquí o puedes importarlo de tus schemas
 import axios from "axios";
 import type { AxiosError } from "axios";
 import { apiPublic } from '../apis/axios';
@@ -12,13 +11,7 @@ import type { BackendErrorResponse } from "../types/types";
 import GlucoOlvido from '../assets/gluco-olvido.png';
 import { CardBase } from "../components/ui/Cards/CardBase";
 import { ButtonBase } from "../components/ui/Buttons/ButtonBase";
-
-// 1. Esquema de validación específico para recuperar contraseña
-const forgotPasswordSchema = z.object({
-    email: z.string().email("Ingresa un correo electrónico válido"),
-});
-
-type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
+import { forgotPasswordSchema, type ForgotPasswordData } from "../schemas/forgot_password";
 
 export default function ForgotPassword() {
     const theme = useTheme();
