@@ -8,6 +8,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { CardBase } from '../components/ui/Cards/fdhjasfdasdfalsk.tsx';
 
+
 const MAX = 100;
 const MIN = 0;
 const marks = [

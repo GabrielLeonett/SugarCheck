@@ -1,14 +1,12 @@
-import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
-import LightModeIcon from "@mui/icons-material/LightMode";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import ExitIcon from "@mui/icons-material/ExitToApp"; // Icono para cerrar sesión
 import ChangeIcon from "@mui/icons-material/ChangeCircle"; // Icono para cerrar sesión
-import React from 'react';
-import { ThemeContext } from '../../../contexts/ThemeContext.tsx';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { useAuthStore } from '../../../stores/authStore.tsx';
-import LanguageSelector from '../../shared/LanguageSelector.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
-import { CardBase } from './fdhjasfdasdfalsk.tsx';
+import { CardBase } from './CardBase.tsx';
+import { ConfigRow } from '../ConfigRow.tsx';
+import { useNavigate } from 'react-router-dom';
 
 
 interface ProfileNavBarProps {
@@ -18,7 +16,8 @@ interface ProfileNavBarProps {
 export default function ProfileNavBar({ open }: ProfileNavBarProps) {
     const user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
-    const { isDarkMode, toggleTheme } = React.useContext(ThemeContext);
+    const navigate = useNavigate()
+
     const { t } = useLanguage("common");
     if (!open) return null;
     return (
@@ -34,7 +33,7 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
                 position: 'fixed', // Asegúrate de posicionarlo correctamente si es un menú
                 right: 16,
                 top: 70,
-                zIndex:999
+                zIndex: 999
             }}
             elevation={3}
         >
@@ -48,26 +47,22 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
             <Divider sx={{ my: 1 }} />
 
             {/* Ajustes: Tema y Idioma */}
-            <Stack sx={{ direction: "row", justifyContent: "space-between", alignItems: "center", px: 1, py: 0.5 }}>
-                <Typography variant="body2" color="text.secondary">{t("configuracion")}</Typography>
-                <Box>
-                    <IconButton onClick={toggleTheme} size="small">
-                        {isDarkMode ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-                    </IconButton>
-                    <LanguageSelector />
-                </Box>
-            </Stack>
+            <ConfigRow />
 
             <Divider sx={{ my: 1 }} />
 
             {/* Acciones principales */}
-            <Stack spacing={0.5} direction="row">
+            <Stack spacing={0.5} direction="column">
                 {[
-                    { icon: <ChangeIcon />, label: t("cambiarContrasena") },
+                    { icon: <AccountBoxIcon />, label: t("perfil"), onClick: () => navigate('/perfil') },
+                    { icon: <ChangeIcon />, label: t("cambiarContrasena"), onClick: () => { /* tu función aquí */ } },
                     { icon: <ExitIcon />, label: t("cerrarSesion"), onClick: logout },
                 ].map((item, index) => (
                     <Box
                         key={index}
+                        component="div"
+                        role="button"
+                        tabIndex={0}
                         sx={{
                             display: "flex",
                             alignItems: "center",
@@ -76,13 +71,23 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
                             p: 1.5,
                             borderRadius: 1,
                             cursor: "pointer",
+                            userSelect: "none",
                             "&:hover": { bgcolor: "action.hover" },
-                            transition: "background 0.2s"
+                            "&:focus-visible": { bgcolor: "action.focus", outline: "none" },
+                            transition: "background-color 0.2s"
                         }}
                         onClick={item.onClick}
+                        onKeyDown={(e) => {
+                            if ((e.key === 'Enter' || e.key === ' ') && item.onClick) {
+                                e.preventDefault();
+                                item.onClick();
+                            }
+                        }}
                     >
                         {item.icon}
-                        <Typography variant="body2">{item.label}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {item.label}
+                        </Typography>
                     </Box>
                 ))}
             </Stack>

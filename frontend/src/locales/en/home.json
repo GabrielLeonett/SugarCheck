@@ -1,0 +1,43 @@
+{
+    "welcomeMessage": "Hello, Warrior {name}!",
+    "actions": {
+        "registerGlucose": "Log Glucose",
+        "applyInsulin": "Log Insulin",
+        "registerWeight": "Log Weight/Height"
+    },
+    "cards": {
+        "lastBattle": {
+            "title": "Last Battle",
+            "unit": "mg/dL",
+            "timeLabel": "{time} ago (Post-lunch)"
+        },
+        "securityTimer": {
+            "title": "Security Timer",
+            "description": "Last Rapid Insulin",
+            "alertMessage": "The shield is running out"
+        },
+        "safeZone": {
+            "title": "Safe Zone Mastery",
+            "alertMessage": "Low levels. Check your logs and take action"
+        },
+        "battleHistory": {
+            "title": "Battle History"
+        },
+        "physicalBalance": {
+            "title": "Physical Strength Balance",
+            "statusHealthy": "Healthy condition",
+            "statusUnderweight": "Underweight",
+            "statusNormal": "Normal",
+            "statusOverweight": "Overweight"
+        }
+    },
+    "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+    }
+}

@@ -10,12 +10,16 @@ import { ThresholdsDTO, InsulinRatiosDTO } from './utils.dto';
 
 export class SavePreferenceDTO {
 
+  @IsString({ message: 'La URL de la imagen debe ser un texto' })
+  @IsNotEmpty({ message: 'La URL de la imagen es obligatoria' })
+  profileImg!: string;
+
   @IsString({ message: 'La unidad de medida debe ser un texto' })
   @IsNotEmpty({ message: 'La unidad de medida es obligatoria' })
   unitMeasure!: string;
 
   @ValidateNested({ message: 'Los umbrales tienen un formato incorrecto' })
-  @Type(() => ThresholdsDTO) // Obligatorio para transformar el JSON a la clase
+  @Type(() => ThresholdsDTO)
   @IsNotEmpty({ message: 'Los umbrales son obligatorios' })
   thresholds!: ThresholdsDTO;
 
