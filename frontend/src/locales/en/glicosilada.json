@@ -1,0 +1,39 @@
+{
+  "titleHistorial": "Glycated Hemoglobin (HbA1c) History",
+  "btnRegistrar": "Register Laboratory Result",
+  "modal": {
+    "title": "Register HbA1c Result",
+    "labelResultado": "Laboratory Result (%)",
+    "labelFecha": "Analysis Date",
+    "btnGuardar": "Save Result"
+  },
+  "ultimoResultado": {
+    "title": "Latest Result",
+    "estimado": "Estimated eAG: {{valor}} mg/dL",
+    "enRango": "Within Target Range",
+    "fueraRango": "Out of Target Range"
+  },
+  "grafico": {
+    "title": "HbA1c Evolution",
+    "labelSerie": "Result (%)",
+    "sinDatos": "No tests in this period",
+    "filtros": {
+      "trimestre": "Quarter",
+      "año": "Year",
+      "todos": "All"
+    }
+  },
+  "tabla": {
+    "title": "Laboratory History",
+    "headers": {
+      "fecha": "Test Date",
+      "resultado": "Result (HbA1c)",
+      "estimado": "Estimated Average",
+      "estado": "Status"
+    },
+    "sinDatos": "No tests in this selected range.",
+    "paginacion": {
+      "filasPorPagina": "Rows per page:"
+    }
+  }
+}

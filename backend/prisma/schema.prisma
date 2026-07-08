@@ -19,11 +19,12 @@ model User {
 }
 
 model Preference {
-  userId        String   @id 
-  unitMeasure   String
+  userId        String   @id
+  profileImg    String   
+  unitMeasure   String   
+  sensitivity   Float   
   thresholds    Json     
-  insulinRatios Json
-  sensitivity   Float    
+  insulinRatios Json     
 
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
