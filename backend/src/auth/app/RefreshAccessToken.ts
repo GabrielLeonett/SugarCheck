@@ -48,23 +48,21 @@ export class RefreshAccessToken {
       // 4. Generar payload actualizado con tipos primitivos limpios
       const newPayload = {
         sub: user.id,
-        name: user.name,
+        username: user.username,
         roles: user.roles,
       };
 
-      // 5. Rotación de tokens (Estrategia de seguridad para EduFlow)
       const [at, rt] = await Promise.all([
         this.jwtService.signAsync(newPayload, { expiresIn: '15m' }),
         this.jwtService.signAsync(newPayload, { expiresIn: '7d' }),
       ]);
 
-      // 6. Retornar los nuevos tokens y la info plana del usuario
       return Result.ok({ 
         at, 
         rt, 
         user: { 
           id: user.id, 
-          name: user.name, 
+          username: user.username, 
           roles: user.roles 
         } 
       });

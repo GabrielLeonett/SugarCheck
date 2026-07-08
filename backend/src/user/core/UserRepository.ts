@@ -1,5 +1,6 @@
 import { User } from './User';
 import { UserEmail } from './value-objects/UserEmail';
+import { UserUsername } from './value-objects/UserUsername';
 import { ErrorAbstract } from '../../shared/error-abstract';
 import { Result } from '../../shared/result';
 import { UserId } from '../../shared/core/value-objects/UserId';
@@ -10,6 +11,8 @@ export interface UserRepository {
   getOneById(id: UserId): Promise<Result<User, ErrorAbstract>>;
 
   getOneByEmail(email: UserEmail): Promise<Result<User, ErrorAbstract>>;
+
+  getOneByUsername(username: UserUsername): Promise<Result<User, ErrorAbstract>>;
 
   save(user: User): Promise<Result<User, ErrorAbstract>>;
 
