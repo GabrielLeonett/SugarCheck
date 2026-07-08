@@ -25,8 +25,13 @@ export function useNavbar() {
     }, 
     {
         name: t("agente"), submenu: [
+<<<<<<< HEAD
+            { name: t("consultarAlOraculo"), href: "/agente/oraculo-chat" },
+            { name: t("rutaDelGuerrero"), href: "/agente/registro-de-alimentos" },
+=======
             { name: t("consultarAlOraculo"), href: "/agente/control-de-go-de-lucemia" }, 
             { name: t("rutaDelGuerrero"), href: "/agente/camino" },
+>>>>>>> 4df533bce7f4bdf0172f34d73e2bdbdb5fe6c12b
         ]
         , icon: <MenuIcon />
     }];

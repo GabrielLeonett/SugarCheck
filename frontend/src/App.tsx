@@ -56,17 +56,26 @@ function App() {
                 </Route>
               </Route>
 
-              <Route element={<PublicRoute />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/olvidoContrasena" element={<ForgotPassword />} />
-                <Route path="/register" element={<Register />} />
-              </Route>
-            </Routes>
-          </Router>
-        </Suspense>
-      )}
-    </ThemeWrapperContext>
-  );
+                 <Route path="agente">
+                 <Route path="oraculo-chat" element={<Oraculo />} />
+
+               </Route>
+
+             </Route>
+
+
+
+             {/* Rutas Públicas */}
+             <Route element={<PublicRoute />}>
+               <Route path="/login" element={<Login />} />
+               <Route path="/olvidoContrasena" element={<ForgotPassword />} />
+               <Route path="/register" element={<Register />} />
+             </Route>
+           </Routes>
+         </Router>
+       </ThemeWrapperContext>
+     </Suspense>
+   );
 }
 
 export default App;
