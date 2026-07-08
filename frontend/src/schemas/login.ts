@@ -1,11 +1,8 @@
 import { z } from "zod";
 
-// Definimos el esquema
 export const loginSchema = z.object({
-  email: z.string().email("El correo electrónico no es válido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres")
+  username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres").max(30).regex(/^[a-zA-Z][a-zA-Z0-9_-]*$/, "Solo letras, números, guiones y guiones bajos"),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
 });
 
-// Zod infiere el tipo de TypeScript automáticamente
 export type LoginData = z.infer<typeof loginSchema>;
-

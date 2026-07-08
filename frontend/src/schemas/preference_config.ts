@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 // 1. Esquemas para los valores específicos
-export const ThemeSchema = z.enum(['light', 'dark', 'system']);
-export const LocaleSchema = z.enum(['es', 'ja', 'en', 'pt']);
+export const ThemeSchema = z.enum(['light', 'dark', 'system'] as const);
+export const LocaleSchema = z.enum(['es', 'ja', 'en', 'pt'] as const);
 
 // 2. Esquema principal de Preferencias
 export const PreferenceSchema = z.object({
   userId: z.string().uuid(), // Validamos que sea un UUID
-  profileImg: z.string().url(), // Validamos que sea una URL válida
+  profileImg: z.string().min(1),
   unitMeasure: z.string().min(1),
   thresholds: z.object({
     hypo: z.number().positive(),

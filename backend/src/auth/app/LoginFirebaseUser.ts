@@ -35,7 +35,8 @@ export class LoginFirebaseUser {
       const saveResult = await this.SaveUser.run({
         name: dto.name,
         email: dto.email,
-        roles: [Role.Guerrero], // Asignamos un rol por defecto, puedes ajustar esto según tu lógica
+        roles: [Role.Guerrero],
+        sexo: 'masculino',
         fechaNacimiento: new Date('2000-01-01'),
         password: `FB_EXTERNAL_AUTH_${Math.random().toString(36).substring(2)}`,
       });
@@ -54,11 +55,10 @@ export class LoginFirebaseUser {
     // 4. Generar el Payload para TU propio ecosistema de JWT
     const payload = {
       sub: user.id,
-      name: user.name,
+      username: user.username,
       roles: user.roles,
     };
 
-    // 5. Firmar los tokens de tu aplicación
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: '15m' }),
       this.jwtService.signAsync(payload, { expiresIn: '7d' }),
@@ -69,7 +69,7 @@ export class LoginFirebaseUser {
       rt,
       user: {
         id: user.id,
-        name: user.name,
+        username: user.username,
         roles: user.roles,
       },
     });
