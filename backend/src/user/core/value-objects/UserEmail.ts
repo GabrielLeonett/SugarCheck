@@ -8,12 +8,13 @@ export class UserEmail {
   }
 
   public static create(
-    value: string,
+    value?: string | null,
   ): Result<UserEmail, UserEmailInvalidError> {
-    // 1. Limpieza básica
-    const email = value ? value.trim().toLowerCase() : '';
+    if (!value || !value.trim()) {
+      return Result.ok(new UserEmail(''));
+    }
 
-    // 2. Expresión regular para validar email
+    const email = value.trim().toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
@@ -24,7 +25,6 @@ export class UserEmail {
       );
     }
 
-    // 3. Si todo está bien, retornamos la instancia
     return Result.ok(new UserEmail(email));
   }
 }

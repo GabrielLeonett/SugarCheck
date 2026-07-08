@@ -9,6 +9,7 @@ import CheckIcon from '@mui/icons-material/Check';
 
 // Importamos TU componente base
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
+import { monitoreoFisicoSchema, type MonitoreoFisicoData } from '../../../schemas/monitoreo_fisico';
 
 interface RegisterMeasurementModalProps {
   onClose: () => void;
