@@ -106,7 +106,7 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
               {t('tabla.title')}
             </Typography>
 
-            <TableContainer component={Paper} variant="outlined" sx={{ mb: 1, border: 'none' }}>
+            <TableContainer component={Paper} variant="outlined" sx={{ mb: 1, borderColor: 'divider' }}>
               <Table size="small" aria-label="tabla de hba1c">
                 <TableHead sx={{ bgcolor: 'primary.main' }}>
                   <TableRow>
