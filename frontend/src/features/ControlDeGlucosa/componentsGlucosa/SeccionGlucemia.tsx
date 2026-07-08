@@ -41,14 +41,14 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
             />
 
             {/* Dominio de la Zona Segura */}
-            <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, textAlign: "center"}}>
                 {t('zonaSegura.title')}
               </Typography>
-              <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "error.light" }}>
+              <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "error.light", textAlign: "center" }}>
                 {dataHook.porcentajeZonaSegura !== undefined ? `${dataHook.porcentajeZonaSegura}%` : "45%"}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", mt: 1 }}>
                 {t('zonaSegura.caption')}
               </Typography>
               <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "error.light" }}>
@@ -156,7 +156,7 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
               {t('tabla.title')}
             </Typography>
 
-            <TableContainer component={Paper} variant="outlined" sx={{ mb: 1, border: 'none' }}>
+            <TableContainer component={Paper} variant="outlined" sx={{ mb: 1, borderColor: 'divider' }}>
               <Table size="small" aria-label="tabla de glucosa">
                 <TableHead sx={{ bgcolor: 'primary.main' }}>
                   <TableRow>
