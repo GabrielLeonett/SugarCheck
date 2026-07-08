@@ -19,18 +19,19 @@ interface ThemeContextType {
 }
 
 interface User {
-  sub: number;
-  name: string;
-  email: string;
+  id: string;
+  username: string;
+  email?: string;
+  sexo?: string;
 }
 
 interface AuthContextType {
   auth: {
-    user: User | null; // Puedes definir un tipo más específico para el usuario si lo deseas
+    user: User | null;
     accessToken: string | null;
   };
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<string>;
 }
