@@ -7,6 +7,7 @@ export interface SaveUserInterface {
         name: string;
         email: string;
         roles: string[];
+        sexo: string;
         fechaNacimiento: Date;
         password: string;
     }): Promise<Result<UserInterface, ErrorAbstract>>;
