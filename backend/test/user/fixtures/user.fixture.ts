@@ -7,6 +7,7 @@ import { UserPassword } from '../../../src/user/core/value-objects/UserPassword'
 import { UserRoles } from '../../../src/user/core/value-objects/UserRoles';
 import { UserCreatedAt } from '../../../src/user/core/value-objects/UserCreatedAt';
 import { UserFechaNacimiento } from '../../../src/user/core/value-objects/UserFechaNacimiento';
+import { UserSexo } from '../../../src/user/core/value-objects/UserSexo';
 import { UserId } from '../../../src/shared/core/value-objects/UserId';
 
 // Definimos una interfaz para los datos que queremos permitir personalizar
@@ -15,6 +16,7 @@ interface UserOverrides {
   name?: string;
   password?: string;
   email?: string;
+  sexo?: string;
   roles?: Role[];
   createdAt?: Date;
   fechaNacimiento?: Date;
@@ -40,6 +42,7 @@ export class UserFactory {
         overrides.email ?? faker.internet.email(),
       ).getValue(),
       roles: UserRoles.create(overrides.roles ?? [Role.Guerrero]).getValue(),
+      sexo: UserSexo.create(overrides.sexo ?? 'masculino').getValue(),
       createdAt: UserCreatedAt.create(
         overrides.createdAt ?? new Date(),
       ).getValue(),

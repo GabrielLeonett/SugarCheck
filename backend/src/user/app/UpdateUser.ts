@@ -6,6 +6,7 @@ import { UserEmail } from "../core/value-objects/UserEmail";
 import { UserName } from "../core/value-objects/UserName";
 import { UserFechaNacimiento } from "../core/value-objects/UserFechaNacimiento";
 import { UserPassword } from "../core/value-objects/UserPassword";
+import { UserSexo } from "../core/value-objects/UserSexo";
 import { PasswordHasher } from "../../shared/application/ports/password-hasher.interface";
 import { User } from "../core/User";
 
@@ -19,6 +20,7 @@ export class UpdateUser {
     async run(id: string, update: {
         name?: string;
         email?: string;
+        sexo?: string;
         fechaNacimiento?: Date;
         password?: string;
     }): Promise<Result<User, ErrorAbstract>> {
@@ -53,6 +55,12 @@ export class UpdateUser {
                 }
             }
             validatedUpdate.email = emailRes.getValue();
+        }
+
+        if (update.sexo !== undefined) {
+            const sexoRes = UserSexo.create(update.sexo);
+            if (!sexoRes.isValid) return Result.fail(sexoRes.getError());
+            validatedUpdate.sexo = sexoRes.getValue();
         }
 
         if (update.fechaNacimiento !== undefined) {
