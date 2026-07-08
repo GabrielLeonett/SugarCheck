@@ -8,6 +8,7 @@ import { CardBase } from '../components/ui/Cards/CardBase';
 export default function Register() {
     const theme = useTheme();
     const [activeStep, setActiveStep] = useState(0);
+    // Estado central del formulario: almacena los datos ingresados en cada paso para poder validarlos y enviarlos después.
     const [formData, setFormData] = useState({
         // Paso 1: Crear cuenta
         nombre: '',
@@ -26,8 +27,10 @@ export default function Register() {
         parentesco: '',
         telefono: ''
     });
+    // Estado de errores: guarda los mensajes por campo para mostrar validaciones en tiempo real y por paso.
     const [errors, setErrors] = useState<Record<string, string>>({});
 
+    // Paso 1: valida credenciales básicas, rango de edad y concordancia de contraseñas.
     const validateStep1 = () => {
         const newErrors: Record<string, string> = {};
         const edad = Number(formData.edad);
@@ -72,6 +75,7 @@ export default function Register() {
         return Object.keys(newErrors).length === 0;
     };
 
+    // Paso 2: valida rangos de salud con límites coherentes para peso, talla y glucosa.
     const validateStep2 = () => {
         const newErrors: Record<string, string> = {};
         const peso = Number(formData.peso);
@@ -99,6 +103,7 @@ export default function Register() {
         return Object.keys(newErrors).length === 0;
     };
 
+    // Paso 3: valida el contacto de emergencia; el teléfono usa una regex específica para números venezolanos.
     const validateStep3 = () => {
         const newErrors: Record<string, string> = {};
         const nombreGuardiánError = formData.nombreGuardián ? validateTextFieldValue(formData.nombreGuardián) : 'Nombre del guardián es requerido';
@@ -194,6 +199,7 @@ export default function Register() {
         setErrors(newErrors);
     };
 
+    // Actualiza el valor del campo y limpia su error al mismo tiempo cuando el input queda válido.
     const handleChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         const newErrors = { ...errors };
