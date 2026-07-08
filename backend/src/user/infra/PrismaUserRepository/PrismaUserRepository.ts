@@ -6,22 +6,24 @@ import { ErrorAbstract } from '../../../shared/error-abstract';
 import { DatabaseError } from '../../../shared/DatabaseError';
 import { UserRepository } from '../../core/UserRepository';
 import { PrismaService } from '../../../shared/infrastructure/prisma.service';
-import { UserName } from '../../core/value-objects/UserName';
+import { UserUsername } from '../../core/value-objects/UserUsername';
 import { UserEmail } from '../../core/value-objects/UserEmail';
 import { UserRoles } from '../../core/value-objects/UserRoles';
 import { UserCreatedAt } from '../../core/value-objects/UserCreatedAt';
 import { UserPassword } from '../../core/value-objects/UserPassword';
 import { UserFechaNacimiento } from '../../core/value-objects/UserFechaNacimiento';
+import { UserSexo } from '../../core/value-objects/UserSexo';
 import { UserNotFoundError } from '../../core/errors/UserNotFoundError';
 import { UserAlreadyExists } from '../../core/errors/UserAlreadyExists';
 import { UserId } from '../../../shared/core/value-objects/UserId';
 
 interface UserDB {
   id: string;
-  name: string;
+  username: string;
   password: string;
-  email: string;
+  email: string | null;
   roles: string[];
+  sexo: string;
   createdAt: Date;
   fechaNacimiento: Date;
 }
@@ -33,9 +35,10 @@ export class PrismaUserRepository implements UserRepository {
   private toDomain(raw: UserDB): User {
     return new User({
       id: UserId.create(raw.id).getValue(),
-      name: UserName.create(raw.name).getValue(),
+      username: UserUsername.create(raw.username).getValue(),
       email: UserEmail.create(raw.email).getValue(),
       roles: UserRoles.create(raw.roles).getValue(),
+      sexo: UserSexo.create(raw.sexo).getValue(),
       createdAt: UserCreatedAt.create(raw.createdAt).getValue(),
       password: UserPassword.create(raw.password).getValue(),
       fechaNacimiento: UserFechaNacimiento.create(
@@ -47,9 +50,10 @@ export class PrismaUserRepository implements UserRepository {
   private toPersistence(user: User): UserDB {
     return {
       id: user.id.value,
-      name: user.name.value,
-      email: user.email.value,
+      username: user.username.value,
+      email: user.email.value || null,
       roles: user.roles.value,
+      sexo: user.sexo.value,
       createdAt: user.createdAt.value,
       password: user.password.value,
       fechaNacimiento: user.fechaNacimiento.value,
@@ -69,7 +73,13 @@ export class PrismaUserRepository implements UserRepository {
 
   async getOneByEmail(email: UserEmail): Promise<Result<User, ErrorAbstract>> {
     try {
-      const user = await this.prisma.user.findUnique({
+      if (!email.value) {
+        return Result.fail(
+          new UserNotFoundError('Email no proporcionado'),
+        );
+      }
+
+      const user = await this.prisma.user.findFirst({
         where: { email: email.value },
       });
 
@@ -84,6 +94,27 @@ export class PrismaUserRepository implements UserRepository {
     } catch (error) {
       return Result.fail(
         new DatabaseError('Error técnico al buscar por email'),
+      );
+    }
+  }
+
+  async getOneByUsername(username: UserUsername): Promise<Result<User, ErrorAbstract>> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { username: username.value },
+      });
+
+      if (!user)
+        return Result.fail(
+          new UserNotFoundError(
+            `Usuario '${username.value}' no encontrado`,
+          ),
+        );
+
+      return Result.ok(this.toDomain(user));
+    } catch (error) {
+      return Result.fail(
+        new DatabaseError('Error técnico al buscar por nombre de usuario'),
       );
     }
   }
@@ -107,16 +138,30 @@ export class PrismaUserRepository implements UserRepository {
 
   async save(user: User): Promise<Result<User, ErrorAbstract>> {
     try {
-      const existingUser = await this.prisma.user.findUnique({
-        where: { email: user.email.value },
+      const existingUsername = await this.prisma.user.findUnique({
+        where: { username: user.username.value },
       });
 
-      if (existingUser) {
+      if (existingUsername) {
         return Result.fail(
           new UserAlreadyExists(
-            `El email ${user.email.value} ya está registrado`,
+            `El nombre de usuario '${user.username.value}' ya está registrado`,
           ),
         );
+      }
+
+      if (user.email.value) {
+        const existingEmail = await this.prisma.user.findFirst({
+          where: { email: user.email.value },
+        });
+
+        if (existingEmail) {
+          return Result.fail(
+            new UserAlreadyExists(
+              `El email ${user.email.value} ya está registrado`,
+            ),
+          );
+        }
       }
 
       const savedUser = await this.prisma.user.create({
@@ -141,28 +186,22 @@ export class PrismaUserRepository implements UserRepository {
 
 async update(id: UserId, update: Partial<User>): Promise<Result<User, ErrorAbstract>> {
   try {
-    // 1. Es obligatorio usar await para que la base de datos se actualice realmente
     await this.prisma.user.update({
       where: { id: id.value },
       data: {
-        // Usamos el encadenamiento opcional (?.) para que si el campo no viene en el Partial,
-        // Prisma simplemente lo ignore y no intente actualizarlo a undefined de forma explícita.
-        name: update.name?.value,
-        email: update.email?.value,
+        username: update.username?.value,
+        email: update.email?.value || undefined,
         roles: update.roles?.value,
+        sexo: update.sexo?.value,
         password: update.password?.value,
         fechaNacimiento: update.fechaNacimiento?.value,
       },
     });
 
-    // 2. Esperamos y retornamos el usuario fresco ya actualizado desde la DB
     return await this.getOneById(id);
 
   } catch (error) {
-    // 3. Manejo de excepciones controlado para no romper la app y cumplir con la firma del método
-    // Aquí puedes usar tu clase concreta de error que extienda de ErrorAbstract (ej. DatabaseError)
     const dbError = new DatabaseError(`Database error during user update: ${error instanceof Error ? error.message : String(error)}`);
-    
     return Result.fail(dbError);
   }
 }

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
 import { Box, Typography, TextField, InputAdornment, Grid, styled } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import CheckIcon from '@mui/icons-material/Check';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
+import { monitoreoFisicoSchema, type MonitoreoFisicoData } from '../../../schemas/monitoreo_fisico';
 
 interface RegisterMeasurementModalProps {
   onClose: () => void;
@@ -34,36 +36,43 @@ const StyledTextField = styled(TextField)(() => ({
 }));
 
 export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> = ({ onClose, onSave }) => {
-  const [peso, setPeso] = useState('');
-  const [estatura, setEstatura] = useState('');
-  const [dd, setDd] = useState('');
-  const [mm, setMm] = useState('');
-  const [aaaa, setAaaa] = useState('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<MonitoreoFisicoData>({
+    resolver: zodResolver(monitoreoFisicoSchema),
+    mode: 'onChange',
+    defaultValues: {
+      peso: '',
+      estatura: '',
+      dd: '',
+      mm: '',
+      aaaa: '',
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!peso || !estatura || !dd || !mm || !aaaa) return;
-
+  const onSubmit = (data: MonitoreoFisicoData) => {
     onSave({
-      peso: parseFloat(peso),
-      estatura: parseFloat(estatura),
-      fecha: `${dd.padStart(2, '0')}/${mm.padStart(2, '0')}/${aaaa}`,
+      peso: parseFloat(data.peso),
+      estatura: parseFloat(data.estatura),
+      fecha: `${data.dd.padStart(2, '0')}/${data.mm.padStart(2, '0')}/${data.aaaa}`,
     });
     onClose();
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ p: 1 }}>
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ p: 1 }}>
       <ModalTitle>Registrar Nuevas Medidas</ModalTitle>
 
-      {/* Input Peso */}
       <Box sx={{ mb: 2.5 }}>
         <FormLabel>Peso</FormLabel>
         <StyledTextField
           fullWidth
           size="small"
-          value={peso}
-          onChange={(e) => setPeso(e.target.value)}
+          {...register('peso')}
+          error={!!errors.peso}
+          helperText={errors.peso?.message}
           slotProps={{
             input: {
               endAdornment: <InputAdornment position="end" sx={{ fontWeight: 700, color: '#2C3E50' }}>Kg</InputAdornment>,
@@ -72,14 +81,14 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
         />
       </Box>
 
-      {/* Input Talla */}
       <Box sx={{ mb: 5 }}>
         <FormLabel>Talla</FormLabel>
         <StyledTextField
           fullWidth
           size="small"
-          value={estatura}
-          onChange={(e) => setEstatura(e.target.value)}
+          {...register('estatura')}
+          error={!!errors.estatura}
+          helperText={errors.estatura?.message}
           slotProps={{
             input: {
               endAdornment: <InputAdornment position="end" sx={{ fontWeight: 700, color: '#2C3E50' }}>cm</InputAdornment>,
@@ -88,23 +97,39 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
         />
       </Box>
 
-      {/* Input Fecha Compuesta */}
       <Box sx={{ mb: 4 }}>
         <FormLabel>Fecha</FormLabel>
         <Grid container spacing={1.5}>
           <Grid size={3.5}>
-            <StyledTextField placeholder="DD" size="small" value={dd} onChange={(e) => setDd(e.target.value)} />
+            <StyledTextField
+              placeholder="DD"
+              size="small"
+              {...register('dd')}
+              error={!!errors.dd}
+              helperText={errors.dd?.message}
+            />
           </Grid>
           <Grid size={3.5}>
-            <StyledTextField placeholder="MM" size="small" value={mm} onChange={(e) => setMm(e.target.value)} />
+            <StyledTextField
+              placeholder="MM"
+              size="small"
+              {...register('mm')}
+              error={!!errors.mm}
+              helperText={errors.mm?.message}
+            />
           </Grid>
           <Grid size={5}>
-            <StyledTextField placeholder="YYYY" size="small" value={aaaa} onChange={(e) => setAaaa(e.target.value)} />
+            <StyledTextField
+              placeholder="YYYY"
+              size="small"
+              {...register('aaaa')}
+              error={!!errors.aaaa}
+              helperText={errors.aaaa?.message}
+            />
           </Grid>
         </Grid>
       </Box>
 
-      {/* Botón de Guardado */}
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <ButtonBase type="submit" startIcon={<CheckIcon />}>
           Registrar Medidas
