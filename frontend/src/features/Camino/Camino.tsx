@@ -14,14 +14,14 @@ return (
         <Grid container  sx={{ mt: 2, width: "100%" }}>
             <Grid size={8}>
                 <Typography variant="h3" sx={{ textAlign: "center" }}>
-                    git Camino del guerrero
+                    Camino del guerrero
                 </Typography>
                 <Box sx={{ border: "2px solid black", p: 2, height: "100%" }}>
                     <HexagonoMundo numero = "1"/>
                     <HexagonoMundo numero = "2"/>
                 </Box>
             </Grid>
-             {/*aca es el apartado de las insignias*/} 
+                {/*aca es el apartado de las insignias*/} 
             <Grid  size={4} >
                 <Box  //contenedor azul principal de las insignias y sus propiedades
                 sx={{
