@@ -10,13 +10,14 @@ import {
   TablePagination
 } from '@mui/material';
 import type { PhysicalRecord } from '../../../types/types';
+import useLanguage from "../../../hooks/useLanguage";
 
 interface HistoryTableProps {
   records: PhysicalRecord[];
 }
 
 export const HistoryTable: React.FC<HistoryTableProps> = ({ records }) => {
-  // Configuración inicial de paginación basada en tu diseño
+  const { t } = useLanguage("monitoreoFisico");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(4);
 
@@ -55,11 +56,11 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ records }) => {
         <Table aria-label="Bitácora histórica">
           <TableHead>
             <TableRow sx={{ backgroundColor: '#7FB3D5' /* Color azul del encabezado */ }}>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>Fecha</TableCell>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>Peso (Kg)</TableCell>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>Estatura (cm)</TableCell>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>IMC</TableCell>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>Estado</TableCell>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tableFecha")}</TableCell>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tablePeso")}</TableCell>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tableEstatura")}</TableCell>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tableImc")}</TableCell>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tableEstado")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -92,8 +93,8 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ records }) => {
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Filas por páginas:"
-        labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`}
+        labelRowsPerPage={t("rowsPerPage")}
+        labelDisplayedRows={({ from, to, count }) => t("displayedRows", { from, to, count: count !== -1 ? count : `más de ${to}` })}
         sx={{ 
           border: '1px solid #CCD5DE', 
           borderTop: 'none', 

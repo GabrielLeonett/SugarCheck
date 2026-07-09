@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, Divider } from '@mui/material';
 import { CardBase } from '../componentsIMC/CardBase';
 import type { PhysicalEvolution } from '../../../types/types';
+import useLanguage from "../../../hooks/useLanguage";
 
 interface MetricCardProps {
   type: 'balance' | 'evolution';
@@ -10,6 +11,7 @@ interface MetricCardProps {
 }
 
 export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc, evolutionData }) => {
+  const { t } = useLanguage("monitoreoFisico");
   // Renderizado para la tarjeta de Balance de Fortaleza Física
   if (type === 'balance') {
     let color = '#27AE60'; // Verde (Normal)
@@ -22,7 +24,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc, evolut
     return (
       <CardBase>
         <Typography sx={{ color: '#34495E', fontWeight: 700, textAlign: 'center', mb: 2 }}>
-          Balance de Fortaleza Física
+{t("balanceTitle")}
         </Typography>
         
         <Typography variant="h2" sx={{ color: color, fontWeight: 800, textAlign: 'center', mb: 3 }}>
@@ -51,7 +53,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc, evolut
     return (
       <CardBase>
         <Typography sx={{ color: '#34495E', fontWeight: 700, textAlign: 'center', mb: 3 }}>
-          Evolución Física
+{t("evolutionTitle")}
         </Typography>
         
         <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 3 }}>
@@ -61,7 +63,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc, evolut
               {evolutionData.pesoDiff > 0 ? '+' : ''}{evolutionData.pesoDiff} Kg
             </Typography>
             <Typography sx={{ fontSize: '0.8rem', color: '#34495E', fontWeight: 700 }}>
-              Diferencia de Peso
+{t("weightDiff")}
             </Typography>
           </Box>
 
@@ -71,14 +73,14 @@ export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc, evolut
               {evolutionData.estaturaDiff > 0 ? '+' : ''}{evolutionData.estaturaDiff} cm
             </Typography>
             <Typography sx={{ fontSize: '0.8rem', color: '#34495E', fontWeight: 700 }}>
-              Crecimiento Logrado
+{t("heightGrowth")}
             </Typography>
           </Box>
         </Box>
 
         <Divider sx={{ mb: 2, borderColor: '#CCD5DE' }} />
         <Typography sx={{ fontSize: '0.75rem', color: '#7F8C8D', textAlign: 'center' }}>
-          Evolución con respecto al registro anterior ({evolutionData.fechaReferencia}).
+          {t("evolutionDesc", { date: evolutionData?.fechaReferencia })}
         </Typography>
       </CardBase>
     );

@@ -8,14 +8,14 @@ import { ButtonBase } from "../../components/ui/Buttons/ButtonBase.tsx";
 import ModalInsulinaLenta from "./components/ModalInsulinaLenta.tsx";
 import ModalInsulinaRapida from "./components/ModalInsulinaRapida.tsx";
 import InsulinaHistorial from "./components/insulinaHistorial.tsx";
-import useLanguage from "../../hooks/useLanguage.tsx";
+import useLanguage from "../../hooks/useLanguage";
 
 export default function Insulina() {
   // ESTADOS PARA LOS MODALES
   const [openLento, setOpenLento] = useState(false);
   const [openRapido, setOpenRapido] = useState(false);
 
-  const {t} = useLanguage('insulina')
+  const {t} = useLanguage('insulina');
 
   // ESTADOS PARA LAS ZONAS
   const [vistaCuerpo, setVistaCuerpo] = useState<"FRENTE" | "ATRÁS">("FRENTE");
