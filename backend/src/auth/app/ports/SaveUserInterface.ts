@@ -5,6 +5,7 @@ import { UserInterface } from './UserInterface';
 export interface SaveUserInterface {
     run(data: {
         name: string;
+        username: string;
         email: string;
         roles: string[];
         sexo: string;
