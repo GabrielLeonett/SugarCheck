@@ -121,6 +121,7 @@ export default function Register() {
       fechaNacimiento.setFullYear(fechaNacimiento.getFullYear() - parseInt(values.edad || '0'));
 
       await apiPublic.post('/user/register', {
+        name: values.name,
         username: values.username,
         email: values.email || undefined,
         sexo: values.sexo,

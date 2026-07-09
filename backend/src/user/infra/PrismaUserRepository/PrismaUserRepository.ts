@@ -13,12 +13,14 @@ import { UserCreatedAt } from '../../core/value-objects/UserCreatedAt';
 import { UserPassword } from '../../core/value-objects/UserPassword';
 import { UserFechaNacimiento } from '../../core/value-objects/UserFechaNacimiento';
 import { UserSexo } from '../../core/value-objects/UserSexo';
+import { UserName } from '../../core/value-objects/UserName';
 import { UserNotFoundError } from '../../core/errors/UserNotFoundError';
 import { UserAlreadyExists } from '../../core/errors/UserAlreadyExists';
 import { UserId } from '../../../shared/core/value-objects/UserId';
 
 interface UserDB {
   id: string;
+  name: string;
   username: string;
   password: string;
   email: string | null;
@@ -35,6 +37,7 @@ export class PrismaUserRepository implements UserRepository {
   private toDomain(raw: UserDB): User {
     return new User({
       id: UserId.create(raw.id).getValue(),
+      name: UserName.create(raw.name).getValue(),
       username: UserUsername.create(raw.username).getValue(),
       email: UserEmail.create(raw.email).getValue(),
       roles: UserRoles.create(raw.roles).getValue(),
@@ -50,6 +53,7 @@ export class PrismaUserRepository implements UserRepository {
   private toPersistence(user: User): UserDB {
     return {
       id: user.id.value,
+      name: user.name.value,
       username: user.username.value,
       email: user.email.value || null,
       roles: user.roles.value,
@@ -189,6 +193,7 @@ async update(id: UserId, update: Partial<User>): Promise<Result<User, ErrorAbstr
     await this.prisma.user.update({
       where: { id: id.value },
       data: {
+        name: update.name?.value,
         username: update.username?.value,
         email: update.email?.value || undefined,
         roles: update.roles?.value,
