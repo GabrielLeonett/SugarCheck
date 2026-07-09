@@ -105,6 +105,7 @@ export class UserController {
   @Post('register')
   async register(@Body() create: CreateUserDTO) {
     const result = await this.saveUser.run({
+      name: create.name,
       username: create.username,
       email: create.email,
       roles: [Role.Guerrero],
@@ -128,6 +129,7 @@ export class UserController {
   @UseGuards(AuthGuard, RolesGuard)
   async createAdmin(@Body() create: CreateUserDTO) {
     const result = await this.saveUser.run({
+      name: create.name,
       username: create.username,
       email: create.email,
       roles: [Role.Admin],
