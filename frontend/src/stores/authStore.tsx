@@ -10,7 +10,7 @@ interface AuthState {
   accessToken: string | null;
   isAuthLoading: boolean;
   refresh: () => Promise<string>;
-  login: (email: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setAuth: (user: User, accessToken: string) => void;
   setLoading: (loading: boolean) => void;
@@ -24,27 +24,22 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setAuth: (user: User, accessToken: string) => set({ user, accessToken }),
   setLoading: (loading: boolean) => set({ isAuthLoading: loading }),
-  
-  login: async (email, password) => {
-    const response = await apiPrivate.post('/auth/login', { email, password }, { withCredentials: true });
 
-    // ➔ OBTENER ACCIÓN FUERA DE REACT Y EJECUTARLA SIN ERRORES
+  login: async (username, password) => {
+    const response = await apiPrivate.post('/auth/login', { username, password }, { withCredentials: true });
+
     await preferenceStore.getState().load();
-    
+
     set({ user: response.data.user, accessToken: response.data.accessToken });
   },
 
   logout: async () => {
     try {
-      // 1. Revocación de token en proveedor de identidad (Firebase)
       await signOut(authFirebase);
-
-      // 2. Destrucción de sesión por cookies en el Servidor (NestJS)
       await apiPrivate.post('/auth/logout', {}, { withCredentials: true });
     } catch (error) {
       console.error("Error durante el proceso de cierre de sesión:", error);
     } finally {
-      // 3. Limpieza obligatoria del estado local independientemente del estado de la red
       set({ user: null, accessToken: null });
     }
   },
@@ -53,6 +48,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const response = await apiPrivate.post('/auth/refresh', {}, { withCredentials: true });
       set({ user: response.data.user, accessToken: response.data.accessToken });
+      await preferenceStore.getState().load();
       return response.data.accessToken;
     } catch (error) {
       set({ user: null, accessToken: null });
@@ -66,13 +62,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         ? new GoogleAuthProvider()
         : new FacebookAuthProvider();
 
-      // Autenticación federada vía ventana emergente (Popup)
       const userCredential = await signInWithPopup(authFirebase, provider);
-
-      // Extracción del Json Web Token (IdToken) emitido por Firebase
       const firebaseToken = await userCredential.user.getIdToken();
 
-      // Transmisión del token al Backend para su respectiva verificación y registro/login
       const response = await apiPrivate.post(
         '/auth/firebase-login',
         { token: firebaseToken },

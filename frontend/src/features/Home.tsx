@@ -17,32 +17,11 @@ const MIN = 0;
 export default function Home() {
   const user = useAuthStore((state) => state.user);
 
-  // Inicializamos el hook con el namespace 'home'
   const { t } = useLanguage("home");
 
-  const obtenerFechaActual = () => {
-    const hoy = new Date();
-    const offset = hoy.getTimezoneOffset();
-    const fechaLocal = new Date(hoy.getTime() - offset * 60 * 1000);
-    return fechaLocal.toISOString().split('T')[0];
-  };
-
-  const obtenerHoraActual = () => {
-    const ahora = new Date();
-    const horas = String(ahora.getHours()).padStart(2, '0');
-    const minutos = String(ahora.getMinutes()).padStart(2, '0');
-    return `${horas}:${minutos}`;
-  };
-
   const [openGlucosaModal, setOpenGlucosaModal] = useState(false);
-  const [nivelGlucosa, setNivelGlucosa] = useState('');
-  const [contextoGlucosa, setContextoGlucosa] = useState('');
-  const [fechaGlucosa, setFechaGlucosa] = useState(obtenerFechaActual());
-  const [horaGlucosa, setHoraGlucosa] = useState(obtenerHoraActual());
 
   const handleOpenGlucosaModal = () => {
-    setFechaGlucosa(obtenerFechaActual());
-    setHoraGlucosa(obtenerHoraActual());
     setOpenGlucosaModal(true);
   };
 
@@ -51,7 +30,6 @@ export default function Home() {
   };
 
   const handleSaveGlucosaModal = () => {
-    // Aquí puedes hacer la lógica para guardar el registro.
     setOpenGlucosaModal(false);
   };
 
@@ -84,7 +62,7 @@ export default function Home() {
           my: 10
         }}>
           <Typography variant='h4' component={'h4'}>
-            {t("welcomeMessage").replace("{name}", user?.name.split(' ')[0] || "")}
+            {t("welcomeMessage").replace("{name}", user?.username || "")}
           </Typography>
           <Box sx={{ display: 'flex', gap: 4 }}>
             <ButtonBase onClick={handleOpenGlucosaModal} startIcon={<AddIcon />}>{t("actions.registerGlucose")}</ButtonBase>
@@ -96,14 +74,6 @@ export default function Home() {
         <ModalGlucosaForm
           open={openGlucosaModal}
           onClose={handleCloseGlucosaModal}
-          nivelGlucosa={nivelGlucosa}
-          onNivelGlucosaChange={setNivelGlucosa}
-          contexto={contextoGlucosa}
-          onContextoChange={setContextoGlucosa}
-          fecha={fechaGlucosa}
-          onFechaChange={setFechaGlucosa}
-          hora={horaGlucosa}
-          onHoraChange={setHoraGlucosa}
           onSave={handleSaveGlucosaModal}
         />
 
