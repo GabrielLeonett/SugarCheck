@@ -16,14 +16,13 @@ import type { Response, Request } from 'express';
 import { InvalidCredentialsError } from '../core/errors/InvalidCredentialsError';
 import { FirebaseAdminService } from './firebase-admin.service';
 import { LoginFirebaseDTO } from './DTOs/login-firebase.dto';
-import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly firebaseAdminService: FirebaseAdminService,
-  ) {}
+  ) { }
 
   private readonly isProduction = process.env.NODE_ENV === 'production';
 
@@ -31,16 +30,21 @@ export class AuthController {
   private getCookieOptions(maxAge: number) {
     return {
       httpOnly: true,
+      // En producción requiere HTTPS (true), en desarrollo puede ser false
       secure: this.isProduction,
-      sameSite: this.isProduction ? 'strict' as const : 'lax' as const,
+      // 'none' es obligatorio en producción para permitir cookies cross-site (con secure: true)
+      // 'lax' es ideal para desarrollo local
+      sameSite: this.isProduction ? 'none' as const : 'lax' as const,
       maxAge,
       path: '/',
+      // Si estás en producción, es buena práctica añadir 'domain' si es necesario
+      // domain: this.isProduction ? '.tu-dominio.com' : undefined,
     };
   }
 
   // Access Token: 15 minutos
   private readonly cookieOptionsAccessToken = this.getCookieOptions(15 * 60 * 1000);
-  
+
   // Refresh Token: 7 días
   private readonly cookieOptionsRefreshToken = this.getCookieOptions(7 * 24 * 60 * 60 * 1000);
 
@@ -50,7 +54,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.login(data.username, data.password);
-    
+
     if (!result.isValid) {
       const error = result.getError();
       if (error instanceof InvalidCredentialsError) {
@@ -78,7 +82,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const oldRefreshToken = req.cookies['refresh_token'];
-    
+
     if (!oldRefreshToken) {
       // Limpiar cualquier cookie residual
       res.clearCookie('access_token', { path: '/' });
@@ -114,7 +118,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken = req.cookies['refresh_token'];
-    
+
     // Invalidar refresh token en el servidor si existe
     if (refreshToken) {
       await this.authService.logout();
@@ -147,12 +151,12 @@ export class AuthController {
     }
 
     const { uid, email, name } = decodedToken;
-    const result = await this.authService.loginFirebaseUser({ 
-      email, 
-      name, 
-      firebaseUid: uid 
+    const result = await this.authService.loginFirebaseUser({
+      email,
+      name,
+      firebaseUid: uid
     });
-    
+
     if (!result.isValid) {
       throw new UnauthorizedException(result.getError().message);
     }
