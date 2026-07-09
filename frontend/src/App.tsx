@@ -7,16 +7,19 @@ import Home from "./features/Home";
 import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
-import Insulina from "./features/insulina"
+import Insulina from "./features/Insulina/insulina"
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 import Glucosa from "./features/ControlDeGlucosa/ControlDeGlucosaPage";
 import ForgotPassword from "./features/ForgotPassword";
 import { Camino } from "./features/Camino/Camino";
+import Oraculo from "./features/ChatIA/Oraculo";
 import "./App.css";
 import { Profile } from "./features/Profile/Profile";
 import { LoadingScreen } from "./components/ui/LoadingScreen";
+import { useTranslation } from "react-i18next";
 
 function App() {
+  const { t } = useTranslation("common");
   const refresh = useAuthStore((state) => state.refresh);
   const setLoading = useAuthStore((state) => state.setLoading);
   const isAuthLoading = useAuthStore((state) => state.isAuthLoading);
@@ -38,7 +41,7 @@ function App() {
   return (
     <ThemeWrapperContext>
       {isAuthLoading ? (
-        <LoadingScreen message="Verificando sesión..." />
+        <LoadingScreen message={t("verificandoSesion")} />
       ) : (
         <Suspense fallback={<LoadingScreen />}>
           <Router>
@@ -53,19 +56,10 @@ function App() {
                 </Route>
                 <Route path="agente">
                   <Route path="camino" element={<Camino />} />
+                  <Route path="oraculo-chat" element={<Oraculo />} />
                 </Route>
               </Route>
 
-                 <Route path="agente">
-                 <Route path="oraculo-chat" element={<Oraculo />} />
-
-               </Route>
-
-             </Route>
-
-
-
-             {/* Rutas Públicas */}
              <Route element={<PublicRoute />}>
                <Route path="/login" element={<Login />} />
                <Route path="/olvidoContrasena" element={<ForgotPassword />} />
@@ -73,8 +67,9 @@ function App() {
              </Route>
            </Routes>
          </Router>
-       </ThemeWrapperContext>
-     </Suspense>
+       </Suspense>
+     )}
+   </ThemeWrapperContext>
    );
 }
 

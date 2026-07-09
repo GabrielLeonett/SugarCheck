@@ -7,20 +7,23 @@ import {
   TableContainer, 
   TableHead, 
   TableRow, 
-  TablePagination
+  TablePagination,
+  useTheme
 } from '@mui/material';
 import type { PhysicalRecord } from '../../../types/types';
+import useLanguage from "../../../hooks/useLanguage";
 
 interface HistoryTableProps {
   records: PhysicalRecord[];
 }
 
 export const HistoryTable: React.FC<HistoryTableProps> = ({ records }) => {
-  // Configuración inicial de paginación basada en tu diseño
+  const { t } = useLanguage("monitoreoFisico");
+  const theme = useTheme();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(4);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -47,19 +50,19 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ records }) => {
     <Box sx={{ width: '100%', mt: 4 }}>
       <TableContainer 
         sx={{ 
-          border: '1px solid #CCD5DE', 
-          borderRadius: '8px 8px 0 0', // Solo redondea arriba para que coincida con la paginación abajo
-          backgroundColor: '#FFFFFF'
+          border: `1px solid ${theme.palette.divider}`, 
+          borderRadius: '8px 8px 0 0',
+          backgroundColor: theme.palette.background.paper
         }}
       >
         <Table aria-label="Bitácora histórica">
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#7FB3D5' /* Color azul del encabezado */ }}>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>Fecha</TableCell>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>Peso (Kg)</TableCell>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>Estatura (cm)</TableCell>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>IMC</TableCell>
-              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>Estado</TableCell>
+            <TableRow sx={{ backgroundColor: theme.palette.primary.main }}>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tableFecha")}</TableCell>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tablePeso")}</TableCell>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tableEstatura")}</TableCell>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tableImc")}</TableCell>
+              <TableCell sx={{ color: '#FFFFFF', fontWeight: 600 }}>{t("tableEstado")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -70,10 +73,10 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ records }) => {
                   key={record.id} 
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
-                  <TableCell sx={{ color: '#34495E' }}>{record.fecha}</TableCell>
-                  <TableCell sx={{ color: '#34495E' }}>{record.peso}</TableCell>
-                  <TableCell sx={{ color: '#34495E' }}>{record.estatura}</TableCell>
-                  <TableCell sx={{ color: '#34495E' }}>{record.imc.toFixed(1)}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>{record.fecha}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>{record.peso}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>{record.estatura}</TableCell>
+                  <TableCell sx={{ color: theme.palette.text.primary }}>{record.imc.toFixed(1)}</TableCell>
                   <TableCell sx={{ color: getStatusColor(record.estado), fontWeight: 700 }}>
                     {record.estado}
                   </TableCell>
@@ -83,23 +86,22 @@ export const HistoryTable: React.FC<HistoryTableProps> = ({ records }) => {
         </Table>
       </TableContainer>
       
-      {/* Paginación estilo Material UI acoplada a la tabla */}
       <TablePagination
-        rowsPerPageOptions={[4, 8, 12]} // Opciones para el usuario
+        rowsPerPageOptions={[4, 8, 12]}
         component="div"
         count={records.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Filas por páginas:"
-        labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`}
+        labelRowsPerPage={t("rowsPerPage")}
+        labelDisplayedRows={({ from, to, count }) => t("displayedRows", { from, to, count: count !== -1 ? count : `más de ${to}` })}
         sx={{ 
-          border: '1px solid #CCD5DE', 
+          border: `1px solid ${theme.palette.divider}`, 
           borderTop: 'none', 
           borderRadius: '0 0 8px 8px',
-          backgroundColor: '#FFFFFF',
-          color: '#7F8C8D'
+          backgroundColor: theme.palette.background.paper,
+          color: theme.palette.text.secondary
         }}
       />
     </Box>

@@ -4,6 +4,7 @@ import { ButtonBase } from "../../../components/ui/Buttons/ButtonBase";
 import EditIcon from '@mui/icons-material/Edit';
 import { AVATAR_MAP, AVATAR_NAMES } from "../../../constants/avatars";
 import { usePreferenceConfig } from "../../../hooks/usePreferenceConfig";
+import useLanguage from "../../../hooks/useLanguage";
 
 const baseAvatarSx = {
     width: { xs: 80, sm: 100, md: 120 },
@@ -29,6 +30,7 @@ const AvatarSelectedSx = {
 };
 
 export function AvatarProfile() {
+    const { t } = useLanguage("profile");
     const [openAvatarEdit, setOpenAvatarEdit] = React.useState<boolean>(false);
 
     const { preference, changeAvatar, save } = usePreferenceConfig();
@@ -124,7 +126,7 @@ export function AvatarProfile() {
                             color="error"
                             onClick={handleOpenModalAvatarEdit}
                         >
-                            Cancelar
+                            {t("cancel")}
                         </ButtonBase>
                         <ButtonBase
                             variant="contained"
@@ -134,7 +136,7 @@ export function AvatarProfile() {
                                 setOpenAvatarEdit(false);
                             }}
                         >
-                            Guardar
+                            {t("save")}
                         </ButtonBase>
                     </Box>
                 </Box>
