@@ -199,7 +199,7 @@ function DrawerSubmenuItem({
                             >
                                 <ListItemText
                                     primary={sub.name}
-                                    primaryTypographyProps={{ variant: "body2" }}
+                                    slotProps={{ primary: { variant: "body2" } }}
                                 />
                             </ListItemButton>
                         </ListItem>

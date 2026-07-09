@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   Box, 
   Typography, 
   TextField, 
-  InputAdornment 
+  InputAdornment,
+  useTheme 
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
-// Importamos TU componente base
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
-import { monitoreoFisicoSchema, type MonitoreoFisicoData } from '../../../schemas/monitoreo_fisico';
 import useLanguage from "../../../hooks/useLanguage";
 
 interface RegisterMeasurementModalProps {
@@ -19,6 +18,7 @@ interface RegisterMeasurementModalProps {
 
 export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> = ({ onClose, onSave }) => {
   const { t } = useLanguage("monitoreoFisico");
+  const theme = useTheme();
   const [peso, setPeso] = useState('');
   const [talla, setTalla] = useState('');
   const [fecha, setFecha] = useState(''); 
@@ -38,8 +38,8 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
   };
 
   return (
-    <Box sx={{ padding: '24px', backgroundColor: '#EBF2F7', borderRadius: '12px', minWidth: '350px' }}>
-      <Typography variant="h6" sx={{ color: '#2C3E50', fontWeight: 'bold', textAlign: 'center', mb: 3 }}>
+    <Box sx={{ padding: '24px', backgroundColor: theme.palette.background.default, borderRadius: '12px', minWidth: '350px' }}>
+      <Typography variant="h6" sx={{ color: theme.palette.text.primary, fontWeight: 'bold', textAlign: 'center', mb: 3 }}>
         {t("modalTitle")}
       </Typography>
 
@@ -51,10 +51,10 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
           value={peso}
           onChange={(e) => setPeso(e.target.value)}
           type="number"
-          sx={{ backgroundColor: '#FFFFFF', borderRadius: '4px' }}
-          InputProps={{
+          sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }}
+          slotProps={{ input: {
             endAdornment: <InputAdornment position="end">Kg</InputAdornment>,
-          }}
+          }}}
         />
 
         <TextField
@@ -64,10 +64,10 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
           value={talla}
           onChange={(e) => setTalla(e.target.value)}
           type="number"
-          sx={{ backgroundColor: '#FFFFFF', borderRadius: '4px' }}
-          InputProps={{
+          sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }}
+          slotProps={{ input: {
             endAdornment: <InputAdornment position="end">cm</InputAdornment>,
-          }}
+          }}}
         />
 
         <TextField
@@ -76,7 +76,7 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
           fullWidth
           value={fecha}
           onChange={(e) => setFecha(e.target.value)}
-          sx={{ backgroundColor: '#FFFFFF', borderRadius: '4px' }}
+          sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }}
           placeholder={`${t("dayPlaceholder")}/${t("monthPlaceholder")}/${t("yearPlaceholder")}`}
         />
 
@@ -85,13 +85,13 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
           onClick={handleSave}
           startIcon={<CheckIcon />}
           sx={{
-            backgroundColor: '#7FB3D5', // Ajuste al color celeste del diseño
+            backgroundColor: theme.palette.primary.main,
             color: '#FFFFFF',
             mt: 2,
             py: 1.5,
             width: '100%',
             '&:hover': {
-              backgroundColor: '#5C97BF',
+              backgroundColor: theme.palette.primary.dark,
             }
           }}
         >
