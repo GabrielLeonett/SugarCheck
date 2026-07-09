@@ -2,14 +2,16 @@ import Navbar from "../../components/layout/Header/Navbar";
 import Footer from "../../components/layout/Footer/Footer";
 import { Box, Grid, Typography } from "@mui/material";
 import InsigniaCard from "./Components/InsigniasCard";
+import useLanguage from "../../hooks/useLanguage";
 export function Camino() {
+const { t } = useLanguage("camino");
 return (
     <>
 
     <Navbar />
     <Box sx={{width:"95%", border: "2px solid black", mx:6, mt:2, p:2, display: "flex", flexDirection: "column", alignItems: "center" }}>  
         <Typography variant="h3" sx={{ textAlign: "center" }}>
-            Camino del guerrero
+            {t("title")}
         </Typography>
         <Grid container  sx={{ mt: 2, width: "100%" }}>
             <Grid size={8}>
@@ -40,12 +42,12 @@ return (
                     {/*aca es el apartado de las insignias*/} 
                     {/* 2. ¡AQUÍ ADENTRO VA TU CONTENIDO! */}
                 <Typography variant="h5" sx={{ color: 'white', textAlign: 'center', fontWeight: 'bold' }}>
-                Colección de Insignias
+                {t("badgeCollection")}
                 </Typography>
                 <InsigniaCard/>
                 {/* Sección de progreso simulada al fondo del Box */}
                 <Box sx={{ mt: 'auto', pt: 2, color: 'white', textAlign: 'center' }}>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Progreso de la Ruta</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{t("routeProgress")}</Typography>
                 {/* Tu barra de progreso irá aquí */}
                 </Box>
                 </Box>

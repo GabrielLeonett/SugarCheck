@@ -9,6 +9,7 @@ import { UserRoles } from '../core/value-objects/UserRoles';
 import { UserCreatedAt } from '../core/value-objects/UserCreatedAt';
 import { UserFechaNacimiento } from '../core/value-objects/UserFechaNacimiento';
 import { UserSexo } from '../core/value-objects/UserSexo';
+import { UserName } from '../core/value-objects/UserName';
 import { PasswordHasher } from '../../shared/application/ports/password-hasher.interface';
 import { UserPassword } from '../core/value-objects/UserPassword';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
@@ -38,6 +39,7 @@ export class SaveUser {
   ) { }
 
   public async run(data: {
+    name: string;
     username: string;
     email?: string;
     roles: string[];
@@ -49,6 +51,9 @@ export class SaveUser {
     const id = await this.generateUUID.run();
     const idRes = UserId.create(id);
     if (!idRes.isValid) return Result.fail(idRes.getError());
+
+    const nameRes = UserName.create(data.name);
+    if (!nameRes.isValid) return Result.fail(nameRes.getError());
 
     const usernameRes = UserUsername.create(data.username);
     if (!usernameRes.isValid) return Result.fail(usernameRes.getError());
@@ -74,6 +79,7 @@ export class SaveUser {
 
     const user = new User({
       id: idRes.getValue(),
+      name: nameRes.getValue(),
       username: usernameRes.getValue(),
       email: emailRes.getValue(),
       roles: roleRes.getValue(),

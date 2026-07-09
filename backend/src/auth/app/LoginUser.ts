@@ -56,6 +56,7 @@ export class LoginUser {
       rt,
       user: {
         id: user.id,
+        name: user.name,
         username: user.username,
         roles: user.roles,
       },
