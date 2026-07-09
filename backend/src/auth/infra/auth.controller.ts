@@ -49,7 +49,7 @@ export class AuthController {
     @Body() data: LoginDTO,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.authService.login(data.email, data.password);
+    const result = await this.authService.login(data.username, data.password);
     
     if (!result.isValid) {
       const error = result.getError();

@@ -13,10 +13,14 @@ import NavBarItem from "../../ui/NavBarItem";
 import ProfileNavBar from "../../ui/Cards/ProfileNavBar";
 import { useNavbar } from "../../../hooks/useNavbar";
 import { usePreferenceConfig } from "../../../hooks/usePreferenceConfig";
+import { AVATAR_MAP } from "../../../constants/avatars";
 
 
 function Navbar() {
   const {preference} = usePreferenceConfig();
+  const avatarSrc = preference?.profileImg && AVATAR_MAP[preference.profileImg]
+    ? AVATAR_MAP[preference.profileImg]
+    : undefined;
 
   const {
     isDarkMode, toggleTheme,
@@ -43,8 +47,6 @@ function Navbar() {
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography
                 variant="h6"
-                component={"a"}
-                href="#"
                 sx={{
                   fontWeight: 700,
                   color: "text.primary",
@@ -58,8 +60,6 @@ function Navbar() {
               </Typography>
               <Typography
                 variant={"caption"}
-                component="a"
-                href="#"
                 sx={{
                   fontWeight: 400,
                   color: "text.primary",
@@ -97,14 +97,14 @@ function Navbar() {
             <Badge badgeContent={4} color="secondary">
               <NotificationIcon />
             </Badge>
-            <Avatar alt="User" src={preference?.profileImg} children={userInitials} sx={{
-              "&:hover": {
-                backgroundColor: "action.hover",
-                borderRadius: 1,
-                cursor: "pointer", // Opcional, para indicar que es interactivo
-              },
-            }}
-              onClick={() => setProfileMenuOpen(!profileMenuOpen)} />
+            <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => setProfileMenuOpen(!profileMenuOpen)}>
+              <Avatar alt="User" src={avatarSrc} children={userInitials} sx={{
+                "&:hover": {
+                  backgroundColor: "action.hover",
+                  borderRadius: 1,
+                },
+              }} />
+            </Box>
           </Box>
 
           {/* Menú hamburguesa */}
