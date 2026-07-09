@@ -12,9 +12,11 @@ import GlucoOlvido from '../assets/gluco-olvido.png';
 import { CardBase } from "../components/ui/Cards/CardBase";
 import { ButtonBase } from "../components/ui/Buttons/ButtonBase";
 import { forgotPasswordSchema, type ForgotPasswordData } from "../schemas/forgot_password";
+import useLanguage from "../hooks/useLanguage";
 
 export default function ForgotPassword() {
     const theme = useTheme();
+    const { t } = useLanguage("forgotPassword");
 
     // Estados locales para el feedback del usuario
     const [authError, setAuthError] = useState<BackendErrorResponse | null>(null);
@@ -44,10 +46,10 @@ export default function ForgotPassword() {
             const response = await apiPublic.post("/auth/forgot-password", { email: data.email });
 
             // Si tu backend retorna un mensaje de éxito dinámico, puedes usar: response.data.message
-            setSuccessMessage(response.data?.message || "Se ha enviado un correo de recuperación si la cuenta existe.");
+            setSuccessMessage(response.data?.message || t("successMessage"));
 
         } catch (error) {
-            let message = "Error al procesar la solicitud. Inténtalo de nuevo.";
+            let message = t("errorMessage");
 
             // Seguimos usando el 'axios' global para validar la naturaleza del error
             if (axios.isAxiosError(error)) {
@@ -99,15 +101,15 @@ export default function ForgotPassword() {
                     <Box component="img" src={GlucoOlvido} sx={{ width: 160, height: 'auto', mb: 2, borderRadius: 2 }} />
 
                     <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
-                        ¿Olvidaste tu contraseña?
+                        {t("title")}
                     </Typography>
                     <Typography variant="body1" sx={{ maxWidth: '350px', mb: 4 }}>
-                        No te preocupes. Incluso los guerreros más experimentados necesitan un recordatorio.
+                        {t("description")}
                     </Typography>
 
                     <Typography variant="body2" sx={{ mt: 'auto' }}>
                         <Link href="/login" sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-                            Volver a Iniciar Sesión
+                            {t("backToLogin")}
                         </Link>
                     </Typography>
                 </CardBase>
@@ -132,10 +134,10 @@ export default function ForgotPassword() {
                     <Box sx={{ maxWidth: '350px', width: '100%', textAlign: 'center' }}>
                         <LockResetIcon sx={{ fontSize: 50, mb: 1 }} />
                         <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                            Recuperar Acceso
+                            {t("formTitle")}
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 5 }}>
-                            Ingresa tu correo para instrucciones
+                            {t("formSubtitle")}
                         </Typography>
 
                         {/* Mostrar alertas de error */}
@@ -156,7 +158,7 @@ export default function ForgotPassword() {
                         <TextField
                             {...register("email")}
                             fullWidth
-                            label="Correo electrónico"
+                            label={t("emailLabel")}
                             variant="outlined"
                             size="small"
                             error={!!errors.email}
@@ -181,7 +183,7 @@ export default function ForgotPassword() {
                             variant="contained"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? "Enviando..." : "Enviar enlace"}
+                            {isSubmitting ? t("sendingButton") : t("submitButton")}
                         </ButtonBase>
                     </Box>
                 </CardBase>
@@ -190,7 +192,7 @@ export default function ForgotPassword() {
             {/* Footer */}
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 5, pt: 2 }}>
                 <Typography variant="body2" sx={{  mb: 1 }}>
-                    Patrocinado por
+                    {t("sponsoredBy")}
                 </Typography>
                 <LogoGA />
             </Box>

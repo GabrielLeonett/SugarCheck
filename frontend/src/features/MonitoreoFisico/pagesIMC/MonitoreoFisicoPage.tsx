@@ -15,6 +15,7 @@ import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
 import { CardBase } from '../../../components/ui/Cards/CardBase';
 import Navbar from '../../../components/layout/Header/Navbar';
 import Footer from '../../../components/layout/Footer/Footer';
+import useLanguage from "../../../hooks/useLanguage";
 
 // Mock inicial basado exactamente en la data visual de tu imagen
 const INITIAL_RECORDS: PhysicalRecord[] = [
@@ -30,6 +31,7 @@ const INITIAL_EVOLUTION: PhysicalEvolution = {
 };
 
 export const PhysicalMonitoringPage: React.FC = () => {
+  const { t } = useLanguage("monitoreoFisico");
   const [records, setRecords] = useState<PhysicalRecord[]>(INITIAL_RECORDS);
   const [evolution] = useState<PhysicalEvolution>(INITIAL_EVOLUTION);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,7 +83,7 @@ export const PhysicalMonitoringPage: React.FC = () => {
             marginBottom: '32px',
           }}
         >
-          Monitoreo de la Fortaleza Física.
+          {t("pageTitle")}
         </Typography>
 
         <Grid container spacing={4}>
@@ -92,7 +94,7 @@ export const PhysicalMonitoringPage: React.FC = () => {
               onClick={handleOpenModal}
               fullWidth
             >
-              Registrar Nuevas Medidas
+              {t("registerButton")}
             </ButtonBase>
             
             <MetricCard type="balance" currentImc={currentImc} />

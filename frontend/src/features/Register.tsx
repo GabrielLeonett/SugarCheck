@@ -15,6 +15,7 @@ import {
   registerStep2Schema,
   registerStep3Schema,
 } from '../schemas/register';
+import useLanguage from "../hooks/useLanguage";
 
 type RegisterFormData = {
   username: string;
@@ -54,6 +55,7 @@ export default function Register() {
   const theme = useTheme();
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
+  const { t } = useLanguage("register");
   const [activeStep, setActiveStep] = useState(0);
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -138,14 +140,14 @@ export default function Register() {
     } catch (error) {
       if (error instanceof Error) {
         const axiosError = error as AxiosError<BackendErrorResponse>;
-        const message = axiosError.response?.data?.message || 'Error al registrar usuario';
+        const message = axiosError.response?.data?.message || t("errorRegister");
 
         if (axiosError.response?.status === 409) {
-          setError('email', { message: 'Este correo electrónico ya está registrado' });
+          setError('email', { message: t("errorEmailTaken") });
         }
         setAuthError(message);
       } else {
-        setAuthError('Error al registrar usuario');
+        setAuthError(t("errorRegister"));
       }
     } finally {
       setIsSubmitting(false);
@@ -170,16 +172,16 @@ export default function Register() {
           <>
             <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
             <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
-              Crear cuenta
+              {t("title")}
             </Typography>
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
-              Ingresa tus credenciales para acceder
+              {t("subtitle")}
             </Typography>
 
             <TextField
               {...register("username")}
               fullWidth
-              label="Nombre de usuario"
+              label={t("usernameLabel")}
               variant="outlined"
               size="small"
               error={!!errors.username}
@@ -190,7 +192,7 @@ export default function Register() {
             <TextField
               {...register("nombre")}
               fullWidth
-              label="Nombre completo (opcional)"
+              label={t("nameLabel")}
               variant="outlined"
               size="small"
               sx={textFieldStyles}
@@ -198,7 +200,7 @@ export default function Register() {
 
             <TextField
               fullWidth
-              label="Edad"
+              label={t("ageLabel")}
               variant="outlined"
               size="small"
               type="number"
@@ -209,7 +211,7 @@ export default function Register() {
             <TextField
               {...register("sexo")}
               fullWidth
-              label="Sexo"
+              label={t("sexLabel")}
               variant="outlined"
               size="small"
               select
@@ -217,14 +219,14 @@ export default function Register() {
               helperText={errors.sexo?.message}
               sx={textFieldStyles}
             >
-              <MenuItem value="masculino">Masculino</MenuItem>
-              <MenuItem value="femenino">Femenino</MenuItem>
+              <MenuItem value="masculino">{t("sexMale")}</MenuItem>
+              <MenuItem value="femenino">{t("sexFemale")}</MenuItem>
             </TextField>
 
             <TextField
               {...register("email")}
               fullWidth
-              label="Correo electrónico (opcional)"
+              label={t("emailLabel")}
               variant="outlined"
               size="small"
               type="email"
@@ -236,7 +238,7 @@ export default function Register() {
             <TextField
               {...register("password")}
               fullWidth
-              label="Contraseña"
+              label={t("passwordLabel")}
               type="password"
               variant="outlined"
               size="small"
@@ -248,7 +250,7 @@ export default function Register() {
             <TextField
               {...register("confirmPassword")}
               fullWidth
-              label="Confirmar contraseña"
+              label={t("confirmPasswordLabel")}
               type="password"
               variant="outlined"
               size="small"
@@ -264,10 +266,10 @@ export default function Register() {
           <>
             <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
             <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
-              Configuración de Salud
+              {t("healthTitle")}
             </Typography>
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
-              Prepara tus Estadísticas
+{t("healthSubtitle")}
             </Typography>
 
             <Grid container spacing={2} sx={{ mb: 2 }}>
@@ -275,7 +277,7 @@ export default function Register() {
                 <TextField
                   {...register("peso")}
                   fullWidth
-                  label="Peso (Kg)"
+                  label={t("weightLabel")}
                   variant="outlined"
                   size="small"
                   type="number"
@@ -288,7 +290,7 @@ export default function Register() {
                 <TextField
                   {...register("talla")}
                   fullWidth
-                  label="Talla (cm)"
+                  label={t("heightLabel")}
                   variant="outlined"
                   size="small"
                   type="number"
@@ -300,7 +302,7 @@ export default function Register() {
             </Grid>
 
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', mb: 2, textAlign: 'left' }}>
-              Rango objetivo de Glucosa
+              {t("glucoseRangeTitle")}
             </Typography>
 
             <Grid spacing={2} container sx={{ mb: 2 }}>
@@ -308,7 +310,7 @@ export default function Register() {
                 <TextField
                   {...register("glucosaMin")}
                   fullWidth
-                  label="Mínimo"
+                  label={t("glucoseMinLabel")}
                   variant="outlined"
                   size="small"
                   type="number"
@@ -321,7 +323,7 @@ export default function Register() {
                 <TextField
                   {...register("glucosaMax")}
                   fullWidth
-                  label="Máximo"
+                  label={t("glucoseMaxLabel")}
                   variant="outlined"
                   size="small"
                   type="number"
@@ -339,16 +341,16 @@ export default function Register() {
           <>
             <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
             <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
-              Contactos de Emergencia
+              {t("emergencyTitle")}
             </Typography>
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
-              Convoca a tus Guardianes
+{t("emergencySubtitle")}
             </Typography>
 
             <TextField
               {...register("nombreGuardián")}
               fullWidth
-              label="Nombre del Familiar"
+              label={t("guardianNameLabel")}
               variant="outlined"
               size="small"
               error={!!errors.nombreGuardián}
@@ -359,7 +361,7 @@ export default function Register() {
             <TextField
               {...register("parentesco")}
               fullWidth
-              label="Parentesco"
+              label={t("relationshipLabel")}
               variant="outlined"
               size="small"
               select
@@ -367,22 +369,22 @@ export default function Register() {
               helperText={errors.parentesco?.message}
               sx={textFieldStyles}
             >
-              <MenuItem value="madre">Madre</MenuItem>
-              <MenuItem value="padre">Padre</MenuItem>
-              <MenuItem value="hermano">Hermano</MenuItem>
-              <MenuItem value="hermana">Hermana</MenuItem>
-              <MenuItem value="abuelo">Abuelo</MenuItem>
-              <MenuItem value="abuela">Abuela</MenuItem>
-              <MenuItem value="tio">Tío</MenuItem>
-              <MenuItem value="tia">Tía</MenuItem>
-              <MenuItem value="tutor">Tutor</MenuItem>
-              <MenuItem value="otro">Otro</MenuItem>
+              <MenuItem value="madre">{t("relationshipMother")}</MenuItem>
+              <MenuItem value="padre">{t("relationshipFather")}</MenuItem>
+              <MenuItem value="hermano">{t("relationshipBrother")}</MenuItem>
+              <MenuItem value="hermana">{t("relationshipSister")}</MenuItem>
+              <MenuItem value="abuelo">{t("relationshipGrandfather")}</MenuItem>
+              <MenuItem value="abuela">{t("relationshipGrandmother")}</MenuItem>
+              <MenuItem value="tio">{t("relationshipUncle")}</MenuItem>
+              <MenuItem value="tia">{t("relationshipAunt")}</MenuItem>
+              <MenuItem value="tutor">{t("relationshipGuardian")}</MenuItem>
+              <MenuItem value="otro">{t("relationshipOther")}</MenuItem>
             </TextField>
 
             <TextField
               {...register("telefono")}
               fullWidth
-              label="Teléfono"
+              label={t("phoneLabel")}
               variant="outlined"
               size="small"
               type="tel"
@@ -400,23 +402,23 @@ export default function Register() {
     switch (activeStep) {
       case 0:
         return {
-          title: '¡Únete a la batalla, Guerrero!',
-          description: 'Estás a unos pocos pasos de iniciar tu gran viaje. Registra tus datos básicos para forjar tu perfil en nuestra orden.'
+          title: t("leftTitleStep0"),
+          description: t("leftDescStep0")
         };
       case 1:
         return {
-          title: 'Prepara tus Estadísticas',
-          description: 'Para ayudarte a mantenerte en la Zona Segura y calcular tu evolución física, necesitamos conocer tu estado de batalla actual.'
+          title: t("leftTitleStep1"),
+          description: t("leftDescStep1")
         };
       case 2:
         return {
-          title: 'Convoca a tus Guardianes',
-          description: 'Ningún guerrero lucha solo. Añade a tus contactos de emergencia para que te acompañen y te cuiden en cada misión.'
+          title: t("leftTitleStep2"),
+          description: t("leftDescStep2")
         };
       default:
         return {
-          title: '¡Únete a la batalla, Guerrero!',
-          description: 'Completa todos los pasos para unirte a nuestra orden.'
+          title: t("leftTitleStep0"),
+          description: t("leftDescDefault")
         };
     }
   };
@@ -457,9 +459,9 @@ export default function Register() {
             {leftContent.description}
           </Typography>
           <Typography variant="body2" sx={{ mt: 'auto' }}>
-            ¿Ya tienes cuenta?{' '}
+            {t("hasAccount")}{' '}
             <Link href="/login" sx={{ color: theme.palette.primary.main, fontWeight: 'bold', textDecoration: 'none' }}>
-              Iniciar sesión
+              {t("loginLink")}
             </Link>
           </Typography>
         </CardBase>
@@ -495,7 +497,7 @@ export default function Register() {
                   '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.3)' }
                 }}
               >
-                Atrás
+                {t("backButton")}
               </Button>
 
               <Button
@@ -510,7 +512,7 @@ export default function Register() {
                   '&:hover': { bgcolor: '#f5f5f5' }
                 }}
               >
-                {activeStep === 2 ? 'Finalizar Registro' : 'Siguiente Paso'}
+                {activeStep === 2 ? t("finishButton") : t("nextButton")}
               </Button>
             </Box>
           </Box>
@@ -525,7 +527,7 @@ export default function Register() {
         pt: 2
       }}>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-          Patrocinado por
+          {t("sponsoredBy")}
         </Typography>
         <LogoGA />
       </Box>
