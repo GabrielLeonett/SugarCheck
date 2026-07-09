@@ -6,7 +6,7 @@ import { ButtonBase } from '../components/ui/Buttons/ButtonBase.tsx';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { LineChart } from '@mui/x-charts/LineChart';
-import { CardBase } from '../components/ui/Cards/fdhjasfdasdfalsk.tsx';
+import { CardBase } from '../components/ui/Cards/CardBase.tsx';
 
 
 const MAX = 100;
