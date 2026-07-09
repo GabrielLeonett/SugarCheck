@@ -153,6 +153,10 @@ export class AuthController {
       firebaseUid: uid 
     });
     
+    if (!result.isValid) {
+      throw new UnauthorizedException(result.getError().message);
+    }
+
     const { at, rt, user } = result.getValue();
 
     res.cookie('access_token', at, this.cookieOptionsAccessToken);
