@@ -1,6 +1,7 @@
 
 export interface UserPlainInterface {
     id: string;
+    name: string;
     username: string;
     email: string;
     roles: string[];
@@ -13,6 +14,7 @@ export interface UserPlainInterface {
 export interface UserInterface {
     toPlain(): {
         id: string;
+        name: string;
         username: string;
         email: string;
         roles: string[];
