@@ -13,8 +13,8 @@ export class AuthService {
     private readonly LoginFirebaseUser: LoginFirebaseUser,
   ) { }
 
-  async login(email: string, pass: string) {
-    return await this.loginUser.run({ email, password: pass });
+  async login(username: string, pass: string) {
+    return await this.loginUser.run({ username, password: pass });
   }
 
   async refreshToken(token: string) {

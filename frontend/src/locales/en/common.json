@@ -1,5 +1,7 @@
 {
+  "perfil": "Profile",
   "configuracion": "Settings",
   "cambiarContrasena": "Change Password",
-  "cerrarSesion": "Logout"
+  "cerrarSesion": "Logout",
+  "verificandoSesion": "Verifying session..."
 }
