@@ -32,12 +32,12 @@ export function CardBase({
   elevation = 1,
   title,
   subtitle,
-  avatar,
-  headerAction,
   image,
   imageHeight = '140',
-  children,
+  avatar,
+  headerAction,
   actions,
+  children,
   sx
 }: CustomCardProps) {
 
@@ -47,7 +47,6 @@ export function CardBase({
       elevation={variant === 'elevation' ? elevation : 0}
       sx={{ ...sx}}
     >
-      {/* Renderiza el header solo si hay título, subtítulo o avatar */}
       {(title || subtitle || avatar || headerAction) && (
         <CardHeader
           avatar={avatar}
@@ -57,7 +56,6 @@ export function CardBase({
         />
       )}
 
-      {/* Renderiza la imagen solo si se proporciona una URL */}
       {image && (
         <CardMedia
           component="img"
@@ -67,7 +65,6 @@ export function CardBase({
         />
       )}
 
-      {/* El contenido principal de la tarjeta */}
       {children && (
         <CardContent>
           {typeof children === 'string' ? (
@@ -80,7 +77,6 @@ export function CardBase({
         </CardContent>
       )}
 
-      {/* Renderiza las acciones abajo si existen */}
       {actions && (
         <CardActions disableSpacing>
           {actions}

@@ -5,8 +5,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState } from "react";
 import { ButtonBase } from "../../../components/ui/Buttons/ButtonBase.tsx";
 import { Modal } from "../../../components/ui/Modals/Modals.tsx";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+
 
 interface ModalInsulinaLentaProps {
   open: boolean;

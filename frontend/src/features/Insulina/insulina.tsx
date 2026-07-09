@@ -2,8 +2,8 @@ import Navbar from "../../components/layout/Header/Navbar.tsx";
 import Footer from '../../components/layout/Footer/Footer.tsx';
 import { Typography, Box, Grid, Container } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { CardBase } from "../../components/ui/Cards/fdhjasfdasdfalsk.tsx";
-import { useState, useEffect } from "react";
+import { CardBase } from "../../components/ui/Cards/CardBase.tsx";
+import { useState } from "react";
 import { ButtonBase } from "../../components/ui/Buttons/ButtonBase.tsx";
 import ModalInsulinaLenta from "./components/ModalInsulinaLenta.tsx";
 import ModalInsulinaRapida from "./components/ModalInsulinaRapida.tsx";
@@ -11,45 +11,13 @@ import InsulinaHistorial from "./components/insulinaHistorial.tsx";
 import useLanguage from "../../hooks/useLanguage";
 
 export default function Insulina() {
-  // ESTADOS PARA LOS MODALES
   const [openLento, setOpenLento] = useState(false);
   const [openRapido, setOpenRapido] = useState(false);
 
   const {t} = useLanguage('insulina');
 
-  // ESTADOS PARA LAS ZONAS
-  const [vistaCuerpo, setVistaCuerpo] = useState<"FRENTE" | "ATRÁS">("FRENTE");
-  const [zonaSeleccionada, setZonaSeleccionada] =
-    useState<string>("Abdomen Izquierdo");
-
-  // Definición de las zonas por cada vista
-  const zonasFrente = [
-    "Abdomen Derecho",
-    "Abdomen Izquierdo",
-    "Muslo Derecho",
-    "Muslo Izquierdo",
-  ];
-  const zonasAtras = [
-    "Brazo Derecho",
-    "Brazo Izquierdo",
-    "Glúteo Derecho",
-    "Glúteo Izquierdo",
-  ];
-
   const Rango = ["80 - 120", "121 - 150", "151 - 190", "191 - 250", "> 250"];
   const unidadesE = ["2 UI", "3 UI", "4 UI", "5 UI", "6 UI"];
-
-  // Cambiar la zona seleccionada por defecto al alternar la vista
-  useEffect(() => {
-    if (vistaCuerpo === "FRENTE") {
-      setZonaSeleccionada("Abdomen Izquierdo");
-    } else {
-      setZonaSeleccionada("Glúteo Derecho");
-    }
-  }, [vistaCuerpo]);
-
-  // Obtener la lista actual de zonas según el estado de la vista
-  const zonasActuales = vistaCuerpo === "FRENTE" ? zonasFrente : zonasAtras;
 
   return (
     <>

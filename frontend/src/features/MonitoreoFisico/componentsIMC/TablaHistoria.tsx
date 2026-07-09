@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, ButtonGroup, Button } from '@mui/material';
+import { Box, Typography, ButtonGroup, Button, useTheme } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
 import type { PhysicalRecord } from '../../../types/types';
 import useLanguage from "../../../hooks/useLanguage";
@@ -12,6 +12,7 @@ type FilterType = 'TODOS' | 'TRIMESTRE' | 'AÑO';
 
 export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
   const { t } = useLanguage("monitoreoFisico");
+  const theme = useTheme();
   const [activeFilter, setActiveFilter] = useState<FilterType>('TODOS');
 
   // Para el gráfico, normalmente queremos ver los datos del más antiguo al más reciente (de izquierda a derecha).
@@ -35,7 +36,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
       >
         <Typography 
           sx={{ 
-            color: '#34495E', 
+            color: theme.palette.text.primary, 
             fontWeight: 700, 
             fontSize: '1.1rem',
             maxWidth: '200px',
@@ -50,8 +51,8 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
           size="small" 
           sx={{ 
             '& .MuiButton-root': {
-              borderColor: '#7FB3D5',
-              color: '#7FB3D5',
+              borderColor: theme.palette.primary.main,
+              color: theme.palette.primary.main,
               fontWeight: 600,
               textTransform: 'uppercase',
               fontSize: '0.75rem',
@@ -61,9 +62,9 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
           <Button 
             onClick={() => setActiveFilter('TODOS')}
             sx={{ 
-              backgroundColor: activeFilter === 'TODOS' ? '#7FB3D5' : 'transparent',
-              color: activeFilter === 'TODOS' ? '#FFFFFF !important' : '#7FB3D5',
-              '&:hover': { backgroundColor: activeFilter === 'TODOS' ? '#5C97BF' : '#EBF2F7' }
+              backgroundColor: activeFilter === 'TODOS' ? theme.palette.primary.main : 'transparent',
+              color: activeFilter === 'TODOS' ? '#FFFFFF !important' : theme.palette.primary.main,
+              '&:hover': { backgroundColor: activeFilter === 'TODOS' ? theme.palette.primary.dark : theme.palette.action.hover }
             }}
           >
             {t("filterAll")}
@@ -71,9 +72,9 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
           <Button 
             onClick={() => setActiveFilter('TRIMESTRE')}
             sx={{ 
-              backgroundColor: activeFilter === 'TRIMESTRE' ? '#7FB3D5' : 'transparent',
-              color: activeFilter === 'TRIMESTRE' ? '#FFFFFF !important' : '#7FB3D5',
-              '&:hover': { backgroundColor: activeFilter === 'TRIMESTRE' ? '#5C97BF' : '#EBF2F7' }
+              backgroundColor: activeFilter === 'TRIMESTRE' ? theme.palette.primary.main : 'transparent',
+              color: activeFilter === 'TRIMESTRE' ? '#FFFFFF !important' : theme.palette.primary.main,
+              '&:hover': { backgroundColor: activeFilter === 'TRIMESTRE' ? theme.palette.primary.dark : theme.palette.action.hover }
             }}
           >
             {t("filterQuarter")}
@@ -81,9 +82,9 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
           <Button 
             onClick={() => setActiveFilter('AÑO')}
             sx={{ 
-              backgroundColor: activeFilter === 'AÑO' ? '#7FB3D5' : 'transparent',
-              color: activeFilter === 'AÑO' ? '#FFFFFF !important' : '#7FB3D5',
-              '&:hover': { backgroundColor: activeFilter === 'AÑO' ? '#5C97BF' : '#EBF2F7' }
+              backgroundColor: activeFilter === 'AÑO' ? theme.palette.primary.main : 'transparent',
+              color: activeFilter === 'AÑO' ? '#FFFFFF !important' : theme.palette.primary.main,
+              '&:hover': { backgroundColor: activeFilter === 'AÑO' ? theme.palette.primary.dark : theme.palette.action.hover }
             }}
           >
             {t("filterYear")}
@@ -96,8 +97,8 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
         sx={{ 
           width: '100%', 
           height: 300, 
-          backgroundColor: '#FFFFFF', // Fondo blanco de la gráfica en tu imagen
-          border: '1px solid #CCD5DE',
+          backgroundColor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
           borderRadius: '4px',
           pt: 2,
           pr: 2
@@ -108,33 +109,32 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
             { 
               scaleType: 'point', 
               data: xLabels,
-              tickLabelStyle: { fill: '#7F8C8D', fontSize: 12 }
+              tickLabelStyle: { fill: theme.palette.text.secondary, fontSize: 12 }
             }
           ]}
           yAxis={[
             {
-              min: Math.min(...weightData) - 5, // Darle un poco de margen inferior al gráfico
-              max: Math.max(...weightData) + 5, // Darle margen superior
-              tickLabelStyle: { fill: '#7F8C8D', fontSize: 12 }
+              min: Math.min(...weightData) - 5,
+              max: Math.max(...weightData) + 5,
+              tickLabelStyle: { fill: theme.palette.text.secondary, fontSize: 12 }
             }
           ]}
           series={[
             {
               data: weightData,
-              color: '#7FB3D5', // Azul claro de la línea
-              showMark: true,   // Muestra los puntos en las intersecciones
-              curve: 'linear',  // Línea recta entre puntos como en tu imagen
+              color: theme.palette.primary.main,
+              showMark: true,
+              curve: 'linear',
             },
           ]}
-          grid={{ horizontal: true }} // Agrega las líneas horizontales de fondo
+          grid={{ horizontal: true }}
           height={280}
           margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
           sx={{
-            // Estilos adicionales para los puntos de la gráfica
             '& .MuiMarkElement-root': {
-              fill: '#FFFFFF',
+              fill: theme.palette.background.paper,
               strokeWidth: 2,
-              stroke: '#7FB3D5',
+              stroke: theme.palette.primary.main,
             },
           }}
         />

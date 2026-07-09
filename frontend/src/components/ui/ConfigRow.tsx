@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { Stack, IconButton, Divider } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -10,7 +9,6 @@ import React from 'react';
 
 export const ConfigRow = () => {
     const { isDarkMode, toggleTheme } = React.useContext(ThemeContext);
-    const { t } = useTranslation('common');
 
     return (
         <Stack
