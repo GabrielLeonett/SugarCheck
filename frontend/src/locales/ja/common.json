@@ -1,5 +1,7 @@
 {
+  "perfil": "プロフィール",
   "configuracion": "設定",
   "cambiarContrasena": "パスワードを変更",
-  "cerrarSesion": "ログアウト"
+  "cerrarSesion": "ログアウト",
+  "verificandoSesion": "セッションを確認中..."
 }

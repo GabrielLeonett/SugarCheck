@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import React from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
@@ -8,6 +9,7 @@ import useLanguage from "./useLanguage";
 
 
 export function useNavbar() {
+    const navigate = useNavigate();
     const { isDarkMode, toggleTheme } = React.useContext(ThemeContext);
     const user = useAuthStore((state) => state.user);
     const { t } = useLanguage("nav");
@@ -23,7 +25,7 @@ export function useNavbar() {
     }, 
     {
         name: t("agente"), submenu: [
-            { name: t("consultarAlOraculo"), href: "/agente/control-de-go-de-lucemia" }, 
+{ name: t("consultarAlOraculo"), href: "/agente/oraculo-chat" },
             { name: t("rutaDelGuerrero"), href: "/agente/camino" },
         ]
         , icon: <MenuIcon />
@@ -35,16 +37,13 @@ export function useNavbar() {
 
     const handleNavClick = (href: string) => {
         setDrawerOpen(false);
-        const element = document.querySelector(href);
-        if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        navigate(href);
     };
 
     const userInitials = React.useMemo(() => {
         if (!user) return "";
-        const names = user.name.split(" ");
-        console.log("User Name:", user.name);
+        const names = user.username.split(" ");
+        console.log("User Name:", user.username);
         const initials = names.map(name => name[0]).join("");
         return initials.toUpperCase();
     }, [user])

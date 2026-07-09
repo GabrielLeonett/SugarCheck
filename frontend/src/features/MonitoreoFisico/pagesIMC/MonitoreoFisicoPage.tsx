@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid } from '@mui/material';
+import { Box, Typography, Grid, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 // UI Components
@@ -15,6 +15,7 @@ import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
 import { CardBase } from '../../../components/ui/Cards/CardBase';
 import Navbar from '../../../components/layout/Header/Navbar';
 import Footer from '../../../components/layout/Footer/Footer';
+import useLanguage from "../../../hooks/useLanguage";
 
 // Mock inicial basado exactamente en la data visual de tu imagen
 const INITIAL_RECORDS: PhysicalRecord[] = [
@@ -30,6 +31,8 @@ const INITIAL_EVOLUTION: PhysicalEvolution = {
 };
 
 export const PhysicalMonitoringPage: React.FC = () => {
+  const { t } = useLanguage("monitoreoFisico");
+  const theme = useTheme();
   const [records, setRecords] = useState<PhysicalRecord[]>(INITIAL_RECORDS);
   const [evolution] = useState<PhysicalEvolution>(INITIAL_EVOLUTION);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,7 +67,7 @@ export const PhysicalMonitoringPage: React.FC = () => {
   return (
     <Box
       sx={{
-        backgroundColor: '#EBF2F7', // Color exacto de fondo suave de SugarCheck
+        backgroundColor: theme.palette.background.default,
         minHeight: '100vh',
         padding: '40px 24px',
       }}
@@ -74,14 +77,14 @@ export const PhysicalMonitoringPage: React.FC = () => {
         <Typography
           variant="h1"
           sx={{
-            color: '#1C2833',
+            color: theme.palette.text.primary,
             fontWeight: 800,
             fontSize: '1.75rem',
             textAlign: 'center',
             marginBottom: '32px',
           }}
         >
-          Monitoreo de la Fortaleza Física.
+          {t("pageTitle")}
         </Typography>
 
         <Grid container spacing={4}>
@@ -92,7 +95,7 @@ export const PhysicalMonitoringPage: React.FC = () => {
               onClick={handleOpenModal}
               fullWidth
             >
-              Registrar Nuevas Medidas
+              {t("registerButton")}
             </ButtonBase>
             
             <MetricCard type="balance" currentImc={currentImc} />

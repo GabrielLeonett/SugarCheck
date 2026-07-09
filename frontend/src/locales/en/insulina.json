@@ -1,12 +1,6 @@
 {
-  "monitoreoDiarioDeInsulina": "Daily Insulin Monitoring",
-  "registrarRapida": "Register Rapid Dose Application",
-  "registrarLenta": "Register Slow Dose Application",
-  "cronometroSeguridad": "Safety Timer",
-  "ultimaDosisRapida": "Last Rapid Insulin Dose",
-  "escudoAgotando": "The shield is running out",
-  "unidadesTotalesDia": "Total Units of the Day",
-  "esquemaCorrector": "Correction Scheme",
-  "mgDl": "mg/dL",
-  "uiBolus": "Bolus UI"
+    "title": "Insulin Log",
+    "fastDoseButton": "Register Rapid Dose Application",
+    "slowDoseButton": "Register Slow Dose Application",
+    "safetyTimer": "Safety Timer"
 }
