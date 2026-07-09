@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import escudo_de_fibra from "../../../assets/insigniasCamino/escudo_de_fribra.png";
+
 
 // 1. Definimos el "contrato" de qué datos puede recibir esta tarjeta
 interface InsigniaCardProps {

@@ -5,6 +5,7 @@ import InsigniaCard from "./Components/InsigniasCard";
 import { HexagonoMundo } from "./Components/NivelesHexagono";
 import yelmo_de_sabiduria from "../../assets/insigniasCamino/yelmo_de_sabiduria.png"
 import escudo_de_fibra from "../../assets/insigniasCamino/escudo_de_fribra.png";
+import SeparadorMundo from "./Components/SeparaMundos"
 export function Camino() {
 return (
     <>
@@ -17,8 +18,14 @@ return (
                     Camino del guerrero
                 </Typography>
                 <Box sx={{ border: "2px solid black", p: 2, height: "100%" }}>
-                    <HexagonoMundo numero = "1"/>
-                    <HexagonoMundo numero = "2"/>
+                    <SeparadorMundo numero = "1" texto = "Camino de la energía"/>
+                    <HexagonoMundo numero = "1" lines = {true} color = {true}/>
+                    <HexagonoMundo numero = "2" lines = {true} color = {true}/>
+                    <HexagonoMundo numero = "3" color = {true}/>
+                    <SeparadorMundo numero = "1" texto = "Camino de la energía" bool = {false}/>
+                    <HexagonoMundo numero = "4" lines = {true}/>
+                    <HexagonoMundo numero = "5" lines = {true}/>
+                    <HexagonoMundo numero = "6" />
                 </Box>
             </Grid>
                 {/*aca es el apartado de las insignias*/} 
