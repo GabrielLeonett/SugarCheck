@@ -2,29 +2,12 @@ import React from "react";
 import { Avatar, Box, Grid, Modal } from "@mui/material";
 import { ButtonBase } from "../../../components/ui/Buttons/ButtonBase";
 import EditIcon from '@mui/icons-material/Edit';
-// Imágenes de perfil
-import GlucoAstro from '../../../assets/profile/GlucoAstro.png';
-import GlucoBeisbol from '../../../assets/profile/GlucoBeisbol.png';
-import GlucoBombero from '../../../assets/profile/GlucoBombero.png';
-import GlucoFutbolista from '../../../assets/profile/GlucoFutbolista.png';
-import GlucoInformatico from '../../../assets/profile/GlucoInformatico.png';
-import GlucoMedico from '../../../assets/profile/GlucoMedico.png';
-import GlucoPintor from '../../../assets/profile/GlucoPintor.png';
-import GlucoPolicia from '../../../assets/profile/GlucoPolicia.png';
-import GlucoMago from '../../../assets/profile/GucloMago.png'; // Corregido typo en la importación (Guclo -> Gluco)
+import { AVATAR_MAP, AVATAR_NAMES } from "../../../constants/avatars";
 import { usePreferenceConfig } from "../../../hooks/usePreferenceConfig";
+import useLanguage from "../../../hooks/useLanguage";
 
-// Exportamos el array por si necesitas renderizar la lista en un componente de selección
-const ImagesProfile = [
-    GlucoAstro, GlucoBeisbol, GlucoBombero,
-    GlucoFutbolista, GlucoInformatico,
-    GlucoMedico, GlucoPintor, GlucoPolicia,
-    GlucoMago
-];
-
-// Estilos base comunes para los avatares de la lista
 const baseAvatarSx = {
-    width: { xs: 80, sm: 100, md: 120 }, // Tamaños responsivos para evitar desbordes en móviles
+    width: { xs: 80, sm: 100, md: 120 },
     height: { xs: 80, sm: 100, md: 120 },
     cursor: 'pointer',
     transition: 'all 0.2s ease-in-out',
@@ -41,16 +24,20 @@ const AvatarNormalSx = {
 
 const AvatarSelectedSx = {
     ...baseAvatarSx,
-    border: "4px solid #3182CE", // Borde más grueso para notar la selección
+    border: "4px solid #3182CE",
     transform: 'scale(1.05)',
     boxShadow: '0px 4px 10px rgba(49, 130, 206, 0.3)'
 };
 
 export function AvatarProfile() {
-    const { preference, changeAvatar } = usePreferenceConfig()
-    console.log(preference?.profileImg)
-
+    const { t } = useLanguage("profile");
     const [openAvatarEdit, setOpenAvatarEdit] = React.useState<boolean>(false);
+
+    const { preference, changeAvatar, save } = usePreferenceConfig();
+
+    const currentAvatar = preference?.profileImg && AVATAR_MAP[preference.profileImg]
+        ? AVATAR_MAP[preference.profileImg]
+        : AVATAR_MAP.GlucoAstro;
 
     const handleOpenModalAvatarEdit = () => {
         setOpenAvatarEdit(!openAvatarEdit);
@@ -58,7 +45,6 @@ export function AvatarProfile() {
 
     return (
         <>
-            {/* Avatar Principal Visible en el Perfil */}
             <Box
                 sx={{
                     position: "relative",
@@ -69,7 +55,7 @@ export function AvatarProfile() {
                 }}
             >
                 <Avatar
-                    src={preference?.profileImg} // Ahora cambia dinámicamente con el estado
+                    src={currentAvatar}
                     alt="Perfil actual"
                     sx={{
                         width: '100%',
@@ -79,7 +65,6 @@ export function AvatarProfile() {
                     }}
                 />
 
-                {/* Capa de Edición que se activa en Hover */}
                 <Box
                     className="overlay"
                     onClick={handleOpenModalAvatarEdit}
@@ -102,7 +87,6 @@ export function AvatarProfile() {
                 </Box>
             </Box>
 
-            {/* Modal de Selección */}
             <Modal
                 open={openAvatarEdit}
                 onClose={handleOpenModalAvatarEdit}
@@ -114,44 +98,45 @@ export function AvatarProfile() {
                         boxShadow: 24,
                         p: 4,
                         borderRadius: 2,
-                        width: { xs: '90%', sm: 450 }, // Ajustado para un ancho de modal óptimo
+                        width: { xs: '90%', sm: 450 },
                         maxWidth: '100%',
                         maxHeight: '90vh',
                         overflowY: 'auto',
                         outline: 'none'
                     }}
                 >
-                    {/* Rejilla de Avatares */}
                     <Grid container spacing={2} sx={{ mb: 3 }}>
-                        {ImagesProfile.map((img, index) => {
+                        {AVATAR_NAMES.map((name) => {
                             return (
-                                <Grid size={4} key={index} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <Grid size={4} key={name} sx={{ display: 'flex', justifyContent: 'center' }}>
                                     <Avatar
-                                        src={img}
-                                        alt={`Opción ${index}`}
-                                        onClick={() => { changeAvatar(img) }} // Guarda la selección temporal en el estado
-                                        sx={img === preference?.profileImg ? AvatarSelectedSx : AvatarNormalSx}
+                                        src={AVATAR_MAP[name]}
+                                        alt={name}
+                                        onClick={() => { changeAvatar(name) }}
+                                        sx={name === preference?.profileImg ? AvatarSelectedSx : AvatarNormalSx}
                                     />
                                 </Grid>
                             );
                         })}
                     </Grid>
 
-                    {/* Botones de Acción */}
                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 2 }}>
                         <ButtonBase
                             variant="outlined"
                             color="error"
                             onClick={handleOpenModalAvatarEdit}
                         >
-                            Cancelar
+                            {t("cancel")}
                         </ButtonBase>
                         <ButtonBase
                             variant="contained"
                             color="primary"
-                            onClick={handleOpenModalAvatarEdit}
+                            onClick={() => {
+                                if (preference) save(preference);
+                                setOpenAvatarEdit(false);
+                            }}
                         >
-                            Guardar
+                            {t("save")}
                         </ButtonBase>
                     </Box>
                 </Box>

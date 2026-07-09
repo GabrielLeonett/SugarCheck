@@ -52,7 +52,7 @@ return (
                 <InsigniaCard img={yelmo_de_sabiduria} mundo="Mundo 2" name="yelmo de la sabiduria" bloqueado />
                 {/* Sección de progreso simulada al fondo del Box */}
                 <Box sx={{ mt: 'auto', pt: 2, color: 'white', textAlign: 'center' }}>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>Progreso de la Ruta</Typography>
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{("routeProgress")}</Typography>
                 {/* Tu barra de progreso irá aquí */}
                 </Box>
                 </Box>

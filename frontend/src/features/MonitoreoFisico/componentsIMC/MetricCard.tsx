@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
-import { ProgressBar } from '../../../components/ui/ProgressBar';
+import { Box, Typography, Divider, useTheme } from '@mui/material';
+import { CardBase } from '../componentsIMC/CardBase';
 import type { PhysicalEvolution } from '../../../types/types';
-import { CardBase } from '../../../components/ui/Cards/CardBase'
+import useLanguage from "../../../hooks/useLanguage";
 
 interface MetricCardProps {
   type: 'balance' | 'evolution';
@@ -10,61 +10,77 @@ interface MetricCardProps {
   evolutionData?: PhysicalEvolution;
 }
 
-// Estilos base reutilizables mediante el objeto sx
-const titleSx = {
-  color: '#2C3E50',
-  fontWeight: 700,
-  fontSize: '1.1rem',
-  textAlign: 'center',
-  marginBottom: '16px',
-};
-
-const bigValueSx = (color = '#2ECC71') => ({
-  fontSize: '3.5rem',
-  fontWeight: 800,
-  textAlign: 'center',
-  lineHeight: 1,
-  color: color,
-});
-
-export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc = 0, evolutionData }) => {
+export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc, evolutionData }) => {
+  const { t } = useLanguage("monitoreoFisico");
+  const theme = useTheme();
+  // Renderizado para la tarjeta de Balance de Fortaleza Física
   if (type === 'balance') {
+    let color = '#27AE60'; // Verde (Normal)
+    if (currentImc && currentImc < 18.5) {
+      color = '#3498DB'; // Azul (Bajo peso)
+    } else if (currentImc && currentImc >= 25) {
+      color = '#E67E22'; // Naranja (Sobrepeso)
+    }
+
     return (
-      <CardBase sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 4 }}>
-        <Typography sx={titleSx}>Balance de Fortaleza Física</Typography>
-        <Typography sx={bigValueSx()}>{currentImc.toFixed(1)}</Typography>
-        <ProgressBar value={currentImc} />
+      <CardBase>
+        <Typography sx={{ color: theme.palette.text.primary, fontWeight: 700, textAlign: 'center', mb: 2 }}>
+{t("balanceTitle")}
+        </Typography>
+        
+        <Typography variant="h2" sx={{ color: color, fontWeight: 800, textAlign: 'center', mb: 3 }}>
+          {currentImc?.toFixed(1) || '0.0'}
+        </Typography>
+
+        <Box sx={{ display: 'flex', height: '6px', borderRadius: '3px', overflow: 'hidden', mb: 1, gap: '2px' }}>
+          <Box sx={{ flex: 1, backgroundColor: '#3498DB', opacity: (currentImc && currentImc < 18.5) ? 1 : 0.4 }} />
+          <Box sx={{ flex: 1, backgroundColor: '#27AE60', opacity: (currentImc && currentImc >= 18.5 && currentImc < 25) ? 1 : 0.4 }} />
+          <Box sx={{ flex: 1, backgroundColor: '#E67E22', opacity: (currentImc && currentImc >= 25) ? 1 : 0.4 }} />
+        </Box>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, fontWeight: (currentImc && currentImc < 18.5) ? 700 : 400 }}>Bajo peso</Typography>
+          <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, fontWeight: (currentImc && currentImc >= 18.5 && currentImc < 25) ? 700 : 400 }}>Normal</Typography>
+          <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, fontWeight: (currentImc && currentImc >= 25) ? 700 : 400 }}>Sobrepeso</Typography>
+        </Box>
       </CardBase>
     );
   }
 
-  const pesoSign = evolutionData && evolutionData.pesoDiff > 0 ? '+' : '';
-  const tallaSign = evolutionData && evolutionData.estaturaDiff > 0 ? '+' : '';
+  if (type === 'evolution' && evolutionData) {
+    return (
+      <CardBase>
+        <Typography sx={{ color: theme.palette.text.primary, fontWeight: 700, textAlign: 'center', mb: 3 }}>
+{t("evolutionTitle")}
+        </Typography>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 3 }}>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h5" sx={{ color: evolutionData.pesoDiff <= 0 ? '#27AE60' : '#E74C3C', fontWeight: 800 }}>
+              {evolutionData.pesoDiff > 0 ? '+' : ''}{evolutionData.pesoDiff} Kg
+            </Typography>
+            <Typography sx={{ fontSize: '0.8rem', color: theme.palette.text.primary, fontWeight: 700 }}>
+{t("weightDiff")}
+            </Typography>
+          </Box>
 
-  return (
-    <CardBase sx={{ py: 4 }}>
-      <Typography sx={titleSx}>Evolución Física</Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', my: 2 }}>
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography sx={bigValueSx('#2ECC71')}>
-            {pesoSign}{evolutionData?.pesoDiff} Kg
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#7F8C8D', fontWeight: 600, mt: 1 }}>
-            Diferencia de Peso
-          </Typography>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h5" sx={{ color: evolutionData.estaturaDiff > 0 ? '#27AE60' : theme.palette.text.secondary, fontWeight: 800 }}>
+              {evolutionData.estaturaDiff > 0 ? '+' : ''}{evolutionData.estaturaDiff} cm
+            </Typography>
+            <Typography sx={{ fontSize: '0.8rem', color: theme.palette.text.primary, fontWeight: 700 }}>
+{t("heightGrowth")}
+            </Typography>
+          </Box>
         </Box>
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography sx={bigValueSx('#2ECC71')}>
-            {tallaSign}{evolutionData?.estaturaDiff} cm
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#7F8C8D', fontWeight: 600, mt: 1 }}>
-            Crecimiento Logrado
-          </Typography>
-        </Box>
-      </Box>
-      <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', color: '#95A5A6', mt: 3 }}>
-        Evolución con respecto al registro anterior ({evolutionData?.fechaReferencia}).
-      </Typography>
-    </CardBase>
-  );
+
+        <Divider sx={{ mb: 2, borderColor: theme.palette.divider }} />
+        <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, textAlign: 'center' }}>
+          {t("evolutionDesc", { date: evolutionData?.fechaReferencia })}
+        </Typography>
+      </CardBase>
+    );
+  }
+
+  return null;
 };
