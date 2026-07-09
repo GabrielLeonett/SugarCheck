@@ -11,14 +11,17 @@ import {
   Param,
   Patch,
   Post,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { GetAllUser } from '../../app/GetAllUser';
 import { DeleteUser } from '../../app/DeleteUser';
 import { GetOneByIdUser } from '../../app/GetOneByIdUser';
 import { GetOneByEmailUser } from '../../app/GetOneByEmailUser';
+import { GetOneByUsernameUser } from '../../app/GetOneByUsernameUser';
 import { SaveUser } from '../../app/SaveUser';
 import { UpdateUser } from '../../app/UpdateUser';
+import { UpdateUserEmail } from '../../app/UpdateUserEmail';
 import { UserAlreadyExists } from '../../core/errors/UserAlreadyExists';
 import { ErrorAbstract } from '../../../shared/error-abstract';
 import { UserNotFoundError } from '../../core/errors/UserNotFoundError';
@@ -26,9 +29,10 @@ import { FindUserIdDTO } from '../../../shared/infrastructure/DTOs/find-user-id.
 import { FindUserEmailDTO } from './DTOs/find-user-email.dto';
 import { CreateUserDTO } from './DTOs/create-user.dto';
 import { UpdateUserDto } from './DTOs/update-user.dto';
+import { UpdateEmailDTO } from './DTOs/update-email.dto';
 import { AuthGuard } from '../../../auth/infra/auth.guard';
 import { RolesGuard } from '../../../auth/infra/roles.guard';
-import { Roles } from '../../../auth/infra/roles.decorator'; // Asegúrate de tener tu decorador personalizado de roles
+import { Roles } from '../../../auth/infra/roles.decorator';
 import { Role } from '../../../shared/enums/role.enum';
 
 @Controller('user')
@@ -39,7 +43,9 @@ export class UserController {
     @Inject('GetOneByIdUser') private readonly getOneByIdUser: GetOneByIdUser,
     @Inject('UpdateUser') private readonly updateUser: UpdateUser,
     @Inject('GetOneByEmailUser') private readonly getOneByEmailUser: GetOneByEmailUser,
+    @Inject('GetOneByUsernameUser') private readonly getOneByUsernameUser: GetOneByUsernameUser,
     @Inject('SaveUser') private readonly saveUser: SaveUser,
+    @Inject('UpdateUserEmail') private readonly updateUserEmail: UpdateUserEmail,
   ) {}
 
   @Get()
@@ -69,7 +75,7 @@ export class UserController {
   @Get('/email/:email')
   async getOneByEmail(@Param() params: FindUserEmailDTO) {
     const result = await this.getOneByEmailUser.run(params);
-    
+
     if (!result.isValid) {
       const error = result.getError();
       if (error instanceof UserNotFoundError) throw new NotFoundException(error.message);
@@ -82,14 +88,31 @@ export class UserController {
     return user.toPlain();
   }
 
-  /**
-   * 1. REGISTRO PÚBLICO (Cualquiera puede crear su cuenta aquí)
-   * Importante: El `CreateUserDTO` no debe permitir mutar el rol, o el caso 
-   * de uso `SaveUser` debe forzar que se guarde como rol 'USER'.
-   */
+  @Get('/username/:username')
+  async getOneByUsername(@Param('username') username: string) {
+    const result = await this.getOneByUsernameUser.run({ username });
+
+    if (!result.isValid) {
+      const error = result.getError();
+      if (error instanceof UserNotFoundError) throw new NotFoundException(error.message);
+      if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
+      throw error;
+    }
+
+    return result.getValue().toPlain();
+  }
+
   @Post('register')
   async register(@Body() create: CreateUserDTO) {
-    const result = await this.saveUser.run({ ...create, roles: [Role.Guerrero] }); // Forzamos el rol USER desde el backend
+    const result = await this.saveUser.run({
+      name: create.name,
+      username: create.username,
+      email: create.email,
+      roles: [Role.Guerrero],
+      sexo: create.sexo,
+      fechaNacimiento: create.fechaNacimiento,
+      password: create.password,
+    });
 
     if (!result.isValid) {
       const error = result.getError();
@@ -101,15 +124,19 @@ export class UserController {
     return result.getValue().toPlain();
   }
 
-  /**
-   * 2. CREACIÓN INTERNA DE ADMINS (Protegido)
-   * Solo administradores autenticados pueden crear otros administradores.
-   */
   @Post('admin')
-  @Roles(Role.Admin) // Solo admins pueden crear otros admins
+  @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   async createAdmin(@Body() create: CreateUserDTO) {
-    const result = await this.saveUser.run({ ...create, roles: [Role.Admin] }); // Forzamos el rol ADMIN
+    const result = await this.saveUser.run({
+      name: create.name,
+      username: create.username,
+      email: create.email,
+      roles: [Role.Admin],
+      sexo: create.sexo,
+      fechaNacimiento: create.fechaNacimiento,
+      password: create.password,
+    });
 
     if (!result.isValid) {
       const error = result.getError();
@@ -125,7 +152,7 @@ export class UserController {
   @UseGuards(AuthGuard, RolesGuard)
   async update(
     @Param('id') id: string,
-    @Body() updateDto: UpdateUserDto
+    @Body() updateDto: UpdateUserDto,
   ) {
     const result = await this.updateUser.run(id, updateDto);
 
@@ -139,10 +166,29 @@ export class UserController {
     return result.getValue().toPlain();
   }
 
+  @Patch('/email')
+  @UseGuards(AuthGuard)
+  async updateEmail(
+    @Body() body: UpdateEmailDTO,
+    @Request() req: any,
+  ) {
+    const userId = req.user.sub;
+    const result = await this.updateUserEmail.run({ id: userId, email: body.email });
+
+    if (!result.isValid) {
+      const error = result.getError();
+      if (error instanceof UserAlreadyExists) throw new ConflictException(error.message);
+      if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
+      throw error;
+    }
+
+    return { message: 'Correo electrónico actualizado correctamente' };
+  }
+
   @Delete(':id')
   @HttpCode(204)
   @UseGuards(AuthGuard, RolesGuard)
-  async delete(@Param() param: FindUserIdDTO) { // <-- Corregido: Se quitó el string vacío del @Param()
+  async delete(@Param() param: FindUserIdDTO) {
     const result = await this.deleteUser.run(param);
 
     if (!result.isValid) {

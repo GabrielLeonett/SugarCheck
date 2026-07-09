@@ -1,5 +1,7 @@
 {
+  "perfil": "Perfil",
   "configuracion": "Configuração",
   "cambiarContrasena": "Alterar Senha",
-  "cerrarSesion": "Sair"
+  "cerrarSesion": "Sair",
+  "verificandoSesion": "Verificando sessão..."
 }

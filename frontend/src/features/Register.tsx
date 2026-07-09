@@ -1,454 +1,537 @@
 import { useState } from 'react';
-import { Box, useTheme, Typography, TextField, Button, Link, Grid } from "@mui/material";
+import { Box, useTheme, Typography, TextField, Button, Link, Grid, MenuItem, Alert } from "@mui/material";
+import { useForm } from "react-hook-form";
 import { LogoGA } from "../components/ui/LogoGA";
 import LoginIcon from '@mui/icons-material/Login';
 import { CardBase } from '../components/ui/Cards/CardBase';
+import { apiPublic } from '../apis/axios';
+import { contactEmergenceApi } from '../apis/contact_emergence';
+import { useAuthStore } from '../stores/authStore';
+import { useNavigate } from 'react-router-dom';
+import type { AxiosError } from 'axios';
+import type { BackendErrorResponse } from '../types/types';
+import {
+  registerStep1Schema,
+  registerStep2Schema,
+  registerStep3Schema,
+} from '../schemas/register';
+import useLanguage from "../hooks/useLanguage";
+
+type RegisterFormData = {
+  username: string;
+  nombre: string;
+  edad: string;
+  sexo: '' | 'masculino' | 'femenino';
+  email: string;
+  password: string;
+  confirmPassword: string;
+  peso: string;
+  talla: string;
+  glucosaMin: string;
+  glucosaMax: string;
+  nombreGuardián: string;
+  parentesco: '' | 'madre' | 'padre' | 'hermano' | 'hermana' | 'abuelo' | 'abuela' | 'tio' | 'tia' | 'tutor' | 'otro';
+  telefono: string;
+};
+
+const defaultValues: RegisterFormData = {
+  username: '',
+  nombre: '',
+  edad: '',
+  sexo: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  peso: '',
+  talla: '',
+  glucosaMin: '',
+  glucosaMax: '',
+  nombreGuardián: '',
+  parentesco: '',
+  telefono: '',
+};
 
 export default function Register() {
-    const theme = useTheme();
-    const [activeStep, setActiveStep] = useState(0);
-    const [formData, setFormData] = useState({
-        // Paso 1: Crear cuenta
-        nombre: '',
-        edad: '',
-        genero: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        // Paso 2: Configuración de salud
-        peso: '',
-        talla: '',
-        glucosaMin: '',
-        glucosaMax: '',
-        // Paso 3: Contacto de confianza
-        nombreGuardián: '',
-        parentesco: '',
-        telefono: ''
-    });
-    const [errors, setErrors] = useState<Record<string, string>>({});
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+  const { t } = useLanguage("register");
+  const [activeStep, setActiveStep] = useState(0);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const validateStep1 = () => {
-        const newErrors: Record<string, string> = {};
-        if (!formData.nombre) newErrors.nombre = 'Nombre es requerido';
-        if (!formData.email) newErrors.email = 'Correo electrónico es requerido';
-        if (!formData.password) newErrors.password = 'Contraseña es requerida';
-        if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+  const {
+    register,
+    setError,
+    clearErrors,
+    getValues,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    defaultValues,
+  });
 
-    const validateStep2 = () => {
-        const newErrors: Record<string, string> = {};
-        if (!formData.peso) newErrors.peso = 'Peso es requerido';
-        if (!formData.talla) newErrors.talla = 'Talla es requerida';
-        if (!formData.glucosaMin) newErrors.glucosaMin = 'Glucosa mínima es requerida';
-        if (!formData.glucosaMax) newErrors.glucosaMax = 'Glucosa máxima es requerida';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+  const stepSchemas = [registerStep1Schema, registerStep2Schema, registerStep3Schema];
 
-    const validateStep3 = () => {
-        const newErrors: Record<string, string> = {};
-        if (!formData.nombreGuardián) newErrors.nombreGuardián = 'Nombre del guardián es requerido';
-        if (!formData.parentesco) newErrors.parentesco = 'Parentesco es requerido';
-        if (!formData.telefono) newErrors.telefono = 'Teléfono es requerido';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleNext = () => {
-        let isValid = false;
-        if (activeStep === 0) isValid = validateStep1();
-        else if (activeStep === 1) isValid = validateStep2();
-        else isValid = validateStep3();
-
-        if (isValid && activeStep < 2) {
-            setActiveStep((prev) => prev + 1);
+  const validateStep = (step: number): boolean => {
+    const values = getValues();
+    const schema = stepSchemas[step];
+    const result = schema.safeParse(values);
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      for (const [field, messages] of Object.entries(fieldErrors)) {
+        if (messages?.[0]) {
+          setError(field as keyof RegisterFormData, { message: messages[0] });
         }
-    };
+      }
+      return false;
+    }
+    clearErrors();
+    return true;
+  };
 
-    const handleBack = () => {
-        setActiveStep((prev) => prev - 1);
-    };
+  const handleNext = () => {
+    const valid = validateStep(activeStep);
+    if (valid) {
+      setActiveStep((prev) => prev + 1);
+    }
+  };
 
-    const handleSubmit = () => {
-        if (validateStep3()) {
-            console.log('Formulario completo:', formData);
-            alert('Registro completado exitosamente!');
+  const handleBack = () => {
+    setActiveStep((prev) => prev - 1);
+  };
+
+  const onSubmit = async () => {
+    const values = getValues();
+    const result = registerStep3Schema.safeParse(values);
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      for (const [field, messages] of Object.entries(fieldErrors)) {
+        if (messages?.[0]) {
+          setError(field as keyof RegisterFormData, { message: messages[0] });
         }
-    };
+      }
+      return;
+    }
 
-    const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [field]: event.target.value });
-        if (errors[field]) {
-            setErrors({ ...errors, [field]: '' });
+    setIsSubmitting(true);
+    setAuthError(null);
+
+    try {
+      const fechaNacimiento = new Date();
+      fechaNacimiento.setFullYear(fechaNacimiento.getFullYear() - parseInt(values.edad || '0'));
+
+      await apiPublic.post('/user/register', {
+        name: values.nombre,
+        username: values.username,
+        email: values.email || undefined,
+        sexo: values.sexo,
+        fechaNacimiento: fechaNacimiento.toISOString(),
+        password: values.password,
+      });
+
+      await login(values.username, values.password);
+
+      await contactEmergenceApi.create({
+        name: values.nombreGuardián,
+        parentesco: values.parentesco,
+        telefono: values.telefono || undefined,
+      });
+
+      navigate('/');
+    } catch (error) {
+      if (error instanceof Error) {
+        const axiosError = error as AxiosError<BackendErrorResponse>;
+        const message = axiosError.response?.data?.message || t("errorRegister");
+
+        if (axiosError.response?.status === 409) {
+          setError('email', { message: t("errorEmailTaken") });
         }
-    };
+        setAuthError(message);
+      } else {
+        setAuthError(t("errorRegister"));
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    const textFieldStyles = {
-        mb: 2,
-        '& .MuiOutlinedInput-root': {
-            bgcolor: 'rgba(255,255,255,0.1)',
-            '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' }
-        },
-        '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-        '& .MuiInputBase-input': { color: 'white' },
-        '& .MuiFormHelperText-root': { color: '#ff6b6b' }
-    };
+  const textFieldStyles = {
+    mb: 2,
+    '& .MuiOutlinedInput-root': {
+      bgcolor: 'rgba(255,255,255,0.1)',
+      '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' }
+    },
+    '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
+    '& .MuiInputBase-input': { color: 'white' },
+    '& .MuiFormHelperText-root': { color: '#ff6b6b' }
+  };
 
-    const getStepContent = () => {
-        switch (activeStep) {
-            case 0:
-                return (
-                    <>
-                        <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
-                        <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
-                            Crear cuenta
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
-                            Ingresa tus credenciales para acceder
-                        </Typography>
+  const getStepContent = () => {
+    switch (activeStep) {
+      case 0:
+        return (
+          <>
+            <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
+            <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+              {t("title")}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
+              {t("subtitle")}
+            </Typography>
 
-                        <TextField
-                            fullWidth
-                            label="Nombre"
-                            variant="outlined"
-                            size="small"
-                            value={formData.nombre}
-                            onChange={handleChange('nombre')}
-                            error={!!errors.nombre}
-                            helperText={errors.nombre}
-                            sx={textFieldStyles}
-                        />
+            <TextField
+              {...register("username")}
+              fullWidth
+              label={t("usernameLabel")}
+              variant="outlined"
+              size="small"
+              error={!!errors.username}
+              helperText={errors.username?.message}
+              sx={textFieldStyles}
+            />
 
-                        <TextField
-                            fullWidth
-                            label="Edad"
-                            variant="outlined"
-                            size="small"
-                            type="number"
-                            value={formData.edad}
-                            onChange={handleChange('edad')}
-                            sx={textFieldStyles}
-                        />
+            <TextField
+              {...register("nombre")}
+              fullWidth
+              label={t("nameLabel")}
+              variant="outlined"
+              size="small"
+              sx={textFieldStyles}
+            />
 
-                        <TextField
-                            fullWidth
-                            label="Género"
-                            variant="outlined"
-                            size="small"
-                            value={formData.genero}
-                            onChange={handleChange('genero')}
-                            sx={textFieldStyles}
-                        />
+            <TextField
+              fullWidth
+              label={t("ageLabel")}
+              variant="outlined"
+              size="small"
+              type="number"
+              {...register("edad")}
+              sx={textFieldStyles}
+            />
 
-                        <TextField
-                            fullWidth
-                            label="Correo electrónico"
-                            variant="outlined"
-                            size="small"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange('email')}
-                            error={!!errors.email}
-                            helperText={errors.email}
-                            sx={textFieldStyles}
-                        />
+            <TextField
+              {...register("sexo")}
+              fullWidth
+              label={t("sexLabel")}
+              variant="outlined"
+              size="small"
+              select
+              error={!!errors.sexo}
+              helperText={errors.sexo?.message}
+              sx={textFieldStyles}
+            >
+              <MenuItem value="masculino">{t("sexMale")}</MenuItem>
+              <MenuItem value="femenino">{t("sexFemale")}</MenuItem>
+            </TextField>
 
-                        <TextField
-                            fullWidth
-                            label="Contraseña"
-                            type="password"
-                            variant="outlined"
-                            size="small"
-                            value={formData.password}
-                            onChange={handleChange('password')}
-                            error={!!errors.password}
-                            helperText={errors.password}
-                            sx={textFieldStyles}
-                        />
+            <TextField
+              {...register("email")}
+              fullWidth
+              label={t("emailLabel")}
+              variant="outlined"
+              size="small"
+              type="email"
+              error={!!errors.email}
+              helperText={errors.email?.message || ''}
+              sx={textFieldStyles}
+            />
 
-                        <TextField
-                            fullWidth
-                            label="Confirmar contraseña"
-                            type="password"
-                            variant="outlined"
-                            size="small"
-                            value={formData.confirmPassword}
-                            onChange={handleChange('confirmPassword')}
-                            error={!!errors.confirmPassword}
-                            helperText={errors.confirmPassword}
-                            sx={textFieldStyles}
-                        />
-                    </>
-                );
-            
-            case 1:
-                return (
-                    <>
-                        <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
-                        <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
-                            Configuración de Salud
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
-                            Prepara tus Estadísticas
-                        </Typography>
+            <TextField
+              {...register("password")}
+              fullWidth
+              label={t("passwordLabel")}
+              type="password"
+              variant="outlined"
+              size="small"
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              sx={textFieldStyles}
+            />
 
-                        {/* Peso y Talla en dos columnas */}
-                        <Grid container spacing={2} sx={{ mb: 2 }}>
-                            <Grid size={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Peso (Kg)"
-                                    variant="outlined"
-                                    size="small"
-                                    type="number"
-                                    value={formData.peso}
-                                    onChange={handleChange('peso')}
-                                    error={!!errors.peso}
-                                    helperText={errors.peso}
-                                    sx={textFieldStyles}
-                                />
-                            </Grid>
-                            <Grid size={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Talla (cm)"
-                                    variant="outlined"
-                                    size="small"
-                                    type="number"
-                                    value={formData.talla}
-                                    onChange={handleChange('talla')}
-                                    error={!!errors.talla}
-                                    helperText={errors.talla}
-                                    sx={textFieldStyles}
-                                />
-                            </Grid>
-                        </Grid>
+            <TextField
+              {...register("confirmPassword")}
+              fullWidth
+              label={t("confirmPasswordLabel")}
+              type="password"
+              variant="outlined"
+              size="small"
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword?.message}
+              sx={textFieldStyles}
+            />
+          </>
+        );
 
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', mb: 2, textAlign: 'left' }}>
-                            Rango objetivo de Glucosa
-                        </Typography>
+      case 1:
+        return (
+          <>
+            <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
+            <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+              {t("healthTitle")}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
+{t("healthSubtitle")}
+            </Typography>
 
-                        {/* Mínimo y Máximo en dos columnas */}
-                        <Grid spacing={2} container sx={{ mb: 2 }}>
-                            <Grid size={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Mínimo"
-                                    variant="outlined"
-                                    size="small"
-                                    type="number"
-                                    value={formData.glucosaMin}
-                                    onChange={handleChange('glucosaMin')}
-                                    error={!!errors.glucosaMin}
-                                    helperText={errors.glucosaMin}
-                                    sx={textFieldStyles}
-                                />
-                            </Grid>
-                            <Grid size={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Máximo"
-                                    variant="outlined"
-                                    size="small"
-                                    type="number"
-                                    value={formData.glucosaMax}
-                                    onChange={handleChange('glucosaMax')}
-                                    error={!!errors.glucosaMax}
-                                    helperText={errors.glucosaMax}
-                                    sx={textFieldStyles}
-                                />
-                            </Grid>
-                        </Grid>
-                    </>
-                );
-            
-            case 2:
-                return (
-                    <>
-                        <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
-                        <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
-                            Contactos de Confianza
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
-                            Convoca a tus Guardianes
-                        </Typography>
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid size={6}>
+                <TextField
+                  {...register("peso")}
+                  fullWidth
+                  label={t("weightLabel")}
+                  variant="outlined"
+                  size="small"
+                  type="number"
+                  error={!!errors.peso}
+                  helperText={errors.peso?.message}
+                  sx={textFieldStyles}
+                />
+              </Grid>
+              <Grid size={6}>
+                <TextField
+                  {...register("talla")}
+                  fullWidth
+                  label={t("heightLabel")}
+                  variant="outlined"
+                  size="small"
+                  type="number"
+                  error={!!errors.talla}
+                  helperText={errors.talla?.message}
+                  sx={textFieldStyles}
+                />
+              </Grid>
+            </Grid>
 
-                        <TextField
-                            fullWidth
-                            label="Nombre del Guardián"
-                            variant="outlined"
-                            size="small"
-                            value={formData.nombreGuardián}
-                            onChange={handleChange('nombreGuardián')}
-                            error={!!errors.nombreGuardián}
-                            helperText={errors.nombreGuardián}
-                            sx={textFieldStyles}
-                        />
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', mb: 2, textAlign: 'left' }}>
+              {t("glucoseRangeTitle")}
+            </Typography>
 
-                        <TextField
-                            fullWidth
-                            label="Parentesco"
-                            variant="outlined"
-                            size="small"
-                            value={formData.parentesco}
-                            onChange={handleChange('parentesco')}
-                            error={!!errors.parentesco}
-                            helperText={errors.parentesco}
-                            sx={textFieldStyles}
-                        />
+            <Grid spacing={2} container sx={{ mb: 2 }}>
+              <Grid size={6}>
+                <TextField
+                  {...register("glucosaMin")}
+                  fullWidth
+                  label={t("glucoseMinLabel")}
+                  variant="outlined"
+                  size="small"
+                  type="number"
+                  error={!!errors.glucosaMin}
+                  helperText={errors.glucosaMin?.message}
+                  sx={textFieldStyles}
+                />
+              </Grid>
+              <Grid size={6}>
+                <TextField
+                  {...register("glucosaMax")}
+                  fullWidth
+                  label={t("glucoseMaxLabel")}
+                  variant="outlined"
+                  size="small"
+                  type="number"
+                  error={!!errors.glucosaMax}
+                  helperText={errors.glucosaMax?.message}
+                  sx={textFieldStyles}
+                />
+              </Grid>
+            </Grid>
+          </>
+        );
 
-                        <TextField
-                            fullWidth
-                            label="Teléfono"
-                            variant="outlined"
-                            size="small"
-                            type="tel"
-                            value={formData.telefono}
-                            onChange={handleChange('telefono')}
-                            error={!!errors.telefono}
-                            helperText={errors.telefono}
-                            sx={textFieldStyles}
-                        />
-                    </>
-                );
-            
-            default:
-                return null;
-        }
-    };
+      case 2:
+        return (
+          <>
+            <LoginIcon sx={{ fontSize: 50, color: 'white', mb: 1 }} />
+            <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+              {t("emergencyTitle")}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 3 }}>
+{t("emergencySubtitle")}
+            </Typography>
 
-    const getLeftContent = () => {
-        switch (activeStep) {
-            case 0:
-                return {
-                    title: '¡Únete a la batalla, Guerrero!',
-                    description: 'Estás a unos pocos pasos de iniciar tu gran viaje. Registra tus datos básicos para forjar tu perfil en nuestra orden.'
-                };
-            case 1:
-                return {
-                    title: 'Prepara tus Estadísticas',
-                    description: 'Para ayudarte a mantenerte en la Zona Segura y calcular tu evolución física, necesitamos conocer tu estado de batalla actual.'
-                };
-            case 2:
-                return {
-                    title: 'Convoca a tus Guardianes',
-                    description: 'Ningún guerrero lucha solo. Añade a tus contactos de confianza para que te acompañen y te cuiden en cada misión.'
-                };
-            default:
-                return {
-                    title: '¡Únete a la batalla, Guerrero!',
-                    description: 'Completa todos los pasos para unirte a nuestra orden.'
-                };
-        }
-    };
+            <TextField
+              {...register("nombreGuardián")}
+              fullWidth
+              label={t("guardianNameLabel")}
+              variant="outlined"
+              size="small"
+              error={!!errors.nombreGuardián}
+              helperText={errors.nombreGuardián?.message}
+              sx={textFieldStyles}
+            />
 
-    const leftContent = getLeftContent();
+            <TextField
+              {...register("parentesco")}
+              fullWidth
+              label={t("relationshipLabel")}
+              variant="outlined"
+              size="small"
+              select
+              error={!!errors.parentesco}
+              helperText={errors.parentesco?.message}
+              sx={textFieldStyles}
+            >
+              <MenuItem value="madre">{t("relationshipMother")}</MenuItem>
+              <MenuItem value="padre">{t("relationshipFather")}</MenuItem>
+              <MenuItem value="hermano">{t("relationshipBrother")}</MenuItem>
+              <MenuItem value="hermana">{t("relationshipSister")}</MenuItem>
+              <MenuItem value="abuelo">{t("relationshipGrandfather")}</MenuItem>
+              <MenuItem value="abuela">{t("relationshipGrandmother")}</MenuItem>
+              <MenuItem value="tio">{t("relationshipUncle")}</MenuItem>
+              <MenuItem value="tia">{t("relationshipAunt")}</MenuItem>
+              <MenuItem value="tutor">{t("relationshipGuardian")}</MenuItem>
+              <MenuItem value="otro">{t("relationshipOther")}</MenuItem>
+            </TextField>
 
-    return (
-        <Box sx={{ 
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            bgcolor: theme.palette.background.default || '#f5f5f5',
+            <TextField
+              {...register("telefono")}
+              fullWidth
+              label={t("phoneLabel")}
+              variant="outlined"
+              size="small"
+              type="tel"
+              sx={textFieldStyles}
+            />
+          </>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const getLeftContent = () => {
+    switch (activeStep) {
+      case 0:
+        return {
+          title: t("leftTitleStep0"),
+          description: t("leftDescStep0")
+        };
+      case 1:
+        return {
+          title: t("leftTitleStep1"),
+          description: t("leftDescStep1")
+        };
+      case 2:
+        return {
+          title: t("leftTitleStep2"),
+          description: t("leftDescStep2")
+        };
+      default:
+        return {
+          title: t("leftTitleStep0"),
+          description: t("leftDescDefault")
+        };
+    }
+  };
+
+  const leftContent = getLeftContent();
+
+  return (
+    <Box sx={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      bgcolor: theme.palette.background.default || '#f5f5f5',
+    }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        gap: 4,
+        justifyContent: 'center',
+        alignItems: 'stretch',
+        maxWidth: '1000px',
+        width: '100%'
+      }}>
+        <CardBase sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: 2,
+          textAlign: 'center',
         }}>
-            <Box sx={{ 
-                display: 'flex', 
-                flexDirection: 'row', 
-                gap: 4, 
-                justifyContent: 'center', 
-                alignItems: 'stretch',
-                maxWidth: '1000px',
-                width: '100%'
-            }}>
-                {/* Columna izquierda - Mensajes dinámicos */}
-                <CardBase sx={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    p: 2,
-                    textAlign: 'center',
-                }}>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
-                        {leftContent.title}
-                    </Typography>
-                    <Typography variant="body1" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
-                        {leftContent.description}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 'auto' }}>
-                        ¿Ya tienes cuenta?{' '}
-                        <Link href="/login" sx={{ color: theme.palette.primary.main, fontWeight: 'bold', textDecoration: 'none' }}>
-                            Iniciar sesión
-                        </Link>
-                    </Typography>
-                </CardBase>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+            {leftContent.title}
+          </Typography>
+          <Typography variant="body1" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
+            {leftContent.description}
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 'auto' }}>
+            {t("hasAccount")}{' '}
+            <Link href="/login" sx={{ color: theme.palette.primary.main, fontWeight: 'bold', textDecoration: 'none' }}>
+              {t("loginLink")}
+            </Link>
+          </Typography>
+        </CardBase>
 
-                {/* Columna derecha - Formulario dinámico */}
-                <CardBase sx={{
-                    flex: 1,
-                    bgcolor: theme.palette.primary.dark,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    p: 2,
-                }}>
-                    <Box sx={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
-                        {getStepContent()}
-                        
-                        <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={handleBack}
-                                disabled={activeStep === 0}
-                                sx={{
-                                    py: 1,
-                                    borderColor: 'white',
-                                    color: 'white',
-                                    '&:hover': { borderColor: '#f5f5f5', bgcolor: 'rgba(255,255,255,0.1)' },
-                                    '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.3)' }
-                                }}
-                            >
-                                Atrás
-                            </Button>
-                            
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                onClick={activeStep === 2 ? handleSubmit : handleNext}
-                                sx={{
-                                    py: 1,
-                                    bgcolor: 'white',
-                                    color: theme.palette.primary.main,
-                                    '&:hover': { bgcolor: '#f5f5f5' }
-                                }}
-                            >
-                                {activeStep === 2 ? 'Finalizar Registro' : 'Siguiente Paso'}
-                            </Button>
-                        </Box>
-                    </Box>
-                </CardBase>
-            </Box>
+        <CardBase sx={{
+          flex: 1,
+          bgcolor: theme.palette.primary.dark,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: 2,
+        }}>
+          <Box sx={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
+            {authError && (
+              <Alert severity="error" sx={{ mb: 2, textAlign: 'left' }}>
+                {authError}
+              </Alert>
+            )}
+            {getStepContent()}
 
-            {/* Footer */}
-            <Box sx={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center', 
-                mt: 5,
-                pt: 2
-            }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-                    Patrocinado por
-                </Typography>
-                <LogoGA />
+            <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleBack}
+                disabled={activeStep === 0 || isSubmitting}
+                sx={{
+                  py: 1,
+                  borderColor: 'white',
+                  color: 'white',
+                  '&:hover': { borderColor: '#f5f5f5', bgcolor: 'rgba(255,255,255,0.1)' },
+                  '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.3)' }
+                }}
+              >
+                {t("backButton")}
+              </Button>
+
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={activeStep === 2 ? onSubmit : handleNext}
+                disabled={isSubmitting}
+                sx={{
+                  py: 1,
+                  bgcolor: 'white',
+                  color: theme.palette.primary.main,
+                  '&:hover': { bgcolor: '#f5f5f5' }
+                }}
+              >
+                {activeStep === 2 ? t("finishButton") : t("nextButton")}
+              </Button>
             </Box>
-        </Box>
-    );
+          </Box>
+        </CardBase>
+      </Box>
+
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        mt: 5,
+        pt: 2
+      }}>
+        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+          {t("sponsoredBy")}
+        </Typography>
+        <LogoGA />
+      </Box>
+    </Box>
+  );
 }
