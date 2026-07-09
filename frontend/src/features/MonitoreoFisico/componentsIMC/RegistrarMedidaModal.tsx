@@ -10,6 +10,7 @@ import CheckIcon from '@mui/icons-material/Check';
 // Importamos TU componente base
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
 import { monitoreoFisicoSchema, type MonitoreoFisicoData } from '../../../schemas/monitoreo_fisico';
+import useLanguage from "../../../hooks/useLanguage";
 
 interface RegisterMeasurementModalProps {
   onClose: () => void;
@@ -17,6 +18,7 @@ interface RegisterMeasurementModalProps {
 }
 
 export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> = ({ onClose, onSave }) => {
+  const { t } = useLanguage("monitoreoFisico");
   const [peso, setPeso] = useState('');
   const [talla, setTalla] = useState('');
   const [fecha, setFecha] = useState(''); 
@@ -38,12 +40,12 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
   return (
     <Box sx={{ padding: '24px', backgroundColor: '#EBF2F7', borderRadius: '12px', minWidth: '350px' }}>
       <Typography variant="h6" sx={{ color: '#2C3E50', fontWeight: 'bold', textAlign: 'center', mb: 3 }}>
-        Registrar Nuevas Medidas
+        {t("modalTitle")}
       </Typography>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <TextField
-          label="Peso"
+          label={t("pesoLabel")}
           variant="outlined"
           fullWidth
           value={peso}
@@ -56,7 +58,7 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
         />
 
         <TextField
-          label="Talla"
+          label={t("tallaLabel")}
           variant="outlined"
           fullWidth
           value={talla}
@@ -69,13 +71,13 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
         />
 
         <TextField
-          label="Fecha (DD/MM/YYYY)"
+          label={t("fechaLabel")}
           variant="outlined"
           fullWidth
           value={fecha}
           onChange={(e) => setFecha(e.target.value)}
           sx={{ backgroundColor: '#FFFFFF', borderRadius: '4px' }}
-          placeholder="25/05/2026"
+          placeholder={`${t("dayPlaceholder")}/${t("monthPlaceholder")}/${t("yearPlaceholder")}`}
         />
 
         {/* Usamos tu ButtonBase pasándole estilos específicos (sx) para este caso */}
@@ -93,7 +95,7 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
             }
           }}
         >
-          Registrar Medidas
+          {t("saveButton")}
         </ButtonBase>
       </Box>
     </Box>

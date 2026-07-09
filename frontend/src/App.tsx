@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
@@ -17,6 +18,7 @@ import { Profile } from "./features/Profile/Profile";
 import { LoadingScreen } from "./components/ui/LoadingScreen";
 
 function App() {
+  const { t } = useTranslation("common");
   const refresh = useAuthStore((state) => state.refresh);
   const setLoading = useAuthStore((state) => state.setLoading);
   const isAuthLoading = useAuthStore((state) => state.isAuthLoading);
@@ -38,7 +40,7 @@ function App() {
   return (
     <ThemeWrapperContext>
       {isAuthLoading ? (
-        <LoadingScreen message="Verificando sesión..." />
+        <LoadingScreen message={t("verificandoSesion")} />
       ) : (
         <Suspense fallback={<LoadingScreen />}>
           <Router>

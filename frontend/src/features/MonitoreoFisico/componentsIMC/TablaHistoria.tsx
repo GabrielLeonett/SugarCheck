@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Typography, ButtonGroup, Button } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
 import type { PhysicalRecord } from '../../../types/types';
+import useLanguage from "../../../hooks/useLanguage";
 
 interface HistoryChartProps {
   records: PhysicalRecord[];
@@ -10,6 +11,7 @@ interface HistoryChartProps {
 type FilterType = 'TODOS' | 'TRIMESTRE' | 'AÑO';
 
 export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
+  const { t } = useLanguage("monitoreoFisico");
   const [activeFilter, setActiveFilter] = useState<FilterType>('TODOS');
 
   // Para el gráfico, normalmente queremos ver los datos del más antiguo al más reciente (de izquierda a derecha).
@@ -40,7 +42,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
             lineHeight: 1.2
           }}
         >
-          Bitácora Histórica de Fortaleza Física
+          {t("chartTitle")}
         </Typography>
 
         <ButtonGroup 
@@ -64,7 +66,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
               '&:hover': { backgroundColor: activeFilter === 'TODOS' ? '#5C97BF' : '#EBF2F7' }
             }}
           >
-            Todos
+            {t("filterAll")}
           </Button>
           <Button 
             onClick={() => setActiveFilter('TRIMESTRE')}
@@ -74,7 +76,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
               '&:hover': { backgroundColor: activeFilter === 'TRIMESTRE' ? '#5C97BF' : '#EBF2F7' }
             }}
           >
-            Trimestre
+            {t("filterQuarter")}
           </Button>
           <Button 
             onClick={() => setActiveFilter('AÑO')}
@@ -84,7 +86,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
               '&:hover': { backgroundColor: activeFilter === 'AÑO' ? '#5C97BF' : '#EBF2F7' }
             }}
           >
-            Año
+            {t("filterYear")}
           </Button>
         </ButtonGroup>
       </Box>

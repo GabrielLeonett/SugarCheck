@@ -37,8 +37,10 @@ import { userApi } from "../../apis/user_config";
 import { contactEmergenceApi, type ContactEmergenceData } from "../../apis/contact_emergence";
 import { profilePersonalSchema, type ProfilePersonalData } from "../../schemas/profile";
 import { contactEmergenceSchema, type ContactEmergenceData as ContactEmergenceFormData } from "../../schemas/contact_emergence";
+import useLanguage from "../../hooks/useLanguage";
 
 export function Profile() {
+    const { t: tp } = useLanguage("profile");
     const authUser = useAuthStore((state) => state.user);
     const authLogout = useAuthStore((state) => state.logout);
 
@@ -105,7 +107,7 @@ export function Profile() {
         try {
             const userId = authUser?.id;
             if (!userId) {
-                setMsg({ type: 'error', text: 'Usuario no autenticado' });
+                setMsg({ type: 'error', text: tp("usuarioNoAutenticado") });
                 return;
             }
             await userApi.update(userId, {
@@ -113,9 +115,9 @@ export function Profile() {
                 email: data.email || undefined,
                 sexo: data.sexo || undefined,
             });
-            setMsg({ type: 'success', text: 'Datos personales guardados' });
+            setMsg({ type: 'success', text: tp("guardadoExitoPersonal") });
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : 'Error al guardar' });
+            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorGuardar") });
         }
     };
 
@@ -124,7 +126,7 @@ export function Profile() {
             await apiPrivate.get('/preference').then(async (res) => {
                 const current = res.data?.data;
                 if (!current?.userId) {
-                    setMsg({ type: 'error', text: 'No hay preferencias cargadas' });
+                    setMsg({ type: 'error', text: tp("errorCarga") });
                     return;
                 }
                 await apiPrivate.post('/preference', {
@@ -134,10 +136,10 @@ export function Profile() {
                     insulinRatios: { breakfast: prefForm.breakfast, lunch: prefForm.lunch, dinner: prefForm.dinner },
                     sensitivity: prefForm.sensitivity,
                 });
-                setMsg({ type: 'success', text: 'Parámetros clínicos guardados' });
+                setMsg({ type: 'success', text: tp("guardadoExitoClinico") });
             });
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : 'Error al guardar' });
+            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorGuardar") });
         }
     };
 
@@ -152,9 +154,9 @@ export function Profile() {
             setEditingContact(null);
             resetContact({ name: '', parentesco: '', telefono: '' });
             await loadContacts();
-            setMsg({ type: 'success', text: editingContact ? 'Contacto actualizado' : 'Contacto agregado' });
+            setMsg({ type: 'success', text: editingContact ? tp("contactoActualizado") : tp("contactoAgregado") });
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : 'Error al guardar contacto' });
+            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorGuardar") });
         }
     };
 
@@ -178,9 +180,9 @@ export function Profile() {
         try {
             await contactEmergenceApi.delete(id);
             await loadContacts();
-            setMsg({ type: 'success', text: 'Contacto eliminado' });
+            setMsg({ type: 'success', text: tp("contactoEliminado") });
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : 'Error al eliminar' });
+            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorEliminar") });
         }
     };
 
@@ -191,7 +193,7 @@ export function Profile() {
             await userApi.delete(userId);
             await authLogout();
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : 'Error al eliminar' });
+            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorEliminar") });
         }
     };
 
@@ -214,26 +216,26 @@ export function Profile() {
                                 </Typography>
                             </Box>
                             <Box sx={{ mb: 4, p: 2, borderRadius: 2 }}>
-                                <Typography variant="subtitle2" color="#4A5568">Días en Racha</Typography>
+                                <Typography variant="subtitle2" color="#4A5568">{tp("streaks")}</Typography>
                                 <Typography variant="h3" sx={{ my: 1, color: "success.light" }}>7</Typography>
-                                <Typography variant="caption" color="#718096">Días seguidos en la zona segura</Typography>
+                                <Typography variant="caption" color="#718096">{tp("daysInSafeZone")}</Typography>
                             </Box>
                             <Box sx={{ mb: 4 }}>
-                                <Typography variant="subtitle1" align="center">La Ruta del Guerrero</Typography>
+                                <Typography variant="subtitle1" align="center">{tp("warriorPath")}</Typography>
                                 <Box sx={{ display: "flex", alignItems: "center", mt: 1, mb: 0.5 }}>
                                     <LinearProgress variant="determinate" value={progress} sx={{ flexGrow: 1, height: 20, borderRadius: 5, bgcolor: 'primary.dark' }} />
                                     <Typography variant="body2" sx={{ ml: 1, fontWeight: "bold" }}>{progress}%</Typography>
                                 </Box>
-                                <Typography variant="body2" sx={{ mt: 2 }}>Nivel Actual</Typography>
-                                <Typography variant="caption" sx={{ mt: 4 }}>Mundo 2 - Misión 8</Typography>
+                                <Typography variant="body2" sx={{ mt: 2 }}>{tp("currentLevel")}</Typography>
+                                <Typography variant="caption" sx={{ mt: 4 }}>{tp("badMission")}</Typography>
                             </Box>
                             <Box sx={{ textAlign: "left" }}>
-                                <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>Insignias Obtenidas</Typography>
+                                <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>{tp("badges")}</Typography>
                                 <Box sx={{ bgcolor: 'primary.500', display: "flex", alignItems: "center", justifyContent: 'center', p: 1.5, borderRadius: 2, gap: 2 }}>
                                     <Box component="img" src={Medal} alt="Medalla" sx={{ width: 50, height: 50 }} />
                                     <Box>
-                                        <Typography variant="body2">Escudo de Fibra</Typography>
-                                        <Typography variant="caption">Mundo 1</Typography>
+                                        <Typography variant="body2">{tp("badgeShield")}</Typography>
+                                        <Typography variant="caption">{tp("badgeWorld")}</Typography>
                                     </Box>
                                 </Box>
                             </Box>
@@ -241,16 +243,16 @@ export function Profile() {
                     </Grid>
 
                     <Grid size={8}>
-                        <Typography variant="h4" sx={{ my: 4 }}>Perfil y Configuraciones</Typography>
+                        <Typography variant="h4" sx={{ my: 4 }}>{tp("profileTitle")}</Typography>
 
                         <Accordion defaultExpanded sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "2px solid #3182CE", mb: 3 }}>
-                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>Personal</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>{tp("personalSection")}</Typography>
                             </AccordionSummary>
                             <AccordionDetails sx={{ p: 0, mb: 4 }}>
                                 <Grid container spacing={3}>
                                     <Grid size={12}>
-                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>Nombre de usuario</Typography>
+                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("usernameLabel")}</Typography>
                                         <TextField
                                             {...registerPersonal('username')}
                                             fullWidth
@@ -262,13 +264,13 @@ export function Profile() {
                                         />
                                     </Grid>
                                     <Grid size={12}>
-                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>Fecha de Nacimiento</Typography>
+                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("birthDateLabel")}</Typography>
                                         <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DateField fullWidth label="Fecha de Nacimiento" />
+                                            <DateField fullWidth label={tp("birthDateLabel")} />
                                         </LocalizationProvider>
                                     </Grid>
                                     <Grid size={12}>
-                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>Sexo</Typography>
+                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("sexLabel")}</Typography>
                                         <TextField
                                             {...registerPersonal('sexo')}
                                             select
@@ -276,12 +278,12 @@ export function Profile() {
                                             error={!!errorsPersonal.sexo}
                                             helperText={errorsPersonal.sexo?.message}
                                         >
-                                            <MenuItem value="masculino">Masculino</MenuItem>
-                                            <MenuItem value="femenino">Femenino</MenuItem>
+                                            <MenuItem value="masculino">{tp("sexMale")}</MenuItem>
+                                            <MenuItem value="femenino">{tp("sexFemale")}</MenuItem>
                                         </TextField>
                                     </Grid>
                                     <Grid size={12}>
-                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>Correo Electrónico</Typography>
+                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("emailLabel")}</Typography>
                                         <TextField
                                             {...registerPersonal('email')}
                                             fullWidth
@@ -291,15 +293,15 @@ export function Profile() {
                                         />
                                     </Grid>
                                     <Grid size={12}>
-                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>Contraseña Actual</Typography>
+                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("currentPasswordLabel")}</Typography>
                                         <TextField fullWidth type="password" />
                                     </Grid>
                                     <Grid size={12}>
-                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>Nueva Contraseña</Typography>
+                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("newPasswordLabel")}</Typography>
                                         <TextField fullWidth type="password" />
                                     </Grid>
                                     <Grid size={12} sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                                        <ButtonBase variant="contained" onClick={handleSubmitPersonal(onPersonalSave)}>Guardar Cambios</ButtonBase>
+                                        <ButtonBase variant="contained" onClick={handleSubmitPersonal(onPersonalSave)}>{tp("saveChanges")}</ButtonBase>
                                     </Grid>
                                 </Grid>
                             </AccordionDetails>
@@ -307,7 +309,7 @@ export function Profile() {
 
                         <Accordion sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "2px solid #3182CE", mb: 3 }}>
-                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>Contactos de Emergencia</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>{tp("emergencyContacts")}</Typography>
                             </AccordionSummary>
                             <AccordionDetails sx={{ p: 0, mb: 4, display: "flex", flexDirection: "column", alignItems: "center" }}>
                                 {contacts.map((contact) => (
@@ -316,36 +318,36 @@ export function Profile() {
                                             <IconButton onClick={() => handleContactEdit(contact)}><EditIcon fontSize="small" /></IconButton>
                                             <IconButton onClick={() => handleContactDelete(contact.id)}><DeleteIcon fontSize="small" /></IconButton>
                                         </Box>
-                                        <Typography variant="body2" sx={{ mb: 0.5 }}><strong>Nombre:</strong> {contact.name}</Typography>
-                                        <Typography variant="body2" sx={{ mb: 0.5 }}><strong>Parentesco:</strong> {contact.parentesco}</Typography>
-                                        <Typography variant="body2"><strong>Teléfono:</strong> {contact.telefono || '—'}</Typography>
+                                        <Typography variant="body2" sx={{ mb: 0.5 }}><strong>{tp("contactName")}</strong> {contact.name}</Typography>
+                                        <Typography variant="body2" sx={{ mb: 0.5 }}><strong>{tp("contactRelationship")}</strong> {contact.parentesco}</Typography>
+                                        <Typography variant="body2"><strong>{tp("contactPhone")}</strong> {contact.telefono || '—'}</Typography>
                                     </CardBase>
                                 ))}
                                 {contacts.length === 0 && (
-                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>No hay contactos de emergencia registrados</Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>{tp("noContacts")}</Typography>
                                 )}
                                 <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={openAddContactModal}>
-                                    Añadir Contacto
+{tp("addContact")}
                                 </ButtonBase>
                             </AccordionDetails>
                         </Accordion>
 
                         <Accordion sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "2px solid #3182CE", mb: 3 }}>
-                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>Parámetros Clínicos</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>{tp("clinicalParams")}</Typography>
                             </AccordionSummary>
                             <AccordionDetails sx={{ p: 0, mb: 4 }}>
                                 <Accordion defaultExpanded sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
                                     <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "1px solid #CBD5E0", mb: 2 }}>
-                                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>Rangos de Alerta Glucémica</Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("glucoseAlertRanges")}</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ p: 0, mb: 3 }}>
                                         <Grid container spacing={2} sx={{ maxWidth: 500, mx: "auto" }}>
                                             <Grid size={{ sm: 12, md: 6 }}>
-                                                <NumberSpinner label="Límite de Hipoglucemia Severa" min={10} max={40} value={prefForm.hypo} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hypo: _v }); }} />
+                                                <NumberSpinner label={tp("severeHypoLimit")} min={10} max={40} value={prefForm.hypo} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hypo: _v }); }} />
                                             </Grid>
                                             <Grid size={{ sm: 12, md: 6 }}>
-                                                <NumberSpinner label="Límite de Hiperglucemia Severa" min={10} max={40} value={prefForm.hiper} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hiper: _v }); }} />
+                                                <NumberSpinner label={tp("severeHyperLimit")} min={10} max={40} value={prefForm.hiper} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hiper: _v }); }} />
                                             </Grid>
                                             <Grid size={12} sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
                                                 <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={handlePrefSave}>
@@ -358,34 +360,34 @@ export function Profile() {
 
                                 <Accordion sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
                                     <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "1px solid #CBD5E0", mb: 2 }}>
-                                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>Tabla de Corrección Dinámica</Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("dynamicCorrection")}</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ p: 0, mb: 3 }}>
                                         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap", mb: 2 }}>
                                             <Box sx={{ width: 100 }}>
-                                                <Typography variant="caption" sx={{ display: "block", textAlign: "center", fontWeight: "bold" }}>Mínimo mg/dL</Typography>
+                                                <Typography variant="caption" sx={{ display: "block", textAlign: "center", fontWeight: "bold" }}>{tp("minMgdl")}</Typography>
                                                 <TextField placeholder="Value" />
                                             </Box>
                                             <Typography variant="h6" sx={{ alignSelf: "flex-end", mb: 0.5 }}>/</Typography>
                                             <Box sx={{ width: 100 }}>
-                                                <Typography variant="caption" sx={{ display: "block", textAlign: "center", fontWeight: "bold" }}>Máximo mg/dL</Typography>
+                                                <Typography variant="caption" sx={{ display: "block", textAlign: "center", fontWeight: "bold" }}>{tp("maxMgdl")}</Typography>
                                                 <TextField placeholder="Value" />
                                             </Box>
-                                            <Typography variant="body2" sx={{ alignSelf: "flex-end", mb: 1, fontWeight: "bold" }}>Aplicar:</Typography>
+                                            <Typography variant="body2" sx={{ alignSelf: "flex-end", mb: 1, fontWeight: "bold" }}>{tp("applyDose")}</Typography>
                                             <Box sx={{ width: 100 }}>
-                                                <Typography variant="caption" sx={{ display: "block", textAlign: "center", fontWeight: "bold" }}>Dosis UI</Typography>
+                                                <Typography variant="caption" sx={{ display: "block", textAlign: "center", fontWeight: "bold" }}>{tp("doseUi")}</Typography>
                                                 <TextField placeholder="Value" />
                                             </Box>
                                         </Box>
                                         <Box sx={{ display: "flex", justifyContent: "center" }}>
-                                            <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }}>Añadir Rango</ButtonBase>
+                                            <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }}>{tp("addRange")}</ButtonBase>
                                         </Box>
                                     </AccordionDetails>
                                 </Accordion>
 
                                 <Accordion sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
                                     <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "1px solid #CBD5E0", mb: 2 }}>
-                                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>Esquema Basal</Typography>
+                                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("basalScheme")}</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ p: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
                                         <CardBase sx={{ p: 2, borderRadius: 2, width: "100%", maxWidth: 400, mb: 2, position: "relative" }}>
@@ -393,10 +395,10 @@ export function Profile() {
                                                 <IconButton><EditIcon fontSize="small" /></IconButton>
                                                 <IconButton><DeleteIcon fontSize="small" /></IconButton>
                                             </Box>
-                                            <Typography variant="body2" sx={{ mb: 1 }}><strong>Hora de Inyección:</strong></Typography>
-                                            <Typography variant="body2"><strong>Dosis Establecida:</strong></Typography>
+                                            <Typography variant="body2" sx={{ mb: 1 }}><strong>{tp("injectionTime")}</strong></Typography>
+                                            <Typography variant="body2"><strong>{tp("establishedDose")}</strong></Typography>
                                         </CardBase>
-                                        <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }}>Añadir Esquema</ButtonBase>
+                                        <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }}>{tp("addSchema")}</ButtonBase>
                                     </AccordionDetails>
                                 </Accordion>
                             </AccordionDetails>
@@ -404,51 +406,51 @@ export function Profile() {
 
                         <Accordion sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "2px solid #3182CE", mb: 3 }}>
-                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>Preferencias</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>{tp("preferences")}</Typography>
                             </AccordionSummary>
                             <AccordionDetails sx={{ p: 0, mb: 4 }}>
-                                <Typography variant="body1" sx={{ fontWeight: "bold" }}>Recordatorios</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("reminders")}</Typography>
                                 <Box sx={{ maxWidth: 400, mx: "auto" }}>
                                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>Mediciones de Glucemia</Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>{tp("glucoseMeasurements")}</Typography>
                                         <Switch defaultChecked />
                                     </Box>
                                     <Box sx={{ pl: 2, display: "flex", flexDirection: "column", gap: 1.5, mb: 3 }}>
                                         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                            <Typography variant="caption" sx={{ fontWeight: "bold" }}>Pre-Prandial</Typography>
+                                            <Typography variant="caption" sx={{ fontWeight: "bold" }}>{tp("prePrandial")}</Typography>
                                             <TextField type="time" defaultValue="00:00" sx={{ width: 150 }} />
                                         </Box>
                                         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                            <Typography variant="caption" sx={{ fontWeight: "bold" }}>Post-Prandial</Typography>
+                                            <Typography variant="caption" sx={{ fontWeight: "bold" }}>{tp("postPrandial")}</Typography>
                                             <TextField type="time" defaultValue="00:00" sx={{ width: 150 }} />
                                         </Box>
                                         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                            <Typography variant="caption" sx={{ fontWeight: "bold" }}>Nocturna</Typography>
+                                            <Typography variant="caption" sx={{ fontWeight: "bold" }}>{tp("nocturnal")}</Typography>
                                             <TextField type="time" defaultValue="00:00" sx={{ width: 150 }} />
                                         </Box>
                                     </Box>
                                     <Divider sx={{ my: 2 }} />
                                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                         <Box>
-                                            <Typography variant="body2" sx={{ fontWeight: "bold" }}>Exámenes de Laboratorio</Typography>
-                                            <Typography variant="caption" color="text.secondary">Cada 90 días</Typography>
+                                            <Typography variant="body2" sx={{ fontWeight: "bold" }}>{tp("labExams")}</Typography>
+                                            <Typography variant="caption" color="text.secondary">{tp("every90Days")}</Typography>
                                         </Box>
                                         <Switch defaultChecked />
                                     </Box>
                                 </Box>
-                                <Typography variant="body1" sx={{ fontWeight: "bold" }}>Notificaciones</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("notifications")}</Typography>
                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: 400, mx: "auto" }}>
-                                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>Notificaciones Push</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>{tp("pushNotifications")}</Typography>
                                     <Switch defaultChecked />
                                 </Box>
-                                <Typography variant="body1" sx={{ fontWeight: "bold" }}>Modo de Emergencia</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("emergencyMode")}</Typography>
                                 <Grid container spacing={2} sx={{ maxWidth: 400, mx: "auto" }}>
                                     <Grid size={12} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>Bloqueo por Solapamiento de Dosis</Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>{tp("doseOverlapBlock")}</Typography>
                                         <Switch defaultChecked />
                                     </Grid>
                                     <Grid size={12} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>Canal SOS Automatizado</Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>{tp("sosChannel")}</Typography>
                                         <Switch defaultChecked />
                                     </Grid>
                                 </Grid>
@@ -457,7 +459,7 @@ export function Profile() {
 
                         <Modal open={openContactModal} onClose={() => setOpenContactModal(false)}>
                             <Paper sx={{ p: 4, maxWidth: 400, mx: 'auto', mt: '20vh' }}>
-                                <Typography variant="h6" sx={{ mb: 2 }}>{editingContact ? 'Editar Contacto' : 'Añadir Contacto'}</Typography>
+                                <Typography variant="h6" sx={{ mb: 2 }}>{editingContact ? tp("editContact") : tp("addContact")}</Typography>
                                 <TextField
                                     {...registerContact('name')}
                                     fullWidth
@@ -499,28 +501,28 @@ export function Profile() {
                                     sx={{ mb: 2 }}
                                 />
                                 <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                                    <ButtonBase onClick={() => setOpenContactModal(false)}>Cancelar</ButtonBase>
+                                    <ButtonBase onClick={() => setOpenContactModal(false)}>{tp("cancel")}</ButtonBase>
                                     <ButtonBase sx={{ color: '#3182CE' }} onClick={handleSubmitContact(onContactSave)}>
-                                        {editingContact ? 'Actualizar' : 'Guardar'}
+                                        {editingContact ? tp("update") : tp("save")}
                                     </ButtonBase>
                                 </Box>
                             </Paper>
                         </Modal>
 
                         <Box sx={{ display: "flex", flexDirection: 'column', gap: 2, p: 2 }}>
-                            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#FF4D4D" }}>Zona de Riesgo</Typography>
+                            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#FF4D4D" }}>{tp("dangerZone")}</Typography>
                             <Divider sx={{ borderBottomWidth: 5, borderColor: "#FF4D4D", my: 2 }} />
                             <ButtonBase onClick={() => setOpenConfirm(true)} sx={{ bgcolor: "#FF4D4D", color: 'white', borderRadius: 1, "&:hover": { bgcolor: "#E53E3E" }, fontWeight: "bold", px: 4, py: 1 }}>
-                                Eliminar Cuenta
+                                {tp("deleteAccount")}
                             </ButtonBase>
-                            <Typography variant="caption" sx={{ color: "#718096" }}>ADVERTENCIA: Esta acción no se puede deshacer</Typography>
+                            <Typography variant="caption" sx={{ color: "#718096" }}>{tp("deleteWarning")}</Typography>
                             <Modal open={openConfirm} onClose={() => setOpenConfirm(false)}>
                                 <Paper sx={{ p: 4, maxWidth: 400, mx: 'auto', mt: '20vh' }}>
-                                    <Typography variant="h6" color="error">¿Estás completamente seguro?</Typography>
-                                    <Typography sx={{ my: 2 }}>Al eliminar tu cuenta se borrarán todos tus datos permanentemente.</Typography>
+                                    <Typography variant="h6" color="error">{tp("deleteConfirmTitle")}</Typography>
+                                    <Typography sx={{ my: 2 }}>{tp("deleteConfirmDesc")}</Typography>
                                     <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                                        <ButtonBase onClick={() => setOpenConfirm(false)}>Cancelar</ButtonBase>
-                                        <ButtonBase sx={{ color: '#FF4D4D' }} onClick={handleDeleteAccount}>Confirmar Eliminación</ButtonBase>
+                                        <ButtonBase onClick={() => setOpenConfirm(false)}>{tp("cancel")}</ButtonBase>
+                                        <ButtonBase sx={{ color: '#FF4D4D' }} onClick={handleDeleteAccount}>{tp("confirmDelete")}</ButtonBase>
                                     </Box>
                                 </Paper>
                             </Modal>
