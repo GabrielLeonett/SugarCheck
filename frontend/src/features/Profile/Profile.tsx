@@ -111,7 +111,7 @@ export function Profile() {
                 return;
             }
             await userApi.update(userId, {
-                username: data.username || undefined,
+                name: data.username || undefined,
                 email: data.email || undefined,
                 sexo: data.sexo || undefined,
             });
