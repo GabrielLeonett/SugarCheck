@@ -2,7 +2,7 @@ import Navbar from "../../components/layout/Header/Navbar.tsx";
 import Footer from '../../components/layout/Footer/Footer.tsx';
 import { Typography, Box, Grid, Container } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { CardBase } from "../../components/ui/Cards/fdhjasfdasdfalsk.tsx";
+import { CardBase } from "../../components/ui/Cards/CardBase.tsx";
 import { useState, useEffect } from "react";
 import { ButtonBase } from "../../components/ui/Buttons/ButtonBase.tsx";
 import ModalInsulinaLenta from "./components/ModalInsulinaLenta.tsx";
