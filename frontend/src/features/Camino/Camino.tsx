@@ -18,7 +18,7 @@ return (
                     Camino del guerrero
                 </Typography>
                 <Box sx={{ border: "2px solid black", p: 2, height: "100%" }}>
-                    <SeparadorMundo numero = "1" texto = "Camino de la energía"/>
+                    <SeparadorMundo numero="1" texto="Camino de la energía" bool/>
                     <HexagonoMundo numero = "1" lines = {true} color = {true}/>
                     <HexagonoMundo numero = "2" lines = {true} color = {true}/>
                     <HexagonoMundo numero = "3" color = {true}/>
