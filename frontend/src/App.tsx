@@ -7,13 +7,15 @@ import Home from "./features/Home";
 import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
-import Insulina from "./features/insulina"
+import Insulina from "./features/Insulina/insulina"
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 import Glucosa from "./features/ControlDeGlucosa/ControlDeGlucosaPage";
 import ForgotPassword from "./features/ForgotPassword";
 import { Camino } from "./features/Camino/Camino";
 import "./App.css";
 import { Profile } from "./features/Profile/Profile";
+import { ChatIA } from "./features/ChatIA/Oraculo";
+
 
 function App() {
   const refresh = useAuthStore((state) => state.refresh);
@@ -62,13 +64,9 @@ function App() {
             </Route>
 
                  <Route path="agente">
-                 <Route path="oraculo-chat" element={<Oraculo />} />
+                 <Route path="oraculo-chat" element={<ChatIA />} />
 
                </Route>
-
-             </Route>
-
-
 
              {/* Rutas Públicas */}
              <Route element={<PublicRoute />}>

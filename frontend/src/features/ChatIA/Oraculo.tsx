@@ -7,7 +7,7 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import MicIcon from '@mui/icons-material/Mic';
 import SendIcon from '@mui/icons-material/Send';
 
-export default function ChatIA() {
+export function ChatIA() {
   // Mock data for chat history items
   const historyItems = [
     'Historial 1',
