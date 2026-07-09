@@ -50,7 +50,7 @@ export default function Login() {
         setIsSubmitting(true);
 
         try {
-            await login(data.email, data.password);
+            await login(data.username, data.password);
             navigate("/");
         } catch (error) {
             // Error por defecto traducido
@@ -160,21 +160,21 @@ export default function Login() {
                             </Alert>
                         )}
 
-                        {/* INPUT CORREO */}
+                        {/* INPUT USUARIO */}
                         <TextField
-                            {...register("email")}
+                            {...register("username")}
                             fullWidth
-                            label={t("emailLabel")}
+                            label={t("usernameLabel")}
                             variant="outlined"
                             size="small"
-                            error={!!errors.email}
-                            helperText={errors.email?.message}
+                            error={!!errors.username}
+                            helperText={errors.username?.message}
                             disabled={isSubmitting}
                             sx={{
                                 mb: 2,
                                 '& .MuiOutlinedInput-root': {
                                     bgcolor: 'rgba(255,255,255,0.1)',
-                                    '& fieldset': { borderColor: errors.email ? 'error.main' : 'rgba(255,255,255,0.3)' }
+                                    '& fieldset': { borderColor: errors.username ? 'error.main' : 'rgba(255,255,255,0.3)' }
                                 },
                                 '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
                                 '& .MuiFormHelperText-root': { color: theme.palette.error.light }

@@ -1,0 +1,16 @@
+{
+  "evolucionInsulina": "Evolução da Insulina",
+  "todas": "Todas",
+  "lenta": "Lenta",
+  "rapida": "Rápida",
+  "dosisUi": "Dose (UI)",
+  "noHayRegistrosGraficar": "Não há registros para gráfico",
+  "historialRegistros": "Histórico de Registros",
+  "hora": "Hora",
+  "dosis": "Dose (UI)",
+  "tipo": "Tipo",
+  "zona": "Zona",
+  "contexto": "Contexto",
+  "noHayRegistrosFiltro": "Não há registros para este filtro.",
+  "filasPorPagina": "Linhas por página:"
+}

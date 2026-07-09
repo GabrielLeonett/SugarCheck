@@ -1,113 +1,101 @@
-import React, { useState } from 'react';
-import { Box, Typography, TextField, InputAdornment, Grid, styled } from '@mui/material';
+import { useState } from 'react';
+import { 
+  Box, 
+  Typography, 
+  TextField, 
+  InputAdornment,
+  useTheme 
+} from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
+
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
+import useLanguage from "../../../hooks/useLanguage";
 
 interface RegisterMeasurementModalProps {
   onClose: () => void;
   onSave: (data: { peso: number; estatura: number; fecha: string }) => void;
 }
 
-const ModalTitle = styled(Typography)(() => ({
-  color: '#2C3E50',
-  fontWeight: 700,
-  fontSize: '1.25rem',
-  textAlign: 'center',
-  marginBottom: '24px',
-}));
-
-const FormLabel = styled(Typography)(() => ({
-  color: '#7F8C8D',
-  fontWeight: 600,
-  fontSize: '0.875rem',
-  marginBottom: '6px',
-}));
-
-const StyledTextField = styled(TextField)(() => ({
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '8px',
-    '& fieldset': { border: '1px solid #D5DBDB' },
-    '&:hover fieldset': { borderColor: '#BDC3C7' },
-    '&.Mui-focused fieldset': { borderColor: '#5D9CEC' },
-  },
-}));
-
 export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> = ({ onClose, onSave }) => {
+  const { t } = useLanguage("monitoreoFisico");
+  const theme = useTheme();
   const [peso, setPeso] = useState('');
-  const [estatura, setEstatura] = useState('');
-  const [dd, setDd] = useState('');
-  const [mm, setMm] = useState('');
-  const [aaaa, setAaaa] = useState('');
+  const [talla, setTalla] = useState('');
+  const [fecha, setFecha] = useState(''); 
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!peso || !estatura || !dd || !mm || !aaaa) return;
-
-    onSave({
-      peso: parseFloat(peso),
-      estatura: parseFloat(estatura),
-      fecha: `${dd.padStart(2, '0')}/${mm.padStart(2, '0')}/${aaaa}`,
-    });
-    onClose();
+  const handleSave = () => {
+    if (peso && talla && fecha) {
+      onSave({
+        peso: parseFloat(peso),
+        estatura: parseFloat(talla),
+        fecha: fecha,
+      });
+      onClose();
+      setPeso('');
+      setTalla('');
+      setFecha('');
+    }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ p: 1 }}>
-      <ModalTitle>Registrar Nuevas Medidas</ModalTitle>
+    <Box sx={{ padding: '24px', backgroundColor: theme.palette.background.default, borderRadius: '12px', minWidth: '350px' }}>
+      <Typography variant="h6" sx={{ color: theme.palette.text.primary, fontWeight: 'bold', textAlign: 'center', mb: 3 }}>
+        {t("modalTitle")}
+      </Typography>
 
-      {/* Input Peso */}
-      <Box sx={{ mb: 2.5 }}>
-        <FormLabel>Peso</FormLabel>
-        <StyledTextField
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <TextField
+          label={t("pesoLabel")}
+          variant="outlined"
           fullWidth
-          size="small"
           value={peso}
           onChange={(e) => setPeso(e.target.value)}
-          slotProps={{
-            input: {
-              endAdornment: <InputAdornment position="end" sx={{ fontWeight: 700, color: '#2C3E50' }}>Kg</InputAdornment>,
-            },
-          }}
+          type="number"
+          sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }}
+          slotProps={{ input: {
+            endAdornment: <InputAdornment position="end">Kg</InputAdornment>,
+          }}}
         />
-      </Box>
 
-      {/* Input Talla */}
-      <Box sx={{ mb: 5 }}>
-        <FormLabel>Talla</FormLabel>
-        <StyledTextField
+        <TextField
+          label={t("tallaLabel")}
+          variant="outlined"
           fullWidth
-          size="small"
-          value={estatura}
-          onChange={(e) => setEstatura(e.target.value)}
-          slotProps={{
-            input: {
-              endAdornment: <InputAdornment position="end" sx={{ fontWeight: 700, color: '#2C3E50' }}>cm</InputAdornment>,
-            },
-          }}
+          value={talla}
+          onChange={(e) => setTalla(e.target.value)}
+          type="number"
+          sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }}
+          slotProps={{ input: {
+            endAdornment: <InputAdornment position="end">cm</InputAdornment>,
+          }}}
         />
-      </Box>
 
-      {/* Input Fecha Compuesta */}
-      <Box sx={{ mb: 4 }}>
-        <FormLabel>Fecha</FormLabel>
-        <Grid container spacing={1.5}>
-          <Grid size={3.5}>
-            <StyledTextField placeholder="DD" size="small" value={dd} onChange={(e) => setDd(e.target.value)} />
-          </Grid>
-          <Grid size={3.5}>
-            <StyledTextField placeholder="MM" size="small" value={mm} onChange={(e) => setMm(e.target.value)} />
-          </Grid>
-          <Grid size={5}>
-            <StyledTextField placeholder="YYYY" size="small" value={aaaa} onChange={(e) => setAaaa(e.target.value)} />
-          </Grid>
-        </Grid>
-      </Box>
+        <TextField
+          label={t("fechaLabel")}
+          variant="outlined"
+          fullWidth
+          value={fecha}
+          onChange={(e) => setFecha(e.target.value)}
+          sx={{ backgroundColor: theme.palette.background.paper, borderRadius: '4px' }}
+          placeholder={`${t("dayPlaceholder")}/${t("monthPlaceholder")}/${t("yearPlaceholder")}`}
+        />
 
-      {/* Botón de Guardado */}
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <ButtonBase type="submit" startIcon={<CheckIcon />}>
-          Registrar Medidas
+        {/* Usamos tu ButtonBase pasándole estilos específicos (sx) para este caso */}
+        <ButtonBase
+          onClick={handleSave}
+          startIcon={<CheckIcon />}
+          sx={{
+            backgroundColor: theme.palette.primary.main,
+            color: '#FFFFFF',
+            mt: 2,
+            py: 1.5,
+            width: '100%',
+            '&:hover': {
+              backgroundColor: theme.palette.primary.dark,
+            }
+          }}
+        >
+          {t("saveButton")}
         </ButtonBase>
       </Box>
     </Box>
