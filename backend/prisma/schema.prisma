@@ -9,13 +9,16 @@ generator client {
 model User {
   id              String      @id @default(uuid())
   name            String
+  username        String      @unique
   password        String
-  email           String      @unique
+  email           String?
+  sexo            String
   roles           String[]
   createdAt       DateTime    @default(now())
   fechaNacimiento DateTime
   
   preference      Preference? 
+  contactEmergences ContactEmergence[]
 }
 
 model Preference {
@@ -27,4 +30,16 @@ model Preference {
   insulinRatios Json     
 
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ContactEmergence {
+  id          String   @id @default(uuid())
+  userId      String
+  name        String
+  parentesco  String
+  telefono    String?
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

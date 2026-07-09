@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid } from '@mui/material';
+import { Box, Typography, Grid, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 // UI Components
@@ -15,6 +15,7 @@ import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase';
 import { CardBase } from '../../../components/ui/Cards/CardBase';
 import Navbar from '../../../components/layout/Header/Navbar';
 import Footer from '../../../components/layout/Footer/Footer';
+import useLanguage from "../../../hooks/useLanguage";
 
 // Mock inicial basado exactamente en la data visual de tu imagen
 const INITIAL_RECORDS: PhysicalRecord[] = [
@@ -30,6 +31,8 @@ const INITIAL_EVOLUTION: PhysicalEvolution = {
 };
 
 export const PhysicalMonitoringPage: React.FC = () => {
+  const { t } = useLanguage("monitoreoFisico");
+  const theme = useTheme();
   const [records, setRecords] = useState<PhysicalRecord[]>(INITIAL_RECORDS);
   const [evolution] = useState<PhysicalEvolution>(INITIAL_EVOLUTION);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,59 +65,52 @@ export const PhysicalMonitoringPage: React.FC = () => {
   const currentImc = records[0]?.imc || 0;
 
   return (
-    <Box
-      sx={{
-        backgroundColor: '#EBF2F7', // Color exacto de fondo suave de SugarCheck
-        minHeight: '100vh',
-        padding: '40px 24px',
-      }}
-    >
+    <>
       <Navbar/>
-      <Box sx={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <Typography
-          variant="h1"
-          sx={{
-            color: '#1C2833',
-            fontWeight: 800,
-            fontSize: '1.75rem',
-            textAlign: 'center',
-            marginBottom: '32px',
-          }}
-        >
-          Monitoreo de la Fortaleza Física
-        </Typography>
+      <Box sx={{ backgroundColor: theme.palette.background.default, py: 4, px: 2, minHeight: 'calc(100vh - 130px)' }}>
+        <Box sx={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <Typography
+            variant="h1"
+            sx={{
+              color: theme.palette.text.primary,
+              fontWeight: 800,
+              fontSize: '1.75rem',
+              textAlign: 'center',
+              marginBottom: '32px',
+            }}
+          >
+            {t("pageTitle")}
+          </Typography>
 
-        <Grid container spacing={4}>
-          {/* COLUMNA IZQUIERDA (Estrecha: Métmeras y acciones) */}
-          <Grid sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <ButtonBase 
-              startIcon={<AddIcon />} 
-              onClick={handleOpenModal}
-              fullWidth
-            >
-              Registrar Nuevas Medidas
-            </ButtonBase>
-            
-            <MetricCard type="balance" currentImc={currentImc} />
-            
-            <MetricCard type="evolution" evolutionData={evolution} />
-          </Grid>
+          <Grid container spacing={4}>
+            <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <ButtonBase 
+                startIcon={<AddIcon />} 
+                onClick={handleOpenModal}
+                fullWidth
+              >
+                {t("registerButton")}
+              </ButtonBase>
+              
+              <MetricCard type="balance" currentImc={currentImc} />
+              
+              <MetricCard type="evolution" evolutionData={evolution} />
+            </Grid>
 
-          {/* COLUMNA DERECHA (Ancha: Gráfico e Historial) */}
-          <Grid >
-            <CardBase>
-              <HistoryChart records={records} />
-              <HistoryTable records={records} />
-            </CardBase>
+            <Grid size={{ xs: 12, md: 8 }}>
+              <CardBase>
+                <HistoryChart records={records} />
+                <HistoryTable records={records} />
+              </CardBase>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
       </Box>
 
-      {/* MODAL DE REGISTRO */}
       <Modal open={isModalOpen} onClose={handleCloseModal}>
         <RegisterMeasurementModal onClose={handleCloseModal} onSave={handleSaveMeasurement} />
       </Modal>
       <Footer/>
-    </Box>
+    </>
   );
 };
