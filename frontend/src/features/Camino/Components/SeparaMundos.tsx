@@ -1,5 +1,4 @@
 import { Box, Typography } from "@mui/material";
-import { grey } from "@mui/material/colors";
 
 interface SeparadorMundoProps {
     texto: string; 
