@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, Paper, TextField, InputAdornment, Avatar, useTheme } from '@mui/material';
+import { Box, IconButton, Typography, Paper, TextField, InputAdornment, Avatar, useTheme, Badge } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,11 +8,22 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import MicIcon from '@mui/icons-material/Mic';
 import SendIcon from '@mui/icons-material/Send';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../stores/authStore';
+import { usePreferenceConfig } from '../../hooks/usePreferenceConfig';
+import { AVATAR_MAP } from '../../constants/avatars';
 
 export default function ChatIA() {
   const theme = useTheme();
   const navigate = useNavigate();
-  const sidebarTextColor = theme.palette.getContrastText(theme.palette.primary.main);
+  const user = useAuthStore((state) => state.user);
+  const { preference } = usePreferenceConfig();
+  const avatarSrc = preference?.profileImg && AVATAR_MAP[preference.profileImg]
+    ? AVATAR_MAP[preference.profileImg]
+    : undefined;
+
+  const userInitials = user?.username
+    ? user.username.split(" ").map((n: string) => n[0]).join("").toUpperCase()
+    : "?";
 
   const historyItems = [
     'Historial 1',
@@ -31,6 +42,8 @@ export default function ChatIA() {
     { text: '"Me siento cansado!"', icon: '🤕' },
     { text: '"¿Qué puedo comer ahora?"', icon: '🍎' },
   ];
+
+  const sidebarTextColor = theme.palette.getContrastText(theme.palette.primary.main);
 
   return (
     <Box sx={{ display: 'flex', width: '100vw', height: '100vh' }}>
@@ -113,8 +126,10 @@ export default function ChatIA() {
                     alignItems: 'center',
                     cursor: 'pointer',
                     '&:last-child': { mb: 0 },
-                    '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.2) }
+                    '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.2) },
+                    transition: 'background-color 0.2s',
                   }}
+                  onClick={() => navigate(`/agente/oraculo-chat?historial=${index + 1}`)}
                 >
                   <Typography variant="body2" sx={{ fontSize: '0.9rem', color: sidebarTextColor }}>{item}</Typography>
                 </Paper>
@@ -123,14 +138,19 @@ export default function ChatIA() {
           </Paper>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', pt: 2 }}>
+        <Box
+          sx={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            cursor: 'pointer', pt: 2,
+          }}
+          onClick={() => navigate('/perfil')}
+        >
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <SettingsIcon sx={{ color: sidebarTextColor, mr: 1 }} />
             <Typography variant="body1" sx={{ color: sidebarTextColor, fontWeight: 'bold' }}>Ajustes</Typography>
           </Box>
         </Box>
       </Box>
-
 
       {/* --- CHAT AREA --- */}
       <Box sx={{
@@ -147,10 +167,25 @@ export default function ChatIA() {
           <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.primary.main, flexGrow: 1 }}>
             Gluco
           </Typography>
-          <Avatar sx={{ width: 40, height: 40, bgcolor: '#ffb300' }}>👤</Avatar>
+          <Badge
+            overlap="circular"
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            badgeContent={
+              <Box sx={{ width: 10, height: 10, bgcolor: '#4caf50', borderRadius: '50%', border: `2px solid ${theme.palette.background.paper}` }} />
+            }
+          >
+            <Avatar
+              alt="User"
+              src={avatarSrc}
+              sx={{ width: 40, height: 40, bgcolor: '#ffb300', cursor: 'pointer' }}
+              onClick={() => navigate('/perfil')}
+            >
+              {userInitials}
+            </Avatar>
+          </Badge>
         </Box>
 
-        {/* Mensajes + Sugerencias + Input (scrollable) */}
+        {/* Mensajes */}
         <Box sx={{
           flexGrow: 1,
           display: 'flex',
@@ -159,7 +194,6 @@ export default function ChatIA() {
           overflowY: 'auto',
           minHeight: 0,
         }}>
-          {/* Mensaje del usuario */}
           <Box sx={{ alignSelf: 'flex-start', mb: 1 }}>
             <Typography variant="caption" sx={{ color: theme.palette.text.secondary, ml: 1, mb: 0.5, display: 'block', fontWeight: 600 }}>
               Tú
@@ -174,12 +208,11 @@ export default function ChatIA() {
               boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="body1" sx={{ whiteSpace: 'pre-line', fontSize: '0.95rem' }}>
-                Worem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. Maecenas eget condimentum velit, sit amet feugiat lectus.
+                Worem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus.
               </Typography>
             </Box>
           </Box>
 
-          {/* Mensaje del Oráculo */}
           <Box sx={{ alignSelf: 'flex-end', mb: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
             <Typography variant="caption" sx={{ color: theme.palette.text.secondary, mr: 1, mb: 0.5, fontWeight: 600 }}>
               Oráculo
@@ -194,7 +227,7 @@ export default function ChatIA() {
               boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
             }}>
               <Typography variant="body1" sx={{ whiteSpace: 'pre-line', fontSize: '0.95rem' }}>
-                Worem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. Maecenas eget condimentum velit, sit amet feugiat lectus.
+                Worem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan.
               </Typography>
             </Box>
           </Box>
@@ -219,7 +252,8 @@ export default function ChatIA() {
                   mb: 1,
                   border: `1px solid ${theme.palette.divider}`,
                   '&:last-child': { mb: 0 },
-                  '&:hover': { backgroundColor: theme.palette.action.selected }
+                  '&:hover': { backgroundColor: theme.palette.action.selected },
+                  transition: 'background-color 0.2s',
                 }}
               >
                 <Typography variant="body1" sx={{ color: theme.palette.text.primary, mr: 1, fontSize: '0.9rem' }}>
@@ -231,7 +265,7 @@ export default function ChatIA() {
           </Box>
         </Box>
 
-        {/* Input de Chat (fijo abajo) */}
+        {/* Input */}
         <Box sx={{ px: 2, mt: 2 }}>
           <TextField
             fullWidth
@@ -262,7 +296,6 @@ export default function ChatIA() {
             }}
           />
         </Box>
-
       </Box>
     </Box>
   );
