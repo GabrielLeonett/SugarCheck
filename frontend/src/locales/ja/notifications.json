@@ -10,5 +10,12 @@
     "minutes": "{{count}}分前",
     "hours": "{{count}}時間前",
     "days": "{{count}}日前"
-  }
+  },
+  "IMC_CREATION_TITLE": "新しいBMI記録",
+  "IMC_CREATION_MESSAGE": "新しいBMI {{value}} - {{category}} を記録しました",
+  "IMC_REMINDER_TITLE": "BMIリマインダー",
+  "IMC_REMINDER_MESSAGE": "今日の体重がまだ記録されていません。ログを更新してください。",
+  "IMC_CATEGORY_UNDERWEIGHT": "フォーサー",
+  "IMC_CATEGORY_NORMAL": "標準",
+  "IMC_CATEGORY_OVERWEIGHT": "オーバー"
 }

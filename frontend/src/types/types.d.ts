@@ -81,6 +81,9 @@ export interface NotificationItem {
   type: NotificationType;
   title: string;
   message: string;
+  titleKey?: string;
+  messageKey?: string;
+  params?: Record<string, string | number>;
   link: string;
   read: boolean;
   createdAt: string;
