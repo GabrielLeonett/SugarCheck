@@ -12,6 +12,7 @@ import { DeleteImc } from '../../app/DeleteImc';
 import { AuthModule } from '../../../auth/infra/auth.module';
 import { NotificationModule } from '../../../notification/infra/Nest/notification.module';
 import { CreateNotification } from '../../../notification/app/CreateNotification';
+import { TranslationService } from '../../../shared/infrastructure/i18n/translation.service';
 
 @Module({
   imports: [forwardRef(() => AuthModule), forwardRef(() => NotificationModule)],
@@ -31,8 +32,9 @@ import { CreateNotification } from '../../../notification/app/CreateNotification
         repo: ImcRepository,
         generate: GenerateUUID,
         createNotification: CreateNotification,
-      ) => new CreateImc(repo, generate, createNotification),
-      inject: ['ImcRepository', 'GenerateUUID', CreateNotification],
+        translationService: TranslationService,
+      ) => new CreateImc(repo, generate, createNotification, translationService),
+      inject: ['ImcRepository', 'GenerateUUID', CreateNotification, TranslationService],
     },
     {
       provide: 'GetAllImcByUserId',
