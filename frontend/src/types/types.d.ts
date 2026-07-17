@@ -20,9 +20,11 @@ interface ThemeContextType {
 
 interface User {
   id: string;
+  name: string;
   username: string;
-  email?: string;
-  sexo?: string;
+  email: string;
+  sexo: string;
+  fechaNacimiento: string;
 }
 
 interface AuthContextType {
@@ -39,8 +41,12 @@ interface AuthContextType {
 // Define la estructura exacta que responde tu backend en errores
 interface BackendErrorResponse {
   message: string;
-  statusCode?: number;
+  statusCode: number;
   error?: string;
+  code?: string;
+  field?: string;
+  timestamp?: string;
+  path?: string;
 }
 
 export type MeasurementState = 'Bajo peso' | 'Normal' | 'Sobrepeso';
@@ -63,5 +69,22 @@ export interface PhysicalEvolution {
 export interface BackendErrorsApi {
   message: string,
   error: string,
-  statusCode: number
+  statusCode: number,
+  code?: string,
+  field?: string,
+}
+
+export type NotificationType = 'alert' | 'reminder' | 'achievement' | 'info' | 'warning';
+
+export interface NotificationItem {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  titleKey?: string;
+  messageKey?: string;
+  params?: Record<string, string | number>;
+  link: string;
+  read: boolean;
+  createdAt: string;
 }

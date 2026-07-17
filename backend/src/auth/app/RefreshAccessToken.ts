@@ -62,8 +62,12 @@ export class RefreshAccessToken {
         rt, 
         user: { 
           id: user.id, 
+          name: user.name,
           username: user.username, 
-          roles: user.roles 
+          email: user.email,
+          roles: user.roles,
+          sexo: user.sexo,
+          fechaNacimiento: user.fechaNacimiento,
         } 
       });
     } catch (error) {

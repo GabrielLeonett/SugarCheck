@@ -4,6 +4,7 @@ export const profilePersonalSchema = z.object({
   username: z.string().min(3, "Mínimo 3 caracteres").max(30).regex(/^[a-zA-Z][a-zA-Z0-9_-]*$/, "Formato inválido").optional(),
   email: z.string().email("El correo no es válido").optional().or(z.literal("")),
   sexo: z.enum(["masculino", "femenino"] as const).optional(),
+  fechaNacimiento: z.string().optional(),
 });
 
 export const profileThresholdsSchema = z.object({
