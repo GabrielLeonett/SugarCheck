@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { Box, useTheme, Typography, TextField, Button, Link, Grid, MenuItem, Alert } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateField } from '@mui/x-date-pickers/DateField';
+import dayjs from 'dayjs';
 import { LogoGA } from "../components/ui/LogoGA";
 import LoginIcon from '@mui/icons-material/Login';
 import { CardBase } from '../components/ui/Cards/CardBase';
@@ -20,7 +24,7 @@ import useLanguage from "../hooks/useLanguage";
 type RegisterFormData = {
   username: string;
   nombre: string;
-  edad: string;
+  fechaNacimiento: string;
   sexo: '' | 'masculino' | 'femenino';
   email: string;
   password: string;
@@ -37,7 +41,7 @@ type RegisterFormData = {
 const defaultValues: RegisterFormData = {
   username: '',
   nombre: '',
-  edad: '',
+  fechaNacimiento: '',
   sexo: '',
   email: '',
   password: '',
@@ -62,6 +66,7 @@ export default function Register() {
 
   const {
     register,
+    control,
     setError,
     clearErrors,
     getValues,
@@ -117,15 +122,12 @@ export default function Register() {
     setAuthError(null);
 
     try {
-      const fechaNacimiento = new Date();
-      fechaNacimiento.setFullYear(fechaNacimiento.getFullYear() - parseInt(values.edad || '0'));
-
       await apiPublic.post('/user/register', {
         name: values.nombre,
         username: values.username,
         email: values.email || undefined,
         sexo: values.sexo,
-        fechaNacimiento: fechaNacimiento.toISOString(),
+        fechaNacimiento: values.fechaNacimiento,
         password: values.password,
       });
 
@@ -144,7 +146,7 @@ export default function Register() {
         const message = axiosError.response?.data?.message || t("errorRegister");
 
         if (axiosError.response?.status === 409) {
-          setError('email', { message: t("errorEmailTaken") });
+          setError('email', { message: t("errorEmailExists") });
         }
         setAuthError(message);
       } else {
@@ -199,15 +201,30 @@ export default function Register() {
               sx={textFieldStyles}
             />
 
-            <TextField
-              fullWidth
-              label={t("ageLabel")}
-              variant="outlined"
-              size="small"
-              type="number"
-              {...register("edad")}
-              sx={textFieldStyles}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Controller
+                name="fechaNacimiento"
+                control={control}
+                render={({ field: { onChange, value, ...rest } }) => (
+                  <DateField
+                    {...rest}
+                    fullWidth
+                    label={t("birthDateLabel")}
+                    format="DD/MM/YYYY"
+                    value={value ? dayjs(value) : null}
+                    onChange={(newValue) => onChange(newValue ? newValue.toISOString() : '')}
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        sx: textFieldStyles,
+                        error: !!errors.fechaNacimiento,
+                        helperText: errors.fechaNacimiento?.message,
+                      }
+                    }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
 
             <TextField
               {...register("sexo")}
@@ -437,12 +454,13 @@ export default function Register() {
     }}>
       <Box sx={{
         display: 'flex',
-        flexDirection: 'row',
-        gap: 4,
+        flexDirection: { xs: 'column', md: 'row' },
+        gap: { xs: 2, sm: 4 },
         justifyContent: 'center',
         alignItems: 'stretch',
         maxWidth: '1000px',
-        width: '100%'
+        width: '100%',
+        px: { xs: 2, sm: 0 }
       }}>
         <CardBase sx={{
           flex: 1,
@@ -450,16 +468,16 @@ export default function Register() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          p: 2,
+          p: { xs: 3, sm: 2 },
           textAlign: 'center',
         }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
             {leftContent.title}
           </Typography>
           <Typography variant="body1" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
             {leftContent.description}
           </Typography>
-          <Typography variant="body2" sx={{ mt: 'auto' }}>
+          <Typography variant="body2" sx={{ mt: { xs: 2, md: 'auto' } }}>
             {t("hasAccount")}{' '}
             <Link href="/login" sx={{ color: theme.palette.primary.main, fontWeight: 'bold', textDecoration: 'none' }}>
               {t("loginLink")}
@@ -474,7 +492,7 @@ export default function Register() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          p: 2,
+          p: { xs: 3, sm: 2 },
         }}>
           <Box sx={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
             {authError && (
@@ -524,7 +542,8 @@ export default function Register() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        mt: 5,
+        mt: { xs: 3, md: 5 },
+        mb: { xs: 2, md: 0 },
         pt: 2
       }}>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>

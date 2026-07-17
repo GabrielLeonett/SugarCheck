@@ -14,7 +14,7 @@ export class ContactParentesco {
       return Result.fail(
         new ContactParentescoInvalidError(
           `El parentesco debe ser uno de: ${validValues.join(', ')}`,
-        ),
+        ).withCode('PARENTESCO_INVALID', 'parentesco'),
       );
     }
     return Result.ok(new ContactParentesco(value as Parentesco));

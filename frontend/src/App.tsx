@@ -11,6 +11,7 @@ import Insulina from "./features/Insulina/insulina"
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 import Glucosa from "./features/ControlDeGlucosa/ControlDeGlucosaPage";
 import ForgotPassword from "./features/ForgotPassword";
+import ResetPassword from "./features/ResetPassword";
 import { Camino } from "./features/Camino/Camino";
 import Oraculo from "./features/ChatIA/Oraculo";
 import "./App.css";
@@ -63,6 +64,7 @@ function App() {
              <Route element={<PublicRoute />}>
                <Route path="/login" element={<Login />} />
                <Route path="/olvidoContrasena" element={<ForgotPassword />} />
+               <Route path="/restablecer-contrasena" element={<ResetPassword />} />
                <Route path="/register" element={<Register />} />
              </Route>
            </Routes>

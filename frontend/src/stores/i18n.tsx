@@ -19,6 +19,8 @@ import enCamino from "../locales/en/camino.json";
 import enMonitoreoFisico from "../locales/en/monitoreoFisico.json";
 import enProfile from "../locales/en/profile.json";
 import enHbA1c from "../locales/en/hba1c.json";
+import enNotifications from "../locales/en/notifications.json";
+import enResetPassword from "../locales/en/resetPassword.json";
 
 import esCommon from "../locales/es/common.json";
 import esFooter from "../locales/es/footer.json";
@@ -35,6 +37,8 @@ import esCamino from "../locales/es/camino.json";
 import esMonitoreoFisico from "../locales/es/monitoreoFisico.json";
 import esProfile from "../locales/es/profile.json";
 import esHbA1c from "../locales/es/hba1c.json";
+import esNotifications from "../locales/es/notifications.json";
+import esResetPassword from "../locales/es/resetPassword.json";
 
 import ptCommon from "../locales/pt/common.json";
 import ptFooter from "../locales/pt/footer.json";
@@ -51,6 +55,8 @@ import ptCamino from "../locales/pt/camino.json";
 import ptMonitoreoFisico from "../locales/pt/monitoreoFisico.json";
 import ptProfile from "../locales/pt/profile.json";
 import ptHbA1c from "../locales/pt/hba1c.json";
+import ptNotifications from "../locales/pt/notifications.json";
+import ptResetPassword from "../locales/pt/resetPassword.json";
 
 import jaCommon from "../locales/ja/common.json";
 import jaFooter from "../locales/ja/footer.json";
@@ -67,14 +73,16 @@ import jaCamino from "../locales/ja/camino.json";
 import jaMonitoreoFisico from "../locales/ja/monitoreoFisico.json";
 import jaProfile from "../locales/ja/profile.json";
 import jaHbA1c from "../locales/ja/hba1c.json";
+import jaNotifications from "../locales/ja/notifications.json";
+import jaResetPassword from "../locales/ja/resetPassword.json";
 
 
 // Agrupa tus recursos por idioma para facilitar la lectura
 const resources = {
-en: { common: enCommon, nav: enNav, footer: enFooter, insulina:enInsulina, insulinaHistorial:enInsulinaHistorial, login: enLogin, home: enHome, glicosilada: enGlicosilada, glucemia: enGlucemia, register: enRegister, forgotPassword: enForgotPassword, camino: enCamino, monitoreoFisico: enMonitoreoFisico, profile: enProfile, hba1c: enHbA1c },
-  es: { common: esCommon, nav: esNav, footer: esFooter, insulina:esInsulina, insulinaHistorial:esInsulinaHistorial, login: esLogin, home: esHome, glicosilada: esGlicosilada, glucemia: esGlucemia, register: esRegister, forgotPassword: esForgotPassword, camino: esCamino, monitoreoFisico: esMonitoreoFisico, profile: esProfile, hba1c: esHbA1c },
-  pt: { common: ptCommon, nav: ptNav, footer: ptFooter, insulina:ptInsulina, insulinaHistorial:ptInsulinaHistorial, login: ptLogin, home: ptHome, glicosilada: ptGlicosilada, glucemia: ptGlucemia, register: ptRegister, forgotPassword: ptForgotPassword, camino: ptCamino, monitoreoFisico: ptMonitoreoFisico, profile: ptProfile, hba1c: ptHbA1c },
-  ja: { common: jaCommon, nav: jaNav, footer: jaFooter, insulina:jaInsulina, insulinaHistorial:jaInsulinaHistorial, login: jaLogin, home: jaHome, glicosilada: jaGlicosilada, glucemia: jaGlucemia, register: jaRegister, forgotPassword: jaForgotPassword, camino: jaCamino, monitoreoFisico: jaMonitoreoFisico, profile: jaProfile, hba1c: jaHbA1c },
+en: { common: enCommon, nav: enNav, footer: enFooter, insulina:enInsulina, insulinaHistorial:enInsulinaHistorial, login: enLogin, home: enHome, glicosilada: enGlicosilada, glucemia: enGlucemia, register: enRegister, forgotPassword: enForgotPassword, camino: enCamino, monitoreoFisico: enMonitoreoFisico, profile: enProfile, hba1c: enHbA1c, notifications: enNotifications, resetPassword: enResetPassword },
+  es: { common: esCommon, nav: esNav, footer: esFooter, insulina:esInsulina, insulinaHistorial:esInsulinaHistorial, login: esLogin, home: esHome, glicosilada: esGlicosilada, glucemia: esGlucemia, register: esRegister, forgotPassword: esForgotPassword, camino: esCamino, monitoreoFisico: esMonitoreoFisico, profile: esProfile, hba1c: esHbA1c, notifications: esNotifications, resetPassword: esResetPassword },
+  pt: { common: ptCommon, nav: ptNav, footer: ptFooter, insulina:ptInsulina, insulinaHistorial:ptInsulinaHistorial, login: ptLogin, home: ptHome, glicosilada: ptGlicosilada, glucemia: ptGlucemia, register: ptRegister, forgotPassword: ptForgotPassword, camino: ptCamino, monitoreoFisico: ptMonitoreoFisico, profile: ptProfile, hba1c: ptHbA1c, notifications: ptNotifications, resetPassword: ptResetPassword },
+  ja: { common: jaCommon, nav: jaNav, footer: jaFooter, insulina:jaInsulina, insulinaHistorial:jaInsulinaHistorial, login: jaLogin, home: jaHome, glicosilada: jaGlicosilada, glucemia: jaGlucemia, register: jaRegister, forgotPassword: jaForgotPassword, camino: jaCamino, monitoreoFisico: jaMonitoreoFisico, profile: jaProfile, hba1c: jaHbA1c, notifications: jaNotifications, resetPassword: jaResetPassword },
 };
 
 i18n
@@ -83,7 +91,7 @@ i18n
   .init({
     resources,
     fallbackLng: "es",
-ns: ["common", "nav", "footer", "insulina", "login", "home", "glicosilada", "glucemia", "register", "forgotPassword", "camino", "monitoreoFisico", "profile", "hba1c"],
+ns: ["common", "nav", "footer", "insulina", "login", "home", "glicosilada", "glucemia", "register", "forgotPassword", "camino", "monitoreoFisico", "profile", "hba1c", "notifications", "resetPassword"],
     defaultNS: "common",
     interpolation: {
       escapeValue: false,

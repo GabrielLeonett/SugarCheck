@@ -23,7 +23,7 @@ export default function Glucosa() {
   return (
     <>
       <Navbar />
-      <Box sx={{ mx: 7, my: 10 }}>
+      <Box sx={{ mx: { xs: 2, sm: 7 }, my: { xs: 4, sm: 10 } }}>
         
         {/* SUB-MÓDULO 1: GLUCEMIA */}
         <SeccionGlucemia 

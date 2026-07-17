@@ -24,20 +24,20 @@ export class Thresholds {
     // 1. Validar que el objeto exista
     if (!value) {
       return Result.fail(
-        new ThresholdInvalidError('Los valores de umbral son requeridos'),
+        new ThresholdInvalidError('Los valores de umbral son requeridos').withCode('THRESHOLD_REQUIRED', 'thresholds'),
       );
     }
 
     // 2. Validar reglas de negocio (numéricas)
     if (value.hypo <= 0 || value.hiper <= 0) {
       return Result.fail(
-        new ThresholdInvalidError('Los umbrales deben ser mayores a cero'),
+        new ThresholdInvalidError('Los umbrales deben ser mayores a cero').withCode('THRESHOLD_POSITIVE', 'thresholds'),
       );
     }
 
     if (value.hypo >= value.hiper) {
       return Result.fail(
-        new ThresholdInvalidError('El umbral de hipo debe ser menor al de híper'),
+        new ThresholdInvalidError('El umbral de hipo debe ser menor al de híper').withCode('THRESHOLD_HYPO_LESS_THAN_HYPER', 'thresholds'),
       );
     }
 
