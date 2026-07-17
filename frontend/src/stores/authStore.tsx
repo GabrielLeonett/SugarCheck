@@ -60,7 +60,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const provider = providerName === 'google'
         ? new GoogleAuthProvider()
-        : new FacebookAuthProvider();
+        : new FacebookAuthProvider(); 
 
       const userCredential = await signInWithPopup(authFirebase, provider);
       const firebaseToken = await userCredential.user.getIdToken();
