@@ -10,9 +10,11 @@ import { GetOneImcById } from '../../app/GetOneImcById';
 import { UpdateImc } from '../../app/UpdateImc';
 import { DeleteImc } from '../../app/DeleteImc';
 import { AuthModule } from '../../../auth/infra/auth.module';
+import { NotificationModule } from '../../../notification/infra/Nest/notification.module';
+import { CreateNotification } from '../../../notification/app/CreateNotification';
 
 @Module({
-  imports: [forwardRef(() => AuthModule)],
+  imports: [forwardRef(() => AuthModule), forwardRef(() => NotificationModule)],
   providers: [
     PrismaService,
     {
@@ -28,8 +30,9 @@ import { AuthModule } from '../../../auth/infra/auth.module';
       useFactory: (
         repo: ImcRepository,
         generate: GenerateUUID,
-      ) => new CreateImc(repo, generate),
-      inject: ['ImcRepository', 'GenerateUUID'],
+        createNotification: CreateNotification,
+      ) => new CreateImc(repo, generate, createNotification),
+      inject: ['ImcRepository', 'GenerateUUID', CreateNotification],
     },
     {
       provide: 'GetAllImcByUserId',

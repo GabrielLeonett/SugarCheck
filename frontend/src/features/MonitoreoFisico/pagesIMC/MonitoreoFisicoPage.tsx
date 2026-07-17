@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Typography, Grid, useTheme } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Box, Typography, Grid, useTheme, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 // UI Components
@@ -16,50 +16,62 @@ import { CardBase } from '../../../components/ui/Cards/CardBase';
 import Navbar from '../../../components/layout/Header/Navbar';
 import Footer from '../../../components/layout/Footer/Footer';
 import useLanguage from "../../../hooks/useLanguage";
-
-// Mock inicial basado exactamente en la data visual de tu imagen
-const INITIAL_RECORDS: PhysicalRecord[] = [
-  { id: '1', fecha: '25/05/2026', peso: 54.2, estatura: 158, imc: 21.7, estado: 'Normal' },
-  { id: '2', fecha: '12/04/2026', peso: 63.5, estatura: 158, imc: 25.4, estado: 'Sobrepeso' },
-  { id: '3', fecha: '02/03/2026', peso: 65.0, estatura: 157, imc: 26.4, estado: 'Sobrepeso' },
-];
-
-const INITIAL_EVOLUTION: PhysicalEvolution = {
-  pesoDiff: -1.3,
-  estaturaDiff: 2.5,
-  fechaReferencia: '12/04/2026',
-};
+import { imcApi } from '../../../apis/monitoreo_fisico';
 
 export const PhysicalMonitoringPage: React.FC = () => {
   const { t } = useLanguage("monitoreoFisico");
   const theme = useTheme();
-  const [records, setRecords] = useState<PhysicalRecord[]>(INITIAL_RECORDS);
-  const [evolution] = useState<PhysicalEvolution>(INITIAL_EVOLUTION);
+  const [records, setRecords] = useState<PhysicalRecord[]>([]);
+  const [evolution, setEvolution] = useState<PhysicalEvolution>({ pesoDiff: 0, estaturaDiff: 0, fechaReferencia: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchRecords = useCallback(async () => {
+    try {
+      setError(null);
+      const data = await imcApi.getAll();
+      setRecords(data);
+      if (data.length >= 2) {
+        const last = data[0];
+        const prev = data[1];
+        setEvolution({
+          pesoDiff: +((last.peso - prev.peso).toFixed(1)),
+          estaturaDiff: +((last.estatura - prev.estatura).toFixed(1)),
+          fechaReferencia: prev.fecha,
+        });
+      } else if (data.length === 1) {
+        setEvolution({ pesoDiff: 0, estaturaDiff: 0, fechaReferencia: data[0].fecha });
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Error al cargar registros');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRecords();
+  }, [fetchRecords]);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleSaveMeasurement = (newData: { peso: number; estatura: number; fecha: string }) => {
-    // Cálculo automatizado del IMC: peso / (estatura en metros)^2
-    const estaturaMetros = newData.estatura / 100;
-    const calculatedImc = newData.peso / (estaturaMetros * estaturaMetros);
-    
-    let estado: 'Bajo peso' | 'Normal' | 'Sobrepeso' = 'Normal';
-    if (calculatedImc < 18.5) estado = 'Bajo peso';
-    else if (calculatedImc >= 25) estado = 'Sobrepeso';
-
-    const newRecord: PhysicalRecord = {
-      id: String(records.length + 1),
-      fecha: newData.fecha,
-      peso: newData.peso,
-      estatura: newData.estatura,
-      imc: calculatedImc,
-      estado,
-    };
-
-    // Insertar al inicio de la bitácora
-    setRecords([newRecord, ...records]);
+  const handleSaveMeasurement = async (newData: { peso: number; estatura: number; fecha: string }) => {
+    const [dd, mm, aaaa] = newData.fecha.split('/');
+    try {
+      setError(null);
+      const created = await imcApi.create({
+        peso: newData.peso,
+        altura: newData.estatura,
+        dia: parseInt(dd),
+        mes: parseInt(mm),
+        anio: parseInt(aaaa),
+      });
+      setRecords([created, ...records]);
+    } catch (err: any) {
+      setError(err?.message || 'Error al guardar');
+    }
   };
 
   const currentImc = records[0]?.imc || 0;
@@ -82,12 +94,19 @@ export const PhysicalMonitoringPage: React.FC = () => {
             {t("pageTitle")}
           </Typography>
 
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+              {error}
+            </Alert>
+          )}
+
           <Grid container spacing={4}>
             <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <ButtonBase 
                 startIcon={<AddIcon />} 
                 onClick={handleOpenModal}
                 fullWidth
+                disabled={isLoading}
               >
                 {t("registerButton")}
               </ButtonBase>
@@ -99,8 +118,16 @@ export const PhysicalMonitoringPage: React.FC = () => {
 
             <Grid size={{ xs: 12, md: 8 }}>
               <CardBase>
-                <HistoryChart records={records} />
-                <HistoryTable records={records} />
+                {isLoading ? (
+                  <Typography sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>
+                    {t("loading")}
+                  </Typography>
+                ) : (
+                  <>
+                    <HistoryChart records={records} />
+                    <HistoryTable records={records} />
+                  </>
+                )}
               </CardBase>
             </Grid>
           </Grid>
