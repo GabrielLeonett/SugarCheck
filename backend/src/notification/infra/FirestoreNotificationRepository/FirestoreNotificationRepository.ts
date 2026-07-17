@@ -57,7 +57,7 @@ export class FirestoreNotificationRepository implements NotificationRepository {
 
       const snapshot = await query.get();
       const notifications = snapshot.docs.map((doc) => {
-        const data = doc.data;
+        const data = doc.data();
         return this.toDomain({ id: doc.id, ...data });
       });
 
