@@ -36,8 +36,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         notifications,
         unreadCount: notifications.filter((n) => !n.read).length,
       });
-    } catch {
-      console.warn('Error fetching notifications, usando datos mock');
+    } catch (err) {
+      console.warn('Error fetching notifications:', err);
       import('../stores/notificationMock').then((m) => {
         const mock = m.MOCK_NOTIFICATIONS;
         set({
