@@ -10,5 +10,12 @@
     "minutes": "Há {{count}} min",
     "hours": "Há {{count}}h",
     "days": "Há {{count}}d"
-  }
+  },
+  "IMC_CREATION_TITLE": "Novo registro de IMC",
+  "IMC_CREATION_MESSAGE": "Você registrou um novo IMC de {{value}} - {{category}}",
+  "IMC_REMINDER_TITLE": "Lembrete de IMC",
+  "IMC_REMINDER_MESSAGE": "Você não registrou seu peso hoje. Mantenha seu diário atualizado.",
+  "IMC_CATEGORY_UNDERWEIGHT": "Abaixo do peso",
+  "IMC_CATEGORY_NORMAL": "Normal",
+  "IMC_CATEGORY_OVERWEIGHT": "Sobrepeso"
 }

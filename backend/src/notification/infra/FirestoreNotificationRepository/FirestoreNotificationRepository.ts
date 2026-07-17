@@ -10,6 +10,9 @@ import { NotificationId } from '../../core/value-objects/NotificationId';
 import { NotificationType } from '../../core/value-objects/NotificationType';
 import { NotificationTitle } from '../../core/value-objects/NotificationTitle';
 import { NotificationMessage } from '../../core/value-objects/NotificationMessage';
+import { NotificationTitleKey } from '../../core/value-objects/NotificationTitleKey';
+import { NotificationMessageKey } from '../../core/value-objects/NotificationMessageKey';
+import { NotificationParams } from '../../core/value-objects/NotificationParams';
 import { NotificationLink } from '../../core/value-objects/NotificationLink';
 import { NotificationNotFoundError } from '../../core/errors/NotificationNotFoundError';
 
@@ -20,12 +23,25 @@ export class FirestoreNotificationRepository implements NotificationRepository {
   constructor(private readonly firestore: FirestoreService) {}
 
   private toDomain(raw: FirebaseFirestore.DocumentData): Notification {
+    const titleKey = raw.titleKey
+      ? NotificationTitleKey.create(raw.titleKey).getValue()
+      : undefined;
+    const messageKey = raw.messageKey
+      ? NotificationMessageKey.create(raw.messageKey).getValue()
+      : undefined;
+    const params = raw.params
+      ? NotificationParams.create(raw.params as Record<string, string | number>)
+      : undefined;
+
     return new Notification({
       id: NotificationId.create(raw.id).getValue(),
       userId: UserId.create(raw.userId).getValue(),
       type: NotificationType.create(raw.type).getValue(),
       title: NotificationTitle.create(raw.title).getValue(),
       message: NotificationMessage.create(raw.message).getValue(),
+      titleKey,
+      messageKey,
+      params,
       link: NotificationLink.create(raw.link).getValue(),
       read: raw.read ?? false,
       createdAt: raw.createdAt?.toDate?.() ?? new Date(raw.createdAt),
@@ -38,6 +54,9 @@ export class FirestoreNotificationRepository implements NotificationRepository {
       type: notification.type.value,
       title: notification.title.value,
       message: notification.message.value,
+      titleKey: notification.titleKey?.value,
+      messageKey: notification.messageKey?.value,
+      params: notification.params?.value,
       link: notification.link.value,
       read: notification.read,
       createdAt: notification.createdAt,

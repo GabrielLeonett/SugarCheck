@@ -9,7 +9,6 @@ import { Altura } from '../core/value-objects/altura';
 import { Fecha } from '../core/value-objects/Fecha';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
 import { CreateNotification } from '../../notification/app/CreateNotification';
-import { TranslationService } from '../../shared/infrastructure/i18n/translation.service';
 
 const CATEGORY_KEYS: Record<string, string> = {
   underweight: 'IMC_CATEGORY_UNDERWEIGHT',
@@ -22,7 +21,6 @@ export class CreateImc {
     private readonly repository: ImcRepository,
     private readonly generateUUID: GenerateUUIDInterface,
     private readonly createNotification: CreateNotification,
-    private readonly translationService: TranslationService,
   ) {}
 
   public async run(data: {
@@ -62,21 +60,19 @@ export class CreateImc {
     if (!saveResult.isValid) return saveResult;
 
     const imcValue = saveResult.getValue().toPlain().imcValue;
-    const lang = data.lang || 'es';
     let catKey = 'normal';
     if (imcValue < 18.5) catKey = 'underweight';
     else if (imcValue >= 25) catKey = 'overweight';
 
-    const category = this.translationService.translate(CATEGORY_KEYS[catKey], lang);
-
     const notifResult = await this.createNotification.run({
       userId: data.userId,
       type: 'info',
-      title: this.translationService.translate('IMC_CREATION_TITLE', lang),
-      message: this.translationService.translate('IMC_CREATION_MESSAGE', lang, {
+      titleKey: 'IMC_CREATION_TITLE',
+      messageKey: 'IMC_CREATION_MESSAGE',
+      params: {
         value: imcValue.toFixed(1),
-        category,
-      }),
+        categoryKey: CATEGORY_KEYS[catKey],
+      },
       link: '/bitacora/monitoreo-fisico',
     });
     if (!notifResult.isValid) {
