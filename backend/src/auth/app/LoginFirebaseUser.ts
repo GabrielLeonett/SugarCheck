@@ -27,13 +27,13 @@ export class LoginFirebaseUser {
     // 1. Buscar si el usuario ya existe en tu base de datos local por email
     const userResult = await this.GetOneByEmailUser.run({ email: dto.email });
 
-    // CORRECCIÓN: Tipado directo con la Interfaz
     let user: UserPlainInterface;
 
     if (!userResult.isValid) {
-      // 2. Si no existe, hacemos el AUTO-REGISTRO
+      const username = this.generateUsernameFromEmail(dto.email);
       const saveResult = await this.SaveUser.run({
         name: dto.name,
+        username,
         email: dto.email,
         roles: [Role.Guerrero],
         sexo: 'masculino',
@@ -56,7 +56,10 @@ export class LoginFirebaseUser {
     const payload = {
       sub: user.id,
       username: user.username,
+      email: user.email,
       roles: user.roles,
+      fechaNacimiento: user.fechaNacimiento,
+      sexo: user.sexo,
     };
 
     const [at, rt] = await Promise.all([
@@ -69,9 +72,26 @@ export class LoginFirebaseUser {
       rt,
       user: {
         id: user.id,
+        name: user.name,
         username: user.username,
+        email: user.email,
         roles: user.roles,
+        fechaNacimiento: user.fechaNacimiento,
+        sexo: user.sexo,
       },
     });
+  }
+
+  private generateUsernameFromEmail(email: string): string {
+    let username = email.split('@')[0].toLowerCase();
+    username = username.replace(/[^a-zA-Z0-9_-]/g, '_');
+    if (!/^[a-zA-Z]/.test(username)) {
+      username = 'u' + username;
+    }
+    username = username.substring(0, 30);
+    if (username.length < 3) {
+      username = username.padEnd(3, '_');
+    }
+    return username;
   }
 }

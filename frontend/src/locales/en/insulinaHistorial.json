@@ -1,0 +1,16 @@
+{
+  "evolucionInsulina": "Insulin Evolution",
+  "todas": "All",
+  "lenta": "Slow",
+  "rapida": "Fast",
+  "dosisUi": "Dose (UI)",
+  "noHayRegistrosGraficar": "No records to graph",
+  "historialRegistros": "Record History",
+  "hora": "Time",
+  "dosis": "Dose (UI)",
+  "tipo": "Type",
+  "zona": "Area",
+  "contexto": "Context",
+  "noHayRegistrosFiltro": "No records for this filter.",
+  "filasPorPagina": "Rows per page:"
+}

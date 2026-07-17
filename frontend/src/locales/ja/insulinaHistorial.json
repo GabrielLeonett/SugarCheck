@@ -1,0 +1,16 @@
+{
+  "evolucionInsulina": "インスリン推移",
+  "todas": "すべて",
+  "lenta": "遅効型",
+  "rapida": "速効型",
+  "dosisUi": "投与量 (UI)",
+  "noHayRegistrosGraficar": "グラフ化する記録がありません",
+  "historialRegistros": "記録履歴",
+  "hora": "時間",
+  "dosis": "投与量 (UI)",
+  "tipo": "種類",
+  "zona": "部位",
+  "contexto": "状況",
+  "noHayRegistrosFiltro": "このフィルターの記録はありません。",
+  "filasPorPagina": "ページあたりの行数:"
+}

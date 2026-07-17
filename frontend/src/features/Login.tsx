@@ -63,7 +63,7 @@ export default function Login() {
                 message = error.message;
             }
 
-            setAuthError({ message });
+            setAuthError({ message, statusCode: 0 });
         } finally {
             setIsSubmitting(false);
         }
@@ -83,11 +83,12 @@ export default function Login() {
             <Box sx={{
                 display: 'flex',
                 flexDirection: { xs: 'column', md: 'row' },
-                gap: 4,
+                gap: { xs: 2, sm: 4 },
                 justifyContent: 'center',
                 alignItems: 'stretch',
                 maxWidth: '900px',
-                width: '100%'
+                width: '100%',
+                px: { xs: 2, sm: 0 }
             }}>
                 {/* Columna izquierda - Bienvenida */}
                 <CardBase elevation={5} sx={{
@@ -96,22 +97,22 @@ export default function Login() {
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    p: 2,
+                    p: { xs: 3, sm: 2 },
                     textAlign: 'center',
                     borderRadius: 3,
-                    minHeight: '500px',
+                    minHeight: { xs: 'auto', md: '500px' },
                 }}>
                     <Box
                         component="img"
                         src={GlucoSaludando}
                         alt="Ilustración de Bienvenida"
                         sx={{
-                            width: '160px',
+                            width: { xs: '120px', sm: '160px' },
                             height: 'auto',
                             mb: 1,
                         }}
                     />
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
                         {t("welcomeTitle")}
                     </Typography>
 
@@ -119,7 +120,7 @@ export default function Login() {
                         {t("welcomeDescription")}
                     </Typography>
 
-                    <Typography variant="body2" sx={{ mt: 'auto' }}>
+                    <Typography variant="body2" sx={{ mt: { xs: 2, md: 'auto' } }}>
                         {t("noAccount")}{' '}
                         <Link href="/register" sx={{ fontWeight: 'bold', textDecoration: 'none' }}>
                             {t("registerLink")}
@@ -138,14 +139,14 @@ export default function Login() {
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        p: 4,
+                        p: { xs: 3, sm: 4 },
                         borderRadius: 3,
                         boxShadow: 3,
-                        minHeight: '500px',
+                        minHeight: { xs: 'auto', md: '500px' },
                     }}
                 >
                     <Box sx={{ maxWidth: '350px', width: '100%', textAlign: 'center' }}>
-                        <LoginIcon sx={{ fontSize: 50, mb: 1 }} />
+                        <LoginIcon sx={{ fontSize: { xs: 40, sm: 50 }, mb: 1 }} />
                         <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
                             {t("formTitle")}
                         </Typography>
@@ -229,7 +230,7 @@ export default function Login() {
                         </Box>
 
                         {/* BOTONES SOCIALES */}
-                        <Box sx={{ display: 'flex', gap: 2, mb: 3, width: '100%' }}>
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3, width: '100%' }}>
 
                             {/* Botón Google */}
                             <Button
@@ -247,9 +248,9 @@ export default function Login() {
                                         navigate("/");
                                     } catch (err: unknown) {
                                         if (axios.isAxiosError(err)) {
-                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError") });
+                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError"), statusCode: 0 });
                                         } else {
-                                            setAuthError({ message: t("errors.unknownError") });
+                                            setAuthError({ message: t("errors.unknownError"), statusCode: 0 });
                                         }
                                     } finally {
                                         setIsSubmitting(false);
@@ -286,9 +287,9 @@ export default function Login() {
                                         navigate("/");
                                     } catch (err: unknown) {
                                         if (axios.isAxiosError(err)) {
-                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError") });
+                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError"), statusCode: 0 });
                                         } else {
-                                            setAuthError({ message: t("errors.unknownError") });
+                                            setAuthError({ message: t("errors.unknownError"), statusCode: 0 });
                                         }
                                     } finally {
                                         setIsSubmitting(false);
@@ -324,7 +325,8 @@ export default function Login() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                mt: 5,
+                mt: { xs: 3, md: 5 },
+                mb: { xs: 2, md: 0 },
                 gap: 2
             }}>
                 <ConfigRow />

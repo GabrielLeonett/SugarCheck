@@ -37,8 +37,9 @@ import { PreferenceModule } from '../../../preference/infra/Nest/preference.modu
     { provide: 'GetOneByIdUser', useFactory: (repo: UserRepository) => new GetOneByIdUser(repo), inject: ['UserRepository'] },
     { provide: 'DeleteUser', useFactory: (repo: UserRepository) => new DeleteUser(repo), inject: ['UserRepository'] },
     { provide: 'UpdateUserEmail', useFactory: (repo: UserRepository) => new UpdateUserEmail(repo), inject: ['UserRepository'] },
+    { provide: 'UpdatePassword', useClass: PrismaUserRepository },
   ],
   controllers: [UserController],
-  exports: ['GetOneByEmailUser', 'GetOneByUsernameUser', 'GetOneByIdUser', 'SaveUser', 'UpdateUserEmail'],
+  exports: ['GetOneByEmailUser', 'GetOneByUsernameUser', 'GetOneByIdUser', 'SaveUser', 'UpdateUserEmail', 'UpdatePassword'],
 })
 export class UserModule { }

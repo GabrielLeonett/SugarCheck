@@ -10,12 +10,12 @@ export class ContactName {
   public static create(value: string): Result<ContactName, ContactNameInvalidError> {
     if (!value || value.trim().length < 3) {
       return Result.fail(
-        new ContactNameInvalidError('El nombre debe tener al menos 3 caracteres'),
+        new ContactNameInvalidError('El nombre debe tener al menos 3 caracteres').withCode('CONTACT_NAME_MIN_LENGTH', 'name'),
       );
     }
     if (value.length > 50) {
       return Result.fail(
-        new ContactNameInvalidError('El nombre no puede exceder los 50 caracteres'),
+        new ContactNameInvalidError('El nombre no puede exceder los 50 caracteres').withCode('CONTACT_NAME_MAX_LENGTH', 'name'),
       );
     }
     return Result.ok(new ContactName(value.trim()));

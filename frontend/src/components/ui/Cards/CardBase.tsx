@@ -9,7 +9,7 @@ import {
 import type { ReactNode } from 'react';
 import type { CardProps, SxProps, Theme } from '@mui/material';
 
-export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | 'subtitle'> {
+export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | 'subtitle' | 'onSubmit'> {
   title?: ReactNode;
   subtitle?: ReactNode;
   image?: string;
@@ -25,6 +25,8 @@ export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | '
   bgColor?: string;
   borderColor?: string;
   sx?: SxProps<Theme>;
+  component?: React.ElementType;
+  onSubmit?: React.FormEventHandler<HTMLFormElement>;
 }
 
 export function CardBase({
@@ -32,13 +34,16 @@ export function CardBase({
   elevation = 1,
   title,
   subtitle,
-  avatar,
-  headerAction,
   image,
   imageHeight = '140',
-  children,
+  avatar,
+  headerAction,
   actions,
-  sx
+  children,
+  sx,
+  component,
+  onSubmit,
+  ...rest
 }: CustomCardProps) {
 
   return (
@@ -46,8 +51,9 @@ export function CardBase({
       variant={variant}
       elevation={variant === 'elevation' ? elevation : 0}
       sx={{ ...sx}}
+      {...{ component, onSubmit } as any}
+      {...rest}
     >
-      {/* Renderiza el header solo si hay título, subtítulo o avatar */}
       {(title || subtitle || avatar || headerAction) && (
         <CardHeader
           avatar={avatar}
@@ -57,7 +63,6 @@ export function CardBase({
         />
       )}
 
-      {/* Renderiza la imagen solo si se proporciona una URL */}
       {image && (
         <CardMedia
           component="img"
@@ -67,7 +72,6 @@ export function CardBase({
         />
       )}
 
-      {/* El contenido principal de la tarjeta */}
       {children && (
         <CardContent>
           {typeof children === 'string' ? (
@@ -80,7 +84,6 @@ export function CardBase({
         </CardContent>
       )}
 
-      {/* Renderiza las acciones abajo si existen */}
       {actions && (
         <CardActions disableSpacing>
           {actions}

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
+import PersonIcon from "@mui/icons-material/Person";
 import React from "react";
 import { ThemeContext } from "../contexts/ThemeContext";
 import type { NavItemType } from "../types/types";
@@ -25,11 +26,12 @@ export function useNavbar() {
     }, 
     {
         name: t("agente"), submenu: [
-            { name: t("consultarAlOraculo"), href: "/agente/control-de-go-de-lucemia" }, 
+{ name: t("consultarAlOraculo"), href: "/agente/oraculo-chat" },
             { name: t("rutaDelGuerrero"), href: "/agente/camino" },
         ]
         , icon: <MenuIcon />
-    }];
+    },
+    { name: t("perfil"), href: "/perfil", icon: <PersonIcon /> }];
 
     const handleDrawerToggle = () => {
         setDrawerOpen(!drawerOpen);

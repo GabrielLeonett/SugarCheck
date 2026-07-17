@@ -10,6 +10,11 @@ import {
 } from 'class-validator';
 
 export class CreateUserDTO {
+  @IsString({ message: 'El nombre debe ser un texto válido' })
+  @IsNotEmpty({ message: 'El nombre es obligatorio' })
+  @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
+  name!: string;
+
   @IsString({ message: 'El nombre de usuario debe ser un texto válido' })
   @IsNotEmpty({ message: 'El nombre de usuario es obligatorio' })
   @MinLength(3, { message: 'El nombre de usuario debe tener al menos 3 caracteres' })

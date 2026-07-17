@@ -5,6 +5,7 @@
     "registerLink": "Registrarse",
     "formTitle": "Iniciar Sesión",
     "formSubtitle": "Ingresa tus credenciales para acceder",
+    "usernameLabel": "Nombre de usuario",
     "emailLabel": "Correo electrónico",
     "passwordLabel": "Contraseña",
     "submitButton": "Ingresar",
