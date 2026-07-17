@@ -48,18 +48,19 @@ export class FirestoreNotificationRepository implements NotificationRepository {
     try {
       let query: FirebaseFirestore.Query = this.firestore.db
         .collection(COLLECTION)
-        .where('userId', '==', userId.value)
-        .orderBy('createdAt', 'desc');
+        .where('userId', '==', userId.value);
 
       if (filter === 'unread') {
         query = query.where('read', '==', false);
       }
 
       const snapshot = await query.get();
-      const notifications = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        return this.toDomain({ id: doc.id, ...data });
-      });
+      const notifications = snapshot.docs
+        .map((doc) => {
+          const data = doc.data();
+          return this.toDomain({ id: doc.id, ...data });
+        })
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
       return Result.ok(notifications);
     } catch (error) {
