@@ -299,16 +299,24 @@ export function Profile() {
                                     </Grid>
                                     <Grid size={12}>
                                         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("sexLabel")}</Typography>
-                                        <TextField
-                                            {...registerPersonal('sexo')}
-                                            select
-                                            fullWidth
-                                            error={!!errorsPersonal.sexo}
-                                            helperText={errorsPersonal.sexo?.message}
-                                        >
-                                            <MenuItem value="masculino">{tp("sexMale")}</MenuItem>
-                                            <MenuItem value="femenino">{tp("sexFemale")}</MenuItem>
-                                        </TextField>
+                                        <Controller
+                                            name="sexo"
+                                            control={controlPersonal}
+                                            render={({ field: { onChange, value, ...rest } }) => (
+                                                <TextField
+                                                    {...rest}
+                                                    select
+                                                    fullWidth
+                                                    value={value || ''}
+                                                    onChange={onChange}
+                                                    error={!!errorsPersonal.sexo}
+                                                    helperText={errorsPersonal.sexo?.message}
+                                                >
+                                                    <MenuItem value="masculino">{tp("sexMale")}</MenuItem>
+                                                    <MenuItem value="femenino">{tp("sexFemale")}</MenuItem>
+                                                </TextField>
+                                            )}
+                                        />
                                     </Grid>
                                     <Grid size={12}>
                                         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("emailLabel")}</Typography>
