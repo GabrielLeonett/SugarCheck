@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/infra/auth.module';
 import { PreferenceModule } from './preference/infra/Nest/preference.module';
 import { ContactEmergenceModule } from './contact_emergence/infra/Nest/contact-emergence.module';
+import { ImcModule } from './IMC/infra/Nest/imc.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ContactEmergenceModule } from './contact_emergence/infra/Nest/contact-e
     AuthModule,
     PreferenceModule,
     ContactEmergenceModule,
+    ImcModule,
   ],
 })
 export class AppModule {}
