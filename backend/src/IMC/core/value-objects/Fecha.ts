@@ -33,7 +33,15 @@ export class Fecha {
     anio: number,
   ): Result<Fecha, FechaInvalidaError> {
     try {
-      return Result.ok(new Fecha(dia, mes, anio));
+      const fecha = new Fecha(dia, mes, anio);
+      const now = new Date();
+      const hoy = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      if (fecha.valor > hoy) {
+        return Result.fail(
+          new FechaInvalidaError('La fecha no puede ser posterior al día de hoy'),
+        );
+      }
+      return Result.ok(fecha);
     } catch (error) {
       if (error instanceof FechaInvalidaError) {
         return Result.fail(error);
