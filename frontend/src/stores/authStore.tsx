@@ -29,10 +29,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     const response = await apiPrivate.post('/auth/login', { username, password }, { withCredentials: true });
 
     await preferenceStore.getState().load();
-
+    console.log('Login successful, user data:', response.data.user);
     set({ user: response.data.user, accessToken: response.data.accessToken });
   },
-
+  
   logout: async () => {
     try {
       await signOut(authFirebase);
@@ -43,7 +43,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: null, accessToken: null });
     }
   },
-
+  
   refresh: async () => {
     try {
       const response = await apiPrivate.post('/auth/refresh', {}, { withCredentials: true });
@@ -55,22 +55,23 @@ export const useAuthStore = create<AuthState>((set) => ({
       throw error;
     }
   },
-
+  
   loginWithProvider: async (providerName: 'google' | 'facebook') => {
     try {
       const provider = providerName === 'google'
         ? new GoogleAuthProvider()
         : new FacebookAuthProvider();
-
-      const userCredential = await signInWithPopup(authFirebase, provider);
-      const firebaseToken = await userCredential.user.getIdToken();
-
-      const response = await apiPrivate.post(
-        '/auth/firebase-login',
-        { token: firebaseToken },
+        
+        const userCredential = await signInWithPopup(authFirebase, provider);
+        const firebaseToken = await userCredential.user.getIdToken();
+        
+        const response = await apiPrivate.post(
+          '/auth/firebase-login',
+          { token: firebaseToken },
         { withCredentials: true }
       );
-
+      
+      console.log('Login successful, user data:', response.data.user);
       set({ user: response.data.user, accessToken: response.data.accessToken });
     } catch (error: unknown) {
       console.error(`Error en login federado con ${providerName}:`, error);

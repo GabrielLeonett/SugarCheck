@@ -27,14 +27,14 @@ export class InsulinRatios {
     // 1. Validar que todos los ratios sean números positivos
     if (b <= 0 || l <= 0 || d <= 0) {
       return Result.fail(
-        new RatioInvalidError('Los ratios de insulina deben ser mayores a cero'),
+        new RatioInvalidError('Los ratios de insulina deben ser mayores a cero').withCode('RATIO_POSITIVE', 'insulinRatios'),
       );
     }
 
     // 2. Opcional: Validar que no sean nulos (NaN check)
     if (isNaN(b) || isNaN(l) || isNaN(d)) {
       return Result.fail(
-        new RatioInvalidError('Los ratios deben ser valores numéricos válidos'),
+        new RatioInvalidError('Los ratios deben ser valores numéricos válidos').withCode('RATIO_NUMERIC', 'insulinRatios'),
       );
     }
 

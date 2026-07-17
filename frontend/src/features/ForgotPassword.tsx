@@ -93,21 +93,21 @@ export default function ForgotPassword() {
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    p: 2,
+                    p: { xs: 3, sm: 2 },
                     textAlign: 'center',
-                    minHeight: '300px',
+                    minHeight: { xs: 'auto', md: '300px' },
                 }}>
                     {/* Mantienes tu imagen aquí arriba si lo deseas */}
-                    <Box component="img" src={GlucoOlvido} sx={{ width: 160, height: 'auto', mb: 2, borderRadius: 2 }} />
+                    <Box component="img" src={GlucoOlvido} sx={{ width: { xs: 120, sm: 160 }, height: 'auto', mb: 2, borderRadius: 2 }} />
 
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
                         {t("title")}
                     </Typography>
                     <Typography variant="body1" sx={{ maxWidth: '350px', mb: 4 }}>
                         {t("description")}
                     </Typography>
 
-                    <Typography variant="body2" sx={{ mt: 'auto' }}>
+                    <Typography variant="body2" sx={{ mt: { xs: 2, md: 'auto' } }}>
                         <Link href="/login" sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
                             {t("backToLogin")}
                         </Link>
@@ -125,14 +125,14 @@ export default function ForgotPassword() {
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        p: 4,
+                        p: { xs: 3, sm: 4 },
                         borderRadius: 3,
                         boxShadow: 3,
-                        minHeight: '300px',
+                        minHeight: { xs: 'auto', md: '300px' },
                     }}
                 >
                     <Box sx={{ maxWidth: '350px', width: '100%', textAlign: 'center' }}>
-                        <LockResetIcon sx={{ fontSize: 50, mb: 1 }} />
+                        <LockResetIcon sx={{ fontSize: { xs: 40, sm: 50 }, mb: 1 }} />
                         <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
                             {t("formTitle")}
                         </Typography>
@@ -190,7 +190,7 @@ export default function ForgotPassword() {
             </Box>
 
             {/* Footer */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 5, pt: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: { xs: 3, md: 5 }, mb: { xs: 2, md: 0 }, pt: 2 }}>
                 <Typography variant="body2" sx={{  mb: 1 }}>
                     {t("sponsoredBy")}
                 </Typography>

@@ -15,7 +15,7 @@ export class UserCreatedAt {
     // 1. Validación: ¿Es una fecha real? (Invalid Date check)
     if (isNaN(date.getTime())) {
       return Result.fail(
-        new UserDateInvalidError('El formato de fecha es inválido'),
+        new UserDateInvalidError('El formato de fecha es inválido').withCode('DATE_INVALID_FORMAT', 'createdAt'),
       );
     }
 
@@ -24,7 +24,7 @@ export class UserCreatedAt {
       return Result.fail(
         new UserDateInvalidError(
           'La fecha de creación no puede estar en el futuro',
-        ),
+        ).withCode('DATE_FUTURE', 'createdAt'),
       );
     }
 

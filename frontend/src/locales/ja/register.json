@@ -3,7 +3,7 @@
     "subtitle": "アクセスするための認証情報を入力してください",
     "usernameLabel": "ユーザー名",
     "nameLabel": "氏名",
-    "ageLabel": "年齢",
+    "birthDateLabel": "生年月日",
     "sexLabel": "性別",
     "sexMale": "男性",
     "sexFemale": "女性",

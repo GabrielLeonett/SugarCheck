@@ -13,10 +13,13 @@ import { OptionalAuthGuard } from './optionalAuth.guard';
 import { RolesGuard } from './roles.guard';
 import { FirebaseAdminService } from './firebase-admin.service';
 import { LoginFirebaseUser } from '../app/LoginFirebaseUser';
+import { ForgotPassword } from '../app/ForgotPassword';
+import { ResetPassword } from '../app/ResetPassword';
+import { NodemailerService } from './email/nodemailer.service';
+import { ResetCodeStore } from './ResetCodeStore';
 
 @Module({
   imports: [
-    // ➔ Rompemos el bucle envolviendo UserModule en forwardRef
     forwardRef(() => UserModule),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -32,7 +35,6 @@ import { LoginFirebaseUser } from '../app/LoginFirebaseUser';
   ],
   controllers: [AuthController],
   providers: [
-    // Es vital registrar los Guards como providers si van a ser instanciados/inyectados por Nest
     AuthGuard,
     OptionalAuthGuard,
     RolesGuard,
@@ -40,14 +42,23 @@ import { LoginFirebaseUser } from '../app/LoginFirebaseUser';
       provide: 'BcryptHasher',
       useClass: BcryptHasher,
     },
+    {
+      provide: 'NodemailerService',
+      useClass: NodemailerService,
+    },
+    {
+      provide: 'ResetCodeStore',
+      useClass: ResetCodeStore,
+    },
     LoginUser,
     RefreshAccessToken,
     Logout,
     LoginFirebaseUser,
+    ForgotPassword,
+    ResetPassword,
     AuthService,
     FirebaseAdminService,
   ],
-  // Exportamos para que UserModule y otros módulos lean el JwtService y los Guards sin fallas
   exports: [JwtModule, AuthGuard, OptionalAuthGuard, RolesGuard, FirebaseAdminService],
 })
 export class AuthModule { }

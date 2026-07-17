@@ -16,7 +16,7 @@ export class UserSexo {
       return Result.fail(
         new UserSexoInvalidError(
           `El sexo debe ser uno de: ${sexoValues.join(', ')}`,
-        ),
+        ).withCode('SEXO_INVALID_OPTION', 'sexo'),
       );
     }
 

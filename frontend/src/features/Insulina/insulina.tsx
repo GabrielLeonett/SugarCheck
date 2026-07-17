@@ -23,7 +23,7 @@ export default function Insulina() {
     <>
       <Navbar />
 
-          <Container maxWidth="lg" sx={{ mt: 6, mb: 7 }}>
+          <Container maxWidth="lg" sx={{ mt: { xs: 3, sm: 6 }, mb: { xs: 3, sm: 7 }, px: { xs: 2, sm: 3 } }}>
 
 
       {/* TÍTULO */}
