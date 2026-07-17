@@ -1,4 +1,3 @@
-// features/Insulina/components/ModalInsulinaRapida.tsx
 import { Typography, Box, Grid, TextField, IconButton, MenuItem, Paper } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -6,41 +5,37 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState } from "react";
 import { ButtonBase } from "../../../components/ui/Buttons/ButtonBase.tsx";
 import { Modal } from "../../../components/ui/Modals/Modals.tsx";
+import useLanguage from "../../../hooks/useLanguage";
 
-// ✅ Interfaz para las props
 interface ModalInsulinaRapidaProps {
   open: boolean;
   onClose: () => void;
 }
 
-// ✅ Componente principal
 export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapidaProps) {
-  // Estados del formulario
+  const { t } = useLanguage("insulina");
   const [unidades, setUnidades] = useState<number>(0);
   const [contexto, setContexto] = useState<string>("");
   const [fecha, setFecha] = useState({ dd: "23", mm: "06", yyyy: "2026" });
   const [hora, setHora] = useState("14:11");
 
-  // Estados del selector de zonas
   const [vistaCuerpo, setVistaCuerpo] = useState<"FRENTE" | "ATRÁS">("FRENTE");
-  const [zonaSeleccionada, setZonaSeleccionada] = useState<string>("Abdomen Izquierdo");
+  const [zonaSeleccionada, setZonaSeleccionada] = useState<string>(t("zoneAbdomenLeft"));
 
-  // Definición de zonas
   const zonasFrente = [
-    "Abdomen Derecho",
-    "Abdomen Izquierdo",
-    "Muslo Derecho",
-    "Muslo Izquierdo",
+    t("zoneAbdomenRight"),
+    t("zoneAbdomenLeft"),
+    t("zoneThighRight"),
+    t("zoneThighLeft"),
   ];
   
   const zonasAtras = [
-    "Brazo Derecho",
-    "Brazo Izquierdo",
-    "Glúteo Derecho",
-    "Glúteo Izquierdo",
+    t("zoneArmRight"),
+    t("zoneArmLeft"),
+    t("zoneGluteRight"),
+    t("zoneGluteLeft"),
   ];
 
-  // Zonas según la vista seleccionada
   const zonasActuales = vistaCuerpo === "FRENTE" ? zonasFrente : zonasAtras;
 
   // Función para obtener el color según la zona
@@ -72,14 +67,13 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
     setZonaSeleccionada("Abdomen Izquierdo");
   };
 
-  // Función para guardar
   const handleGuardar = () => {
     if (unidades === 0) {
-      alert("Por favor ingresa las unidades");
+      alert(t("pleaseEnterUnits"));
       return;
     }
     if (!contexto) {
-      alert("Por favor selecciona un contexto");
+      alert(t("pleaseSelectContext"));
       return;
     }
     
@@ -111,7 +105,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
         >
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1e293b" }}>
-              Registrar Aplicación de Dosis Rápida
+              {t("modalRapidaTitle")}
             </Typography>
           </Box>
         </Box>
@@ -126,7 +120,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                   variant="body2"
                   sx={{ fontWeight: "bold", color: "#475569", mb: 1 }}
                 >
-                  Nivel de Glucosa (mg/dL)
+                  {t("glucoseLevel")}
                 </Typography>
                 <Box
                   sx={{
@@ -185,7 +179,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                   variant="caption"
                   sx={{ display: "block", textAlign: "center", color: "#94a3b8", mt: 0.5 }}
                 >
-                  Contexto de la Medición
+                  {t("measurementContext")}
                 </Typography>
               </Box>
 
@@ -195,7 +189,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                   variant="body2"
                   sx={{ fontWeight: "bold", color: "#475569", mb: 0.5 }}
                 >
-                  Contexto de Aplicación
+                  {t("applicationContext")}
                 </Typography>
                 <TextField
                   select
@@ -208,12 +202,12 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                   }}
                 >
                   <MenuItem value="">
-                    <em>Seleccionar</em>
+                    <em>{t("selectPlaceholder")}</em>
                   </MenuItem>
-                  <MenuItem value="Desayuno">Antes del Desayuno</MenuItem>
-                  <MenuItem value="Almuerzo">Antes del Almuerzo</MenuItem>
-                  <MenuItem value="Cena">Antes de la Cena</MenuItem>
-                  <MenuItem value="Corrección">Corrección</MenuItem>
+                  <MenuItem value="Desayuno">{t("beforeBreakfast")}</MenuItem>
+                  <MenuItem value="Almuerzo">{t("beforeLunch")}</MenuItem>
+                  <MenuItem value="Cena">{t("beforeDinner")}</MenuItem>
+                  <MenuItem value="Corrección">{t("correction")}</MenuItem>
                 </TextField>
               </Box>
 
@@ -224,7 +218,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                     variant="body2"
                     sx={{ fontWeight: "bold", color: "#475569", mb: 0.5 }}
                   >
-                    Fecha
+                    {t("date")}
                   </Typography>
                   <TextField
                     placeholder="DD/MM/YYYY"
@@ -258,7 +252,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                     variant="body2"
                     sx={{ fontWeight: "bold", color: "#475569", mb: 0.5 }}
                   >
-                    Hora
+                    {t("time")}
                   </Typography>
                   <TextField
                     size="small"
@@ -286,7 +280,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                 }}
               >
                 <Typography variant="body2" sx={{ fontWeight: "bold", color: "#475569" }}>
-                  Zona de Aplicación
+                  {t("applicationZone")}
                 </Typography>
 
                 <Box
@@ -309,7 +303,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                       fontSize: "0.75rem",
                     }}
                   >
-                    FRENTE
+                    {t("front")}
                   </ButtonBase>
 
                   <ButtonBase
@@ -324,7 +318,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                       fontSize: "0.75rem",
                     }}
                   >
-                    ATRÁS
+                    {t("back")}
                   </ButtonBase>
                 </Box>
               </Box>
@@ -390,7 +384,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                     borderRadius: 2,
                   }}
                 >
-                  Guardar Medición
+                  {t("saveMeasurement")}
                 </ButtonBase>
               </Box>
             </Grid>

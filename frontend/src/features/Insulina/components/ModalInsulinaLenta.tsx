@@ -5,6 +5,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState } from "react";
 import { ButtonBase } from "../../../components/ui/Buttons/ButtonBase.tsx";
 import { Modal } from "../../../components/ui/Modals/Modals.tsx";
+import useLanguage from "../../../hooks/useLanguage";
 
 
 interface ModalInsulinaLentaProps {
@@ -13,25 +14,26 @@ interface ModalInsulinaLentaProps {
 }
 
 export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLentaProps) {
+  const { t } = useLanguage("insulina");
   const [unidades, setUnidades] = useState<number>(0);
   const [fecha, setFecha] = useState({ dd: "23", mm: "06", yyyy: "2026" });
   const [hora, setHora] = useState("14:11");
 
   const [vistaCuerpo, setVistaCuerpo] = useState<"FRENTE" | "ATRÁS">("FRENTE");
-  const [zonaSeleccionada, setZonaSeleccionada] = useState<string>("Abdomen Izquierdo");
+  const [zonaSeleccionada, setZonaSeleccionada] = useState<string>(t("zoneAbdomenLeft"));
 
   const zonasFrente = [
-    "Abdomen Derecho",
-    "Abdomen Izquierdo",
-    "Muslo Derecho",
-    "Muslo Izquierdo",
+    t("zoneAbdomenRight"),
+    t("zoneAbdomenLeft"),
+    t("zoneThighRight"),
+    t("zoneThighLeft"),
   ];
   
   const zonasAtras = [
-    "Brazo Derecho",
-    "Brazo Izquierdo",
-    "Glúteo Derecho",
-    "Glúteo Izquierdo",
+    t("zoneArmRight"),
+    t("zoneArmLeft"),
+    t("zoneGluteRight"),
+    t("zoneGluteLeft"),
   ];
 
   const zonasActuales = vistaCuerpo === "FRENTE" ? zonasFrente : zonasAtras;
@@ -70,7 +72,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
         >
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1e293b" }}>
-              Registrar Aplicación de Dosis Lenta
+              {t("modalLentaTitle")}
             </Typography>
             <Box sx={{ textAlign: "right" }}>
             </Box>
@@ -88,7 +90,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                   variant="body2"
                   sx={{ fontWeight: "bold", color: "#475569", mb: 1 }}
                 >
-                  Nivel de Glucosa (mg/dL)
+                  {t("glucoseLevel")}
                 </Typography>
                 <Box
                   sx={{
@@ -147,7 +149,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                   variant="caption"
                   sx={{ display: "block", textAlign: "center", color: "#94a3b8", mt: 0.5 }}
                 >
-                  Contexto de la Medición
+                  {t("measurementContext")}
                 </Typography>
               </Box>
 
@@ -159,7 +161,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                     variant="body2"
                     sx={{ fontWeight: "bold", color: "#475569", mb: 0.5 }}
                   >
-                    Fecha
+                    {t("date")}
                   </Typography>
                   <TextField
                     placeholder="DD/MM/YYYY"
@@ -193,7 +195,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                     variant="body2"
                     sx={{ fontWeight: "bold", color: "#475569", mb: 0.5 }}
                   >
-                    Hora
+                    {t("time")}
                   </Typography>
                   <TextField
                     size="small"
@@ -219,7 +221,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                 }}
               >
                 <Typography variant="body2" sx={{ fontWeight: "bold", color: "#475569" }}>
-                  Frecuencia de Alertas
+                  {t("alertFrequency")}
                 </Typography>
 
                 <Box
@@ -242,7 +244,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                       fontSize: "0.75rem",
                     }}
                   >
-                    FRENTE
+                    {t("front")}
                   </ButtonBase>
 
                   <ButtonBase
@@ -257,7 +259,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                       fontSize: "0.75rem",
                     }}
                   >
-                    ATRÁS
+                    {t("back")}
                   </ButtonBase>
                 </Box>
               </Box>
@@ -322,7 +324,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                     borderRadius: 2,
                   }}
                 >
-                  Guardar Medición
+                  {t("saveMeasurement")}
                 </ButtonBase>
               </Box>
               </Grid>

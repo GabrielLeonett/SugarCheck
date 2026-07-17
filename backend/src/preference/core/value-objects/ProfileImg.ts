@@ -13,7 +13,7 @@ export class ProfileImg {
     // 1. Validar que no sea nulo, undefined o contenga solo espacios
     if (!value || value.trim().length === 0) {
       return Result.fail(
-        new ProfileImgInvalidError('La URL o ruta de la imagen es requerida'),
+        new ProfileImgInvalidError('La URL o ruta de la imagen es requerida').withCode('PROFILE_IMG_REQUIRED', 'profileImg'),
       );
     }
 
@@ -21,7 +21,7 @@ export class ProfileImg {
     // Esto asegura que al menos sea algo como "/a.png" o "http://b.io"
     if (value.trim().length < 5) {
       return Result.fail(
-        new ProfileImgInvalidError('La ruta de la imagen es demasiado corta'),
+        new ProfileImgInvalidError('La ruta de la imagen es demasiado corta').withCode('PROFILE_IMG_TOO_SHORT', 'profileImg'),
       );
     }
 

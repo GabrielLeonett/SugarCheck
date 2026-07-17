@@ -56,7 +56,10 @@ export class LoginFirebaseUser {
     const payload = {
       sub: user.id,
       username: user.username,
+      email: user.email,
       roles: user.roles,
+      fechaNacimiento: user.fechaNacimiento,
+      sexo: user.sexo,
     };
 
     const [at, rt] = await Promise.all([
@@ -71,7 +74,10 @@ export class LoginFirebaseUser {
         id: user.id,
         name: user.name,
         username: user.username,
+        email: user.email,
         roles: user.roles,
+        fechaNacimiento: user.fechaNacimiento,
+        sexo: user.sexo,
       },
     });
   }
