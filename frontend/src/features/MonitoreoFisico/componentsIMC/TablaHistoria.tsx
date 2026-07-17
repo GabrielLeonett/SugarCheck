@@ -29,8 +29,10 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
       <Box 
         sx={{ 
           display: 'flex', 
+          flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between', 
-          alignItems: 'flex-start', 
+          alignItems: { xs: 'stretch', sm: 'flex-start' }, 
+          gap: 1,
           mb: 3 
         }}
       >
@@ -40,7 +42,9 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
             fontWeight: 700, 
             fontSize: '1.1rem',
             maxWidth: '200px',
-            lineHeight: 1.2
+            lineHeight: 1.2,
+            textAlign: { xs: 'center', sm: 'left' },
+            alignSelf: { xs: 'center', sm: 'auto' }
           }}
         >
           {t("chartTitle")}
@@ -50,6 +54,7 @@ export const HistoryChart: React.FC<HistoryChartProps> = ({ records }) => {
           variant="outlined" 
           size="small" 
           sx={{ 
+            alignSelf: { xs: 'center', sm: 'auto' },
             '& .MuiButton-root': {
               borderColor: theme.palette.primary.main,
               color: theme.palette.primary.main,

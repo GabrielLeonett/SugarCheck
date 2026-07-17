@@ -14,7 +14,7 @@ export class LoginUser {
     @Inject('BcryptHasher')
     private readonly Hasher: PasswordHasher,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async run(
     data: { username: string; password: string },
@@ -43,7 +43,10 @@ export class LoginUser {
     const payload = {
       sub: user.id,
       username: user.username,
+      email: user.email,
       roles: user.roles,
+      fechaNacimiento: user.fechaNacimiento,
+      sexo: user.sexo,
     };
 
     const [at, rt] = await Promise.all([
@@ -58,7 +61,10 @@ export class LoginUser {
         id: user.id,
         name: user.name,
         username: user.username,
+        email: user.email,
         roles: user.roles,
+        fechaNacimiento: user.fechaNacimiento,
+        sexo: user.sexo,
       },
     });
   }

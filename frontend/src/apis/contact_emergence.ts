@@ -1,6 +1,4 @@
-import type { AxiosError } from 'axios';
 import { apiPrivate } from './axios';
-import type { BackendErrorResponse } from '../types/types';
 
 export interface ContactEmergenceData {
   id: string;
@@ -12,41 +10,21 @@ export interface ContactEmergenceData {
 
 export const contactEmergenceApi = {
   async getAll(): Promise<ContactEmergenceData[]> {
-    try {
-      const response = await apiPrivate.get('/contact-emergence');
-      return response.data;
-    } catch (error) {
-      const err = error as AxiosError<BackendErrorResponse>;
-      throw new Error(err.response?.data?.message || 'Error al obtener contactos');
-    }
+    const response = await apiPrivate.get('/contact-emergence');
+    return response.data;
   },
 
   async create(data: { name: string; parentesco: string; telefono?: string }): Promise<ContactEmergenceData> {
-    try {
-      const response = await apiPrivate.post('/contact-emergence', data);
-      return response.data;
-    } catch (error) {
-      const err = error as AxiosError<BackendErrorResponse>;
-      throw new Error(err.response?.data?.message || 'Error al crear contacto');
-    }
+    const response = await apiPrivate.post('/contact-emergence', data);
+    return response.data;
   },
 
   async update(id: string, data: { name?: string; parentesco?: string; telefono?: string }): Promise<ContactEmergenceData> {
-    try {
-      const response = await apiPrivate.patch(`/contact-emergence/${id}`, data);
-      return response.data;
-    } catch (error) {
-      const err = error as AxiosError<BackendErrorResponse>;
-      throw new Error(err.response?.data?.message || 'Error al actualizar contacto');
-    }
+    const response = await apiPrivate.patch(`/contact-emergence/${id}`, data);
+    return response.data;
   },
 
   async delete(id: string): Promise<void> {
-    try {
-      await apiPrivate.delete(`/contact-emergence/${id}`);
-    } catch (error) {
-      const err = error as AxiosError<BackendErrorResponse>;
-      throw new Error(err.response?.data?.message || 'Error al eliminar contacto');
-    }
+    await apiPrivate.delete(`/contact-emergence/${id}`);
   },
 };

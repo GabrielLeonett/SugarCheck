@@ -1,0 +1,14 @@
+{
+  "title": "Notificaciones",
+  "markAllAsRead": "Marcar todo como leído",
+  "tabAll": "Todas",
+  "tabUnread": "No leídas",
+  "empty": "No hay notificaciones",
+  "seeAll": "Ver todas las notificaciones",
+  "timeAgo": {
+    "now": "Ahora",
+    "minutes": "Hace {{count}} min",
+    "hours": "Hace {{count}}h",
+    "days": "Hace {{count}}d"
+  }
+}
