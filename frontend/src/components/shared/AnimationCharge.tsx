@@ -28,7 +28,7 @@ export default function AnimationCharge() {
         // 3. Configuramos el intervalo. 
         // 83ms equivale aproximadamente a 12 frames por segundo (1000ms / 12)
         const fps = 22;
-        const intervalTime = 3000 / fps;
+        const intervalTime = 5000 / fps;
 
         const intervalId = setInterval(() => {
             setCurrentFrame((prevFrame) => (prevFrame + 1) % frames.length);

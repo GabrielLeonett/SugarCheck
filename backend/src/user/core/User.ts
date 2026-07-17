@@ -5,10 +5,12 @@ import { UserCreatedAt } from './value-objects/UserCreatedAt';
 import { UserFechaNacimiento } from './value-objects/UserFechaNacimiento';
 import { UserPassword } from './value-objects/UserPassword';
 import { UserSexo } from './value-objects/UserSexo';
+import { UserName } from './value-objects/UserName';
 import { UserId } from '../../shared/core/value-objects/UserId';
 
 interface UserProps {
   id: UserId;
+  name: UserName;
   username: UserUsername;
   password: UserPassword;
   email: UserEmail;
@@ -20,6 +22,7 @@ interface UserProps {
 
 export interface UserPlain {
   id: string;
+  name: string;
   username: string;
   password: string;
   email: string;
@@ -31,6 +34,7 @@ export interface UserPlain {
 
 export class User {
   private readonly _id: UserId;
+  private readonly _name: UserName;
   private _username: UserUsername;
   private readonly _email: UserEmail;
   private readonly _password: UserPassword;
@@ -41,6 +45,7 @@ export class User {
 
   constructor(props: UserProps) {
     this._id = props.id;
+    this._name = props.name;
     this._username = props.username;
     this._password = props.password;
     this._email = props.email;
@@ -52,6 +57,9 @@ export class User {
 
   get id(): UserId {
     return this._id;
+  }
+  get name(): UserName {
+    return this._name;
   }
   get username(): UserUsername {
     return this._username;
@@ -78,6 +86,7 @@ export class User {
   public toPlain(): UserPlain {
     return {
       id: this._id.value,
+      name: this._name.value,
       username: this._username.value,
       email: this._email.value,
       password: this._password.value,

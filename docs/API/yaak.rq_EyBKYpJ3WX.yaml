@@ -1,0 +1,33 @@
+type: http_request
+model: http_request
+id: rq_EyBKYpJ3WX
+createdAt: 2026-07-13T20:53:44.998625200
+updatedAt: 2026-07-13T20:53:48.696929600
+workspaceId: wk_tWcQe25Qgb
+folderId: fl_oGE2bJHqn9
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: ''
+sortPriority: 0.0
+url: https://rates.dolarvzla.com/
+urlParameters: []
+settingSendCookies:
+  enabled: false
+  value: true
+settingStoreCookies:
+  enabled: false
+  value: true
+settingValidateCertificates:
+  enabled: false
+  value: true
+settingFollowRedirects:
+  enabled: false
+  value: true
+settingRequestTimeout:
+  enabled: false
+  value: 0

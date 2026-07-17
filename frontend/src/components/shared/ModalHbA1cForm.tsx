@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { hba1cSchema, type HbA1cData } from '../../schemas/hba1c';
 import { useEffect } from 'react';
+import useLanguage from "../../hooks/useLanguage";
 
 interface ModalHbA1cFormProps {
   open: boolean;
@@ -15,6 +16,8 @@ export default function ModalHbA1cForm({
   onClose,
   onSave,
 }: ModalHbA1cFormProps) {
+  const { t } = useLanguage("hba1c");
+
   const {
     register,
     handleSubmit,
@@ -73,7 +76,7 @@ export default function ModalHbA1cForm({
           color="primary.dark"
           sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}
         >
-          Registrar Resultado HbA1c
+          {t("modalTitle")}
         </Typography>
 
         <TextField
@@ -81,7 +84,7 @@ export default function ModalHbA1cForm({
           fullWidth
           margin="normal"
           id="hba1c-level"
-          label="Resultado del Laboratorio (%)"
+          label={t("resultLabel")}
           type="number"
           error={!!errors.resultadoHbA1c}
           helperText={errors.resultadoHbA1c?.message}
@@ -91,7 +94,7 @@ export default function ModalHbA1cForm({
           {...register('fecha')}
           fullWidth
           margin="normal"
-          label="Fecha del Análisis"
+          label={t("dateLabel")}
           type="date"
           slotProps={{ inputLabel: { shrink: true } }}
           error={!!errors.fecha}
@@ -105,7 +108,7 @@ export default function ModalHbA1cForm({
           color="primary"
           fullWidth
         >
-          Guardar Resultado
+          {t("saveButton")}
         </Button>
       </Box>
     </Modal>

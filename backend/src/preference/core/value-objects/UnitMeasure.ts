@@ -20,7 +20,7 @@ export class UnitMeasure {
     if (!allowedUnits.includes(cleanValue)) {
       return Result.fail(new ConfigUnitInvalidError(
         `La unidad '${cleanValue}' no es válida. Use: ${allowedUnits.join(' o ')}`
-      ));
+      ).withCode('UNIT_INVALID', 'unitMeasure'));
     }
 
     // Usamos "as" para asegurar a TS que el string ya fue validado
