@@ -63,7 +63,7 @@ export default function Login() {
                 message = error.message;
             }
 
-            setAuthError({ message });
+            setAuthError({ message, statusCode: 0 });
         } finally {
             setIsSubmitting(false);
         }
@@ -248,9 +248,9 @@ export default function Login() {
                                         navigate("/");
                                     } catch (err: unknown) {
                                         if (axios.isAxiosError(err)) {
-                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError") });
+                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError"), statusCode: 0 });
                                         } else {
-                                            setAuthError({ message: t("errors.unknownError") });
+                                            setAuthError({ message: t("errors.unknownError"), statusCode: 0 });
                                         }
                                     } finally {
                                         setIsSubmitting(false);
@@ -287,9 +287,9 @@ export default function Login() {
                                         navigate("/");
                                     } catch (err: unknown) {
                                         if (axios.isAxiosError(err)) {
-                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError") });
+                                            setAuthError({ message: err.response?.data.message || t("errors.unknownError"), statusCode: 0 });
                                         } else {
-                                            setAuthError({ message: t("errors.unknownError") });
+                                            setAuthError({ message: t("errors.unknownError"), statusCode: 0 });
                                         }
                                     } finally {
                                         setIsSubmitting(false);
