@@ -63,7 +63,7 @@ export class FirestoreNotificationRepository implements NotificationRepository {
 
       return Result.ok(notifications);
     } catch (error) {
-      return Result.fail(new DatabaseError('Error al obtener notificaciones', error instanceof Error ? error.stack : undefined));
+      return Result.fail(new DatabaseError(error instanceof Error ? error.message : 'Error al obtener notificaciones', error instanceof Error ? error.stack : undefined));
     }
   }
 
