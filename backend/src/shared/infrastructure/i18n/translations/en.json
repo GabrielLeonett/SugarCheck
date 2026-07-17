@@ -48,6 +48,14 @@
   "EMAIL_UPDATED": "Email updated successfully",
   "PREFERENCES_FETCHED": "Preferences fetched successfully",
   "PREFERENCES_SAVED": "Preferences saved successfully",
+  "IMC_CREATION_TITLE": "New BMI record",
+  "IMC_CREATION_MESSAGE": "You registered a new BMI of {{value}} - {{category}}",
+  "IMC_REMINDER_TITLE": "BMI reminder",
+  "IMC_REMINDER_MESSAGE": "You haven't recorded your weight today. Keep your log up to date.",
+  "IMC_CATEGORY_UNDERWEIGHT": "Underweight",
+  "IMC_CATEGORY_NORMAL": "Normal",
+  "IMC_CATEGORY_OVERWEIGHT": "Overweight",
+
   "NOTIFICATION_MARKED_READ": "Notification marked as read",
   "NOTIFICATIONS_ALL_READ": "All notifications marked as read",
 

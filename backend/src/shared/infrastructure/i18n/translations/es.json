@@ -48,6 +48,14 @@
   "EMAIL_UPDATED": "Correo electrónico actualizado correctamente",
   "PREFERENCES_FETCHED": "Preferencias obtenidas exitosamente",
   "PREFERENCES_SAVED": "Preferencias guardadas exitosamente",
+  "IMC_CREATION_TITLE": "Nuevo registro de IMC",
+  "IMC_CREATION_MESSAGE": "Has registrado un nuevo IMC de {{value}} - {{category}}",
+  "IMC_REMINDER_TITLE": "Recordatorio de IMC",
+  "IMC_REMINDER_MESSAGE": "No has registrado tu peso hoy. Mantén tu bitácora al día.",
+  "IMC_CATEGORY_UNDERWEIGHT": "Bajo peso",
+  "IMC_CATEGORY_NORMAL": "Normal",
+  "IMC_CATEGORY_OVERWEIGHT": "Sobrepeso",
+
   "NOTIFICATION_MARKED_READ": "Notificación marcada como leída",
   "NOTIFICATIONS_ALL_READ": "Todas las notificaciones marcadas como leídas",
 

@@ -48,6 +48,14 @@
   "EMAIL_UPDATED": "メールアドレスが正常に更新されました",
   "PREFERENCES_FETCHED": "設定が正常に取得されました",
   "PREFERENCES_SAVED": "設定が正常に保存されました",
+  "IMC_CREATION_TITLE": "新しいBMI記録",
+  "IMC_CREATION_MESSAGE": "新しいBMI {{value}} - {{category}} を記録しました",
+  "IMC_REMINDER_TITLE": "BMIリマインダー",
+  "IMC_REMINDER_MESSAGE": "今日の体重がまだ記録されていません。ログを更新してください。",
+  "IMC_CATEGORY_UNDERWEIGHT": "フォーサー",
+  "IMC_CATEGORY_NORMAL": "標準",
+  "IMC_CATEGORY_OVERWEIGHT": "オーバー",
+
   "NOTIFICATION_MARKED_READ": "通知を既読としてマークしました",
   "NOTIFICATIONS_ALL_READ": "すべての通知を既読としてマークしました",
 
