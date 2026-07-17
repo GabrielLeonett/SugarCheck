@@ -19,7 +19,7 @@ export class UserRoles {
     // 1. Validar que no sea un array vacío (regla de negocio opcional)
     if (!values || values.length === 0) {
       return Result.fail(
-        new UserRoleInvalidError('El usuario debe tener al menos un rol.'),
+        new UserRoleInvalidError('El usuario debe tener al menos un rol.').withCode('ROLE_REQUIRED', 'roles'),
       );
     }
 
@@ -29,7 +29,7 @@ export class UserRoles {
         return Result.fail(
           new UserRoleInvalidError(
             `El rol "${role}" no es válido. Opciones: ${validRoles.join(', ')}`,
-          ),
+          ).withCode('ROLE_INVALID', 'roles'),
         );
       }
     }

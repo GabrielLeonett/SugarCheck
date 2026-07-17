@@ -107,11 +107,11 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
         {/* Columna Derecha: Gráfico con Filtros e Historial */}
         <Grid size={{ xs: 12, md: 7 }}>
           <CardBase sx={{ display: 'flex', flexDirection: 'column', minHeight: 560, height: '100%', p: 3 }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-              <Typography variant="h6" color="primary.dark" sx={{ fontWeight: 600 }}>
+            <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, justifyContent: "space-between", alignItems: { xs: 'stretch', sm: 'center' }, gap: 1, mb: 3 }}>
+              <Typography variant="h6" color="primary.dark" sx={{ fontWeight: 600, textAlign: { xs: 'center', sm: 'left' } }}>
                 {t('grafico.title')}
               </Typography>
-              <ButtonGroup variant="outlined" size="small" aria-label="Filtros de glucosa">
+              <ButtonGroup variant="outlined" size="small" aria-label="Filtros de glucosa" sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
                 <Button 
                   onClick={() => { dataHook.setFiltroGlucosa('hoy'); dataHook.setPageGlucosa(0); }}
                   variant={dataHook.filtroGlucosa === 'hoy' ? 'contained' : 'outlined'}

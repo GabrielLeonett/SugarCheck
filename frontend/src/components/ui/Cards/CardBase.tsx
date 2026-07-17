@@ -25,6 +25,8 @@ export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | '
   bgColor?: string;
   borderColor?: string;
   sx?: SxProps<Theme>;
+  component?: React.ElementType;
+  onSubmit?: React.FormEventHandler<HTMLFormElement>;
 }
 
 export function CardBase({
@@ -38,7 +40,8 @@ export function CardBase({
   headerAction,
   actions,
   children,
-  sx
+  sx,
+  ...rest
 }: CustomCardProps) {
 
   return (
@@ -46,6 +49,7 @@ export function CardBase({
       variant={variant}
       elevation={variant === 'elevation' ? elevation : 0}
       sx={{ ...sx}}
+      {...rest}
     >
       {(title || subtitle || avatar || headerAction) && (
         <CardHeader

@@ -5,7 +5,7 @@
     "evolutionTitle": "Evolução Física",
     "weightDiff": "Diferença de Peso",
     "heightGrowth": "Crescimento Alcançado",
-    "dateDesc": "Evolução em relação ao registro anterior ({date}).",
+    "evolutionDesc": "Evolução em relação ao registro anterior ({date}).",
     "modalTitle": "Registrar Novas Medidas",
     "weightLabel": "Peso",
     "heightLabel": "Altura",
@@ -19,10 +19,14 @@
     "tableEstatura": "Altura (cm)",
     "tableImc": "IMC",
     "tableEstado": "Estado",
+    "statusUnderweight": "Abaixo do peso",
+    "statusNormal": "Normal",
+    "statusOverweight": "Sobrepeso",
     "chartTitle": "Histórico de Força Física",
     "filterAll": "TODOS",
     "filterQuarter": "TRIMESTRE",
     "filterYear": "ANO",
     "rowsPerPage": "Linhas por página:",
-    "displayedRows": "{from}-{to} de {count}"
+    "displayedRows": "{from}-{to} de {count}",
+    "loading": "Carregando..."
 }

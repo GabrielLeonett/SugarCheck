@@ -39,9 +39,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({ type, currentImc, evolut
         </Box>
         
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, fontWeight: (currentImc && currentImc < 18.5) ? 700 : 400 }}>Bajo peso</Typography>
-          <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, fontWeight: (currentImc && currentImc >= 18.5 && currentImc < 25) ? 700 : 400 }}>Normal</Typography>
-          <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, fontWeight: (currentImc && currentImc >= 25) ? 700 : 400 }}>Sobrepeso</Typography>
+          <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, fontWeight: (currentImc && currentImc < 18.5) ? 700 : 400 }}>{t("statusUnderweight")}</Typography>
+          <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, fontWeight: (currentImc && currentImc >= 18.5 && currentImc < 25) ? 700 : 400 }}>{t("statusNormal")}</Typography>
+          <Typography sx={{ fontSize: '0.75rem', color: theme.palette.text.secondary, fontWeight: (currentImc && currentImc >= 25) ? 700 : 400 }}>{t("statusOverweight")}</Typography>
         </Box>
       </CardBase>
     );
