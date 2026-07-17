@@ -19,6 +19,7 @@ model User {
   
   preference      Preference? 
   contactEmergences ContactEmergence[]
+  imcRecords        Imc[]
 }
 
 model Preference {
@@ -40,6 +41,19 @@ model ContactEmergence {
   telefono    String?
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Imc {
+  id        String   @id @default(uuid())
+  userId    String
+  peso      Float
+  altura    Float
+  imcValue  Float
+  fecha     DateTime
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
