@@ -1,8 +1,7 @@
-import { IconButton, AppBar, Box, Toolbar, Typography, Avatar, Badge } from "@mui/material";
+import { IconButton, AppBar, Box, Toolbar, Typography, Avatar } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import NotificationIcon from "@mui/icons-material/Notifications";
 import type { NavItemWithSubmenu } from "../../../types/types";
 
 // ✅ Import correcto del contexto
@@ -14,6 +13,7 @@ import ProfileNavBar from "../../ui/Cards/ProfileNavBar";
 import { useNavbar } from "../../../hooks/useNavbar";
 import { usePreferenceConfig } from "../../../hooks/usePreferenceConfig";
 import { AVATAR_MAP } from "../../../constants/avatars";
+import NotificationsDropdown from "../../shared/NotificationsDropdown";
 
 
 function Navbar() {
@@ -42,9 +42,9 @@ function Navbar() {
             px: { xs: 2, sm: 3, md: 4 },
           }}
         >
-          <Box component={'a'} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none' }} href="/">
+          <Box component={'a'} sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1.5 }, textDecoration: 'none' }} href="/">
             <Logo />
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{ display: { xs: 'none', sm: 'flex' }, flexDirection: 'column', alignItems: 'center' }}>
               <Typography
                 variant="h6"
                 sx={{
@@ -94,9 +94,7 @@ function Navbar() {
               p: 1,
             }}
           >
-            <Badge badgeContent={4} color="secondary">
-              <NotificationIcon />
-            </Badge>
+            <NotificationsDropdown />
             <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => setProfileMenuOpen(!profileMenuOpen)}>
               <Avatar alt="User" src={avatarSrc} children={userInitials} sx={{
                 "&:hover": {

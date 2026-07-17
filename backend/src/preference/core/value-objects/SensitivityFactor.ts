@@ -15,14 +15,14 @@ export class SensitivityFactor {
     // 1. Validar que el valor sea un número y no sea nulo/undefined
     if (value === null || value === undefined) {
       return Result.fail(
-        new SensitivityInvalidError('El factor de sensibilidad es requerido'),
+        new SensitivityInvalidError('El factor de sensibilidad es requerido').withCode('SENSITIVITY_REQUIRED', 'sensitivity'),
       );
     }
 
     // 2. Regla de negocio: El factor de sensibilidad suele ser positivo
     if (value <= 0) {
       return Result.fail(
-        new SensitivityInvalidError('El factor de sensibilidad debe ser mayor a cero'),
+        new SensitivityInvalidError('El factor de sensibilidad debe ser mayor a cero').withCode('SENSITIVITY_POSITIVE', 'sensitivity'),
       );
     }
 

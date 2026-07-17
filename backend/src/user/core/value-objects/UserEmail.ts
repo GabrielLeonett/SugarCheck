@@ -21,7 +21,7 @@ export class UserEmail {
       return Result.fail(
         new UserEmailInvalidError(
           `El correo "${email}" no tiene un formato válido`,
-        ),
+        ).withCode('EMAIL_INVALID_FORMAT', 'email'),
       );
     }
 

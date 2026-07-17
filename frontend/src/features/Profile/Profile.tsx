@@ -16,7 +16,7 @@ import {
     Modal,
     Alert,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Navbar from "../../components/layout/Header/Navbar";
@@ -30,6 +30,7 @@ import { useAuthStore } from "../../stores/authStore";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateField } from '@mui/x-date-pickers/DateField';
+import dayjs from 'dayjs';
 import { ButtonBase } from "../../components/ui/Buttons/ButtonBase";
 import NumberSpinner from "../../components/ui/NumberSpinner";
 import { apiPrivate } from "../../apis/axios";
@@ -62,10 +63,17 @@ export function Profile() {
     const {
         register: registerPersonal,
         handleSubmit: handleSubmitPersonal,
+        control: controlPersonal,
         formState: { errors: errorsPersonal },
     } = useForm<ProfilePersonalData>({
         resolver: zodResolver(profilePersonalSchema),
         mode: "onChange",
+        defaultValues: {
+            fechaNacimiento: authUser?.fechaNacimiento
+                ? new Date(authUser.fechaNacimiento).toISOString()
+                : undefined,
+            sexo: (authUser?.sexo as "masculino" | "femenino") || undefined,
+        },
     });
 
     const {
@@ -114,6 +122,7 @@ export function Profile() {
                 name: data.username || undefined,
                 email: data.email || undefined,
                 sexo: data.sexo || undefined,
+                fechaNacimiento: data.fechaNacimiento ? new Date(data.fechaNacimiento) : undefined,
             });
             setMsg({ type: 'success', text: tp("guardadoExitoPersonal") });
         } catch (error) {
@@ -207,7 +216,7 @@ export function Profile() {
                     </Alert>
                 )}
                 <Grid container spacing={4} sx={{ mx: "auto", maxWidth: 'lg' }}>
-                    <Grid size={4}>
+                    <Grid size={{ xs: 12, md: 4 }}>
                         <CardBase elevation={4} sx={{ p: 3, borderRadius: 3, textAlign: "center" }}>
                             <Box sx={{ mb: 4, display: "flex", flexDirection: "column", alignItems: "center" }}>
                                 <AvatarProfile />
@@ -242,7 +251,7 @@ export function Profile() {
                         </CardBase>
                     </Grid>
 
-                    <Grid size={8}>
+                    <Grid size={{ xs: 12, md: 8 }}>
                         <Typography variant="h4" sx={{ my: 4 }}>{tp("profileTitle")}</Typography>
 
                         <Accordion defaultExpanded sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
@@ -266,7 +275,26 @@ export function Profile() {
                                     <Grid size={12}>
                                         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("birthDateLabel")}</Typography>
                                         <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DateField fullWidth label={tp("birthDateLabel")} />
+                                            <Controller
+                                                name="fechaNacimiento"
+                                                control={controlPersonal}
+                                                render={({ field: { onChange, value, ...rest } }) => (
+                                                    <DateField
+                                                        {...rest}
+                                                        fullWidth
+                                                        label={tp("birthDateLabel")}
+                                                        format="DD/MM/YYYY"
+                                                        value={value ? dayjs(value) : null}
+                                                        onChange={(newValue) => onChange(newValue ? newValue.toISOString() : '')}
+                                                        slotProps={{
+                                                            textField: {
+                                                                error: !!errorsPersonal.fechaNacimiento,
+                                                                helperText: errorsPersonal.fechaNacimiento?.message,
+                                                            }
+                                                        }}
+                                                    />
+                                                )}
+                                            />
                                         </LocalizationProvider>
                                     </Grid>
                                     <Grid size={12}>
@@ -458,7 +486,7 @@ export function Profile() {
                         </Accordion>
 
                         <Modal open={openContactModal} onClose={() => setOpenContactModal(false)}>
-                            <Paper sx={{ p: 4, maxWidth: 400, mx: 'auto', mt: '20vh' }}>
+                            <Paper sx={{ p: { xs: 2, sm: 4 }, maxWidth: 400, mx: { xs: 2, sm: 'auto' }, mt: { xs: '10vh', sm: '20vh' } }}>
                                 <Typography variant="h6" sx={{ mb: 2 }}>{editingContact ? tp("editContact") : tp("addContact")}</Typography>
                                 <TextField
                                     {...registerContact('name')}
@@ -517,7 +545,7 @@ export function Profile() {
                             </ButtonBase>
                             <Typography variant="caption" sx={{ color: "#718096" }}>{tp("deleteWarning")}</Typography>
                             <Modal open={openConfirm} onClose={() => setOpenConfirm(false)}>
-                                <Paper sx={{ p: 4, maxWidth: 400, mx: 'auto', mt: '20vh' }}>
+                                <Paper sx={{ p: { xs: 2, sm: 4 }, maxWidth: 400, mx: { xs: 2, sm: 'auto' }, mt: { xs: '10vh', sm: '20vh' } }}>
                                     <Typography variant="h6" color="error">{tp("deleteConfirmTitle")}</Typography>
                                     <Typography sx={{ my: 2 }}>{tp("deleteConfirmDesc")}</Typography>
                                     <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>

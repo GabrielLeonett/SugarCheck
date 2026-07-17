@@ -1,7 +1,30 @@
-import axios from 'axios';
+import axios, { type AxiosError } from 'axios';
 import { useAuthStore } from '../stores/authStore';
+import { ApiError } from './api-error';
+import type { BackendErrorResponse } from '../types/types';
+import i18n from '../stores/i18n';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
+
+function addLanguageHeader(config: any) {
+  if (config.headers) {
+    config.headers['Accept-Language'] = i18n.language || 'es';
+  }
+  return config;
+}
+
+function handleResponseError(error: AxiosError<BackendErrorResponse>) {
+  const data = error.response?.data;
+
+  const apiError = new ApiError(
+    data?.message || error.message || 'Error inesperado',
+    data?.code || 'UNKNOWN_ERROR',
+    data?.field,
+    data?.statusCode || error.response?.status || 500,
+  );
+
+  return Promise.reject(apiError);
+}
 
 export const apiPrivate = axios.create({
   baseURL: BASE_URL,
@@ -14,25 +37,22 @@ export const apiPublic = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Interceptor de Petición: Inyecta el token dinámicamente desde el store
 apiPrivate.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().accessToken;
     if (token && !config.headers['Authorization']) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    return config;
+    return addLanguageHeader(config);
   },
   (error) => Promise.reject(error)
 );
 
-// Interceptor de Respuesta: Maneja el error 401 y renueva el token
 apiPrivate.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  async (error: AxiosError<BackendErrorResponse>) => {
     const prevRequest = error?.config;
 
-    // No reintentar si la petición que falló es el propio refresh (evita bucle infinito)
     if (
       error?.response?.status === 401 &&
       !prevRequest?.sent &&
@@ -49,7 +69,17 @@ apiPrivate.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-    return Promise.reject(error);
+
+    return handleResponseError(error);
   }
 );
 
+apiPublic.interceptors.request.use(
+  (config) => addLanguageHeader(config),
+  (error) => Promise.reject(error)
+);
+
+apiPublic.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<BackendErrorResponse>) => handleResponseError(error)
+);
