@@ -64,7 +64,7 @@ export default function ResetPassword() {
                 message = error.message;
             }
 
-            setAuthError({ message });
+            setAuthError({ message, statusCode: 0 });
         } finally {
             setIsSubmitting(false);
         }
