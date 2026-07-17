@@ -10,6 +10,7 @@ import { Fecha } from '../core/value-objects/Fecha';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
 import { CreateNotification } from '../../notification/app/CreateNotification';
 import { DrasticWeightChangeError } from '../core/errors/DrasticWeightChangeError';
+import { FechaInvalidaError } from '../core/errors/FechaInvalidError';
 
 const MAX_WEIGHT_CHANGE_KG = 5;
 const CATEGORY_KEYS: Record<string, string> = {
@@ -49,6 +50,14 @@ export class CreateImc {
 
     const fechaRes = Fecha.crear(data.dia, data.mes, data.anio);
     if (!fechaRes.isValid) return Result.fail(fechaRes.getError());
+
+    const now = new Date();
+    const hoy = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (fechaRes.getValue().valor > hoy) {
+      return Result.fail(
+        new FechaInvalidaError('La fecha no puede ser posterior al día de hoy'),
+      );
+    }
 
     const lastImcResult = await this.repository.getAllByUserId(userIdRes.getValue());
     if (lastImcResult.isValid) {
