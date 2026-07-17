@@ -174,7 +174,7 @@ export default function Home() {
                 {t("cards.battleHistory.title")}
               </Typography>
 
-              <Box sx={{ width: '100%', height: 'fit-content' }}>
+              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                 <LineChart
                   xAxis={[{
                     data: ObtenerDiasOrdenados(),
@@ -182,7 +182,7 @@ export default function Home() {
                   }]}
                   yAxis={[{
                     min: 50,
-                    max: 200,
+                    max: 500,
                   }]}
                   series={[
                     {
@@ -191,7 +191,7 @@ export default function Home() {
                       showMark: true,
                     },
                   ]}
-                  height={200}
+                  height={500}
                   margin={{ left: 50, right: 20, top: 20, bottom: 30 }}
                 />
               </Box>

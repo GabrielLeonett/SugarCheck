@@ -8,11 +8,21 @@ import { Peso } from '../core/value-objects/peso';
 import { Altura } from '../core/value-objects/altura';
 import { Fecha } from '../core/value-objects/Fecha';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
+import { CreateNotification } from '../../notification/app/CreateNotification';
+import { getImcNotifText } from '../core/imc-notification-translations';
+
+const CATEGORY_TRANSLATIONS: Record<string, Record<string, string>> = {
+  es: { underweight: 'Bajo peso', normal: 'Normal', overweight: 'Sobrepeso' },
+  en: { underweight: 'Underweight', normal: 'Normal', overweight: 'Overweight' },
+  pt: { underweight: 'Abaixo do peso', normal: 'Normal', overweight: 'Sobrepeso' },
+  ja: { underweight: '\u30d5\u30a9\u30fc\u30b5\u30fc', normal: '\u6a19\u6e96', overweight: '\u30aa\u30fc\u30d0\u30fc' },
+};
 
 export class CreateImc {
   constructor(
     private readonly repository: ImcRepository,
     private readonly generateUUID: GenerateUUIDInterface,
+    private readonly createNotification: CreateNotification,
   ) {}
 
   public async run(data: {
@@ -22,6 +32,7 @@ export class CreateImc {
     dia: number;
     mes: number;
     anio: number;
+    lang?: string;
   }): Promise<Result<Imc, ErrorAbstract>> {
     const id = this.generateUUID.run();
     const idRes = Id_IMC.create(id);
@@ -47,6 +58,30 @@ export class CreateImc {
       fecha: fechaRes.getValue(),
     });
 
-    return await this.repository.save(imc);
+    const saveResult = await this.repository.save(imc);
+    if (!saveResult.isValid) return saveResult;
+
+    const imcValue = saveResult.getValue().toPlain().imcValue;
+    const lang = data.lang || 'es';
+    const cats = CATEGORY_TRANSLATIONS[lang] || CATEGORY_TRANSLATIONS.es;
+    let catKey = 'normal';
+    if (imcValue < 18.5) catKey = 'underweight';
+    else if (imcValue >= 25) catKey = 'overweight';
+
+    const notifResult = await this.createNotification.run({
+      userId: data.userId,
+      type: 'info',
+      title: getImcNotifText(lang, 'creationTitle'),
+      message: getImcNotifText(lang, 'creationMessage', {
+        value: imcValue.toFixed(1),
+        category: cats[catKey],
+      }),
+      link: '/bitacora/monitoreo-fisico',
+    });
+    if (!notifResult.isValid) {
+      console.warn('Notificación IMC no creada:', notifResult.getError().message);
+    }
+
+    return saveResult;
   }
 }

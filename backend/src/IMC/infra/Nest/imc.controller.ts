@@ -25,6 +25,7 @@ import { CreateImcDTO } from './DTOs/create-imc.dto';
 import { UpdateImcDTO } from './DTOs/update-imc.dto';
 import { ImcNotFoundError } from '../../core/errors/ImcNotFoundError';
 import { ErrorAbstract } from '../../../shared/error-abstract';
+import { TranslationService } from '../../../shared/infrastructure/i18n/translation.service';
 
 @Controller('imc')
 @UseGuards(AuthGuard)
@@ -40,6 +41,7 @@ export class ImcController {
     private readonly updateImc: UpdateImc,
     @Inject('DeleteImc')
     private readonly deleteImc: DeleteImc,
+    private readonly translationService: TranslationService,
   ) {}
 
   @Get()
@@ -67,6 +69,7 @@ export class ImcController {
   @Post()
   async create(@Request() req: any, @Body() body: CreateImcDTO) {
     const userId = req.user.sub;
+    const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     const result = await this.createImc.run({
       userId,
       peso: body.peso,
@@ -74,6 +77,7 @@ export class ImcController {
       dia: body.dia,
       mes: body.mes,
       anio: body.anio,
+      lang,
     });
     if (!result.isValid) {
       throw new HttpException(result.getError().message, HttpStatus.BAD_REQUEST);

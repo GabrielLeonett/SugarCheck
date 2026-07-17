@@ -57,11 +57,18 @@ export default function NotificationsDropdown() {
   const theme = useTheme();
   const navigate = useNavigate();
   const { t } = useLanguage("notifications");
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotificationStore();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, fetchNotifications, fetchUnreadCount, connectSocket, disconnectSocket } = useNotificationStore();
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const ref = useRef<HTMLDivElement>(null);
   const getTimeAgo = useTimeAgo();
+
+  useEffect(() => {
+    fetchNotifications();
+    fetchUnreadCount();
+    connectSocket();
+    return () => { disconnectSocket(); };
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
