@@ -1,16 +1,19 @@
 import AddIcon from '@mui/icons-material/Add';
-import { 
-  Box, Typography, Grid, LinearProgress, Table, TableBody, TableCell, 
-  TableContainer, TableHead, TableRow, Paper, TablePagination, Button, ButtonGroup 
+import {
+  Box, Typography, Grid, LinearProgress, Button, ButtonGroup,
 } from '@mui/material';
-import { LineChart } from '@mui/x-charts/LineChart';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
 import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
 import ModalGlucosaForm from '../../../components/shared/ModalGlucosaForm.tsx';
+import HistorialTable from '../../../components/shared/HistorialTable';
+import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
+import { GraficoLinea } from '../../../components/shared/GraficoLinea';
 import { obtenerColorEstado } from '../../../hooks/useGlucosaData.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 
 import type { GlucosaData } from '../../../schemas/glucosa';
+import type { GlucosaRecord } from '../../../data/recordsMock';
+import type { Column } from '../../../components/shared/HistorialTable';
 
 interface SeccionGlucemiaProps {
   dataHook: any;
@@ -19,6 +22,44 @@ interface SeccionGlucemiaProps {
 
 export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProps) {
   const { t } = useLanguage("glucemia");
+
+  const columns: Column<GlucosaRecord>[] = [
+    { key: 'hora', label: t('tabla.headers.hora'), render: (row) => row.hora },
+    { key: 'nivel', label: t('tabla.headers.nivel'), render: (row) => row.nivel },
+    { key: 'contexto', label: t('tabla.headers.contexto'), render: (row) => row.contexto },
+    {
+      key: 'estado', label: t('tabla.headers.estado'),
+      render: (row) => (
+        <Box sx={{ fontWeight: 700, color: obtenerColorEstado(row.estado) }}>
+          {row.estado}
+        </Box>
+      ),
+    },
+  ];
+
+  const chartComponent = (
+    <GraficoLinea
+      data={dataHook.nivelesGlucosa}
+      labels={dataHook.horasGlucosa}
+      color="#94c2e6"
+      label={t('grafico.labelSerie')}
+      emptyMessage={t('grafico.sinDatos')}
+    />
+  );
+
+  const filterComponent = (
+    <ButtonGroup variant="outlined" size="small" aria-label={t('grafico.filtros.ariaLabel')} sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
+      {(['hoy', 'semana', 'mes'] as const).map((filtro) => (
+        <Button
+          key={filtro}
+          onClick={() => { dataHook.setFiltroGlucosa(filtro); dataHook.setPageGlucosa(0); }}
+          variant={dataHook.filtroGlucosa === filtro ? 'contained' : 'outlined'}
+        >
+          {t(`grafico.filtros.${filtro}`)}
+        </Button>
+      ))}
+    </ButtonGroup>
+  );
 
   return (
     <Box component="section" sx={{ mb: 6 }}>
@@ -52,7 +93,6 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
                 {t('zonaSegura.caption')}
               </Typography>
               <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "error.light" }}>
-                {/* Lógica condicional dinámica basada en los rangos clínicos */}
                 {dataHook.porcentajeZonaSegura < 50 ? t('zonaSegura.alertaBaja') : t('zonaSegura.alertaNormal')}
               </Typography>
             </CardBase>
@@ -106,104 +146,29 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
 
         {/* Columna Derecha: Gráfico con Filtros e Historial */}
         <Grid size={{ xs: 12, md: 7 }}>
-          <CardBase sx={{ display: 'flex', flexDirection: 'column', minHeight: 560, height: '100%', p: 3 }}>
-            <Box sx={{ display: "flex", flexDirection: { xs: 'column', sm: 'row' }, justifyContent: "space-between", alignItems: { xs: 'stretch', sm: 'center' }, gap: 1, mb: 3 }}>
-              <Typography variant="h6" color="primary.dark" sx={{ fontWeight: 600, textAlign: { xs: 'center', sm: 'left' } }}>
-                {t('grafico.title')}
-              </Typography>
-              <ButtonGroup variant="outlined" size="small" aria-label="Filtros de glucosa" sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
-                <Button 
-                  onClick={() => { dataHook.setFiltroGlucosa('hoy'); dataHook.setPageGlucosa(0); }}
-                  variant={dataHook.filtroGlucosa === 'hoy' ? 'contained' : 'outlined'}
-                >
-                  {t('grafico.filtros.hoy')}
-                </Button>
-                <Button 
-                  onClick={() => { dataHook.setFiltroGlucosa('semana'); dataHook.setPageGlucosa(0); }}
-                  variant={dataHook.filtroGlucosa === 'semana' ? 'contained' : 'outlined'}
-                >
-                  {t('grafico.filtros.semana')}
-                </Button>
-                <Button 
-                  onClick={() => { dataHook.setFiltroGlucosa('mes'); dataHook.setPageGlucosa(0); }}
-                  variant={dataHook.filtroGlucosa === 'mes' ? 'contained' : 'outlined'}
-                >
-                  {t('grafico.filtros.mes')}
-                </Button>
-              </ButtonGroup>
-            </Box>
-            
-            <Box sx={{ flexGrow: 1, width: '100%', height: 220, mb: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              {dataHook.nivelesGlucosa.length > 0 ? (
-                <LineChart
-                  xAxis={[{ scaleType: 'point', data: dataHook.horasGlucosa }]}
-                  series={[{ data: dataHook.nivelesGlucosa, label: t('grafico.labelSerie'), color: '#94c2e6', curve: 'catmullRom' }]}
-                  sx={{
-                    '& .MuiLineElement-root': { strokeWidth: 2 },
-                    '& .MuiMarkElement-root': { stroke: '#94c2e6', strokeWidth: 2, fill: '#ffffff', scale: '1.1' }
-                  }}
-                  height={220}
-                  margin={{ top: 20, bottom: 30, left: 0, right: 40 }}
-                />
-              ) : (
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                  <Typography variant="body2" color="text.secondary">{t('grafico.sinDatos')}</Typography>
-                </Box>
-              )}
-            </Box>
-
-            <Typography variant="h6" color="primary.dark" sx={{ fontWeight: 600, my: 3 }}>
-              {t('tabla.title')}
-            </Typography>
-
-            <TableContainer component={Paper} variant="outlined" sx={{ mb: 1, borderColor: 'divider' }}>
-              <Table size="small" aria-label="tabla de glucosa">
-                <TableHead sx={{ bgcolor: 'primary.main' }}>
-                  <TableRow>
-                    <TableCell sx={{ color: '#fff', fontWeight: 700 }}>{t('tabla.headers.hora')}</TableCell>
-                    <TableCell sx={{ color: '#fff', fontWeight: 700 }}>{t('tabla.headers.nivel')}</TableCell>
-                    <TableCell sx={{ color: '#fff', fontWeight: 700 }}>{t('tabla.headers.contexto')}</TableCell>
-                    <TableCell sx={{ color: '#fff', fontWeight: 700 }}>{t('tabla.headers.estado')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {[...dataHook.glucosaFiltrada].reverse()
-                    .slice(dataHook.pageGlucosa * dataHook.rowsPerPageGlucosa, dataHook.pageGlucosa * dataHook.rowsPerPageGlucosa + dataHook.rowsPerPageGlucosa)
-                    .map((row) => (
-                      <TableRow key={row.id} hover>
-                        <TableCell sx={{ color: 'text.secondary' }}>{row.hora}</TableCell>
-                        <TableCell sx={{ color: 'text.secondary' }}>{row.nivel}</TableCell>
-                        <TableCell sx={{ color: 'text.secondary' }}>{row.contexto}</TableCell>
-                        <TableCell sx={{ fontWeight: 700, color: obtenerColorEstado(row.estado) }}>
-                          {row.estado}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  {dataHook.glucosaFiltrada.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={4} align="center" sx={{ color: 'text.secondary', py: 3 }}>
-                        {t('tabla.sinDatos')}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            
-            <TablePagination
-              rowsPerPageOptions={[4, 10, 25]}
-              component="div"
-              count={dataHook.glucosaFiltrada.length}
-              rowsPerPage={dataHook.rowsPerPageGlucosa}
-              page={dataHook.pageGlucosa}
-              onPageChange={(_, newPage) => dataHook.setPageGlucosa(newPage)}
-              onRowsPerPageChange={(e) => {
-                dataHook.setRowsPerPageGlucosa(parseInt(e.target.value, 10));
-                dataHook.setPageGlucosa(0);
-              }}
-              labelRowsPerPage={t('tabla.paginacion.filasPorPagina')}
-            />
-          </CardBase>
+          <PanelGraficoHistorial
+            chartTitle={t('grafico.title')}
+            filterComponent={filterComponent}
+            chartComponent={chartComponent}
+            tableTitle={t('tabla.title')}
+            tableComponent={
+              <HistorialTable<GlucosaRecord>
+                columns={columns}
+                data={[...dataHook.glucosaFiltrada].reverse()}
+                page={dataHook.pageGlucosa}
+                rowsPerPage={dataHook.rowsPerPageGlucosa}
+                totalCount={dataHook.glucosaFiltrada.length}
+                onPageChange={(_, newPage) => dataHook.setPageGlucosa(newPage)}
+                onRowsPerPageChange={(e) => {
+                  dataHook.setRowsPerPageGlucosa(parseInt(e.target.value, 10));
+                  dataHook.setPageGlucosa(0);
+                }}
+                emptyMessage={t('tabla.sinDatos')}
+                labelRowsPerPage={t('tabla.paginacion.filasPorPagina')}
+                ariaLabel={t('tabla.ariaLabel')}
+              />
+            }
+          />
         </Grid>
       </Grid>
     </Box>
