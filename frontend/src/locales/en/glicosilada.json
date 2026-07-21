@@ -20,11 +20,13 @@
     "filtros": {
       "trimestre": "Quarter",
       "año": "Year",
-      "todos": "All"
+      "todos": "All",
+      "ariaLabel": "HbA1c filters"
     }
   },
   "tabla": {
     "title": "Laboratory History",
+    "ariaLabel": "HbA1c history table",
     "headers": {
       "fecha": "Test Date",
       "resultado": "Result (HbA1c)",
