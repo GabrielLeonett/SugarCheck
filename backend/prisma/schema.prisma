@@ -20,6 +20,7 @@ model User {
   preference      Preference? 
   contactEmergences ContactEmergence[]
   imcRecords        Imc[]
+  insulinas         Insulina[]
 }
 
 model Preference {
@@ -56,4 +57,23 @@ model Imc {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Insulina {
+  id          String   @id @default(uuid())
+  userId      String
+  tipo        String   // "RAPIDA" | "LENTA"
+  dosis       Float
+  unidades    Float
+  fecha       DateTime
+  hora        String   // HH:mm format
+  zona        String   // injection site
+  contexto    String?  // only for RAPIDA: "DESAYUNO" | "ALMUERZO" | "CENA" | "CORRECCION"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, fecha])
 }

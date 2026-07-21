@@ -66,5 +66,16 @@ registerErrorMapping('ConfigUnitInvalidErorr', { statusCode: HttpStatus.BAD_REQU
 
 registerErrorMapping('NotificationNotFoundError', { statusCode: HttpStatus.NOT_FOUND, code: 'NOTIFICATION_NOT_FOUND' });
 
+registerErrorMapping('InsulinaNotFoundError', { statusCode: HttpStatus.NOT_FOUND, code: 'INSULINA_NOT_FOUND' });
+registerErrorMapping('InsulinaNoModificableError', { statusCode: HttpStatus.FORBIDDEN, code: 'INSULINA_NOT_MODIFIABLE' });
+registerErrorMapping('InsulinaNoEliminableError', { statusCode: HttpStatus.FORBIDDEN, code: 'INSULINA_NOT_DELETABLE' });
+registerErrorMapping('IdInsulinaInvalidoError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_INSULIN_ID' });
+registerErrorMapping('DosisInvalidaError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_DOSIS' });
+registerErrorMapping('TipoInsulinaInvalidoError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_INSULIN_TYPE' });
+registerErrorMapping('ZonaInyeccionInvalidaError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_INJECTION_ZONE' });
+registerErrorMapping('ContextoAplicacionInvalidoError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_CONTEXT' });
+registerErrorMapping('FechaInsulinaInvalidaError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_DATE' });
+registerErrorMapping('HoraInsulinaInvalidaError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_TIME' });
+
 registerErrorMapping('ResetTokenInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'RESET_TOKEN_INVALID' });
 registerErrorMapping('ResetTokenExpiredError', { statusCode: HttpStatus.GONE, code: 'RESET_TOKEN_EXPIRED' });
