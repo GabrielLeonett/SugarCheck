@@ -18,7 +18,7 @@ interface UseMetricDataReturn<T> {
   handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-function useMetricData<T extends { id: number; fechaISO: string }>(
+function useMetricData<T extends { id: string | number; fechaISO: string }>(
   initialData: T[],
   initialTimeRange: TimeRange = 'mes',
   options?: UseMetricDataOptions
