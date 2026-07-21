@@ -29,7 +29,7 @@ interface HistorialTableProps<T> {
   ariaLabel?: string;
 }
 
-function HistorialTable<T extends { id: number }>({
+function HistorialTable<T extends { id: string | number }>({
   columns,
   data,
   page,
