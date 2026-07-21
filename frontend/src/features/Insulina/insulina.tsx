@@ -3,28 +3,86 @@ import Footer from '../../components/layout/Footer/Footer.tsx';
 import { Typography, Box, Grid, Container } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { CardBase } from "../../components/ui/Cards/CardBase.tsx";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ButtonBase } from "../../components/ui/Buttons/ButtonBase.tsx";
 import ModalInsulinaLenta from "./components/ModalInsulinaLenta.tsx";
 import ModalInsulinaRapida from "./components/ModalInsulinaRapida.tsx";
 import InsulinaHistorial from "./components/insulinaHistorial.tsx";
 import useLanguage from "../../hooks/useLanguage";
+import { insulinaApi, type DailyTotals } from "../../apis/insulina";
 
 export default function Insulina() {
   const [openLento, setOpenLento] = useState(false);
   const [openRapido, setOpenRapido] = useState(false);
+  const [totals, setTotals] = useState<DailyTotals>({ totalRapida: 0, totalLenta: 0, totalGeneral: 0 });
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const {t} = useLanguage('insulina');
 
   const Rango = ["80 - 120", "121 - 150", "151 - 190", "191 - 250", "> 250"];
   const unidadesE = ["2 UI", "3 UI", "4 UI", "5 UI", "6 UI"];
 
+  const loadTotals = useCallback(async () => {
+    try {
+      const data = await insulinaApi.getTotals();
+      setTotals(data);
+    } catch {
+      console.error("Error al cargar totales de insulina");
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTotals();
+  }, [loadTotals, refreshKey]);
+
+  const handleGuardarRapida = async (data: {
+    dosis: number;
+    contexto: string;
+    dia: number;
+    mes: number;
+    anio: number;
+    hora: string;
+    zona: string;
+  }) => {
+    try {
+      await insulinaApi.create({
+        tipo: 'RAPIDA',
+        ...data,
+      });
+      setOpenRapido(false);
+      setRefreshKey(k => k + 1);
+    } catch (error) {
+      console.error("Error al guardar insulina rápida:", error);
+      throw error;
+    }
+  };
+
+  const handleGuardarLenta = async (data: {
+    dosis: number;
+    dia: number;
+    mes: number;
+    anio: number;
+    hora: string;
+    zona: string;
+  }) => {
+    try {
+      await insulinaApi.create({
+        tipo: 'LENTA',
+        ...data,
+      });
+      setOpenLento(false);
+      setRefreshKey(k => k + 1);
+    } catch (error) {
+      console.error("Error al guardar insulina lenta:", error);
+      throw error;
+    }
+  };
+
   return (
     <>
       <Navbar />
 
           <Container maxWidth="lg" sx={{ mt: { xs: 3, sm: 6 }, mb: { xs: 3, sm: 7 }, px: { xs: 2, sm: 3 } }}>
-
 
       {/* TÍTULO */}
       <Grid container>
@@ -119,7 +177,10 @@ export default function Insulina() {
                   variant="h4"
                   sx={{ color: "#7AAFD7", fontWeight: "bold" }}
                 >
-                  21.1 UI
+                  {totals.totalGeneral.toFixed(1)} UI
+                </Typography>
+                <Typography variant="caption" sx={{ color: "#94a3b8", display: "block", mt: 0.5 }}>
+                  {t("rapida")}: {totals.totalRapida.toFixed(1)} UI | {t("lenta")}: {totals.totalLenta.toFixed(1)} UI
                 </Typography>
               </CardBase>
             </Grid>
@@ -183,7 +244,7 @@ export default function Insulina() {
         <Grid size={{ xs: 12, md: 6 }}>
           {/* COMPONENTE DE HISTORIAL - CON MÁS ESPACIO */}
           <Box sx={{ pl: { md: 1 } }}>
-            <InsulinaHistorial />
+            <InsulinaHistorial refreshTrigger={refreshKey} />
           </Box>
         </Grid>
       </Grid>
@@ -192,17 +253,17 @@ export default function Insulina() {
       <ModalInsulinaRapida
         open={openRapido}
         onClose={() => {
-          console.log("Cerrando modal rápido");
           setOpenRapido(false);
         }}
+        onSave={handleGuardarRapida}
       />
 
       <ModalInsulinaLenta
         open={openLento}
         onClose={() => {
-          console.log("Cerrando modal lento");
           setOpenLento(false);
         }}
+        onSave={handleGuardarLenta}
       />
       </Container>
       <Footer />
