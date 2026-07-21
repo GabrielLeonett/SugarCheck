@@ -20,11 +20,13 @@
     "filtros": {
       "trimestre": "四半期",
       "año": "年",
-      "todos": "すべて"
+      "todos": "すべて",
+      "ariaLabel": "HbA1cフィルター"
     }
   },
   "tabla": {
     "title": "検査履歴",
+    "ariaLabel": "HbA1c履歴テーブル",
     "headers": {
       "fecha": "検査日",
       "resultado": "結果 (HbA1c)",
