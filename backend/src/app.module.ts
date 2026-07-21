@@ -7,6 +7,7 @@ import { PreferenceModule } from './preference/infra/Nest/preference.module';
 import { ContactEmergenceModule } from './contact_emergence/infra/Nest/contact-emergence.module';
 import { NotificationModule } from './notification/infra/Nest/notification.module';
 import { ImcModule } from './IMC/infra/Nest/imc.module';
+import { InsulinaModule } from './insulina/infra/Nest/insulina.module';
 import { I18nModule } from './shared/infrastructure/i18n/i18n.module';
 import { GlobalExceptionFilter } from './shared/infrastructure/exception-filter';
 import { TranslationService } from './shared/infrastructure/i18n/translation.service';
@@ -24,6 +25,7 @@ import { TranslationService } from './shared/infrastructure/i18n/translation.ser
     ContactEmergenceModule,
     NotificationModule,
     ImcModule,
+    InsulinaModule,
   ],
   providers: [
     {
