@@ -32,94 +32,77 @@ export default function HistorialScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <ThemedText type="title" style={{ fontSize: 24 }}>Historial</ThemedText>
-        <Button
-          title="Nuevo"
-          onPress={() => setShowModal(true)}
-          icon={<FontAwesome name="plus" size={14} color="#fff" style={{ marginRight: 6 }} />}
-          style={{ paddingVertical: 8, paddingHorizontal: 16, minHeight: 36 }}
-        />
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-      <View style={styles.tabs}>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'glucosa' && { borderBottomColor: Colors[colorScheme].tint, borderBottomWidth: 2 },
-          ]}
-          onPress={() => setActiveTab('glucosa')}
-        >
-          <ThemedText style={[styles.tabText, activeTab === 'glucosa' && { color: Colors[colorScheme].tint }]}>
-            Glucemia
-          </ThemedText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'hba1c' && { borderBottomColor: Colors[colorScheme].tint, borderBottomWidth: 2 },
-          ]}
-          onPress={() => setActiveTab('hba1c')}
-        >
-          <ThemedText style={[styles.tabText, activeTab === 'hba1c' && { color: Colors[colorScheme].tint }]}>
-            HbA1c
-          </ThemedText>
-        </TouchableOpacity>
-      </View>
+        {/* Cabecera Principal */}
+        <View style={styles.header}>
+          <Text style={styles.pageTitle}>Home</Text>
+          <TouchableOpacity>
+            <Menu color={Colors.light.primary.main} size={32} strokeWidth={2.5} />
+          </TouchableOpacity>
+        </View>
 
-      {activeTab === 'glucosa' ? (
-        <FlatList
-          data={MOCK_GLUCOSE}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <Card style={styles.recordCard}>
-              <View style={styles.recordRow}>
-                <ThemedText type="title" style={{ fontSize: 32, color: item.nivel >= 70 && item.nivel <= 180 ? '#2e7d32' : '#d32f2f' }}>
-                  {item.nivel}
-                </ThemedText>
-                <View style={styles.recordInfo}>
-                  <ThemedText type="defaultSemiBold">{item.contexto}</ThemedText>
-                  <ThemedText style={{ fontSize: 12, opacity: 0.6 }}>
-                    {item.fecha} - {item.hora}
-                  </ThemedText>
-                </View>
-              </View>
-            </Card>
-          )}
-          ListEmptyComponent={
-            <ThemedText style={{ textAlign: 'center', marginTop: 40, opacity: 0.5 }}>
-              Sin registros de glucosa
-            </ThemedText>
-          }
-        />
-      ) : (
-        <FlatList
-          data={MOCK_HBA1C}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <Card style={styles.recordCard}>
-              <View style={styles.recordRow}>
-                <ThemedText type="title" style={{ fontSize: 32, color: item.resultado < 7 ? '#2e7d32' : '#f57c00' }}>
-                  {item.resultado}%
-                </ThemedText>
-                <View style={styles.recordInfo}>
-                  <ThemedText type="defaultSemiBold">Hemoglobina Glicosilada</ThemedText>
-                  <ThemedText style={{ fontSize: 12, opacity: 0.6 }}>{item.fecha}</ThemedText>
-                </View>
-              </View>
-            </Card>
-          )}
-          ListEmptyComponent={
-            <ThemedText style={{ textAlign: 'center', marginTop: 40, opacity: 0.5 }}>
-              Sin registros de HbA1c
-            </ThemedText>
-          }
-        />
-      )}
+        {/* Saludo */}
+        <Text style={styles.greeting}>
+          ¡Hola, Guerrero {user?.name || 'David'}!
+        </Text>
 
-      <AddRecordModal visible={showModal} onClose={() => setShowModal(false)} type={activeTab} />
+        {/* TARJETA 1: Última Batalla y Cronómetro */}
+        <Card style={styles.mainCard}>
+          {/* Sección: Última Batalla */}
+          <H5 style={styles.cardTitle}>Última Batalla</H5>
+
+          <View style={styles.glucoseContainer}>
+            <Text style={styles.glucoseValue}>{lastLevel}</Text>
+            <View style={styles.glucoseUnitWrapper}>
+              <ChevronUp color={Colors.light.success.main} size={32} strokeWidth={3} />
+              <Text style={styles.glucoseUnit}>mg/dL</Text>
+            </View>
+          </View>
+
+          <Text style={styles.timeSubtitle}>Hace 2 horas (Post-Desayuno)</Text>
+
+          {/* Divisor */}
+          <View style={styles.divider} />
+
+          {/* Sección: Cronómetro de Seguridad */}
+          <H5 style={[styles.cardTitle, { width: '70%' }]}>
+            Cronómetro de Seguridad
+          </H5>
+          <Text style={styles.insulinSubtitle}>Última Insulina Rápida</Text>
+
+          <View style={styles.timerContainer}>
+            <Text style={styles.timerValue}>2:15</Text>
+            <Text style={styles.timerUnit}>Horas transcurridas</Text>
+          </View>
+
+          <Text style={styles.safeZoneText}>Zona Segura</Text>
+        </Card>
+
+        {/* TARJETA 2: Misiones del Día */}
+        <Card style={styles.missionCard}>
+          <H5 style={styles.cardTitle}>Misiones del Día</H5>
+          <Text style={styles.missionSubtitle}>Entrenamiento de Hoy</Text>
+
+          <View style={styles.checkList}>
+            <TouchableOpacity style={styles.checkItem}>
+              <CheckSquare color={Colors.light.textSecondary} size={24} />
+              <Text style={styles.checkText}>Desayuno</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.checkItem}>
+              <CheckSquare color={Colors.light.textSecondary} size={24} />
+              <Text style={styles.checkText}>Almuerzo</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.checkItem}>
+              <CheckSquare color={Colors.light.textSecondary} size={24} />
+              <Text style={styles.checkText}>Cena</Text>
+            </TouchableOpacity>
+          </View>
+        </Card>
+
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -161,13 +144,146 @@ function AddRecordModal({ visible, onClose, type }: { visible: boolean; onClose:
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 60, paddingBottom: 8 },
-  tabs: { flexDirection: 'row', marginHorizontal: 16, marginBottom: 8 },
-  tab: { flex: 1, alignItems: 'center', paddingVertical: 12 },
-  tabText: { fontSize: 16, fontFamily: 'Montserrat-SemiBold' },
-  list: { paddingHorizontal: 16, paddingBottom: 100 },
-  recordCard: { padding: 16, marginBottom: 8 },
-  recordRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  recordInfo: { flex: 1 },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.light.background // Color de fondo general (#E4EFF7)
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 100 // Espacio para el Tab Bar inferior
+  },
+
+  // Header y Saludo
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16
+  },
+  pageTitle: {
+    fontSize: 40,
+    fontWeight: '800',
+    color: Colors.light.primary.main,
+  },
+  greeting: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.light.text,
+    marginBottom: 20,
+  },
+
+  // Estilos de las Tarjetas
+  mainCard: {
+    padding: 24,
+    marginBottom: 24,
+    borderRadius: 20,
+    backgroundColor: '#d7e7f3', // Un tono ligeramente más gris/azulado para la tarjeta según la imagen
+    elevation: 0, // Quitamos la sombra para que se vea plano como en el diseño
+  },
+  cardTitle: {
+    color: Colors.light.primary.light, // Azul claro de los títulos de tarjeta
+    fontWeight: '700',
+    fontSize: 20,
+    marginBottom: 12
+  },
+
+  // Sección Última Batalla
+  glucoseContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8
+  },
+  glucoseValue: {
+    fontSize: 80,
+    fontWeight: '800',
+    color: Colors.light.success.main,
+    lineHeight: 85,
+  },
+  glucoseUnitWrapper: {
+    alignItems: 'center',
+    marginLeft: 8,
+    marginTop: 10
+  },
+  glucoseUnit: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.light.success.main,
+  },
+  timeSubtitle: {
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.light.success.main,
+    marginBottom: 20
+  },
+
+  // Divisor
+  divider: {
+    height: 1,
+    backgroundColor: Colors.light.icon,
+    opacity: 0.3,
+    marginBottom: 20
+  },
+
+  // Sección Cronómetro
+  insulinSubtitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.light.textSecondary,
+    marginBottom: 12
+  },
+  timerContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    marginBottom: 16
+  },
+  timerValue: {
+    fontSize: 64,
+    fontWeight: '800',
+    color: Colors.light.success.main,
+    lineHeight: 70,
+  },
+  timerUnit: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.light.success.main,
+    marginLeft: 8
+  },
+  safeZoneText: {
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.light.success.main,
+  },
+
+  // Tarjeta de Misiones
+  missionCard: {
+    padding: 24,
+    marginBottom: 24,
+    borderRadius: 20,
+    backgroundColor: '#d7e7f3',
+    elevation: 0,
+  },
+  missionSubtitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.light.text,
+    marginBottom: 16
+  },
+  checkList: {
+    gap: 16
+  },
+  checkItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12
+  },
+  checkText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.light.textSecondary
+  }
 });

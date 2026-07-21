@@ -9,6 +9,7 @@ export function H1({ children, style, ...props }: ThemedTextProps) {
         {
           fontWeight: 700,
           fontSize: 88,
+          height: 96
         },
         style, // Permitimos que estilos externos también apliquen
       ]}
