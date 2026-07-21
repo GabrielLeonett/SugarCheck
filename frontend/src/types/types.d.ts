@@ -76,6 +76,47 @@ export interface BackendErrorsApi {
 
 export type NotificationType = 'alert' | 'reminder' | 'achievement' | 'info' | 'warning';
 
+// Glucemia (Glucose)
+export type TipoGlucemia = 'En Ayunas' | 'Despues de comer' | 'Control general';
+
+export interface Glucemia {
+  id: string;
+  usuario_id: string;
+  valor_mgdl: number;
+  tipo: TipoGlucemia;
+  fecha: string;
+  hora: string;
+  created_at: string;
+}
+
+export interface CreateGlucemiaDto {
+  valor_mgdl: number;
+  tipo: TipoGlucemia;
+  fecha: string;
+  hora: string;
+}
+
+export interface GlucemiaResponse {
+  data: Glucemia;
+  isCrisis?: boolean;
+}
+
+// HbA1c (Glicosilada)
+export interface Glicosilada {
+  id: string;
+  usuario_id: string;
+  valor_porcentaje: number;
+  fecha_examen: string;
+  eAG: number;
+  vencido: boolean;
+  created_at: string;
+}
+
+export interface CreateGlicosiladaDto {
+  valor_porcentaje: number;
+  fecha_examen: string;
+}
+
 export interface NotificationItem {
   id: string;
   type: NotificationType;

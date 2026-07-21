@@ -42,6 +42,7 @@
     "title": "Histórico de Registros",
     "ariaLabel": "Tabela de histórico de glicose",
     "headers": {
+      "fecha": "Data",
       "hora": "Hora",
       "nivel": "Nível (mg/dL)",
       "contexto": "Contexto",
