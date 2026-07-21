@@ -34,11 +34,13 @@
     "filtros": {
       "hoy": "今日",
       "semana": "今週",
-      "mes": "今月"
+      "mes": "今月",
+      "ariaLabel": "血糖値フィルター"
     }
   },
   "tabla": {
     "title": "記録履歴",
+    "ariaLabel": "血糖値履歴テーブル",
     "headers": {
       "hora": "時間",
       "nivel": "数値 (mg/dL)",

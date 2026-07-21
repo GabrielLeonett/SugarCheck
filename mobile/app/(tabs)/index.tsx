@@ -9,6 +9,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/Button';
 import { useAuthStore } from '@/src/stores/authStore';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { H5 } from '@/components/ui/h5';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -36,10 +37,9 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View>
-            <ThemedText type="title" style={{ fontSize: 24 }}>¡Alerta, Guerrero!</ThemedText>
-            <ThemedText type="subtitle" style={{ fontSize: 14, opacity: 0.7 }}>
+            <H5>
               Bienvenido, {user?.name || 'Guerrero'}
-            </ThemedText>
+            </H5>
           </View>
           <FontAwesome name="shield" size={32} color={Colors[colorScheme].tint} />
         </View>

@@ -34,11 +34,13 @@
     "filtros": {
       "hoy": "Hoje",
       "semana": "Semana",
-      "mes": "Mês"
+      "mes": "Mês",
+      "ariaLabel": "Filtros de glicose"
     }
   },
   "tabla": {
     "title": "Histórico de Registros",
+    "ariaLabel": "Tabela de histórico de glicose",
     "headers": {
       "hora": "Hora",
       "nivel": "Nível (mg/dL)",
