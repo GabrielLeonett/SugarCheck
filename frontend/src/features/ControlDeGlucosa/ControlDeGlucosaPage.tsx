@@ -23,22 +23,22 @@ export default function Glucosa() {
   return (
     <>
       <Navbar />
-      <Box sx={{ mx: { xs: 2, sm: 7 }, my: { xs: 4, sm: 10 } }}>
-        
-        {/* SUB-MÓDULO 1: GLUCEMIA */}
-        <SeccionGlucemia 
-          dataHook={glucoseHookData} 
-          onSaveGlucosa={handleSaveGlucosa} 
-        />
+      <Box sx={{ mx: { xs: 2, sm: 7 }, my: { xs: 4, sm: 10 }, minHeight: 'calc(100vh - 130px)' }}>
+        <Box sx={{ maxWidth: '1200px', width: '100%', margin: '0 auto' }}>
+          {/* SUB-MÓDULO 1: GLUCEMIA */}
+          <SeccionGlucemia 
+            dataHook={glucoseHookData} 
+            onSaveGlucosa={handleSaveGlucosa} 
+          />
 
-        <Divider sx={{ marginY: 8, borderColor: "primary.light" }} />
+          <Divider sx={{ marginY: 8, borderColor: "primary.light" }} />
 
-        {/* SUB-MÓDULO 2: HEMOGLOBINA GLICOSILADA */}
-        <SeccionHbA1c 
-          dataHook={glucoseHookData} 
-          onSaveHbA1c={handleSaveHbA1c} 
-        />
-
+          {/* SUB-MÓDULO 2: HEMOGLOBINA GLICOSILADA */}
+          <SeccionHbA1c 
+            dataHook={glucoseHookData} 
+            onSaveHbA1c={handleSaveHbA1c} 
+          />
+        </Box>
       </Box>
       <Footer />
     </>

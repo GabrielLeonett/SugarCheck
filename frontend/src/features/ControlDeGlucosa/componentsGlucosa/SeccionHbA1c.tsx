@@ -50,6 +50,12 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
   const filterComponent = (
     <ButtonGroup variant="outlined" size="small" aria-label={t('grafico.filtros.ariaLabel')} sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
       <Button
+        onClick={() => { dataHook.setFiltroHbA1c('todos'); dataHook.setPageHbA1c(0); }}
+        variant={dataHook.filtroHbA1c === 'todos' ? 'contained' : 'outlined'}
+      >
+        {t('grafico.filtros.todos')}
+      </Button>
+      <Button
         onClick={() => { dataHook.setFiltroHbA1c('trimestre'); dataHook.setPageHbA1c(0); }}
         variant={dataHook.filtroHbA1c === 'trimestre' ? 'contained' : 'outlined'}
       >
@@ -61,12 +67,7 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
       >
         {t('grafico.filtros.año')}
       </Button>
-      <Button
-        onClick={() => { dataHook.setFiltroHbA1c('todos'); dataHook.setPageHbA1c(0); }}
-        variant={dataHook.filtroHbA1c === 'todos' ? 'contained' : 'outlined'}
-      >
-        {t('grafico.filtros.todos')}
-      </Button>
+      
     </ButtonGroup>
   );
 
