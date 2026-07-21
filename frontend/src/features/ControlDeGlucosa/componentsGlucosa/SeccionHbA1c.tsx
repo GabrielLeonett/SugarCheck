@@ -1,19 +1,19 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Typography, Grid, ButtonGroup, Button } from '@mui/material';
+import { Box, Typography, Grid, ButtonGroup, Button, Alert, CircularProgress } from '@mui/material';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
 import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
 import ModalHbA1cForm from '../../../components/shared/ModalHbA1cForm.tsx';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import { GraficoLinea } from '../../../components/shared/GraficoLinea';
-import { obtenerColorEstado } from '../../../hooks/useGlucosaData.tsx';
+import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 import type { HbA1cData } from '../../../schemas/hba1c';
 import type { HbA1cRecord } from '../../../data/recordsMock';
 import type { Column } from '../../../components/shared/HistorialTable';
 
 interface SeccionHbA1cProps {
-  dataHook: any;
+  dataHook: UseGlucosaDataReturn;
   onSaveHbA1c: (data: HbA1cData) => void;
 }
 
@@ -71,16 +71,28 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
     </ButtonGroup>
   );
 
+  if (dataHook.error && dataHook.hbA1cFiltrada.length === 0) {
+    return (
+      <Box component="section" sx={{ mb: 6 }}>
+        <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
+          {t('titleHistorial')}
+        </Typography>
+        <Alert severity="error">{dataHook.error}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <Box component="section" sx={{ mb: 6 }}>
       <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
         {t('titleHistorial')}
+        {dataHook.loading && <CircularProgress size={20} sx={{ ml: 2 }} />}
       </Typography>
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 5 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            <ButtonBase onClick={dataHook.handleOpenHbA1c} startIcon={<AddIcon />}>
+            <ButtonBase onClick={dataHook.handleOpenHbA1c} startIcon={<AddIcon />} disabled={dataHook.loading}>
               {t('btnRegistrar')}
             </ButtonBase>
 
@@ -95,10 +107,10 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
                 {t('ultimoResultado.title')}
               </Typography>
               <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "success.light" }}>
-                {dataHook.ultimoResultadoHbA1c ? `${dataHook.ultimoResultadoHbA1c}%` : "6.8%"}
+                {dataHook.ultimoResultadoHbA1c ? `${dataHook.ultimoResultadoHbA1c}%` : "—"}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {t('ultimoResultado.estimado', { valor: dataHook.ultimoEag || 148 })}
+                {dataHook.ultimoEag ? t('ultimoResultado.estimado', { valor: dataHook.ultimoEag }) : '—'}
               </Typography>
               <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "success.light" }}>
                 {dataHook.enRangoObjetivo !== false ? t('ultimoResultado.enRango') : t('ultimoResultado.fueraRango')}
