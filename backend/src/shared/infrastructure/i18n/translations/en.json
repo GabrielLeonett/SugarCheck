@@ -122,5 +122,20 @@
   "NOTIFICATION_SAVE_ERROR": "Error saving notification",
   "NOTIFICATION_MARK_READ_ERROR": "Error marking notification as read",
   "NOTIFICATION_MARK_ALL_READ_ERROR": "Error marking all as read",
-  "NOTIFICATION_DELETE_ERROR": "Error deleting notification"
+  "NOTIFICATION_DELETE_ERROR": "Error deleting notification",
+
+  "GLUCOSE_NOT_FOUND": "Glucose record not found",
+  "INVALID_GLUCOSE_VALUE": "Glucose value is not valid. Must be between 1 and 999 mg/dL",
+  "INVALID_MEAL_TAG": "Meal tag is not valid. Must be: En Ayunas, Despues de comer or Control general",
+  "HBA1C_NOT_FOUND": "HbA1c exam not found",
+  "INVALID_HBA1C_VALUE": "HbA1c value is not valid. Must be between 0.1 and 20%",
+  "EDIT_WINDOW_EXPIRED": "The 15-day editing window has expired",
+  "GLUCOSE_CREATED": "Glucose record created successfully",
+  "GLUCOSE_UPDATED": "Glucose record updated successfully",
+  "HBA1C_CREATED": "HbA1c exam created successfully",
+  "HBA1C_UPDATED": "HbA1c exam updated successfully",
+  "GLUCOSE_ALERT_HYPO": "Hypoglycemia Alert",
+  "GLUCOSE_ALERT_HYPO_MESSAGE": "Your glucose level is below the safe threshold: {{value}} mg/dL",
+  "GLUCOSE_ALERT_HYPER": "Hyperglycemia Alert",
+  "GLUCOSE_ALERT_HYPER_MESSAGE": "Your glucose level is above the safe threshold: {{value}} mg/dL"
 }

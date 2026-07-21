@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { CreateHbA1cPayload } from '../apis/hba1c';
 
 export const hba1cSchema = z.object({
   resultadoHbA1c: z.string()
@@ -11,3 +12,10 @@ export const hba1cSchema = z.object({
 });
 
 export type HbA1cData = z.infer<typeof hba1cSchema>;
+
+export function formToCreateHbA1cDto(formData: HbA1cData): CreateHbA1cPayload {
+  return {
+    valuePercent: Number(formData.resultadoHbA1c),
+    examDate: formData.fecha,
+  };
+}

@@ -122,5 +122,20 @@
   "NOTIFICATION_SAVE_ERROR": "Error al guardar notificación",
   "NOTIFICATION_MARK_READ_ERROR": "Error al marcar notificación como leída",
   "NOTIFICATION_MARK_ALL_READ_ERROR": "Error al marcar todas como leídas",
-  "NOTIFICATION_DELETE_ERROR": "Error al eliminar notificación"
+  "NOTIFICATION_DELETE_ERROR": "Error al eliminar notificación",
+
+  "GLUCOSE_NOT_FOUND": "Registro de glucosa no encontrado",
+  "INVALID_GLUCOSE_VALUE": "El valor de glucosa no es válido. Debe estar entre 1 y 999 mg/dL",
+  "INVALID_MEAL_TAG": "La etiqueta de comida no es válida. Debe ser: En Ayunas, Despues de comer o Control general",
+  "HBA1C_NOT_FOUND": "Examen HbA1c no encontrado",
+  "INVALID_HBA1C_VALUE": "El valor de HbA1c no es válido. Debe estar entre 0.1 y 20%",
+  "EDIT_WINDOW_EXPIRED": "El período de edición de 15 días ha expirado",
+  "GLUCOSE_CREATED": "Registro de glucosa creado exitosamente",
+  "GLUCOSE_UPDATED": "Registro de glucosa actualizado exitosamente",
+  "HBA1C_CREATED": "Examen HbA1c creado exitosamente",
+  "HBA1C_UPDATED": "Examen HbA1c actualizado exitosamente",
+  "GLUCOSE_ALERT_HYPO": "Alerta de Hipoglucemia",
+  "GLUCOSE_ALERT_HYPO_MESSAGE": "Tu nivel de glucosa está por debajo del umbral seguro: {{value}} mg/dL",
+  "GLUCOSE_ALERT_HYPER": "Alerta de Hiperglucemia",
+  "GLUCOSE_ALERT_HYPER_MESSAGE": "Tu nivel de glucosa está por encima del umbral seguro: {{value}} mg/dL"
 }

@@ -68,3 +68,15 @@ registerErrorMapping('NotificationNotFoundError', { statusCode: HttpStatus.NOT_F
 
 registerErrorMapping('ResetTokenInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'RESET_TOKEN_INVALID' });
 registerErrorMapping('ResetTokenExpiredError', { statusCode: HttpStatus.GONE, code: 'RESET_TOKEN_EXPIRED' });
+
+registerErrorMapping('GlucoseNotFoundError', { statusCode: HttpStatus.NOT_FOUND, code: 'GLUCOSE_NOT_FOUND' });
+registerErrorMapping('GlucoseValueInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_GLUCOSE_VALUE' });
+registerErrorMapping('GlucoseMealTagInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_MEAL_TAG' });
+registerErrorMapping('HbA1cNotFoundError', { statusCode: HttpStatus.NOT_FOUND, code: 'HBA1C_NOT_FOUND' });
+registerErrorMapping('HbA1cValueInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_HBA1C_VALUE' });
+registerErrorMapping('EditWindowExpiredError', { statusCode: HttpStatus.FORBIDDEN, code: 'EDIT_WINDOW_EXPIRED' });
+registerErrorMapping('GlucoseIdInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_GLUCOSE_ID' });
+registerErrorMapping('GlucoseDateInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_GLUCOSE_DATE' });
+registerErrorMapping('GlucoseTimeInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_GLUCOSE_TIME' });
+registerErrorMapping('HbA1cIdInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_HBA1C_ID' });
+registerErrorMapping('HbA1cExamDateInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_HBA1C_DATE' });

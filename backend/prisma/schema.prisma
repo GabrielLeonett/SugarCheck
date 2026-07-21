@@ -20,6 +20,8 @@ model User {
   preference      Preference? 
   contactEmergences ContactEmergence[]
   imcRecords        Imc[]
+  glucoseRecords    Glucose[]
+  hba1cRecords      HbA1c[]
 }
 
 model Preference {
@@ -54,6 +56,33 @@ model Imc {
   fecha     DateTime
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Glucose {
+  id        String   @id @default(uuid())
+  userId    String
+  valueMgdl Float
+  mealTag   String
+  date      DateTime
+  time      String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, date])
+}
+
+model HbA1c {
+  id           String   @id @default(uuid())
+  userId       String
+  valuePercent Float
+  examDate     DateTime
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

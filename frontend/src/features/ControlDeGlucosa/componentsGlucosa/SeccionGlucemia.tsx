@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import {
-  Box, Typography, Grid, LinearProgress, Button, ButtonGroup,
+  Box, Typography, Grid, LinearProgress, Button, ButtonGroup, Alert, CircularProgress,
 } from '@mui/material';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
 import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
@@ -8,7 +8,7 @@ import ModalGlucosaForm from '../../../components/shared/ModalGlucosaForm.tsx';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import { GraficoLinea } from '../../../components/shared/GraficoLinea';
-import { obtenerColorEstado } from '../../../hooks/useGlucosaData.tsx';
+import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 
 import type { GlucosaData } from '../../../schemas/glucosa';
@@ -16,14 +16,20 @@ import type { GlucosaRecord } from '../../../data/recordsMock';
 import type { Column } from '../../../components/shared/HistorialTable';
 
 interface SeccionGlucemiaProps {
-  dataHook: any;
+  dataHook: UseGlucosaDataReturn;
   onSaveGlucosa: (data: GlucosaData) => void;
 }
 
 export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProps) {
   const { t } = useLanguage("glucemia");
 
+  const formatDate = (iso: string) => {
+    const [aaaa, mm, dd] = iso.split('T')[0].split('-');
+    return `${dd}/${mm}/${aaaa}`;
+  };
+
   const columns: Column<GlucosaRecord>[] = [
+    { key: 'fecha', label: t('tabla.headers.fecha'), render: (row) => formatDate(row.fechaISO) },
     { key: 'hora', label: t('tabla.headers.hora'), render: (row) => row.hora },
     { key: 'nivel', label: t('tabla.headers.nivel'), render: (row) => row.nivel },
     { key: 'contexto', label: t('tabla.headers.contexto'), render: (row) => row.contexto },
@@ -61,17 +67,29 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
     </ButtonGroup>
   );
 
+  if (dataHook.error && dataHook.glucosaFiltrada.length === 0) {
+    return (
+      <Box component="section" sx={{ mb: 6 }}>
+        <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
+          {t('titleMonitoreo')}
+        </Typography>
+        <Alert severity="error">{dataHook.error}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <Box component="section" sx={{ mb: 6 }}>
       <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
         {t('titleMonitoreo')}
+        {dataHook.loading && <CircularProgress size={20} sx={{ ml: 2 }} />}
       </Typography>
 
       <Grid container spacing={3}>
         {/* Columna Izquierda: Métricas */}
         <Grid size={{ xs: 12, md: 5 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            <ButtonBase onClick={dataHook.handleOpenGlucosa} startIcon={<AddIcon />}> 
+            <ButtonBase onClick={dataHook.handleOpenGlucosa} startIcon={<AddIcon />} disabled={dataHook.loading}> 
               {t('btnRegistrar')}
             </ButtonBase>
 
@@ -81,21 +99,23 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
               onSave={onSaveGlucosa}
             />
 
-            {/* Dominio de la Zona Segura */}
-            <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%" }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, textAlign: "center"}}>
-                {t('zonaSegura.title')}
-              </Typography>
-              <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "error.light", textAlign: "center" }}>
-                {dataHook.porcentajeZonaSegura !== undefined ? `${dataHook.porcentajeZonaSegura}%` : "45%"}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", mt: 1 }}>
-                {t('zonaSegura.caption')}
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "error.light" }}>
-                {dataHook.porcentajeZonaSegura < 50 ? t('zonaSegura.alertaBaja') : t('zonaSegura.alertaNormal')}
-              </Typography>
-            </CardBase>
+            {/* Dominio de la Zona Segura (oculta hasta tener >= 2 registros) */}
+            {dataHook.hasGlucosaData && (
+              <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%" }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, textAlign: "center"}}>
+                  {t('zonaSegura.title')}
+                </Typography>
+                <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "error.light", textAlign: "center" }}>
+                  {dataHook.porcentajeZonaSegura}%
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", mt: 1 }}>
+                  {t('zonaSegura.caption')}
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "error.light" }}>
+                  {dataHook.porcentajeZonaSegura < 50 ? t('zonaSegura.alertaBaja') : t('zonaSegura.alertaNormal')}
+                </Typography>
+              </CardBase>
+            )}
             
             {/* Frecuencia de Alertas */}
             <CardBase sx={{ display: "flex", flexDirection: "column", p: 3, width: "100%" }}>
@@ -109,9 +129,9 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
                     {t('frecuenciaAlertas.hiperglucemias')}
                   </Typography>
                   <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
-                    <LinearProgress variant="determinate" value={70} sx={{ width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375', '& .MuiLinearProgress-bar': { bgcolor: 'warning.light', borderRadius: 3 } }} />
-                    <Typography variant="caption" sx={{ position: 'absolute', left: 'calc(70% - 20px)', color: '#fff', fontWeight: 700 }}>
-                      {dataHook.cantHiperglucemias || 4}
+                    <LinearProgress variant="determinate" value={dataHook.porcentajeHiper} sx={{ width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375', '& .MuiLinearProgress-bar': { bgcolor: 'warning.light', borderRadius: 3 } }} />
+                    <Typography variant="caption" sx={{ position: 'absolute', left: `calc(${dataHook.porcentajeHiper}% - 20px)`, color: '#fff', fontWeight: 700 }}>
+                      {dataHook.cantHiperglucemias}
                     </Typography>
                   </Box>
                 </Box>
@@ -121,9 +141,9 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
                     {t('frecuenciaAlertas.hipoglucemias')}
                   </Typography>
                   <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
-                    <LinearProgress variant="determinate" value={30} sx={{ width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375', '& .MuiLinearProgress-bar': { bgcolor: 'info.light', borderRadius: 3 } }} />
-                    <Typography variant="caption" sx={{ position: 'absolute', left: 'calc(30% - 20px)', color: '#fff', fontWeight: 700 }}>
-                      {dataHook.cantHipoglucemias || 1}
+                    <LinearProgress variant="determinate" value={dataHook.porcentajeHipo} sx={{ width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375', '& .MuiLinearProgress-bar': { bgcolor: 'info.light', borderRadius: 3 } }} />
+                    <Typography variant="caption" sx={{ position: 'absolute', left: `calc(${dataHook.porcentajeHipo}% - 20px)`, color: '#fff', fontWeight: 700 }}>
+                      {dataHook.cantHipoglucemias}
                     </Typography>
                   </Box>
                 </Box>
@@ -133,9 +153,9 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
                     {t('frecuenciaAlertas.enRango')}
                   </Typography>
                   <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
-                    <LinearProgress variant="determinate" value={85} sx={{ width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375', '& .MuiLinearProgress-bar': { bgcolor: 'success.light', borderRadius: 3 } }} />
-                    <Typography variant="caption" sx={{ position: 'absolute', left: 'calc(85% - 20px)', color: '#fff', fontWeight: 700 }}>
-                      {dataHook.cantEnRango || 9}
+                    <LinearProgress variant="determinate" value={dataHook.porcentajeEnRango} sx={{ width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375', '& .MuiLinearProgress-bar': { bgcolor: 'success.light', borderRadius: 3 } }} />
+                    <Typography variant="caption" sx={{ position: 'absolute', left: `calc(${dataHook.porcentajeEnRango}% - 20px)`, color: '#fff', fontWeight: 700 }}>
+                      {dataHook.cantEnRango}
                     </Typography>
                   </Box>
                 </Box>
