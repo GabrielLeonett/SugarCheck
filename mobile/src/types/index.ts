@@ -70,8 +70,54 @@ export interface HbA1cRecord {
 
 export interface InsulinRecord {
   id: string;
-  tipo: 'rapida' | 'lenta';
+  userId: string;
+  tipo: string;
   dosis: number;
+  unidades: number;
   fecha: string;
   hora: string;
+  zona: string;
+  zonaLabel: string;
+  contexto: string | null;
+  contextoLabel: string | null;
+  createdAt: string;
 }
+
+export interface DailyInsulinTotals {
+  totalRapida: number;
+  totalLenta: number;
+  totalGeneral: number;
+}
+
+export interface CreateInsulinDTO {
+  tipo: 'RAPIDA' | 'LENTA';
+  dosis: number;
+  dia: number;
+  mes: number;
+  anio: number;
+  hora: string;
+  zona: string;
+  contexto?: string;
+}
+
+export const ZONAS_INYECCION = {
+  FRENTE: [
+    { key: 'ABDOMEN_DERECHO', label: 'Abdomen Derecho', color: '#ef4444' },
+    { key: 'ABDOMEN_IZQUIERDO', label: 'Abdomen Izquierdo', color: '#ef4444' },
+    { key: 'MUSLO_DERECHO', label: 'Muslo Derecho', color: '#f59e0b' },
+    { key: 'MUSLO_IZQUIERDO', label: 'Muslo Izquierdo', color: '#f59e0b' },
+  ],
+  ATRAS: [
+    { key: 'BRAZO_DERECHO', label: 'Brazo Derecho', color: '#f97316' },
+    { key: 'BRAZO_IZQUIERDO', label: 'Brazo Izquierdo', color: '#f97316' },
+    { key: 'GLUTEO_DERECHO', label: 'Glúteo Derecho', color: '#22c55e' },
+    { key: 'GLUTEO_IZQUIERDO', label: 'Glúteo Izquierdo', color: '#22c55e' },
+  ],
+} as const;
+
+export const CONTEXTOS_INSULINA = [
+  { key: 'DESAYUNO', label: 'Desayuno' },
+  { key: 'ALMUERZO', label: 'Almuerzo' },
+  { key: 'CENA', label: 'Cena' },
+  { key: 'CORRECCION', label: 'Corrección' },
+] as const;
