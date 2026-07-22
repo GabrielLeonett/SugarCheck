@@ -1,5 +1,4 @@
-// features/Insulina/components/InsulinaHistorial.tsx
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -17,46 +16,67 @@ import {
 } from "@mui/material";
 import { LineChart } from '@mui/x-charts/LineChart';
 import useLanguage from "../../../hooks/useLanguage";
+import { insulinaApi, type InsulinRecord } from "../../../apis/insulina";
 
-// Mock data para insulina
-const registrosMock = [
-  { id: 1, hora: "07:15 AM", tipo: "Lenta / Basal", dosis: 9, zona: "Abdomen", contexto: "Mañana" },
-  { id: 2, hora: "02:30 PM", tipo: "Rápida / Bolus", dosis: 2, zona: "Brazo", contexto: "Corrección" },
-  { id: 3, hora: "06:45 PM", tipo: "Rápida / Bolus", dosis: 4, zona: "Muslo", contexto: "Antes de comer" },
-  { id: 4, hora: "08:00 AM", tipo: "Lenta / Basal", dosis: 8, zona: "Abdomen", contexto: "Desayuno" },
-  { id: 5, hora: "12:30 PM", tipo: "Rápida / Bolus", dosis: 3, zona: "Brazo", contexto: "Almuerzo" },
-  { id: 6, hora: "09:00 PM", tipo: "Lenta / Basal", dosis: 10, zona: "Glúteo", contexto: "Noche" },
-  { id: 7, hora: "04:00 PM", tipo: "Rápida / Bolus", dosis: 5, zona: "Muslo", contexto: "Corrección" },
-  { id: 8, hora: "11:00 AM", tipo: "Rápida / Bolus", dosis: 6, zona: "Brazo", contexto: "Antes de comer" },
-  { id: 9, hora: "10:00 PM", tipo: "Lenta / Basal", dosis: 7, zona: "Abdomen", contexto: "Noche" },
-  { id: 10, hora: "01:00 PM", tipo: "Rápida / Bolus", dosis: 4, zona: "Muslo", contexto: "Corrección" },
-];
+interface InsulinaHistorialProps {
+  refreshTrigger?: number;
+}
 
-export default function InsulinaHistorial() {
+export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistorialProps) {
   const { t } = useLanguage('insulinaHistorial');
   
+  const [registros, setRegistros] = useState<InsulinRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState<'todas' | 'lenta' | 'rapida'>('todas');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(4);
 
+  const loadRegistros = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await insulinaApi.getAll();
+      setRegistros(data);
+    } catch {
+      console.error("Error al cargar registros de insulina");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadRegistros();
+  }, [loadRegistros, refreshTrigger]);
+
   const obtenerColorTipo = (tipo: string) => {
-    if (tipo.includes("Lenta")) return 'warning.light';
-    if (tipo.includes("Rápida")) return 'info.light';
+    if (tipo === "LENTA") return 'warning.light';
+    if (tipo === "RAPIDA") return 'info.light';
     return 'text.primary';
+  };
+
+  const obtenerTipoLabel = (tipo: string) => {
+    return tipo === "LENTA" ? "Lenta / Basal" : "Rápida / Bolus";
+  };
+
+  const formatHora = (hora: string) => {
+    const [h, m] = hora.split(':');
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${m} ${ampm}`;
   };
 
   // Filtrar insulina según el tipo seleccionado
   const insulinaFiltrada = useMemo(() => {
-    let filtrados = registrosMock;
+    let filtrados = registros;
     
     if (filtro === 'lenta') {
-      filtrados = registrosMock.filter(item => item.tipo.includes("Lenta"));
+      filtrados = registros.filter(item => item.tipo === 'LENTA');
     } else if (filtro === 'rapida') {
-      filtrados = registrosMock.filter(item => item.tipo.includes("Rápida"));
+      filtrados = registros.filter(item => item.tipo === 'RAPIDA');
     }
     
     return [...filtrados].reverse();
-  }, [filtro]);
+  }, [filtro, registros]);
 
   // Datos para el gráfico
   const horasInsulina = insulinaFiltrada.map(item => item.hora.replace(/\s+/g, ''));
@@ -105,7 +125,11 @@ export default function InsulinaHistorial() {
             
             {/* Gráfico de Insulina con X-Charts */}
             <Box sx={{ flexGrow: 1, width: '100%', height: 220, mb: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              {insulinaFiltrada.length > 0 ? (
+              {loading ? (
+                <Typography variant="body2" color="text.secondary">
+                  Cargando...
+                </Typography>
+              ) : insulinaFiltrada.length > 0 ? (
                 <LineChart
                   xAxis={[{ scaleType: 'point', data: horasInsulina }]}
                   series={[
@@ -160,18 +184,18 @@ export default function InsulinaHistorial() {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => (
                       <TableRow key={row.id} hover>
-                        <TableCell sx={{ color: 'text.secondary' }}>{row.hora}</TableCell>
+                        <TableCell sx={{ color: 'text.secondary' }}>{formatHora(row.hora)}</TableCell>
                         <TableCell sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                          {row.dosis}
+                          {row.dosis} UI
                         </TableCell>
                         <TableCell sx={{ fontWeight: 700, color: obtenerColorTipo(row.tipo) }}>
-                          {row.tipo}
+                          {obtenerTipoLabel(row.tipo)}
                         </TableCell>
-                        <TableCell sx={{ color: 'text.secondary' }}>{row.zona}</TableCell>
-                        <TableCell sx={{ color: 'text.secondary' }}>{row.contexto}</TableCell>
+                        <TableCell sx={{ color: 'text.secondary' }}>{row.zonaLabel}</TableCell>
+                        <TableCell sx={{ color: 'text.secondary' }}>{row.contextoLabel || '-'}</TableCell>
                       </TableRow>
                   ))}
-                  {insulinaFiltrada.length === 0 && (
+                  {!loading && insulinaFiltrada.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={5} align="center" sx={{ color: 'text.secondary', py: 3 }}>
                         {t('noHayRegistrosFiltro')}

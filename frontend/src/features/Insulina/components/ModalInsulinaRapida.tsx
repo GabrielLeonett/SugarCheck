@@ -10,14 +10,24 @@ import useLanguage from "../../../hooks/useLanguage";
 interface ModalInsulinaRapidaProps {
   open: boolean;
   onClose: () => void;
+  onSave: (data: {
+    dosis: number;
+    contexto: string;
+    dia: number;
+    mes: number;
+    anio: number;
+    hora: string;
+    zona: string;
+  }) => Promise<void>;
 }
 
-export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapidaProps) {
+export default function ModalInsulinaRapida({ open, onClose, onSave }: ModalInsulinaRapidaProps) {
   const { t } = useLanguage("insulina");
-  const [unidades, setUnidades] = useState<number>(0);
+  const [dosis, setDosis] = useState<number>(0);
   const [contexto, setContexto] = useState<string>("");
   const [fecha, setFecha] = useState({ dd: "23", mm: "06", yyyy: "2026" });
   const [hora, setHora] = useState("14:11");
+  const [loading, setLoading] = useState(false);
 
   const [vistaCuerpo, setVistaCuerpo] = useState<"FRENTE" | "ATRÁS">("FRENTE");
   const [zonaSeleccionada, setZonaSeleccionada] = useState<string>(t("zoneAbdomenLeft"));
@@ -38,7 +48,6 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
 
   const zonasActuales = vistaCuerpo === "FRENTE" ? zonasFrente : zonasAtras;
 
-  // Función para obtener el color según la zona
   const getZonaColor = (zona: string, esSeleccionado: boolean) => {
     if (!esSeleccionado) return "#e2e8f0";
     
@@ -49,7 +58,6 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
     return "#64748b";
   };
 
-  // Función para obtener el icono de la zona
   const getZonaIcon = (zona: string) => {
     if (zona.includes("Abdomen")) return "⬤";
     if (zona.includes("Glúteo")) return "⬤";
@@ -58,17 +66,35 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
     return "⬤";
   };
 
-  // Función para resetear el formulario
   const resetFormulario = () => {
-    setUnidades(0);
+    setDosis(0);
     setContexto("");
-    setFecha({ dd: "23", mm: "06", yyyy: "2026" });
-    setHora("14:11");
-    setZonaSeleccionada("Abdomen Izquierdo");
+    const now = new Date();
+    setFecha({
+      dd: String(now.getDate()).padStart(2, '0'),
+      mm: String(now.getMonth() + 1).padStart(2, '0'),
+      yyyy: String(now.getFullYear()),
+    });
+    setHora(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`);
+    setZonaSeleccionada(t("zoneAbdomenLeft"));
   };
 
-  const handleGuardar = () => {
-    if (unidades === 0) {
+  const zonaToBackend = (zona: string): string => {
+    const mapping: Record<string, string> = {
+      [t("zoneAbdomenRight")]: 'ABDOMEN_DERECHO',
+      [t("zoneAbdomenLeft")]: 'ABDOMEN_IZQUIERDO',
+      [t("zoneThighRight")]: 'MUSLO_DERECHO',
+      [t("zoneThighLeft")]: 'MUSLO_IZQUIERDO',
+      [t("zoneArmRight")]: 'BRAZO_DERECHO',
+      [t("zoneArmLeft")]: 'BRAZO_IZQUIERDO',
+      [t("zoneGluteRight")]: 'GLUTEO_DERECHO',
+      [t("zoneGluteLeft")]: 'GLUTEO_IZQUIERDO',
+    };
+    return mapping[zona] || 'ABDOMEN_IZQUIERDO';
+  };
+
+  const handleGuardar = async () => {
+    if (dosis === 0) {
       alert(t("pleaseEnterUnits"));
       return;
     }
@@ -77,24 +103,30 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
       return;
     }
     
-    console.log({
-      unidades,
-      contexto,
-      fecha: `${fecha.dd}/${fecha.mm}/${fecha.yyyy}`,
-      hora,
-      zona: zonaSeleccionada,
-      vista: vistaCuerpo,
-      tipo: "Rápida"
-    });
-    
-    resetFormulario();
-    onClose();
+    setLoading(true);
+    try {
+      await onSave({
+        dosis,
+        contexto,
+        dia: parseInt(fecha.dd, 10),
+        mes: parseInt(fecha.mm, 10),
+        anio: parseInt(fecha.yyyy, 10),
+        hora,
+        zona: zonaToBackend(zonaSeleccionada),
+      });
+      resetFormulario();
+      onClose();
+    } catch {
+      alert("Error al guardar el registro");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={{ p: 0, maxWidth: 900, mx: "auto" }}>
-        {/* Header con título y porcentaje */}
+        {/* Header con título */}
         <Box
           sx={{
             bgcolor: "#f8fafc",
@@ -114,13 +146,13 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
           <Grid container spacing={4}>
             {/* COLUMNA IZQUIERDA: Formulario */}
             <Grid>
-              {/* Unidades */}
+              {/* Dosis */}
               <Box sx={{ mb: 3 }}>
                 <Typography
                   variant="body2"
                   sx={{ fontWeight: "bold", color: "#475569", mb: 1 }}
                 >
-                  {t("glucoseLevel")}
+                  {t("dosis")}
                 </Typography>
                 <Box
                   sx={{
@@ -131,7 +163,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                   }}
                 >
                   <IconButton
-                    onClick={() => setUnidades((prev) => Math.max(0, prev - 1))}
+                    onClick={() => setDosis((prev) => Math.max(0, prev - 0.5))}
                     sx={{
                       bgcolor: "#e2e8f0",
                       color: "#475569",
@@ -144,10 +176,14 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                     <RemoveIcon />
                   </IconButton>
                   <TextField
-                    value={unidades === 0 ? "" : unidades}
+                    value={dosis === 0 ? "" : dosis}
                     placeholder="0"
-                    onChange={(e) => setUnidades(Number(e.target.value))}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      setDosis(isNaN(val) ? 0 : val);
+                    }}
                     type="number"
+                    inputProps={{ step: 0.5 }}
                     sx={{
                       width: 140,
                       "& .MuiOutlinedInput-root": {
@@ -162,7 +198,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                     }}
                   />
                   <IconButton
-                    onClick={() => setUnidades((prev) => prev + 1)}
+                    onClick={() => setDosis((prev) => prev + 0.5)}
                     sx={{
                       bgcolor: "#e2e8f0",
                       color: "#475569",
@@ -204,10 +240,10 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                   <MenuItem value="">
                     <em>{t("selectPlaceholder")}</em>
                   </MenuItem>
-                  <MenuItem value="Desayuno">{t("beforeBreakfast")}</MenuItem>
-                  <MenuItem value="Almuerzo">{t("beforeLunch")}</MenuItem>
-                  <MenuItem value="Cena">{t("beforeDinner")}</MenuItem>
-                  <MenuItem value="Corrección">{t("correction")}</MenuItem>
+                  <MenuItem value="DESAYUNO">{t("beforeBreakfast")}</MenuItem>
+                  <MenuItem value="ALMUERZO">{t("beforeLunch")}</MenuItem>
+                  <MenuItem value="CENA">{t("beforeDinner")}</MenuItem>
+                  <MenuItem value="CORRECCION">{t("correction")}</MenuItem>
                 </TextField>
               </Box>
 
@@ -330,7 +366,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                   const color = getZonaColor(zona, esSeleccionado);
 
                   return (
-                    <Grid>
+                    <Grid key={zona}>
                       <Paper
                         onClick={() => setZonaSeleccionada(zona)}
                         elevation={esSeleccionado ? 3 : 1}
@@ -377,6 +413,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                   fullWidth
                   startIcon={<CheckCircleIcon />}
                   onClick={handleGuardar}
+                  disabled={loading}
                   sx={{
                     bgcolor: "#1e293b",
                     "&:hover": { bgcolor: "#0f172a" },
@@ -384,7 +421,7 @@ export default function ModalInsulinaRapida({ open, onClose }: ModalInsulinaRapi
                     borderRadius: 2,
                   }}
                 >
-                  {t("saveMeasurement")}
+                  {loading ? t("saving") || "Guardando..." : t("saveMeasurement")}
                 </ButtonBase>
               </Box>
             </Grid>
