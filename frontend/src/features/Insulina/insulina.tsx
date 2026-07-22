@@ -3,21 +3,80 @@ import Footer from '../../components/layout/Footer/Footer.tsx';
 import { Typography, Box, Grid } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { CardBase } from "../../components/ui/Cards/CardBase.tsx";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ButtonBase } from "../../components/ui/Buttons/ButtonBase.tsx";
 import ModalInsulinaLenta from "./components/ModalInsulinaLenta.tsx";
 import ModalInsulinaRapida from "./components/ModalInsulinaRapida.tsx";
 import InsulinaHistorial from "./components/insulinaHistorial.tsx";
 import useLanguage from "../../hooks/useLanguage";
+import { insulinaApi, type DailyTotals } from "../../apis/insulina";
 
 export default function Insulina() {
   const [openLento, setOpenLento] = useState(false);
   const [openRapido, setOpenRapido] = useState(false);
+  const [totals, setTotals] = useState<DailyTotals>({ totalRapida: 0, totalLenta: 0, totalGeneral: 0 });
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const {t} = useLanguage('insulina');
 
   const Rango = ["80 - 120", "121 - 150", "151 - 190", "191 - 250", "> 250"];
   const unidadesE = ["2 UI", "3 UI", "4 UI", "5 UI", "6 UI"];
+
+  const loadTotals = useCallback(async () => {
+    try {
+      const data = await insulinaApi.getTotals();
+      setTotals(data);
+    } catch {
+      console.error("Error al cargar totales de insulina");
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTotals();
+  }, [loadTotals, refreshKey]);
+
+  const handleGuardarRapida = async (data: {
+    dosis: number;
+    contexto: string;
+    dia: number;
+    mes: number;
+    anio: number;
+    hora: string;
+    zona: string;
+  }) => {
+    try {
+      await insulinaApi.create({
+        tipo: 'RAPIDA',
+        ...data,
+      });
+      setOpenRapido(false);
+      setRefreshKey(k => k + 1);
+    } catch (error) {
+      console.error("Error al guardar insulina rápida:", error);
+      throw error;
+    }
+  };
+
+  const handleGuardarLenta = async (data: {
+    dosis: number;
+    dia: number;
+    mes: number;
+    anio: number;
+    hora: string;
+    zona: string;
+  }) => {
+    try {
+      await insulinaApi.create({
+        tipo: 'LENTA',
+        ...data,
+      });
+      setOpenLento(false);
+      setRefreshKey(k => k + 1);
+    } catch (error) {
+      console.error("Error al guardar insulina lenta:", error);
+      throw error;
+    }
+  };
 
   return (
     <>
@@ -34,6 +93,16 @@ export default function Insulina() {
             </Grid>
           </Grid>
 
+<<<<<<< HEAD
+      {/* TÍTULO */}
+      <Grid container>
+        <Grid size={12}>
+                   <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
+                     {t('monitoreoDiarioDeInsulina')}
+                   </Typography>
+        </Grid>
+      </Grid>
+=======
           {/* CONTENEDOR PRINCIPAL CON 2 COLUMNAS */}
           <Grid container spacing={3}>
             {/* COLUMNA IZQUIERDA */}
@@ -80,6 +149,7 @@ export default function Insulina() {
                   {t("registrarLenta")}
                 </ButtonBase>
               </Box>
+>>>>>>> 4901d41471693e401fe6637748586d5f83fbda5d
 
               {/* CARD: CRONÓMETRO */}
               <CardBase sx={{ mb: 2, p: 2.5, textAlign: "center" }}>
@@ -90,6 +160,12 @@ export default function Insulina() {
                   variant="h4"
                   sx={{ color: "#f6983b", fontWeight: "bold", mb: 1 }}
                 >
+<<<<<<< HEAD
+                  {totals.totalGeneral.toFixed(1)} UI
+                </Typography>
+                <Typography variant="caption" sx={{ color: "#94a3b8", display: "block", mt: 0.5 }}>
+                  {t("rapida")}: {totals.totalRapida.toFixed(1)} UI | {t("lenta")}: {totals.totalLenta.toFixed(1)} UI
+=======
                   3h : 45m
                 </Typography>
                 <Typography
@@ -103,6 +179,7 @@ export default function Insulina() {
                   sx={{ color: "#f6983b", fontWeight: 500 }}
                 >
                   {t("escudoAgotando")}
+>>>>>>> 4901d41471693e401fe6637748586d5f83fbda5d
                 </Typography>
               </CardBase>
 
@@ -186,6 +263,34 @@ export default function Insulina() {
             </Grid>
           </Grid>
 
+<<<<<<< HEAD
+        {/* COLUMNA DERECHA */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          {/* COMPONENTE DE HISTORIAL - CON MÁS ESPACIO */}
+          <Box sx={{ pl: { md: 1 } }}>
+            <InsulinaHistorial refreshTrigger={refreshKey} />
+          </Box>
+        </Grid>
+      </Grid>
+
+      {/* MODALES */}
+      <ModalInsulinaRapida
+        open={openRapido}
+        onClose={() => {
+          setOpenRapido(false);
+        }}
+        onSave={handleGuardarRapida}
+      />
+
+      <ModalInsulinaLenta
+        open={openLento}
+        onClose={() => {
+          setOpenLento(false);
+        }}
+        onSave={handleGuardarLenta}
+      />
+      </Container>
+=======
           {/* MODALES */}
           <ModalInsulinaRapida
             open={openRapido}
@@ -204,6 +309,7 @@ export default function Insulina() {
           />
         </Box>
       </Box>
+>>>>>>> 4901d41471693e401fe6637748586d5f83fbda5d
       <Footer />
     </>
   );

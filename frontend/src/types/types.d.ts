@@ -74,6 +74,27 @@ export interface BackendErrorsApi {
   field?: string,
 }
 
+export interface InsulinRecord {
+  id: string;
+  userId: string;
+  tipo: string;
+  unidades: number;
+  dosis: number;
+  fecha: string;
+  hora: string;
+  zona: string;
+  zonaLabel: string;
+  contexto: string | null;
+  contextoLabel: string | null;
+  createdAt: string;
+}
+
+export interface DailyInsulinTotals {
+  totalRapida: number;
+  totalLenta: number;
+  totalGeneral: number;
+}
+
 export type NotificationType = 'alert' | 'reminder' | 'achievement' | 'info' | 'warning';
 
 // Glucemia (Glucose)
