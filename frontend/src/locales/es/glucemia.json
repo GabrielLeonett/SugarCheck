@@ -42,6 +42,7 @@
     "title": "Historial de Registros",
     "ariaLabel": "Tabla de historial de glucosa",
     "headers": {
+      "fecha": "Fecha",
       "hora": "Hora",
       "nivel": "Nivel (mg/dL)",
       "contexto": "Contexto",

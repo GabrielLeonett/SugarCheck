@@ -29,30 +29,39 @@ function useMetricData<T extends { id: string | number; fechaISO: string }>(
 
   const filteredData = useMemo(() => {
     const ahora = new Date();
+    const y = ahora.getFullYear();
+    const m = String(ahora.getMonth() + 1).padStart(2, '0');
+    const d = String(ahora.getDate()).padStart(2, '0');
+    const hoy = `${y}-${m}-${d}`;
+
+    function dateStr(date: Date): string {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
     return initialData.filter((item) => {
-      const fechaItem = new Date(item.fechaISO);
+      const itemDate = item.fechaISO.split('T')[0];
       switch (timeRange) {
         case 'hoy':
-          return fechaItem.toDateString() === ahora.toDateString();
+          return itemDate === hoy;
         case 'semana': {
-          const sieteDiasAtras = new Date();
-          sieteDiasAtras.setDate(ahora.getDate() - 7);
-          return fechaItem >= sieteDiasAtras;
+          const inicio = new Date(ahora);
+          inicio.setDate(ahora.getDate() - 7);
+          return itemDate >= dateStr(inicio) && itemDate <= hoy;
         }
         case 'mes': {
-          const treintaDiasAtras = new Date();
-          treintaDiasAtras.setDate(ahora.getDate() - 30);
-          return fechaItem >= treintaDiasAtras;
+          const inicio = new Date(ahora);
+          inicio.setDate(ahora.getDate() - 30);
+          return itemDate >= dateStr(inicio) && itemDate <= hoy;
         }
         case 'trimestre': {
-          const tresMesesAtras = new Date();
-          tresMesesAtras.setMonth(ahora.getMonth() - 3);
-          return fechaItem >= tresMesesAtras;
+          const inicio = new Date(ahora);
+          inicio.setMonth(ahora.getMonth() - 3);
+          return itemDate >= dateStr(inicio) && itemDate <= hoy;
         }
         case 'año': {
-          const unAnoAtras = new Date();
-          unAnoAtras.setFullYear(ahora.getFullYear() - 1);
-          return fechaItem >= unAnoAtras;
+          const inicio = new Date(ahora);
+          inicio.setFullYear(ahora.getFullYear() - 1);
+          return itemDate >= dateStr(inicio) && itemDate <= hoy;
         }
         case 'todos':
           return true;

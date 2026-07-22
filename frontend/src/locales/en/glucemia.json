@@ -42,6 +42,7 @@
     "title": "Records History",
     "ariaLabel": "Glucose history table",
     "headers": {
+      "fecha": "Date",
       "hora": "Time",
       "nivel": "Level (mg/dL)",
       "contexto": "Context",
