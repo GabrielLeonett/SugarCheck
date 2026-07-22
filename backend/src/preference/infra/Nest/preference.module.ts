@@ -28,6 +28,6 @@ import { AuthModule } from '../../../auth/infra/auth.module';
 
   ],
   controllers: [PreferenceController],
-  exports: ['SavePreference']
+  exports: ['SavePreference', 'GetOneByIdPreference']
 })
 export class PreferenceModule { }

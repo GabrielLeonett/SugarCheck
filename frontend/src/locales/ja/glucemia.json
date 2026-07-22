@@ -42,6 +42,7 @@
     "title": "記録履歴",
     "ariaLabel": "血糖値履歴テーブル",
     "headers": {
+      "fecha": "日付",
       "hora": "時間",
       "nivel": "数値 (mg/dL)",
       "contexto": "状況",
