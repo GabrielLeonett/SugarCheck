@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { LogoGA } from "../components/ui/LogoGA";
 import LoginIcon from '@mui/icons-material/Login';
 import { CardBase } from '../components/ui/Cards/CardBase';
-import { apiPublic } from '../apis/axios';
+import { apiPrivate, apiPublic } from '../apis/axios';
 import { contactEmergenceApi } from '../apis/contact_emergence';
 import { useAuthStore } from '../stores/authStore';
 import { useNavigate } from 'react-router-dom';
@@ -132,6 +132,31 @@ export default function Register() {
       });
 
       await login(values.username, values.password);
+
+      const now = new Date();
+      await apiPrivate.post('/imc', {
+        peso: Number(values.peso),
+        altura: Number(values.talla),
+        dia: now.getDate(),
+        mes: now.getMonth() + 1,
+        anio: now.getFullYear(),
+      }).catch((e) => console.error('Error al crear IMC:', e));
+
+      try {
+        const prefRes = await apiPrivate.get('/preference');
+        const currentPrefs = prefRes.data?.data;
+        if (currentPrefs) {
+          await apiPrivate.post('/preference', {
+            profileImg: currentPrefs.profileImg,
+            unitMeasure: currentPrefs.unitMeasure,
+            thresholds: { hypo: Number(values.glucosaMin), hiper: Number(values.glucosaMax) },
+            insulinRatios: currentPrefs.insulinRatios,
+            sensitivity: currentPrefs.sensitivity,
+          });
+        }
+      } catch (e) {
+        console.error('Error al actualizar preferencias:', e);
+      }
 
       await contactEmergenceApi.create({
         name: values.nombreGuardián,
@@ -319,7 +344,7 @@ export default function Register() {
               </Grid>
             </Grid>
 
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', mb: 2, textAlign: 'left' }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', mb: 2 }}>
               {t("glucoseRangeTitle")}
             </Typography>
 
@@ -466,10 +491,17 @@ export default function Register() {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
           p: { xs: 3, sm: 2 },
-          textAlign: 'center',
+          '& .MuiCardContent-root': {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            height: '100%',
+            padding: 0,
+            '&:last-child': { pb: 0 },
+          },
         }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
             {leftContent.title}
@@ -477,7 +509,7 @@ export default function Register() {
           <Typography variant="body1" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
             {leftContent.description}
           </Typography>
-          <Typography variant="body2" sx={{ mt: { xs: 2, md: 'auto' } }}>
+          <Typography variant="body2" sx={{ mt: 2 }}>
             {t("hasAccount")}{' '}
             <Link href="/login" sx={{ color: theme.palette.primary.main, fontWeight: 'bold', textDecoration: 'none' }}>
               {t("loginLink")}
@@ -503,21 +535,22 @@ export default function Register() {
             {getStepContent()}
 
             <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={handleBack}
-                disabled={activeStep === 0 || isSubmitting}
-                sx={{
-                  py: 1,
-                  borderColor: 'white',
-                  color: 'white',
-                  '&:hover': { borderColor: '#f5f5f5', bgcolor: 'rgba(255,255,255,0.1)' },
-                  '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.3)' }
-                }}
-              >
-                {t("backButton")}
-              </Button>
+              {activeStep > 0 && (
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={handleBack}
+                  disabled={isSubmitting}
+                  sx={{
+                    py: 1,
+                    borderColor: 'white',
+                    color: 'white',
+                    '&:hover': { borderColor: '#f5f5f5', bgcolor: 'rgba(255,255,255,0.1)' },
+                  }}
+                >
+                  {t("backButton")}
+                </Button>
+              )}
 
               <Button
                 fullWidth
