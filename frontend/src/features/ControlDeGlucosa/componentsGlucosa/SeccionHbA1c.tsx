@@ -102,19 +102,34 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
               onSave={onSaveHbA1c}
             />
 
-            <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 1.5 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                 {t('ultimoResultado.title')}
               </Typography>
-              <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "success.light" }}>
-                {dataHook.ultimoResultadoHbA1c ? `${dataHook.ultimoResultadoHbA1c}%` : "—"}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {dataHook.ultimoEag ? t('ultimoResultado.estimado', { valor: dataHook.ultimoEag }) : '—'}
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "success.light" }}>
-                {dataHook.enRangoObjetivo !== false ? t('ultimoResultado.enRango') : t('ultimoResultado.fueraRango')}
-              </Typography>
+
+              {dataHook.ultimoResultadoHbA1c ? (
+                <>
+                  <Typography
+                    variant="h2"
+                    sx={{ fontWeight: 700, color: dataHook.enRangoObjetivo ? 'success.light' : 'warning.light' }}
+                  >
+                    {`${dataHook.ultimoResultadoHbA1c}%`}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {t('ultimoResultado.estimado', { valor: dataHook.ultimoEag })}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: dataHook.enRangoObjetivo ? 'success.light' : 'warning.light' }}
+                  >
+                    {dataHook.enRangoObjetivo ? t('ultimoResultado.enRango') : t('ultimoResultado.fueraRango')}
+                  </Typography>
+                </>
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
+                  {t('ultimoResultado.sinDatos')}
+                </Typography>
+              )}
             </CardBase>
           </Box>
         </Grid>
