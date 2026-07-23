@@ -7,6 +7,15 @@ export interface GlucosaRecord {
   estado: 'Normal' | 'Alto' | 'Bajo';
 }
 
+export interface ImcRecord {
+  id: number;
+  fechaISO: string;
+  peso: number;
+  estatura: number;
+  imc: number;
+  estado: string;
+}
+
 export interface HbA1cRecord {
   id: number;
   fechaISO: string;
