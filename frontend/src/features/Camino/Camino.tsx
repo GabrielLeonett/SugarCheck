@@ -4,7 +4,7 @@ import { Box, Grid, Typography } from "@mui/material";
 import InsigniaCard from "./Components/InsigniasCard";
 import { HexagonoMundo } from "./Components/NivelesHexagono";
 import yelmo_de_sabiduria from "../../assets/insigniasCamino/yelmo_de_sabiduria.png"
-import escudo_de_fibra from "../../assets/insigniasCamino/escudo_de_fribra.png";
+import escudo_fibra from "../../assets/insigniasCamino/escudo_fibra.svg";
 import SeparadorMundo from "./Components/SeparaMundos"
 export function Camino() {
 return (
@@ -53,7 +53,7 @@ return (
                 <Typography variant="h5" sx={{ color: 'white', textAlign: 'center', fontWeight: 'bold', pt: 4 }}>
                 Colección de Insignias
                 </Typography>
-                <InsigniaCard img={escudo_de_fibra} mundo="Mundo 1" name="escudo de fibra" bloqueado={false}    />
+                <InsigniaCard img={escudo_fibra} mundo="Mundo 1" name="escudo de fibra" bloqueado={false}    />
                 <InsigniaCard img={yelmo_de_sabiduria} mundo="Mundo 2" name="yelmo de la sabiduria" bloqueado />
                 <InsigniaCard img={yelmo_de_sabiduria} mundo="Mundo 2" name="yelmo de la sabiduria" bloqueado />
                 <InsigniaCard img={yelmo_de_sabiduria} mundo="Mundo 2" name="yelmo de la sabiduria" bloqueado />

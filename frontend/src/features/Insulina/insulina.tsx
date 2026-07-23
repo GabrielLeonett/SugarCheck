@@ -30,7 +30,7 @@ export default function Insulina() {
       <Grid container>
         <Grid size={12}>
                    <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
-                     {t('monitoreoDiarioDeInsulina')}
+                     {t('title')}
                    </Typography>
         </Grid>
       </Grid>
@@ -62,7 +62,7 @@ export default function Insulina() {
                 borderRadius: 2
               }}
             >
-              {t("registrarRapida")} 
+              {t("fastDoseButton")} 
             </ButtonBase>
 
             <ButtonBase
@@ -78,14 +78,14 @@ export default function Insulina() {
                 borderRadius: 2
               }}
             >
-              {t("registrarLenta")}
+              {t("slowDoseButton")}
             </ButtonBase>
           </Box>
 
           {/* CARD: CRONÓMETRO */}
           <CardBase sx={{ mb: 2, p: 2.5, textAlign: "center" }}>
             <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, mb: 1 }}>
-              {t("cronometroSeguridad")}
+              {t("safetyTimer")}
             </Typography>
             <Typography
               variant="h4"
