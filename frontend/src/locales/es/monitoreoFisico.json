@@ -19,10 +19,14 @@
     "tableEstatura": "Estatura (cm)",
     "tableImc": "IMC",
     "tableEstado": "Estado",
+    "statusUnderweight": "Bajo peso",
+    "statusNormal": "Normal",
+    "statusOverweight": "Sobrepeso",
     "chartTitle": "Bitácora Histórica de Fortaleza Física",
     "filterAll": "TODOS",
     "filterQuarter": "TRIMESTRE",
     "filterYear": "AÑO",
     "rowsPerPage": "Filas por página:",
-    "displayedRows": "{from}-{to} de {count}"
+    "displayedRows": "{from}-{to} de {count}",
+    "loading": "Cargando..."
 }

@@ -19,6 +19,11 @@ model User {
   
   preference      Preference? 
   contactEmergences ContactEmergence[]
+  imcRecords        Imc[]
+  glucoseRecords    Glucose[]
+  hba1cRecords      HbA1c[]
+
+  insulinas         Insulina[]
 }
 
 model Preference {
@@ -42,4 +47,65 @@ model ContactEmergence {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Imc {
+  id        String   @id @default(uuid())
+  userId    String
+  peso      Float
+  altura    Float
+  imcValue  Float
+  fecha     DateTime
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+
+model Glucose {
+  id        String   @id @default(uuid())
+  userId    String
+  valueMgdl Float
+  mealTag   String
+  date      DateTime
+  time      String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, date])
+}
+
+model HbA1c {
+  id           String   @id @default(uuid())
+  userId       String
+  valuePercent Float
+  examDate     DateTime
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Insulina {
+  id          String   @id @default(uuid())
+  userId      String
+  tipo        String   // "RAPIDA" | "LENTA"
+  dosis       Float
+  unidades    Float
+  fecha       DateTime
+  hora        String   // HH:mm format
+  zona        String   // injection site
+  contexto    String?  // only for RAPIDA: "DESAYUNO" | "ALMUERZO" | "CENA" | "CORRECCION"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, fecha])
+
 }

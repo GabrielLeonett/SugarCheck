@@ -19,10 +19,14 @@
     "tableEstatura": "Height (cm)",
     "tableImc": "BMI",
     "tableEstado": "Status",
+    "statusUnderweight": "Underweight",
+    "statusNormal": "Normal",
+    "statusOverweight": "Overweight",
     "chartTitle": "Historical Physical Strength Log",
     "filterAll": "ALL",
     "filterQuarter": "QUARTER",
     "filterYear": "YEAR",
     "rowsPerPage": "Rows per page:",
-    "displayedRows": "{from}-{to} of {count}"
+    "displayedRows": "{from}-{to} of {count}",
+    "loading": "Loading..."
 }

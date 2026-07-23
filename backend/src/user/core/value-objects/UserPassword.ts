@@ -14,7 +14,7 @@ export class UserPassword {
     // 1. Validar que no sea nula o vacía
     if (!password || password.trim().length === 0) {
       return Result.fail(
-        new UserPasswordInvalidError('La contraseña no puede estar vacía.'),
+        new UserPasswordInvalidError('La contraseña no puede estar vacía.').withCode('PASSWORD_EMPTY', 'password'),
       );
     }
 
@@ -23,7 +23,7 @@ export class UserPassword {
       return Result.fail(
         new UserPasswordInvalidError(
           'La contraseña debe tener al menos 8 caracteres.',
-        ),
+        ).withCode('PASSWORD_MIN_LENGTH', 'password'),
       );
     }
 
@@ -33,7 +33,7 @@ export class UserPassword {
       return Result.fail(
         new UserPasswordInvalidError(
           'La contraseña debe incluir al menos un número.',
-        ),
+        ).withCode('PASSWORD_REQUIRES_NUMBER', 'password'),
       );
     }
 

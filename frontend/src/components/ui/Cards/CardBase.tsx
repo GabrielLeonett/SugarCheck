@@ -9,7 +9,7 @@ import {
 import type { ReactNode } from 'react';
 import type { CardProps, SxProps, Theme } from '@mui/material';
 
-export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | 'subtitle'> {
+export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | 'subtitle' | 'onSubmit'> {
   title?: ReactNode;
   subtitle?: ReactNode;
   image?: string;
@@ -25,6 +25,8 @@ export interface CustomCardProps extends Omit<CardProps, 'variant' | 'title' | '
   bgColor?: string;
   borderColor?: string;
   sx?: SxProps<Theme>;
+  component?: React.ElementType;
+  onSubmit?: React.FormEventHandler<HTMLFormElement>;
 }
 
 export function CardBase({
@@ -38,7 +40,10 @@ export function CardBase({
   headerAction,
   actions,
   children,
-  sx
+  sx,
+  component,
+  onSubmit,
+  ...rest
 }: CustomCardProps) {
 
   return (
@@ -46,6 +51,8 @@ export function CardBase({
       variant={variant}
       elevation={variant === 'elevation' ? elevation : 0}
       sx={{ ...sx}}
+      {...{ component, onSubmit } as any}
+      {...rest}
     >
       {(title || subtitle || avatar || headerAction) && (
         <CardHeader

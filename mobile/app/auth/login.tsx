@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 import { FormInput } from '@/components/FormInput';
@@ -16,6 +16,7 @@ export default function LoginScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const isDark = colorScheme === 'dark';
   const login = useAuthStore((s) => s.login);
+  const user = useAuthStore((s) => s.user);
   const loginWithProvider = useAuthStore((s) => s.loginWithProvider);
 
   const [email, setEmail] = useState('');
@@ -57,6 +58,10 @@ export default function LoginScreen() {
       setSocialLoading(null);
     }
   };
+
+  if (user) {
+    return <Redirect href="/(tabs)" />;
+  }
 
   return (
     <ThemedView style={styles.container}>

@@ -45,7 +45,7 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <TextField
-          label={t("pesoLabel")}
+          label={t("weightLabel")}
           variant="outlined"
           fullWidth
           value={peso}
@@ -58,7 +58,7 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
         />
 
         <TextField
-          label={t("tallaLabel")}
+          label={t("heightLabel")}
           variant="outlined"
           fullWidth
           value={talla}
@@ -71,7 +71,7 @@ export const RegisterMeasurementModal: React.FC<RegisterMeasurementModalProps> =
         />
 
         <TextField
-          label={t("fechaLabel")}
+          label={t("dateLabel")}
           variant="outlined"
           fullWidth
           value={fecha}

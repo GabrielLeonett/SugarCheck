@@ -3,7 +3,7 @@
     "subtitle": "Enter your credentials to access",
     "usernameLabel": "Username",
     "nameLabel": "Full Name",
-    "ageLabel": "Age",
+    "birthDateLabel": "Date of Birth",
     "sexLabel": "Sex",
     "sexMale": "Male",
     "sexFemale": "Female",

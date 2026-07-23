@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { Box, useTheme, Typography, TextField, Button, Link, Grid, MenuItem, Alert } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateField } from '@mui/x-date-pickers/DateField';
+import dayjs from 'dayjs';
 import { LogoGA } from "../components/ui/LogoGA";
 import LoginIcon from '@mui/icons-material/Login';
 import { CardBase } from '../components/ui/Cards/CardBase';
-import { apiPublic } from '../apis/axios';
+import { apiPrivate, apiPublic } from '../apis/axios';
 import { contactEmergenceApi } from '../apis/contact_emergence';
 import { useAuthStore } from '../stores/authStore';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +24,7 @@ import useLanguage from "../hooks/useLanguage";
 type RegisterFormData = {
   username: string;
   nombre: string;
-  edad: string;
+  fechaNacimiento: string;
   sexo: '' | 'masculino' | 'femenino';
   email: string;
   password: string;
@@ -37,7 +41,7 @@ type RegisterFormData = {
 const defaultValues: RegisterFormData = {
   username: '',
   nombre: '',
-  edad: '',
+  fechaNacimiento: '',
   sexo: '',
   email: '',
   password: '',
@@ -62,6 +66,7 @@ export default function Register() {
 
   const {
     register,
+    control,
     setError,
     clearErrors,
     getValues,
@@ -117,19 +122,41 @@ export default function Register() {
     setAuthError(null);
 
     try {
-      const fechaNacimiento = new Date();
-      fechaNacimiento.setFullYear(fechaNacimiento.getFullYear() - parseInt(values.edad || '0'));
-
       await apiPublic.post('/user/register', {
         name: values.nombre,
         username: values.username,
         email: values.email || undefined,
         sexo: values.sexo,
-        fechaNacimiento: fechaNacimiento.toISOString(),
+        fechaNacimiento: values.fechaNacimiento,
         password: values.password,
       });
 
       await login(values.username, values.password);
+
+      const now = new Date();
+      await apiPrivate.post('/imc', {
+        peso: Number(values.peso),
+        altura: Number(values.talla),
+        dia: now.getDate(),
+        mes: now.getMonth() + 1,
+        anio: now.getFullYear(),
+      }).catch((e) => console.error('Error al crear IMC:', e));
+
+      try {
+        const prefRes = await apiPrivate.get('/preference');
+        const currentPrefs = prefRes.data?.data;
+        if (currentPrefs) {
+          await apiPrivate.post('/preference', {
+            profileImg: currentPrefs.profileImg,
+            unitMeasure: currentPrefs.unitMeasure,
+            thresholds: { hypo: Number(values.glucosaMin), hiper: Number(values.glucosaMax) },
+            insulinRatios: currentPrefs.insulinRatios,
+            sensitivity: currentPrefs.sensitivity,
+          });
+        }
+      } catch (e) {
+        console.error('Error al actualizar preferencias:', e);
+      }
 
       await contactEmergenceApi.create({
         name: values.nombreGuardián,
@@ -144,7 +171,7 @@ export default function Register() {
         const message = axiosError.response?.data?.message || t("errorRegister");
 
         if (axiosError.response?.status === 409) {
-          setError('email', { message: t("errorEmailTaken") });
+          setError('email', { message: t("errorEmailExists") });
         }
         setAuthError(message);
       } else {
@@ -199,15 +226,30 @@ export default function Register() {
               sx={textFieldStyles}
             />
 
-            <TextField
-              fullWidth
-              label={t("ageLabel")}
-              variant="outlined"
-              size="small"
-              type="number"
-              {...register("edad")}
-              sx={textFieldStyles}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Controller
+                name="fechaNacimiento"
+                control={control}
+                render={({ field: { onChange, value, ...rest } }) => (
+                  <DateField
+                    {...rest}
+                    fullWidth
+                    label={t("birthDateLabel")}
+                    format="DD/MM/YYYY"
+                    value={value ? dayjs(value) : null}
+                    onChange={(newValue) => onChange(newValue ? newValue.toISOString() : '')}
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        sx: textFieldStyles,
+                        error: !!errors.fechaNacimiento,
+                        helperText: errors.fechaNacimiento?.message,
+                      }
+                    }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
 
             <TextField
               {...register("sexo")}
@@ -302,7 +344,7 @@ export default function Register() {
               </Grid>
             </Grid>
 
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', mb: 2, textAlign: 'left' }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.9)', mb: 2 }}>
               {t("glucoseRangeTitle")}
             </Typography>
 
@@ -437,29 +479,37 @@ export default function Register() {
     }}>
       <Box sx={{
         display: 'flex',
-        flexDirection: 'row',
-        gap: 4,
+        flexDirection: { xs: 'column', md: 'row' },
+        gap: { xs: 2, sm: 4 },
         justifyContent: 'center',
         alignItems: 'stretch',
         maxWidth: '1000px',
-        width: '100%'
+        width: '100%',
+        px: { xs: 2, sm: 0 }
       }}>
         <CardBase sx={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          p: 2,
-          textAlign: 'center',
+          p: { xs: 3, sm: 2 },
+          '& .MuiCardContent-root': {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            height: '100%',
+            padding: 0,
+            '&:last-child': { pb: 0 },
+          },
         }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
             {leftContent.title}
           </Typography>
           <Typography variant="body1" sx={{ color: theme.palette.text.primary, maxWidth: '350px', mb: 4 }}>
             {leftContent.description}
           </Typography>
-          <Typography variant="body2" sx={{ mt: 'auto' }}>
+          <Typography variant="body2" sx={{ mt: 2 }}>
             {t("hasAccount")}{' '}
             <Link href="/login" sx={{ color: theme.palette.primary.main, fontWeight: 'bold', textDecoration: 'none' }}>
               {t("loginLink")}
@@ -474,7 +524,7 @@ export default function Register() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          p: 2,
+          p: { xs: 3, sm: 2 },
         }}>
           <Box sx={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
             {authError && (
@@ -485,21 +535,22 @@ export default function Register() {
             {getStepContent()}
 
             <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={handleBack}
-                disabled={activeStep === 0 || isSubmitting}
-                sx={{
-                  py: 1,
-                  borderColor: 'white',
-                  color: 'white',
-                  '&:hover': { borderColor: '#f5f5f5', bgcolor: 'rgba(255,255,255,0.1)' },
-                  '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.3)' }
-                }}
-              >
-                {t("backButton")}
-              </Button>
+              {activeStep > 0 && (
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={handleBack}
+                  disabled={isSubmitting}
+                  sx={{
+                    py: 1,
+                    borderColor: 'white',
+                    color: 'white',
+                    '&:hover': { borderColor: '#f5f5f5', bgcolor: 'rgba(255,255,255,0.1)' },
+                  }}
+                >
+                  {t("backButton")}
+                </Button>
+              )}
 
               <Button
                 fullWidth
@@ -524,7 +575,8 @@ export default function Register() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        mt: 5,
+        mt: { xs: 3, md: 5 },
+        mb: { xs: 2, md: 0 },
         pt: 2
       }}>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
