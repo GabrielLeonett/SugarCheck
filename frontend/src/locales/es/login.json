@@ -6,6 +6,7 @@
     "formTitle": "Iniciar Sesión",
     "formSubtitle": "Ingresa tus credenciales para acceder",
     "emailLabel": "Correo electrónico",
+    "usernameLabel": "Nombre de Usuario",
     "passwordLabel": "Contraseña",
     "submitButton": "Ingresar",
     "submittingButton": "Cargando...",
