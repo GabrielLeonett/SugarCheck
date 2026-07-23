@@ -93,16 +93,6 @@ export default function Insulina() {
             </Grid>
           </Grid>
 
-<<<<<<< HEAD
-      {/* TÍTULO */}
-      <Grid container>
-        <Grid size={12}>
-                   <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
-                     {t('monitoreoDiarioDeInsulina')}
-                   </Typography>
-        </Grid>
-      </Grid>
-=======
           {/* CONTENEDOR PRINCIPAL CON 2 COLUMNAS */}
           <Grid container spacing={3}>
             {/* COLUMNA IZQUIERDA */}
@@ -149,7 +139,6 @@ export default function Insulina() {
                   {t("registrarLenta")}
                 </ButtonBase>
               </Box>
->>>>>>> 4901d41471693e401fe6637748586d5f83fbda5d
 
               {/* CARD: CRONÓMETRO */}
               <CardBase sx={{ mb: 2, p: 2.5, textAlign: "center" }}>
@@ -160,26 +149,10 @@ export default function Insulina() {
                   variant="h4"
                   sx={{ color: "#f6983b", fontWeight: "bold", mb: 1 }}
                 >
-<<<<<<< HEAD
                   {totals.totalGeneral.toFixed(1)} UI
                 </Typography>
                 <Typography variant="caption" sx={{ color: "#94a3b8", display: "block", mt: 0.5 }}>
                   {t("rapida")}: {totals.totalRapida.toFixed(1)} UI | {t("lenta")}: {totals.totalLenta.toFixed(1)} UI
-=======
-                  3h : 45m
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#636973", fontWeight: 500, mb: 0.5 }}
-                >
-                  {t("ultimaDosisRapida")}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#f6983b", fontWeight: 500 }}
-                >
-                  {t("escudoAgotando")}
->>>>>>> 4901d41471693e401fe6637748586d5f83fbda5d
                 </Typography>
               </CardBase>
 
@@ -258,58 +231,29 @@ export default function Insulina() {
             {/* COLUMNA DERECHA */}
             <Grid size={{ xs: 12, md: 7 }}>
               <Box sx={{ width: '100%' }}>
-                <InsulinaHistorial />
+                <InsulinaHistorial refreshTrigger={refreshKey} />
               </Box>
             </Grid>
           </Grid>
 
-<<<<<<< HEAD
-        {/* COLUMNA DERECHA */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          {/* COMPONENTE DE HISTORIAL - CON MÁS ESPACIO */}
-          <Box sx={{ pl: { md: 1 } }}>
-            <InsulinaHistorial refreshTrigger={refreshKey} />
-          </Box>
-        </Grid>
-      </Grid>
-
-      {/* MODALES */}
-      <ModalInsulinaRapida
-        open={openRapido}
-        onClose={() => {
-          setOpenRapido(false);
-        }}
-        onSave={handleGuardarRapida}
-      />
-
-      <ModalInsulinaLenta
-        open={openLento}
-        onClose={() => {
-          setOpenLento(false);
-        }}
-        onSave={handleGuardarLenta}
-      />
-      </Container>
-=======
           {/* MODALES */}
           <ModalInsulinaRapida
             open={openRapido}
             onClose={() => {
-              console.log("Cerrando modal rápido");
               setOpenRapido(false);
             }}
+            onSave={handleGuardarRapida}
           />
 
           <ModalInsulinaLenta
             open={openLento}
             onClose={() => {
-              console.log("Cerrando modal lento");
               setOpenLento(false);
             }}
+            onSave={handleGuardarLenta}
           />
         </Box>
       </Box>
->>>>>>> 4901d41471693e401fe6637748586d5f83fbda5d
       <Footer />
     </>
   );
