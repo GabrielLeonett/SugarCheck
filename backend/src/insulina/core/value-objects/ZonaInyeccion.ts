@@ -57,6 +57,7 @@ export class ZonaInyeccion {
       return Result.fail(new ZonaInyeccionInvalidaError(value));
     }
     const upper = value.toUpperCase()
+      .replace(/_/g, ' ')
       .replace(/Á|á/g, 'A').replace(/É|é/g, 'E')
       .replace(/Í|í/g, 'I').replace(/Ó|ó/g, 'O')
       .replace(/Ú|ú/g, 'U').replace(/Ü|ü/g, 'U')
