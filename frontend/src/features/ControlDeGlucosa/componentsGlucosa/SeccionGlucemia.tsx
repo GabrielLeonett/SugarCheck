@@ -124,41 +124,43 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
               </Typography>
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, width: "100%" }}>
-                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-                  <Typography variant="body2" sx={{ width: 140, color: "text.primary", fontWeight: 500 }}>
-                    {t('frecuenciaAlertas.hiperglucemias')}
-                  </Typography>
-                  <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
-                    <LinearProgress variant="determinate" value={dataHook.porcentajeHiper} sx={{ width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375', '& .MuiLinearProgress-bar': { bgcolor: 'warning.light', borderRadius: 3 } }} />
-                    <Typography variant="caption" sx={{ position: 'absolute', left: `calc(${dataHook.porcentajeHiper}% - 20px)`, color: '#fff', fontWeight: 700 }}>
-                      {dataHook.cantHiperglucemias}
+                {[
+                  { label: t('frecuenciaAlertas.hiperglucemias'), pct: dataHook.porcentajeHiper, count: dataHook.cantHiperglucemias, barColor: 'warning.light' },
+                  { label: t('frecuenciaAlertas.hipoglucemias'), pct: dataHook.porcentajeHipo, count: dataHook.cantHipoglucemias, barColor: 'info.light' },
+                  { label: t('frecuenciaAlertas.enRango'), pct: dataHook.porcentajeEnRango, count: dataHook.cantEnRango, barColor: 'success.light' },
+                ].map((item) => (
+                  <Box key={item.label} sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                    <Typography variant="body2" sx={{ width: 140, color: "text.primary", fontWeight: 500, flexShrink: 0 }}>
+                      {item.label}
                     </Typography>
+                    <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={item.pct}
+                        sx={{
+                          width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375',
+                          '& .MuiLinearProgress-bar': {
+                            bgcolor: item.barColor, borderRadius: 3,
+                            transition: 'transform 0.6s ease-in-out',
+                          },
+                        }}
+                      />
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          position: 'absolute',
+                          left: `${Math.max(4, Math.min(item.pct - 2, 86))}%`,
+                          color: '#fff',
+                          fontWeight: 700,
+                          lineHeight: '24px',
+                          textShadow: item.pct > 4 && item.pct < 90 ? 'none' : '0 1px 2px rgba(0,0,0,0.5)',
+                        }}
+                      >
+                        {item.count}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-
-                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-                  <Typography variant="body2" sx={{ width: 140, color: "text.primary", fontWeight: 500 }}>
-                    {t('frecuenciaAlertas.hipoglucemias')}
-                  </Typography>
-                  <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
-                    <LinearProgress variant="determinate" value={dataHook.porcentajeHipo} sx={{ width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375', '& .MuiLinearProgress-bar': { bgcolor: 'info.light', borderRadius: 3 } }} />
-                    <Typography variant="caption" sx={{ position: 'absolute', left: `calc(${dataHook.porcentajeHipo}% - 20px)`, color: '#fff', fontWeight: 700 }}>
-                      {dataHook.cantHipoglucemias}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-                  <Typography variant="body2" sx={{ width: 140, color: "text.primary", fontWeight: 500 }}>
-                    {t('frecuenciaAlertas.enRango')}
-                  </Typography>
-                  <Box sx={{ flexGrow: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
-                    <LinearProgress variant="determinate" value={dataHook.porcentajeEnRango} sx={{ width: '100%', height: 24, borderRadius: 3, bgcolor: '#4A6375', '& .MuiLinearProgress-bar': { bgcolor: 'success.light', borderRadius: 3 } }} />
-                    <Typography variant="caption" sx={{ position: 'absolute', left: `calc(${dataHook.porcentajeEnRango}% - 20px)`, color: '#fff', fontWeight: 700 }}>
-                      {dataHook.cantEnRango}
-                    </Typography>
-                  </Box>
-                </Box>
+                ))}
               </Box>
             </CardBase>
           </Box>

@@ -10,6 +10,7 @@
   "ultimoResultado": {
     "title": "Último Resultado",
     "estimado": "eAG estimada: {{valor}} mg/dL",
+    "sinDatos": "Sin datos registrados aún",
     "enRango": "Dentro del Rango Objetivo",
     "fueraRango": "Fuera del Rango Objetivo"
   },
