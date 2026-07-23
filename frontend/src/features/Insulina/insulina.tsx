@@ -168,7 +168,7 @@ export default function Insulina() {
                       variant="h4"
                       sx={{ color: "#7AAFD7", fontWeight: "bold" }}
                     >
-                      21.1 UI
+                      {totals.totalRapida.toFixed(1)} UI
                     </Typography>
                   </CardBase>
                 </Grid>
