@@ -1,31 +1,44 @@
+export type ErrorOrigin = 'domain' | 'infrastructure' | 'external';
+
 export abstract class ErrorAbstract extends Error {
   public readonly name: string;
   public readonly date: Date;
-  public readonly code?: string; // Opcional: código de error personalizado
+  public code?: string;
+  public field?: string;
+  public readonly origin: ErrorOrigin;
 
-  constructor(message: string, options?: { stack?: string; code?: string }) {
-    // Pasamos la causa si existe
+  constructor(
+    message: string,
+    options?: { stack?: string; code?: string; field?: string; origin?: ErrorOrigin },
+  ) {
     super(message, { cause: options?.stack });
 
     this.name = this.constructor.name;
     this.date = new Date();
     this.code = options?.code;
+    this.field = options?.field;
+    this.origin = options?.origin ?? 'domain';
 
-    // Mantener la protoype chain correcta
     Object.setPrototypeOf(this, new.target.prototype);
 
-    // Capturar stack trace si no se proporcionó
     if (!options?.stack && Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
   }
 
-  // Método útil para logging
+  withCode(code: string, field?: string): this {
+    this.code = code;
+    if (field) this.field = field;
+    return this;
+  }
+
   toJSON() {
     return {
       name: this.name,
       message: this.message,
       code: this.code,
+      field: this.field,
+      origin: this.origin,
       date: this.date.toISOString(),
       stack: this.stack,
       cause: this.cause,

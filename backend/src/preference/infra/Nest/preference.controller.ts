@@ -2,8 +2,6 @@ import {
   Controller,
   Post,
   Body,
-  HttpException,
-  HttpStatus,
   Inject,
   Get,
   UseGuards,
@@ -13,6 +11,7 @@ import { SavePreference } from '../../app/SavePreference';
 import { GetOneByIdPreference } from '../../app/GetOneByUserIdPreference';
 import { SavePreferenceDTO } from './DTOs/save-preference.dto';
 import { AuthGuard } from '../../../auth/infra/auth.guard';
+import { TranslationService } from '../../../shared/infrastructure/i18n/translation.service';
 
 @Controller('preference')
 @UseGuards(AuthGuard) // <--- Protegemos TODO el controlador de una vez
@@ -22,6 +21,7 @@ export class PreferenceController {
     private readonly getOneByIdPreferenceUseCase: GetOneByIdPreference,
     @Inject('SavePreference')
     private readonly savePreferenceUseCase: SavePreference,
+    private readonly translationService: TranslationService,
   ) { }
 
   /**
@@ -35,23 +35,15 @@ export class PreferenceController {
     // Pasamos el ID envuelto en la estructura que espera tu caso de uso (FindUserIdDTO)
     const result = await this.getOneByIdPreferenceUseCase.run({ id: userId });
 
-    if (!result.isValid) {
-      throw new HttpException(
-        result.getError().message,
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    if (!result.isValid) throw result.getError();
 
+    const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     return {
-      message: 'Preferencias obtenidas exitosamente',
+      message: this.translationService.translate('PREFERENCES_FETCHED', lang),
       data: result.getValue().toPlain(),
     };
   }
 
-  /**
-   * CREAR PREFERENCIAS DEL USUARIO ACTUAL
-   * POST /preference
-   */
   @Post()
   async save(@Request() req: any, @Body() body: SavePreferenceDTO) {
     const userId = req.user.sub;
@@ -65,15 +57,11 @@ export class PreferenceController {
       body.sensitivity,
     );
 
-    if (!result.isValid) {
-      throw new HttpException(
-        result.getError().message,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    if (!result.isValid) throw result.getError();
 
+    const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     return {
-      message: 'Preferencias guardadas exitosamente',
+      message: this.translationService.translate('PREFERENCES_SAVED', lang),
       data: result.getValue().toPlain(),
     };
   }

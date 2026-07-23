@@ -211,6 +211,20 @@ async update(id: UserId, update: Partial<User>): Promise<Result<User, ErrorAbstr
   }
 }
 
+  async updatePassword(id: string, hashedPassword: string): Promise<Result<void, ErrorAbstract>> {
+    try {
+      await this.prisma.user.update({
+        where: { id },
+        data: { password: hashedPassword },
+      });
+      return Result.ok(undefined);
+    } catch (error) {
+      return Result.fail(
+        new DatabaseError('Error al actualizar la contraseña'),
+      );
+    }
+  }
+
   async delete(id: UserId): Promise<Result<void, ErrorAbstract>> {
     try {
       await this.prisma.user.delete({

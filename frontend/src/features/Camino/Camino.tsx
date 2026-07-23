@@ -11,9 +11,9 @@ return (
     <>
 
     <Navbar />
-    <Box sx={{width:"95%", border: "2px", mx:6, mt:2, p:2, display: "flex", flexDirection: "column", alignItems: "center" }}>  
+    <Box sx={{width:"100%", border: "2px", mx: { xs: 0, sm: 6 }, mt:2, p: { xs: 1, sm: 2 }, display: "flex", flexDirection: "column", alignItems: "center" }}>  
         <Grid container  sx={{ mt: 2, width: "100%" }}>
-            <Grid size={8}>
+            <Grid size={{ xs: 12, md: 8 }}>
                 <Typography variant="h3" sx={{ textAlign: "center" }}>
                     Camino del guerrero
                 </Typography>
@@ -29,14 +29,12 @@ return (
                 </Box>
             </Grid>
                 {/*aca es el apartado de las insignias*/} 
-            <Grid  size={4} >
+            <Grid  size={{ xs: 12, md: 4 }} >
                 <Box  //contenedor azul principal de las insignias y sus propiedades
                 sx={{
-                /*width: 329,
-                height: 1091,*/
                 borderRadius: 2,
                 p: 0,
-                mx: 9 ,
+                mx: { xs: 0, sm: 9 },
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 2,

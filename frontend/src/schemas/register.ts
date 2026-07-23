@@ -6,7 +6,7 @@ export const registerStep1Schema = z.object({
     .max(30, "El nombre de usuario no puede exceder 30 caracteres")
     .regex(/^[a-zA-Z][a-zA-Z0-9_-]*$/, "Debe comenzar con una letra. Solo letras, números, guiones"),
   nombre: z.string().optional(),
-  edad: z.string().optional(),
+  fechaNacimiento: z.string().min(1, "La fecha de nacimiento es obligatoria"),
   sexo: z.enum(["masculino", "femenino"] as const, { message: "Selecciona un sexo" }),
   email: z.string().email("El correo electrónico no es válido").optional().or(z.literal("")),
   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),

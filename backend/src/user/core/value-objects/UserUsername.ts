@@ -12,13 +12,13 @@ export class UserUsername {
 
     if (!username || username.length < 3) {
       return Result.fail(
-        new UserUsernameInvalidError('El nombre de usuario debe tener al menos 3 caracteres'),
+        new UserUsernameInvalidError('El nombre de usuario debe tener al menos 3 caracteres').withCode('USERNAME_MIN_LENGTH', 'username'),
       );
     }
 
     if (username.length > 30) {
       return Result.fail(
-        new UserUsernameInvalidError('El nombre de usuario no puede exceder los 30 caracteres'),
+        new UserUsernameInvalidError('El nombre de usuario no puede exceder los 30 caracteres').withCode('USERNAME_MAX_LENGTH', 'username'),
       );
     }
 
@@ -27,7 +27,7 @@ export class UserUsername {
       return Result.fail(
         new UserUsernameInvalidError(
           'El nombre de usuario debe comenzar con una letra y solo puede contener letras, números, guiones y guiones bajos',
-        ),
+        ).withCode('USERNAME_INVALID_FORMAT', 'username'),
       );
     }
 

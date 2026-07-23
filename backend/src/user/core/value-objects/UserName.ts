@@ -13,7 +13,7 @@ export class UserName {
     // 1. Validaciones de negocio
     if (!value || value.trim().length < 3) {
       return Result.fail(
-        new UserNameInvalidError('El nombre debe tener al menos 3 caracteres'),
+        new UserNameInvalidError('El nombre debe tener al menos 3 caracteres').withCode('NAME_MIN_LENGTH', 'name'),
       );
     }
 
@@ -21,7 +21,7 @@ export class UserName {
       return Result.fail(
         new UserNameInvalidError(
           'El nombre no puede exceder los 50 caracteres',
-        ),
+        ).withCode('NAME_MAX_LENGTH', 'name'),
       );
     }
 

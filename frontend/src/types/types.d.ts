@@ -20,9 +20,11 @@ interface ThemeContextType {
 
 interface User {
   id: string;
+  name: string;
   username: string;
-  email?: string;
-  sexo?: string;
+  email: string;
+  sexo: string;
+  fechaNacimiento: string;
 }
 
 interface AuthContextType {
@@ -39,8 +41,12 @@ interface AuthContextType {
 // Define la estructura exacta que responde tu backend en errores
 interface BackendErrorResponse {
   message: string;
-  statusCode?: number;
+  statusCode: number;
   error?: string;
+  code?: string;
+  field?: string;
+  timestamp?: string;
+  path?: string;
 }
 
 export type MeasurementState = 'Bajo peso' | 'Normal' | 'Sobrepeso';
@@ -63,5 +69,84 @@ export interface PhysicalEvolution {
 export interface BackendErrorsApi {
   message: string,
   error: string,
-  statusCode: number
+  statusCode: number,
+  code?: string,
+  field?: string,
+}
+
+export interface InsulinRecord {
+  id: string;
+  userId: string;
+  tipo: string;
+  unidades: number;
+  dosis: number;
+  fecha: string;
+  hora: string;
+  zona: string;
+  zonaLabel: string;
+  contexto: string | null;
+  contextoLabel: string | null;
+  createdAt: string;
+}
+
+export interface DailyInsulinTotals {
+  totalRapida: number;
+  totalLenta: number;
+  totalGeneral: number;
+}
+
+export type NotificationType = 'alert' | 'reminder' | 'achievement' | 'info' | 'warning';
+
+// Glucemia (Glucose)
+export type TipoGlucemia = 'En Ayunas' | 'Despues de comer' | 'Control general';
+
+export interface Glucemia {
+  id: string;
+  usuario_id: string;
+  valor_mgdl: number;
+  tipo: TipoGlucemia;
+  fecha: string;
+  hora: string;
+  created_at: string;
+}
+
+export interface CreateGlucemiaDto {
+  valor_mgdl: number;
+  tipo: TipoGlucemia;
+  fecha: string;
+  hora: string;
+}
+
+export interface GlucemiaResponse {
+  data: Glucemia;
+  isCrisis?: boolean;
+}
+
+// HbA1c (Glicosilada)
+export interface Glicosilada {
+  id: string;
+  usuario_id: string;
+  valor_porcentaje: number;
+  fecha_examen: string;
+  eAG: number;
+  vencido: boolean;
+  created_at: string;
+}
+
+export interface CreateGlicosiladaDto {
+  valor_porcentaje: number;
+  fecha_examen: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  titleKey?: string;
+  messageKey?: string;
+  params?: Record<string, string | number>;
+  link: string;
+  read: boolean;
+  createdAt: string;
 }

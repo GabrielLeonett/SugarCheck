@@ -1,0 +1,33 @@
+type: http_request
+model: http_request
+id: rq_wuRq8QLJYY
+createdAt: 2026-07-13T20:10:22.005333900
+updatedAt: 2026-07-13T20:52:34.240375
+workspaceId: wk_tWcQe25Qgb
+folderId: fl_oGE2bJHqn9
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: ''
+sortPriority: 0.0
+url: https://ve.dolarapi.com/v1/historicos/dolares/oficial/2026/05/23
+urlParameters: []
+settingSendCookies:
+  enabled: false
+  value: true
+settingStoreCookies:
+  enabled: false
+  value: true
+settingValidateCertificates:
+  enabled: false
+  value: true
+settingFollowRedirects:
+  enabled: false
+  value: true
+settingRequestTimeout:
+  enabled: false
+  value: 0

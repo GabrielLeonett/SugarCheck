@@ -3,6 +3,8 @@ import { LoginUser } from '../app/LoginUser';
 import { RefreshAccessToken } from '../app/RefreshAccessToken';
 import { Logout } from '../app/LogoutUser';
 import { LoginFirebaseUser } from '../app/LoginFirebaseUser';
+import { ForgotPassword } from '../app/ForgotPassword';
+import { ResetPassword } from '../app/ResetPassword';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +13,8 @@ export class AuthService {
     private readonly refreshAccessToken: RefreshAccessToken,
     private readonly Logout: Logout,
     private readonly LoginFirebaseUser: LoginFirebaseUser,
+    private readonly forgotPasswordUseCase: ForgotPassword,
+    private readonly resetPasswordUseCase: ResetPassword,
   ) { }
 
   async login(username: string, pass: string) {
@@ -35,5 +39,13 @@ export class AuthService {
     firebaseUid: string,
   }) {
     return await this.LoginFirebaseUser.run({ email, name, firebaseUid });
+  }
+
+  async forgotPassword(email: string, lang?: string) {
+    return await this.forgotPasswordUseCase.run({ email, lang });
+  }
+
+  async resetPassword(email: string, code: string, password: string) {
+    return await this.resetPasswordUseCase.run({ email, code, password });
   }
 }

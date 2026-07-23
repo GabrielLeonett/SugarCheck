@@ -9,7 +9,7 @@ export class UserId {
 
   public static create(value: string): Result<UserId, UserIdInvalidError> {
     if (!value || value.trim().length === 0) {
-      return Result.fail(new UserIdInvalidError('El ID no puede estar vacío'));
+      return Result.fail(new UserIdInvalidError('El ID no puede estar vacío').withCode('ID_EMPTY', 'id'));
     }
 
     return Result.ok(new UserId(value.trim()));

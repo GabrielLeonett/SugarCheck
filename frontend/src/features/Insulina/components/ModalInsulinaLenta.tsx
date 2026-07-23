@@ -5,38 +5,47 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState } from "react";
 import { ButtonBase } from "../../../components/ui/Buttons/ButtonBase.tsx";
 import { Modal } from "../../../components/ui/Modals/Modals.tsx";
-
+import useLanguage from "../../../hooks/useLanguage";
 
 interface ModalInsulinaLentaProps {
   open: boolean;
   onClose: () => void;
+  onSave: (data: {
+    dosis: number;
+    dia: number;
+    mes: number;
+    anio: number;
+    hora: string;
+    zona: string;
+  }) => Promise<void>;
 }
 
-export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLentaProps) {
-  const [unidades, setUnidades] = useState<number>(0);
+export default function ModalInsulinaLenta({ open, onClose, onSave }: ModalInsulinaLentaProps) {
+  const { t } = useLanguage("insulina");
+  const [dosis, setDosis] = useState<number>(0);
   const [fecha, setFecha] = useState({ dd: "23", mm: "06", yyyy: "2026" });
   const [hora, setHora] = useState("14:11");
+  const [loading, setLoading] = useState(false);
 
   const [vistaCuerpo, setVistaCuerpo] = useState<"FRENTE" | "ATRÁS">("FRENTE");
-  const [zonaSeleccionada, setZonaSeleccionada] = useState<string>("Abdomen Izquierdo");
+  const [zonaSeleccionada, setZonaSeleccionada] = useState<string>(t("zoneAbdomenLeft"));
 
   const zonasFrente = [
-    "Abdomen Derecho",
-    "Abdomen Izquierdo",
-    "Muslo Derecho",
-    "Muslo Izquierdo",
+    t("zoneAbdomenRight"),
+    t("zoneAbdomenLeft"),
+    t("zoneThighRight"),
+    t("zoneThighLeft"),
   ];
   
   const zonasAtras = [
-    "Brazo Derecho",
-    "Brazo Izquierdo",
-    "Glúteo Derecho",
-    "Glúteo Izquierdo",
+    t("zoneArmRight"),
+    t("zoneArmLeft"),
+    t("zoneGluteRight"),
+    t("zoneGluteLeft"),
   ];
 
   const zonasActuales = vistaCuerpo === "FRENTE" ? zonasFrente : zonasAtras;
 
-  // Función para obtener el color según la zona
   const getZonaColor = (zona: string, esSeleccionado: boolean) => {
     if (!esSeleccionado) return "#e2e8f0";
     
@@ -47,7 +56,6 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
     return "#64748b";
   };
 
-  // Función para obtener el icono de la zona
   const getZonaIcon = (zona: string) => {
     if (zona.includes("Abdomen")) return "⬤";
     if (zona.includes("Glúteo")) return "⬤";
@@ -56,10 +64,61 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
     return "⬤";
   };
 
+  const resetFormulario = () => {
+    setDosis(0);
+    const now = new Date();
+    setFecha({
+      dd: String(now.getDate()).padStart(2, '0'),
+      mm: String(now.getMonth() + 1).padStart(2, '0'),
+      yyyy: String(now.getFullYear()),
+    });
+    setHora(`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`);
+    setZonaSeleccionada(t("zoneAbdomenLeft"));
+  };
+
+  const zonaToBackend = (zona: string): string => {
+    const mapping: Record<string, string> = {
+      [t("zoneAbdomenRight")]: 'ABDOMEN_DERECHO',
+      [t("zoneAbdomenLeft")]: 'ABDOMEN_IZQUIERDO',
+      [t("zoneThighRight")]: 'MUSLO_DERECHO',
+      [t("zoneThighLeft")]: 'MUSLO_IZQUIERDO',
+      [t("zoneArmRight")]: 'BRAZO_DERECHO',
+      [t("zoneArmLeft")]: 'BRAZO_IZQUIERDO',
+      [t("zoneGluteRight")]: 'GLUTEO_DERECHO',
+      [t("zoneGluteLeft")]: 'GLUTEO_IZQUIERDO',
+    };
+    return mapping[zona] || 'ABDOMEN_IZQUIERDO';
+  };
+
+  const handleGuardar = async () => {
+    if (dosis === 0) {
+      alert(t("pleaseEnterUnits"));
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await onSave({
+        dosis,
+        dia: parseInt(fecha.dd, 10),
+        mes: parseInt(fecha.mm, 10),
+        anio: parseInt(fecha.yyyy, 10),
+        hora,
+        zona: zonaToBackend(zonaSeleccionada),
+      });
+      resetFormulario();
+      onClose();
+    } catch {
+      alert("Error al guardar el registro");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={{ p: 0, maxWidth: 900, mx: "auto" }}>
-        {/* Header con título y porcentaje */}
+        {/* Header con título */}
         <Box
           sx={{
             bgcolor: "#f8fafc",
@@ -70,25 +129,22 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
         >
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1e293b" }}>
-              Registrar Aplicación de Dosis Lenta
+              {t("modalLentaTitle")}
             </Typography>
-            <Box sx={{ textAlign: "right" }}>
-            </Box>
           </Box>
-         
         </Box>
 
         <Box sx={{ p: 3 }}>
           <Grid container spacing={4}>
             {/* COLUMNA IZQUIERDA: Formulario */}
             <Grid>
-              {/* Unidades */}
+              {/* Dosis */}
               <Box sx={{ mb: 3 }}>
                 <Typography
                   variant="body2"
                   sx={{ fontWeight: "bold", color: "#475569", mb: 1 }}
                 >
-                  Nivel de Glucosa (mg/dL)
+                  {t("dosis")}
                 </Typography>
                 <Box
                   sx={{
@@ -99,7 +155,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                   }}
                 >
                   <IconButton
-                    onClick={() => setUnidades((prev) => Math.max(0, prev - 1))}
+                    onClick={() => setDosis((prev) => Math.max(0, prev - 0.5))}
                     sx={{
                       bgcolor: "#e2e8f0",
                       color: "#475569",
@@ -112,10 +168,14 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                     <RemoveIcon />
                   </IconButton>
                   <TextField
-                    value={unidades === 0 ? "" : unidades}
+                    value={dosis === 0 ? "" : dosis}
                     placeholder="0"
-                    onChange={(e) => setUnidades(Number(e.target.value))}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      setDosis(isNaN(val) ? 0 : val);
+                    }}
                     type="number"
+                    inputProps={{ step: 0.5 }}
                     sx={{
                       width: 140,
                       "& .MuiOutlinedInput-root": {
@@ -130,7 +190,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                     }}
                   />
                   <IconButton
-                    onClick={() => setUnidades((prev) => prev + 1)}
+                    onClick={() => setDosis((prev) => prev + 0.5)}
                     sx={{
                       bgcolor: "#e2e8f0",
                       color: "#475569",
@@ -147,19 +207,18 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                   variant="caption"
                   sx={{ display: "block", textAlign: "center", color: "#94a3b8", mt: 0.5 }}
                 >
-                  Contexto de la Medición
+                  {t("measurementContext")}
                 </Typography>
               </Box>
 
               {/* Fecha y Hora */}
-                {/* Fecha y Hora */}
               <Grid container spacing={2}>
                 <Grid>
                   <Typography
                     variant="body2"
                     sx={{ fontWeight: "bold", color: "#475569", mb: 0.5 }}
                   >
-                    Fecha
+                    {t("date")}
                   </Typography>
                   <TextField
                     placeholder="DD/MM/YYYY"
@@ -193,13 +252,14 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                     variant="body2"
                     sx={{ fontWeight: "bold", color: "#475569", mb: 0.5 }}
                   >
-                    Hora
+                    {t("time")}
                   </Typography>
                   <TextField
                     size="small"
                     fullWidth
                     value={hora}
                     onChange={(e) => setHora(e.target.value)}
+                    placeholder="HH:MM"
                     sx={{
                       "& .MuiOutlinedInput-root": { borderRadius: 2, bgcolor: "#f8fafc" },
                     }}
@@ -219,7 +279,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                 }}
               >
                 <Typography variant="body2" sx={{ fontWeight: "bold", color: "#475569" }}>
-                  Frecuencia de Alertas
+                  {t("alertFrequency")}
                 </Typography>
 
                 <Box
@@ -242,7 +302,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                       fontSize: "0.75rem",
                     }}
                   >
-                    FRENTE
+                    {t("front")}
                   </ButtonBase>
 
                   <ButtonBase
@@ -257,7 +317,7 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                       fontSize: "0.75rem",
                     }}
                   >
-                    ATRÁS
+                    {t("back")}
                   </ButtonBase>
                 </Box>
               </Box>
@@ -307,14 +367,16 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                     </Grid>
                   );
                 })}
+              </Grid>
 
-                 {/* Botón Guardar Medición */}
+              {/* Botón Guardar */}
               <Box sx={{ mt: 3 }}>
                 <ButtonBase
                   variant="contained"
                   fullWidth
                   startIcon={<CheckCircleIcon />}
-                  onClick={onClose}
+                  onClick={handleGuardar}
+                  disabled={loading}
                   sx={{
                     bgcolor: "#1e293b",
                     "&:hover": { bgcolor: "#0f172a" },
@@ -322,10 +384,9 @@ export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLenta
                     borderRadius: 2,
                   }}
                 >
-                  Guardar Medición
+                  {loading ? t("saving") || "Guardando..." : t("saveMeasurement")}
                 </ButtonBase>
               </Box>
-              </Grid>
             </Grid>
           </Grid>
         </Box>

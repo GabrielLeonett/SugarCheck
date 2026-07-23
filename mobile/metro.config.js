@@ -5,7 +5,7 @@ const config = getDefaultConfig(__dirname);
 // 1. Habilitar explícitamente la resolución de enlaces simbólicos (symlinks)
 config.resolver.unstable_enableSymlinks = true;
 
-// 2. (Opcional) Si usas un monorepo, descomenta la siguiente línea para vigilar todo el espacio de trabajo:
-// config.watchFolders = [__dirname + '/../..']; 
+// 2. FUERZA a Metro a vigilar únicamente la carpeta actual, evitando que busque arriba
+config.watchFolders = [__dirname];
 
 module.exports = config;

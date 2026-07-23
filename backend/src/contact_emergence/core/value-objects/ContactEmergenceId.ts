@@ -10,7 +10,7 @@ export class ContactEmergenceId {
   public static create(value: string): Result<ContactEmergenceId, ContactNameInvalidError> {
     if (!value || value.trim().length === 0) {
       return Result.fail(
-        new ContactNameInvalidError('El ID del contacto no puede estar vacío'),
+        new ContactNameInvalidError('El ID del contacto no puede estar vacío').withCode('CONTACT_ID_EMPTY', 'id'),
       );
     }
     return Result.ok(new ContactEmergenceId(value.trim()));

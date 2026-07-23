@@ -16,9 +16,7 @@ export function Card({ children, style }: CardProps) {
       style={[
         styles.card, 
         { 
-          backgroundColor: colorScheme === 'dark' ? '#1E1E1E' : '#FFFFFF',
-          // Sombra dinámica según el tema
-          shadowColor: colorScheme === 'dark' ? '#000' : '#000',
+          backgroundColor: Colors[colorScheme].card,
         },
         styles.elevated, 
         style

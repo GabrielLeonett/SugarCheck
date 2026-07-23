@@ -1,4 +1,5 @@
-import { Box, IconButton, Typography, Paper, TextField, InputAdornment, Avatar, useTheme, Badge } from '@mui/material';
+import { useState } from 'react';
+import { Box, IconButton, Typography, Paper, TextField, InputAdornment, Avatar, useTheme, Badge, Drawer } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,6 +8,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import MicIcon from '@mui/icons-material/Mic';
 import SendIcon from '@mui/icons-material/Send';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { usePreferenceConfig } from '../../hooks/usePreferenceConfig';
@@ -17,6 +19,7 @@ export default function ChatIA() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const { preference } = usePreferenceConfig();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const avatarSrc = preference?.profileImg && AVATAR_MAP[preference.profileImg]
     ? AVATAR_MAP[preference.profileImg]
     : undefined;
@@ -45,112 +48,136 @@ export default function ChatIA() {
 
   const sidebarTextColor = theme.palette.getContrastText(theme.palette.primary.main);
 
+  const sidebarContent = (
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+          <IconButton onClick={() => navigate('/')} aria-label="regresar" sx={{ color: sidebarTextColor }}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="body1" sx={{ color: sidebarTextColor, ml: 1, fontWeight: 'bold' }}>Atrás</Typography>
+        </Box>
+
+        <TextField
+          fullWidth
+          placeholder="Buscar"
+          variant="outlined"
+          size="small"
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon sx={{ color: sidebarTextColor }} />
+                </InputAdornment>
+              ),
+            },
+          }}
+          sx={{ 
+            mb: 3,
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: alpha(theme.palette.common.white, 0.15),
+              borderRadius: '20px',
+              '& fieldset': { border: 'none' },
+            },
+            '& .MuiInputBase-input': {
+              color: sidebarTextColor,
+              '&::placeholder': { color: alpha(sidebarTextColor, 0.6), opacity: 1 },
+            }
+          }}
+        />
+
+        <Paper
+          elevation={0}
+          sx={{
+            width: '100%',
+            backgroundColor: alpha(theme.palette.common.white, 0.08),
+            backdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            padding: 2,
+            maxHeight: 'calc(100vh - 250px)',
+            overflowY: 'auto',
+            border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`,
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: sidebarTextColor, fontSize: '1rem' }}>
+              Recientes
+            </Typography>
+            <ScheduleIcon sx={{ color: sidebarTextColor, opacity: 0.7 }} />
+          </Box>
+
+          <Box sx={{ '& > *': { mb: 1.5 } }}>
+            {historyItems.map((item, index) => (
+              <Paper
+                key={index}
+                elevation={0}
+                sx={{
+                  backgroundColor: alpha(theme.palette.common.white, 0.1),
+                  borderRadius: '20px',
+                  padding: '10px 15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  '&:last-child': { mb: 0 },
+                  '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.2) },
+                  transition: 'background-color 0.2s',
+                }}
+                onClick={() => navigate(`/agente/oraculo-chat?historial=${index + 1}`)}
+              >
+                <Typography variant="body2" sx={{ fontSize: '0.9rem', color: sidebarTextColor }}>{item}</Typography>
+              </Paper>
+            ))}
+          </Box>
+        </Paper>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          cursor: 'pointer', pt: 2,
+        }}
+        onClick={() => navigate('/perfil')}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <SettingsIcon sx={{ color: sidebarTextColor, mr: 1 }} />
+          <Typography variant="body1" sx={{ color: sidebarTextColor, fontWeight: 'bold' }}>Ajustes</Typography>
+        </Box>
+      </Box>
+    </Box>
+  );
+
   return (
     <Box sx={{ display: 'flex', width: '100vw', height: '100vh' }}>
 
-      {/* --- SIDEBAR --- */}
+      {/* --- SIDEBAR (Desktop) --- */}
       <Box sx={{
         width: '280px',
         backgroundColor: theme.palette.primary.main,
         padding: '20px',
-        display: 'flex',
+        display: { xs: 'none', md: 'flex' },
         flexDirection: 'column',
-        justifyContent: 'space-between'
       }}>
-        <Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-            <IconButton onClick={() => navigate('/')} aria-label="regresar" sx={{ color: sidebarTextColor }}>
-              <ArrowBackIcon />
-            </IconButton>
-            <Typography variant="body1" sx={{ color: sidebarTextColor, ml: 1, fontWeight: 'bold' }}>Atrás</Typography>
-          </Box>
-
-          <TextField
-            fullWidth
-            placeholder="Buscar"
-            variant="outlined"
-            size="small"
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <SearchIcon sx={{ color: sidebarTextColor }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-            sx={{ 
-              mb: 3,
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: alpha(theme.palette.common.white, 0.15),
-                borderRadius: '20px',
-                '& fieldset': { border: 'none' },
-              },
-              '& .MuiInputBase-input': {
-                color: sidebarTextColor,
-                '&::placeholder': { color: alpha(sidebarTextColor, 0.6), opacity: 1 },
-              }
-            }}
-          />
-
-          <Paper
-            elevation={0}
-            sx={{
-              width: '100%',
-              backgroundColor: alpha(theme.palette.common.white, 0.08),
-              backdropFilter: 'blur(10px)',
-              borderRadius: '20px',
-              padding: 2,
-              maxHeight: 'calc(100vh - 250px)',
-              overflowY: 'auto',
-              border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`,
-            }}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold', color: sidebarTextColor, fontSize: '1rem' }}>
-                Recientes
-              </Typography>
-              <ScheduleIcon sx={{ color: sidebarTextColor, opacity: 0.7 }} />
-            </Box>
-
-            <Box sx={{ '& > *': { mb: 1.5 } }}>
-              {historyItems.map((item, index) => (
-                <Paper
-                  key={index}
-                  elevation={0}
-                  sx={{
-                    backgroundColor: alpha(theme.palette.common.white, 0.1),
-                    borderRadius: '20px',
-                    padding: '10px 15px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    '&:last-child': { mb: 0 },
-                    '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.2) },
-                    transition: 'background-color 0.2s',
-                  }}
-                  onClick={() => navigate(`/agente/oraculo-chat?historial=${index + 1}`)}
-                >
-                  <Typography variant="body2" sx={{ fontSize: '0.9rem', color: sidebarTextColor }}>{item}</Typography>
-                </Paper>
-              ))}
-            </Box>
-          </Paper>
-        </Box>
-
-        <Box
-          sx={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            cursor: 'pointer', pt: 2,
-          }}
-          onClick={() => navigate('/perfil')}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <SettingsIcon sx={{ color: sidebarTextColor, mr: 1 }} />
-            <Typography variant="body1" sx={{ color: sidebarTextColor, fontWeight: 'bold' }}>Ajustes</Typography>
-          </Box>
-        </Box>
+        {sidebarContent}
       </Box>
+
+      {/* --- SIDEBAR (Mobile Drawer) --- */}
+      <Drawer
+        anchor="left"
+        open={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
+        sx={{ display: { xs: 'block', md: 'none' } }}
+        slotProps={{
+          paper: {
+            sx: {
+              width: '280px',
+              backgroundColor: theme.palette.primary.main,
+              padding: '20px',
+            }
+          }
+        }}
+      >
+        {sidebarContent}
+      </Drawer>
 
       {/* --- CHAT AREA --- */}
       <Box sx={{
@@ -162,9 +189,15 @@ export default function ChatIA() {
         position: 'relative'
       }}>
         {/* Encabezado */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, px: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, px: { xs: 0, sm: 2 } }}>
+          <IconButton
+            onClick={() => setMobileSidebarOpen(true)}
+            sx={{ display: { xs: 'inline-flex', md: 'none' }, mr: 1, color: theme.palette.text.primary }}
+          >
+            <MenuIcon />
+          </IconButton>
           <Box sx={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#4caf50', mr: 2, display: 'inline-block' }}></Box>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.primary.main, flexGrow: 1 }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme.palette.primary.main, flexGrow: 1, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
             Gluco
           </Typography>
           <Badge

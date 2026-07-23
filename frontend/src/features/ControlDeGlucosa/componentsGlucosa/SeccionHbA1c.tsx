@@ -1,34 +1,98 @@
 import AddIcon from '@mui/icons-material/Add';
-import {
-  Box, Typography, Grid, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Paper, TablePagination, ButtonGroup, Button,
-} from '@mui/material';
-import { LineChart } from '@mui/x-charts/LineChart';
+import { Box, Typography, Grid, ButtonGroup, Button, Alert, CircularProgress } from '@mui/material';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
 import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
 import ModalHbA1cForm from '../../../components/shared/ModalHbA1cForm.tsx';
-import { obtenerColorEstado } from '../../../hooks/useGlucosaData.tsx';
+import HistorialTable from '../../../components/shared/HistorialTable';
+import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
+import { GraficoLinea } from '../../../components/shared/GraficoLinea';
+import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 import type { HbA1cData } from '../../../schemas/hba1c';
+import type { HbA1cRecord } from '../../../data/recordsMock';
+import type { Column } from '../../../components/shared/HistorialTable';
 
 interface SeccionHbA1cProps {
-  dataHook: any;
+  dataHook: UseGlucosaDataReturn;
   onSaveHbA1c: (data: HbA1cData) => void;
 }
 
 export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
   const { t } = useLanguage("glicosilada");
 
+  const columns: Column<HbA1cRecord>[] = [
+    { key: 'fecha', label: t('tabla.headers.fecha'), render: (row) => row.fecha },
+    {
+      key: 'resultado', label: t('tabla.headers.resultado'),
+      render: (row) => (typeof row.resultado === 'number' ? `${row.resultado} %` : row.resultado),
+    },
+    { key: 'estimado', label: t('tabla.headers.estimado'), render: (row) => row.estimado },
+    {
+      key: 'estado', label: t('tabla.headers.estado'),
+      render: (row) => (
+        <Box sx={{ fontWeight: 700, color: obtenerColorEstado(row.estado) }}>
+          {row.estado}
+        </Box>
+      ),
+    },
+  ];
+
+  const chartComponent = (
+    <GraficoLinea
+      data={dataHook.resultadosHbA1c}
+      labels={dataHook.fechasHbA1c}
+      color="#81c784"
+      label={t('grafico.labelSerie')}
+      emptyMessage={t('grafico.sinDatos')}
+    />
+  );
+
+  const filterComponent = (
+    <ButtonGroup variant="outlined" size="small" aria-label={t('grafico.filtros.ariaLabel')} sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
+      <Button
+        onClick={() => { dataHook.setFiltroHbA1c('todos'); dataHook.setPageHbA1c(0); }}
+        variant={dataHook.filtroHbA1c === 'todos' ? 'contained' : 'outlined'}
+      >
+        {t('grafico.filtros.todos')}
+      </Button>
+      <Button
+        onClick={() => { dataHook.setFiltroHbA1c('trimestre'); dataHook.setPageHbA1c(0); }}
+        variant={dataHook.filtroHbA1c === 'trimestre' ? 'contained' : 'outlined'}
+      >
+        {t('grafico.filtros.trimestre')}
+      </Button>
+      <Button
+        onClick={() => { dataHook.setFiltroHbA1c('año'); dataHook.setPageHbA1c(0); }}
+        variant={dataHook.filtroHbA1c === 'año' ? 'contained' : 'outlined'}
+      >
+        {t('grafico.filtros.año')}
+      </Button>
+      
+    </ButtonGroup>
+  );
+
+  if (dataHook.error && dataHook.hbA1cFiltrada.length === 0) {
+    return (
+      <Box component="section" sx={{ mb: 6 }}>
+        <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
+          {t('titleHistorial')}
+        </Typography>
+        <Alert severity="error">{dataHook.error}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <Box component="section" sx={{ mb: 6 }}>
       <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
         {t('titleHistorial')}
+        {dataHook.loading && <CircularProgress size={20} sx={{ ml: 2 }} />}
       </Typography>
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 5 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            <ButtonBase onClick={dataHook.handleOpenHbA1c} startIcon={<AddIcon />}>
+            <ButtonBase onClick={dataHook.handleOpenHbA1c} startIcon={<AddIcon />} disabled={dataHook.loading}>
               {t('btnRegistrar')}
             </ButtonBase>
 
@@ -43,10 +107,10 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
                 {t('ultimoResultado.title')}
               </Typography>
               <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "success.light" }}>
-                {dataHook.ultimoResultadoHbA1c ? `${dataHook.ultimoResultadoHbA1c}%` : "6.8%"}
+                {dataHook.ultimoResultadoHbA1c ? `${dataHook.ultimoResultadoHbA1c}%` : "—"}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {t('ultimoResultado.estimado', { valor: dataHook.ultimoEag || 148 })}
+                {dataHook.ultimoEag ? t('ultimoResultado.estimado', { valor: dataHook.ultimoEag }) : '—'}
               </Typography>
               <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "success.light" }}>
                 {dataHook.enRangoObjetivo !== false ? t('ultimoResultado.enRango') : t('ultimoResultado.fueraRango')}
@@ -56,106 +120,29 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
         </Grid>
 
         <Grid size={{ xs: 12, md: 7 }}>
-          <CardBase sx={{ display: 'flex', flexDirection: 'column', minHeight: 560, height: '100%', p: 3 }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-              <Typography variant="h6" color="primary.dark" sx={{ fontWeight: 600 }}>
-                {t('grafico.title')}
-              </Typography>
-              <ButtonGroup variant="outlined" size="small" aria-label="Filtros de hba1c">
-                <Button
-                  onClick={() => { dataHook.setFiltroHbA1c('trimestre'); dataHook.setPageHbA1c(0); }}
-                  variant={dataHook.filtroHbA1c === 'trimestre' ? 'contained' : 'outlined'}
-                >
-                  {t('grafico.filtros.trimestre')}
-                </Button>
-                <Button
-                  onClick={() => { dataHook.setFiltroHbA1c('año'); dataHook.setPageHbA1c(0); }}
-                  variant={dataHook.filtroHbA1c === 'año' ? 'contained' : 'outlined'}
-                >
-                  {t('grafico.filtros.año')}
-                </Button>
-                <Button
-                  onClick={() => { dataHook.setFiltroHbA1c('todos'); dataHook.setPageHbA1c(0); }}
-                  variant={dataHook.filtroHbA1c === 'todos' ? 'contained' : 'outlined'}
-                >
-                  {t('grafico.filtros.todos')}
-                </Button>
-              </ButtonGroup>
-            </Box>
-
-            <Box sx={{ flexGrow: 1, width: '100%', height: 220, mb: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              {dataHook.resultadosHbA1c.length > 0 ? (
-                <LineChart
-                  xAxis={[{ scaleType: 'point', data: dataHook.fechasHbA1c }]}
-                  series={[{ data: dataHook.resultadosHbA1c, label: t('grafico.labelSerie'), color: '#81c784', curve: 'catmullRom' }]}
-                  sx={{
-                    '& .MuiLineElement-root': { strokeWidth: 2 },
-                    '& .MuiMarkElement-root': { stroke: '#81c784', strokeWidth: 2, fill: '#ffffff', scale: '1.1' }
-                  }}
-                  height={220}
-                  margin={{ top: 20, bottom: 30, left: 0, right: 40 }}
-                />
-              ) : (
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                  <Typography variant="body2" color="text.secondary">{t('grafico.sinDatos')}</Typography>
-                </Box>
-              )}
-            </Box>
-
-            <Typography variant="h6" color="primary.dark" sx={{ fontWeight: 600, my: 3 }}>
-              {t('tabla.title')}
-            </Typography>
-
-            <TableContainer component={Paper} variant="outlined" sx={{ mb: 1, borderColor: 'divider' }}>
-              <Table size="small" aria-label="tabla de hba1c">
-                <TableHead sx={{ bgcolor: 'primary.main' }}>
-                  <TableRow>
-                    <TableCell sx={{ color: '#fff', fontWeight: 700 }}>{t('tabla.headers.fecha')}</TableCell>
-                    <TableCell sx={{ color: '#fff', fontWeight: 700 }}>{t('tabla.headers.resultado')}</TableCell>
-                    <TableCell sx={{ color: '#fff', fontWeight: 700 }}>{t('tabla.headers.estimado')}</TableCell>
-                    <TableCell sx={{ color: '#fff', fontWeight: 700 }}>{t('tabla.headers.estado')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {[...dataHook.hbA1cFiltrada].reverse()
-                    .slice(dataHook.pageHbA1c * dataHook.rowsPerPageHbA1c, dataHook.pageHbA1c * dataHook.rowsPerPageHbA1c + dataHook.rowsPerPageHbA1c)
-                    .map((row: any) => (
-                      <TableRow key={row.id} hover>
-                        <TableCell sx={{ color: 'text.secondary' }}>{row.fecha}</TableCell>
-                        <TableCell sx={{ color: 'text.secondary' }}>
-                          {typeof row.resultado === 'number' ? `${row.resultado} %` : row.resultado}
-                        </TableCell>
-                        <TableCell sx={{ color: 'text.secondary' }}>{row.estimado}</TableCell>
-                        <TableCell sx={{ fontWeight: 700, color: obtenerColorEstado(row.estado) }}>
-                          {row.estado}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  {dataHook.hbA1cFiltrada.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={4} align="center" sx={{ color: 'text.secondary', py: 3 }}>
-                        {t('tabla.sinDatos')}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-            <TablePagination
-              rowsPerPageOptions={[4, 10, 25]}
-              component="div"
-              count={dataHook.hbA1cFiltrada.length}
-              rowsPerPage={dataHook.rowsPerPageHbA1c}
-              page={dataHook.pageHbA1c}
-              onPageChange={(_, newPage) => dataHook.setPageHbA1c(newPage)}
-              onRowsPerPageChange={(e) => {
-                dataHook.setRowsPerPageHbA1c(parseInt(e.target.value, 10));
-                dataHook.setPageHbA1c(0);
-              }}
-              labelRowsPerPage={t('tabla.paginacion.filasPorPagina')}
-            />
-          </CardBase>
+          <PanelGraficoHistorial
+            chartTitle={t('grafico.title')}
+            filterComponent={filterComponent}
+            chartComponent={chartComponent}
+            tableTitle={t('tabla.title')}
+            tableComponent={
+              <HistorialTable<HbA1cRecord>
+                columns={columns}
+                data={[...dataHook.hbA1cFiltrada].reverse()}
+                page={dataHook.pageHbA1c}
+                rowsPerPage={dataHook.rowsPerPageHbA1c}
+                totalCount={dataHook.hbA1cFiltrada.length}
+                onPageChange={(_, newPage) => dataHook.setPageHbA1c(newPage)}
+                onRowsPerPageChange={(e) => {
+                  dataHook.setRowsPerPageHbA1c(parseInt(e.target.value, 10));
+                  dataHook.setPageHbA1c(0);
+                }}
+                emptyMessage={t('tabla.sinDatos')}
+                labelRowsPerPage={t('tabla.paginacion.filasPorPagina')}
+                ariaLabel={t('tabla.ariaLabel')}
+              />
+            }
+          />
         </Grid>
       </Grid>
     </Box>

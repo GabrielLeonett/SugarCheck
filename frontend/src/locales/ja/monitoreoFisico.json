@@ -5,7 +5,7 @@
     "evolutionTitle": "身体の進化",
     "weightDiff": "体重の変化",
     "heightGrowth": "身長の伸び",
-    "dateDesc": "前回の記録と比較した進化 ({date})。",
+    "evolutionDesc": "前回の記録と比較した進化 ({date})。",
     "modalTitle": "新しい測定を記録",
     "weightLabel": "体重",
     "heightLabel": "身長",
@@ -19,10 +19,14 @@
     "tableEstatura": "身長 (cm)",
     "tableImc": "BMI",
     "tableEstado": "状態",
+    "statusUnderweight": "低体重",
+    "statusNormal": "標準",
+    "statusOverweight": "肥満",
     "chartTitle": "身体力の履歴",
     "filterAll": "すべて",
     "filterQuarter": "四半期",
     "filterYear": "年",
     "rowsPerPage": "ページあたりの行数：",
-    "displayedRows": "{from}-{to} / {count}"
+    "displayedRows": "{from}-{to} / {count}",
+    "loading": "読み込み中..."
 }
