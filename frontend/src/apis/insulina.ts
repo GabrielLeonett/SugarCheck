@@ -49,11 +49,6 @@ export interface InsulinQueryParams {
 }
 
 function mapInsulinResponse(record: InsulinRecord): InsulinRecord {
-  const date = new Date(record.fecha);
-  const dd = String(date.getDate()).padStart(2, '0');
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const aaaa = date.getFullYear();
-
   return {
     ...record,
     unidades: record.dosis,
