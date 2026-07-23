@@ -10,6 +10,7 @@
   "ultimoResultado": {
     "title": "最新の結果",
     "estimado": "推定eAG: {{valor}} mg/dL",
+    "sinDatos": "まだデータが登録されていません",
     "enRango": "目標範囲内",
     "fueraRango": "目標範囲外"
   },
