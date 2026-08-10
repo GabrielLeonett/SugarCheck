@@ -168,6 +168,7 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
 
         {/* Columna Derecha: Gráfico con Filtros e Historial */}
         <Grid size={{ xs: 12, md: 7 }}>
+          
           <PanelGraficoHistorial
             chartTitle={t('grafico.title')}
             filterComponent={filterComponent}

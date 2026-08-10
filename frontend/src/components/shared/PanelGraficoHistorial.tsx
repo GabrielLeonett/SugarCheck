@@ -34,18 +34,28 @@ export function PanelGraficoHistorial({
           justifyContent: 'space-between',
           alignItems: { xs: 'stretch', sm: 'center' },
           gap: 1,
-          mb: 3,
         }}
-      >
+      > 
         <Typography
           variant="h6"
           color="primary.dark"
-          sx={{ fontWeight: 600, textAlign: { xs: 'center', sm: 'left' } }}
+          sx={{ fontWeight: 600, my: 4, textAlign: { xs: 'center', sm: 'left' } }}
         >
-          {chartTitle}
+          {tableTitle}
         </Typography>
         {filterComponent}
       </Box>
+      
+
+      {tableComponent}
+
+        <Typography
+          variant="h6"
+          color="primary.dark"
+          sx={{ fontWeight: 600, my: 3, textAlign: { xs: 'center', sm: 'left' } }}
+        >
+          {chartTitle}
+        </Typography>
 
       <Box
         sx={{
@@ -61,15 +71,6 @@ export function PanelGraficoHistorial({
         {chartComponent}
       </Box>
 
-      <Typography
-        variant="h6"
-        color="primary.dark"
-        sx={{ fontWeight: 600, my: 3 }}
-      >
-        {tableTitle}
-      </Typography>
-
-      {tableComponent}
     </CardBase>
   );
 }
