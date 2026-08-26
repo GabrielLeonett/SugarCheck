@@ -8,7 +8,7 @@ import { CardBase } from '../../../components/ui/Cards/CardBase';
 import ModalImcForm from '../../../components/shared/ModalImcForm';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
-import { GraficoLinea } from '../../../components/shared/GraficoLinea';
+import { GraficoBarra } from '../../../components/shared/GraficoBarra';
 import { useImcData } from '../../../hooks/useImcData';
 import useLanguage from '../../../hooks/useLanguage';
 import type { ImcRecord } from '../../../data/recordsMock';
@@ -48,7 +48,7 @@ export const PhysicalMonitoringPage: React.FC = () => {
   ];
 
   const chartComponent = (
-    <GraficoLinea
+    <GraficoBarra
       data={imc.pesos}
       labels={imc.fechas.map((f) => formatDate(f))}
       color="#94c2e6"
