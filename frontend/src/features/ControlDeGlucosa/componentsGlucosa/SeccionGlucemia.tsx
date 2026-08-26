@@ -7,7 +7,7 @@ import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
 import ModalGlucosaForm from '../../../components/shared/ModalGlucosaForm.tsx';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
-import { GraficoLinea } from '../../../components/shared/GraficoLinea';
+import { GraficoBarra } from '../../../components/shared/GraficoBarra';
 import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 
@@ -44,7 +44,7 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
   ];
 
   const chartComponent = (
-    <GraficoLinea
+    <GraficoBarra
       data={dataHook.nivelesGlucosa}
       labels={dataHook.horasGlucosa}
       color="#94c2e6"
