@@ -27,7 +27,7 @@
     "hipoglucemias": "Hipoglicemias",
     "enRango": "Na meta objetivo"
   },
-  "grafico": {
+"grafico": {
     "title": "Evolução da Glicemia",
     "labelSerie": "Nível (mg/dL)",
     "sinDatos": "Nenhum registro para gerar o gráfico",
