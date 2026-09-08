@@ -1,0 +1,12 @@
+# Usuario por defecto: postgres
+# Password: la que configuraste al instalar Postgres
+# Host: localhost o 127.0.0.1
+# Puerto: 5432 (por defecto)
+# Database: El nombre de la DB que creaste (ej. guerreros_db)
+
+DATABASE_URL="postgresql://postgres:1234@localhost:5432/guerreros_db?schema=public"
+
+# En local, el DIRECT_URL suele ser igual al DATABASE_URL
+DIRECT_URL="postgresql://postgres:1234@localhost:5432/guerreros_db?schema=public"
+
+JWT_SECRET="G8w3DVygMBxQc0PTGA5x4kkMfCmSFkAko3W9el5cF9c="

@@ -1,0 +1,40 @@
+@startuml Contactos_Emergencia_UseCase
+left to right direction
+skinparam monochrome true
+skinparam packageStyle rectangle
+
+actor "Usuario / Paciente" as User
+actor "Sistema (Monitor de Glucemia)" as System
+actor "Contacto de Emergencia" as Contact
+
+rectangle "Módulo: Contactos_Emergencia" {
+  usecase "Agregar Contacto" as CU07
+  usecase "Editar Contacto" as CU08
+  usecase "Eliminar Contacto" as CU09
+  usecase "Listar Contactos" as CU10
+  usecase "Activar Botón de Pánico Manual" as CU11
+  usecase "Enviar Alerta Automática" as CU12
+}
+
+' Relaciones del Usuario
+User --> CU07
+User --> CU08
+User --> CU09
+User --> CU10
+User --> CU11
+
+' Relaciones del Sistema
+System --> CU12 : "Detecta Hipoglucemia Severa"
+
+' Relación con el Actor Externo
+CU11 ..> Contact : "Notifica vía SMS/WhatsApp"
+CU12 ..> Contact : "Notifica vía SMS/WhatsApp"
+
+note bottom of CU12
+  Se dispara cuando el nivel 
+  de glucosa cae por debajo 
+  del umbral crítico definido 
+  en Preferencias_Config.
+end note
+
+@enduml

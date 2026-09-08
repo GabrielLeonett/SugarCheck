@@ -1,0 +1,100 @@
+@startuml Contacto_Emergencia_Module
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+package "Shared" {
+    class "Result<T, E>" as Result
+    class ErrorAbstract
+}
+
+package "Errors" {
+    class ContactNameInvalidError
+    class PhoneFormatInvalidError
+    class PriorityInvalidError
+}
+
+package "Value Objects (Emergency)" {
+    class ContactName {
+        + value: string
+        + {static} create(name: string): Result<ContactName, ContactNameInvalidError>
+    }
+
+    class ContactPhone {
+        + value: string
+        + {static} create(phone: string): Result<ContactPhone, PhoneFormatInvalidError>
+    }
+
+    enum Relationship {
+        Madre
+        Padre
+        Abuelo
+        Medico
+        Otro
+    }
+
+    class ContactPriority {
+        + value: int
+        + {static} create(level: int): Result<ContactPriority, PriorityInvalidError>
+    }
+}
+
+package "Entity & Interfaces" {
+    interface ContactProps {
+        + id: ContactId
+        + userId: UserId
+        + nombreCompleto: ContactName
+        + telefono: ContactPhone
+        + parentesco: Relationship
+        + smsEnabled: boolean
+        + whatsappEnabled: boolean
+        + prioridad: ContactPriority
+    }
+
+    interface ContactPlain {
+        + id: string
+        + userId: string
+        + nombreCompleto: string
+        + telefono: string
+        + parentesco: string
+        + smsEnabled: boolean
+        + whatsappEnabled: boolean
+        + prioridad: number
+    }
+
+    class ContactoEmergencia {
+        - _id: ContactId
+        - _userId: UserId
+        - _nombreCompleto: ContactName
+        - _telefono: ContactPhone
+        - _parentesco: Relationship
+        - _smsEnabled: boolean
+        - _whatsappEnabled: boolean
+        - _prioridad: ContactPriority
+
+        + constructor(props: ContactProps)
+        + toPlain(): ContactPlain
+    }
+}
+
+package "Domain / Repository" {
+    interface EmergencyContactRepository {
+        + getByUserId(id: UserId): Promise<Result<ContactoEmergencia[], ErrorAbstract>>
+        + save(contact: ContactoEmergencia): Promise<Result<ContactoEmergencia, ErrorAbstract>>
+        + update(contact: ContactoEmergencia): Promise<Result<ContactoEmergencia, ErrorAbstract>>
+        + delete(id: ContactId): Promise<Result<void, ErrorAbstract>>
+    }
+}
+
+' Relaciones
+ContactoEmergencia "1" *-- "1" ContactName
+ContactoEmergencia "1" *-- "1" ContactPhone
+ContactoEmergencia "1" *-- "1" Relationship
+ContactoEmergencia "1" *-- "1" ContactPriority
+
+ContactoEmergencia ..> ContactProps : "usa"
+ContactoEmergencia ..> ContactPlain : "exporta"
+EmergencyContactRepository ..> ContactoEmergencia : "gestiona"
+
+@enduml
