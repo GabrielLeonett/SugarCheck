@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 
-export type TimeRange = 'hoy' | 'semana' | 'mes' | 'trimestre' | 'año' | 'todos';
+export type TimeRange = 'hoy' | 'semana' | 'mes' | 'trimestre' | 'año' | 'todos' | 'personalizado';
 
 interface UseMetricDataOptions {
   initialRowsPerPage?: number;

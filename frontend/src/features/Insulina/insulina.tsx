@@ -15,9 +15,9 @@ export default function Insulina() {
   const [openLento, setOpenLento] = useState(false);
   const [openRapido, setOpenRapido] = useState(false);
   const [totals, setTotals] = useState<DailyTotals>({ totalRapida: 0, totalLenta: 0, totalGeneral: 0 });
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const {t} = useLanguage('insulina');
+  const { t } = useLanguage('insulina');
 
   const Rango = ["80 - 120", "121 - 150", "151 - 190", "191 - 250", "> 250"];
   const unidadesE = ["2 UI", "3 UI", "4 UI", "5 UI", "6 UI"];
@@ -33,7 +33,11 @@ export default function Insulina() {
 
   useEffect(() => {
     loadTotals();
-  }, [loadTotals, refreshKey]);
+  }, [loadTotals, refreshTrigger]);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshTrigger(k => k + 1);
+  }, []);
 
   const handleGuardarRapida = async (data: {
     dosis: number;
@@ -50,7 +54,7 @@ export default function Insulina() {
         ...data,
       });
       setOpenRapido(false);
-      setRefreshKey(k => k + 1);
+      handleRefresh();
     } catch (error) {
       console.error("Error al guardar insulina rápida:", error);
       throw error;
@@ -71,7 +75,7 @@ export default function Insulina() {
         ...data,
       });
       setOpenLento(false);
-      setRefreshKey(k => k + 1);
+      handleRefresh();
     } catch (error) {
       console.error("Error al guardar insulina lenta:", error);
       throw error;
@@ -231,7 +235,7 @@ export default function Insulina() {
             {/* COLUMNA DERECHA */}
             <Grid size={{ xs: 12, md: 7 }}>
               <Box sx={{ width: '100%' }}>
-                <InsulinaHistorial refreshTrigger={refreshKey} />
+                <InsulinaHistorial refreshTrigger={refreshTrigger} />
               </Box>
             </Grid>
           </Grid>
