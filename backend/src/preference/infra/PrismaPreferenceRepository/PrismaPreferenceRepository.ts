@@ -88,4 +88,36 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
       );
     }
   }
+
+  async update(
+    id: UserId,
+    update: Partial<Preference>,
+  ): Promise<Result<Preference, ErrorAbstract>> {
+    try {
+      await this.prisma.preference.update({
+        where: { userId: id.value },
+        data: {
+          profileImg: update.profileImg?.value,
+          unitMeasure: update.unitMeasure?.value,
+          thresholds: update.thresholds
+            ? (update.thresholds.value as unknown as Prisma.InputJsonValue)
+            : undefined,
+          insulinRatios: update.insulinRatios
+            ? {
+                breakfast: update.insulinRatios.breakfast,
+                lunch: update.insulinRatios.lunch,
+                dinner: update.insulinRatios.dinner,
+              }
+            : undefined,
+          sensitivity: update.sensitivity?.value,
+        },
+      });
+
+      return await this.getOneById(id);
+    } catch (error) {
+      return Result.fail(
+        new DatabaseError('Error al actualizar las preferencias'),
+      );
+    }
+  }
 }
