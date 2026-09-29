@@ -1,1 +1,5 @@
 /.agents
+
+# dotenv environment files (nunca commitear secretos)
+.env*
+!.env.example
