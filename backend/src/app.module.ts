@@ -9,6 +9,7 @@ import { NotificationModule } from './notification/infra/Nest/notification.modul
 import { ImcModule } from './IMC/infra/Nest/imc.module';
 import { GlucoseModule } from './glucose/infra/Nest/glucose.module';
 import { InsulinaModule } from './insulina/infra/Nest/insulina.module';
+import { SyncModule } from './sync/infra/Nest/sync.module';
 import { I18nModule } from './shared/infrastructure/i18n/i18n.module';
 import { GlobalExceptionFilter } from './shared/infrastructure/exception-filter';
 import { TranslationService } from './shared/infrastructure/i18n/translation.service';
@@ -28,6 +29,7 @@ import { TranslationService } from './shared/infrastructure/i18n/translation.ser
     ImcModule,
     GlucoseModule,
     InsulinaModule,
+    SyncModule,
   ],
   providers: [
     {

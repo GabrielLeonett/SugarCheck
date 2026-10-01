@@ -79,7 +79,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
   async getAllByUserId(userId: string): Promise<Result<Insulina[], ErrorAbstract>> {
     try {
       const records = await this.prisma.insulina.findMany({
-        where: { userId },
+        where: { userId, deletedAt: null },
         orderBy: { fecha: 'desc' },
       });
 
@@ -98,8 +98,8 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
 
   async getById(id: IdInsulina): Promise<Result<Insulina | null, ErrorAbstract>> {
     try {
-      const record = await this.prisma.insulina.findUnique({
-        where: { id: id.value },
+      const record = await this.prisma.insulina.findFirst({
+        where: { id: id.value, deletedAt: null },
       });
       if (!record) {
         return Result.ok(null);
@@ -178,8 +178,9 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
 
   async delete(id: IdInsulina): Promise<Result<void, ErrorAbstract>> {
     try {
-      await this.prisma.insulina.delete({
+      await this.prisma.insulina.update({
         where: { id: id.value },
+        data: { deletedAt: new Date() },
       });
       return Result.ok(undefined);
     } catch (error) {
@@ -196,6 +197,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
       const records = await this.prisma.insulina.findMany({
         where: {
           userId,
+          deletedAt: null,
           fecha: {
             gte: startDate,
             lte: endDate,
@@ -227,6 +229,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
       const records = await this.prisma.insulina.findMany({
         where: {
           userId,
+          deletedAt: null,
           fecha: {
             gte: startOfDay,
             lte: endOfDay,

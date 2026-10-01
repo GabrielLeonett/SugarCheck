@@ -38,6 +38,8 @@ import { userApi } from "../../apis/user_config";
 import { contactEmergenceApi, type ContactEmergenceData } from "../../apis/contact_emergence";
 import { profilePersonalSchema, type ProfilePersonalData } from "../../schemas/profile";
 import { contactEmergenceSchema, type ContactEmergenceData as ContactEmergenceFormData } from "../../schemas/contact_emergence";
+import ModalBasalSchema from "./components/ModalBasalSchema";
+import ModalDynamicCorrection from "./components/ModalDynamicCorrection";
 import useLanguage from "../../hooks/useLanguage";
 
 export function Profile() {
@@ -59,6 +61,8 @@ export function Profile() {
     const [contacts, setContacts] = React.useState<ContactEmergenceData[]>([]);
     const [openContactModal, setOpenContactModal] = React.useState(false);
     const [editingContact, setEditingContact] = React.useState<ContactEmergenceData | null>(null);
+    const [openBasalModal, setOpenBasalModal] = React.useState(false);
+    const [openCorrectionModal, setOpenCorrectionModal] = React.useState(false);
 
     const {
         register: registerPersonal,
@@ -69,6 +73,8 @@ export function Profile() {
         resolver: zodResolver(profilePersonalSchema),
         mode: "onChange",
         defaultValues: {
+            username: authUser?.username || undefined,
+            email: authUser?.email || undefined,
             fechaNacimiento: authUser?.fechaNacimiento
                 ? new Date(authUser.fechaNacimiento).toISOString()
                 : undefined,
@@ -144,6 +150,8 @@ export function Profile() {
                     thresholds: { hypo: prefForm.hypo, hiper: prefForm.hiper },
                     insulinRatios: { breakfast: prefForm.breakfast, lunch: prefForm.lunch, dinner: prefForm.dinner },
                     sensitivity: prefForm.sensitivity,
+                    correctionSchemas: current.correctionSchemas ?? [],
+                    basalSchemas: current.basalSchemas ?? [],
                 });
                 setMsg({ type: 'success', text: tp("guardadoExitoClinico") });
             });
@@ -398,26 +406,13 @@ export function Profile() {
                                     <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "1px solid #CBD5E0", mb: 2 }}>
                                         <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("dynamicCorrection")}</Typography>
                                     </AccordionSummary>
-                                    <AccordionDetails sx={{ p: 0, mb: 3 }}>
-                                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap", mb: 2 }}>
-                                            <Box sx={{ width: 100 }}>
-                                                <Typography variant="caption" sx={{ display: "block", textAlign: "center", fontWeight: "bold" }}>{tp("minMgdl")}</Typography>
-                                                <TextField placeholder="Value" />
-                                            </Box>
-                                            <Typography variant="h6" sx={{ alignSelf: "flex-end", mb: 0.5 }}>/</Typography>
-                                            <Box sx={{ width: 100 }}>
-                                                <Typography variant="caption" sx={{ display: "block", textAlign: "center", fontWeight: "bold" }}>{tp("maxMgdl")}</Typography>
-                                                <TextField placeholder="Value" />
-                                            </Box>
-                                            <Typography variant="body2" sx={{ alignSelf: "flex-end", mb: 1, fontWeight: "bold" }}>{tp("applyDose")}</Typography>
-                                            <Box sx={{ width: 100 }}>
-                                                <Typography variant="caption" sx={{ display: "block", textAlign: "center", fontWeight: "bold" }}>{tp("doseUi")}</Typography>
-                                                <TextField placeholder="Value" />
-                                            </Box>
-                                        </Box>
-                                        <Box sx={{ display: "flex", justifyContent: "center" }}>
-                                            <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }}>{tp("addRange")}</ButtonBase>
-                                        </Box>
+                                    <AccordionDetails sx={{ p: 0, mb: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                        <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
+                                            Administre los rangos de glucemia y las dosis de corrección correspondientes.
+                                        </Typography>
+                                        <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={() => setOpenCorrectionModal(true)}>
+                                            {tp("addRange")}
+                                        </ButtonBase>
                                     </AccordionDetails>
                                 </Accordion>
 
@@ -426,15 +421,12 @@ export function Profile() {
                                         <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("basalScheme")}</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ p: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                                        <CardBase sx={{ p: 2, borderRadius: 2, width: "100%", maxWidth: 400, mb: 2, position: "relative" }}>
-                                            <Box sx={{ position: "absolute", top: 8, right: 8 }}>
-                                                <IconButton><EditIcon fontSize="small" /></IconButton>
-                                                <IconButton><DeleteIcon fontSize="small" /></IconButton>
-                                            </Box>
-                                            <Typography variant="body2" sx={{ mb: 1 }}><strong>{tp("injectionTime")}</strong></Typography>
-                                            <Typography variant="body2"><strong>{tp("establishedDose")}</strong></Typography>
-                                        </CardBase>
-                                        <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }}>{tp("addSchema")}</ButtonBase>
+                                        <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
+                                            Configure las dosis de insulina basal según la hora del día.
+                                        </Typography>
+                                        <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={() => setOpenBasalModal(true)}>
+                                            {tp("addSchema")}
+                                        </ButtonBase>
                                     </AccordionDetails>
                                 </Accordion>
                             </AccordionDetails>
@@ -567,6 +559,15 @@ export function Profile() {
                 </Grid>
             </Box>
             <Footer />
+
+            <ModalBasalSchema
+                open={openBasalModal}
+                onClose={() => setOpenBasalModal(false)}
+            />
+            <ModalDynamicCorrection
+                open={openCorrectionModal}
+                onClose={() => setOpenCorrectionModal(false)}
+            />
         </>
     );
 }
