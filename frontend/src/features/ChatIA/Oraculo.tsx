@@ -3,6 +3,7 @@ import {
   Avatar,
   Badge,
   Box,
+  CircularProgress,
   Drawer,
   IconButton,
   InputAdornment,
@@ -15,6 +16,7 @@ import { alpha } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import HistoryIcon from '@mui/icons-material/History';
 import MenuIcon from '@mui/icons-material/Menu';
 import MicIcon from '@mui/icons-material/Mic';
@@ -27,36 +29,13 @@ import { useAuthStore } from '../../stores/authStore';
 import { usePreferenceConfig } from '../../hooks/usePreferenceConfig';
 import { AVATAR_MAP } from '../../constants/avatars';
 import { Logo } from '../../components/ui/Logo';
-
-interface ChatMessage {
-  id: number;
-  author: 'user' | 'oracle';
-  text: string;
-  time: string;
-}
-
-const HISTORY_ITEMS = [
-  '¿Qué puedo desayunar?',
-  'Mi energía esta bajita',
-  'Recordatorio de poción',
-  '¿Cuánta insulina hoy?',
-  'Zona Sagrada alcanzada',
-  'Mensaje de motivación',
-  '¿Puedo comer dulces?',
-  'Resumen de hoy',
-];
+import { useOraculoChat } from '../../hooks/useOraculoChat';
+import type { OraculoMessage } from '../../apis/oraculo';
 
 const SUGGESTIONS = [
   { text: '¿Cómo está mi energía?', icon: '⚡' },
   { text: 'Me siento cansado', icon: '🥱' },
   { text: '¿Qué puedo comer?', icon: '🍎' },
-];
-
-const ORACLE_REPLIES = [
-  '¡Buenas noticias! Tu energía se mantiene dentro de la Zona Sagrada. ¡Sigue así, pequeño héroe! 💙',
-  'Una manzana dorada 🍎 y un vaso de agua serán perfectos para mantener tu energía estable.',
-  'Tu última lectura fue muy estable. ¡Estás listo para la aventura de hoy! 🛡️',
-  'Recuerda registrar tu poción al mediodía para que el Oráculo pueda ayudarte mejor. ⚗️',
 ];
 
 const USER_GRADIENT = 'linear-gradient(135deg, #3d586c 0%, #558eb9 100%)';
@@ -74,11 +53,22 @@ export default function ChatIA() {
   const { preference } = usePreferenceConfig();
   const isDark = theme.palette.mode === 'dark';
 
+  const {
+    conversations,
+    activeConversationId,
+    messages,
+    loadingConversations,
+    sending,
+    error,
+    selectConversation,
+    startNewConversation,
+    sendMessage,
+    deleteConversation,
+  } = useOraculoChat();
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const [thinking, setThinking] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const sidebarText = '#ffffff';
@@ -98,42 +88,33 @@ export default function ChatIA() {
 
   const filteredHistory = useMemo(
     () =>
-      HISTORY_ITEMS.filter((item) =>
-        item.toLowerCase().includes(search.trim().toLowerCase()),
+      conversations.filter((item) =>
+        item.title.toLowerCase().includes(search.trim().toLowerCase()),
       ),
-    [search],
+    [conversations, search],
   );
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, [messages, thinking]);
+  }, [messages, sending]);
 
-  const sendMessage = (text?: string) => {
+  const handleSend = async (text?: string) => {
     const content = (text ?? input).trim();
-    if (!content || thinking) return;
-
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now(), author: 'user', text: content, time: formatTime(new Date()) },
-    ]);
+    if (!content || sending) return;
     setInput('');
-    setThinking(true);
-
-    setTimeout(() => {
-      const reply = ORACLE_REPLIES[Math.floor(Math.random() * ORACLE_REPLIES.length)];
-      setMessages((prev) => [
-        ...prev,
-        { id: Date.now() + 1, author: 'oracle', text: reply, time: formatTime(new Date()) },
-      ]);
-      setThinking(false);
-    }, 1100);
+    await sendMessage(content);
   };
 
-  const newChat = () => {
-    setMessages([]);
+  const handleNewChat = async () => {
     setSearch('');
     setDrawerOpen(false);
     setInput('');
+    await startNewConversation();
+  };
+
+  const handleSelectConversation = async (id: string) => {
+    setDrawerOpen(false);
+    await selectConversation(id);
   };
 
   const oracleAvatar = (
@@ -188,7 +169,7 @@ export default function ChatIA() {
         </Box>
 
         <IconButton
-          onClick={newChat}
+          onClick={handleNewChat}
           sx={{
             width: '100%',
             py: 1.25,
@@ -252,15 +233,19 @@ export default function ChatIA() {
             '&::-webkit-scrollbar-thumb': { backgroundColor: alpha('#ffffff', 0.25), borderRadius: 4 },
           }}
         >
-          {filteredHistory.length === 0 ? (
+          {loadingConversations ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+              <CircularProgress size={22} sx={{ color: sidebarText }} />
+            </Box>
+          ) : filteredHistory.length === 0 ? (
             <Typography sx={{ color: alpha(sidebarText, 0.6), fontSize: '0.8rem', py: 2, textAlign: 'center' }}>
               Sin conversaciones
             </Typography>
           ) : (
-            filteredHistory.map((item, index) => (
+            filteredHistory.map((item) => (
               <Box
-                key={`${item}-${index}`}
-                onClick={() => sendMessage(item)}
+                key={item.id}
+                onClick={() => handleSelectConversation(item.id)}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
@@ -268,14 +253,39 @@ export default function ChatIA() {
                   p: '10px 14px',
                   mb: 1,
                   borderRadius: '14px',
-                  backgroundColor: alpha('#ffffff', 0.1),
+                  backgroundColor:
+                    activeConversationId === item.id
+                      ? alpha('#ffffff', 0.24)
+                      : alpha('#ffffff', 0.1),
                   cursor: 'pointer',
                   transition: 'background-color 0.2s ease',
                   '&:hover': { backgroundColor: alpha('#ffffff', 0.2) },
                 }}
               >
                 <HistoryIcon sx={{ color: alpha(sidebarText, 0.7), fontSize: 18 }} />
-                <Typography sx={{ color: sidebarText, fontSize: '0.85rem', flex: 1 }}>{item}</Typography>
+                <Typography
+                  sx={{
+                    color: sidebarText,
+                    fontSize: '0.85rem',
+                    flex: 1,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {item.title}
+                </Typography>
+                <IconButton
+                  size="small"
+                  aria-label="eliminar conversación"
+                  sx={{ color: alpha(sidebarText, 0.6) }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteConversation(item.id);
+                  }}
+                >
+                  <DeleteOutlineIcon sx={{ fontSize: 17 }} />
+                </IconButton>
               </Box>
             ))
           )}
@@ -387,19 +397,8 @@ export default function ChatIA() {
             </Typography>
           </Box>
 
-          <IconButton
-            onClick={newChat}
-            sx={{
-              display: { xs: 'inline-flex', sm: 'none' },
-              color: theme.palette.primary.main,
-            }}
-            aria-label="nueva consulta"
-          >
-            <AddIcon />
-          </IconButton>
-
           <Box
-            onClick={newChat}
+            onClick={handleNewChat}
             sx={{
               display: { xs: 'none', sm: 'flex' },
               alignItems: 'center',
@@ -459,7 +458,7 @@ export default function ChatIA() {
           }}
         >
           <Box sx={{ maxWidth: 820, width: '100%', mx: 'auto' }}>
-            {messages.length === 0 && !thinking ? (
+            {messages.length === 0 && !sending ? (
               <Box
                 sx={{
                   minHeight: '100%',
@@ -495,11 +494,17 @@ export default function ChatIA() {
                   Pregúntame sobre tu energía, qué comer o recibe un mensaje de motivación para tu aventura.
                 </Typography>
 
+                {error && (
+                  <Typography sx={{ color: theme.palette.error.main, mt: 2, fontSize: '0.85rem' }}>
+                    {error}
+                  </Typography>
+                )}
+
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 1.5, mt: 3 }}>
                   {SUGGESTIONS.map((suggestion) => (
                     <Box
                       key={suggestion.text}
-                      onClick={() => sendMessage(suggestion.text)}
+                      onClick={() => handleSend(suggestion.text)}
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
@@ -528,8 +533,14 @@ export default function ChatIA() {
               </Box>
             ) : (
               <>
-                {messages.map((message) => {
-                  const isUser = message.author === 'user';
+                {error && (
+                  <Typography sx={{ color: theme.palette.error.main, mb: 2, fontSize: '0.85rem', textAlign: 'center' }}>
+                    {error}
+                  </Typography>
+                )}
+
+                {messages.map((message: OraculoMessage) => {
+                  const isUser = message.role === 'user';
                   return (
                     <Box
                       key={message.id}
@@ -577,14 +588,14 @@ export default function ChatIA() {
                               lineHeight: 1.5,
                             }}
                           >
-                            {message.text}
+                            {message.content}
                           </Typography>
                         </Box>
                         <Typography
                           variant="caption"
                           sx={{ color: theme.palette.text.disabled, mt: 0.5, fontSize: '0.68rem' }}
                         >
-                          {isUser ? 'Tú' : 'Oráculo'} · {message.time}
+                          {isUser ? 'Tú' : 'Oráculo'} · {formatTime(new Date(message.createdAt))}
                         </Typography>
                       </Box>
                       {isUser && (
@@ -600,7 +611,7 @@ export default function ChatIA() {
                   );
                 })}
 
-                {thinking && (
+                {sending && (
                   <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1, mb: 2 }}>
                     {oracleAvatar}
                     <Box
@@ -676,7 +687,7 @@ export default function ChatIA() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  sendMessage();
+                  handleSend();
                 }
               }}
               slotProps={{
@@ -694,13 +705,13 @@ export default function ChatIA() {
             <IconButton
               sx={{ color: theme.palette.text.secondary }}
               aria-label="grabar mensaje"
-              onClick={() => sendMessage('🎤 (mensaje de voz)')}
+              onClick={() => setInput((prev) => prev)}
             >
               <MicIcon fontSize="small" />
             </IconButton>
             <IconButton
-              onClick={() => sendMessage()}
-              disabled={!input.trim() || thinking}
+              onClick={() => handleSend()}
+              disabled={!input.trim() || sending}
               aria-label="enviar"
               sx={{
                 width: 44,

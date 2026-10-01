@@ -91,3 +91,13 @@ registerErrorMapping('GlucoseDateInvalidError', { statusCode: HttpStatus.BAD_REQ
 registerErrorMapping('GlucoseTimeInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_GLUCOSE_TIME' });
 registerErrorMapping('HbA1cIdInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_HBA1C_ID' });
 registerErrorMapping('HbA1cExamDateInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_HBA1C_DATE' });
+
+registerErrorMapping('ConversationNotFoundError', { statusCode: HttpStatus.NOT_FOUND, code: 'CONVERSATION_NOT_FOUND' });
+registerErrorMapping('ConversationAccessDeniedError', { statusCode: HttpStatus.FORBIDDEN, code: 'CONVERSATION_ACCESS_DENIED' });
+registerErrorMapping('ConversationIdInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'CONVERSATION_ID_INVALID' });
+registerErrorMapping('ConversationTitleInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'CONVERSATION_TITLE_INVALID' });
+registerErrorMapping('MessageIdInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'MESSAGE_ID_INVALID' });
+registerErrorMapping('MessageRoleInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'MESSAGE_ROLE_INVALID' });
+registerErrorMapping('EmptyMessageError', { statusCode: HttpStatus.BAD_REQUEST, code: 'EMPTY_MESSAGE' });
+registerErrorMapping('UnsafeMedicalRequestError', { statusCode: HttpStatus.BAD_REQUEST, code: 'UNSAFE_MEDICAL_REQUEST' });
+registerErrorMapping('LanguageModelError', { statusCode: HttpStatus.SERVICE_UNAVAILABLE, code: 'LANGUAGE_MODEL_ERROR' });
