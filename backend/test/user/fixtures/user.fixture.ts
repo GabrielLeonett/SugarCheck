@@ -3,6 +3,7 @@ import { User } from '../../../src/user/core/User';
 import { UserEmail } from '../../../src/user/core/value-objects/UserEmail';
 import { Role } from '../../../src/shared/enums/role.enum';
 import { UserName } from '../../../src/user/core/value-objects/UserName';
+import { UserUsername } from '../../../src/user/core/value-objects/UserUsername';
 import { UserPassword } from '../../../src/user/core/value-objects/UserPassword';
 import { UserRoles } from '../../../src/user/core/value-objects/UserRoles';
 import { UserCreatedAt } from '../../../src/user/core/value-objects/UserCreatedAt';
@@ -14,6 +15,7 @@ import { UserId } from '../../../src/shared/core/value-objects/UserId';
 interface UserOverrides {
   id?: string;
   name?: string;
+  username?: string;
   password?: string;
   email?: string;
   sexo?: string;
@@ -36,6 +38,11 @@ export class UserFactory {
       id: UserId.create(overrides.id ?? faker.string.uuid()).getValue(),
       name: UserName.create(
         overrides.name ?? faker.person.fullName(),
+      ).getValue(),
+      username: UserUsername.create(
+        overrides.username ??
+          faker.string.alpha({ length: 1, casing: 'lower' }) +
+            faker.string.alphanumeric(9),
       ).getValue(),
       password: UserPassword.create(passwordRaw).getValue(),
       email: UserEmail.create(

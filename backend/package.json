@@ -13,7 +13,7 @@
     "migrate:test": "dotenv-cli -e .env.test -- prisma migrate dev",
     "prisma:studio": "dotenv-cli -e .env.development -- prisma studio",
     "test": "cross-env NODE_ENV=test jest",
-    "test:int": "cross-env NODE_ENV=test dotenv-cli -e .env.test -- jest -i --config ./test/jest-int.json",
+    "test:int": "cross-env NODE_ENV=test jest -i --config \"test/jest-int.json\"",
     "test:watch": "cross-env NODE_ENV=test jest --watch",
     "test:cov": "cross-env NODE_ENV=test jest --coverage",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
