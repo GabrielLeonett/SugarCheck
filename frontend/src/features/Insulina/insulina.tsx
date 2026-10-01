@@ -20,10 +20,9 @@ export default function Insulina() {
   const [openRapido, setOpenRapido] = useState(false);
   const [openCorrection, setOpenCorrection] = useState(false);
   const [totals, setTotals] = useState<DailyTotals>({ totalRapida: 0, totalLenta: 0, totalGeneral: 0 });
-  const [correctionItems, setCorrectionItems] = useState<CorrectionSchemaItem[]>([]);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const {t} = useLanguage('insulina');
+  const { t } = useLanguage('insulina');
 
   const loadTotals = useCallback(async () => {
     try {
@@ -45,8 +44,11 @@ export default function Insulina() {
 
   useEffect(() => {
     loadTotals();
-    loadCorrectionSchemas();
-  }, [loadTotals, loadCorrectionSchemas, refreshKey]);
+  }, [loadTotals, refreshTrigger]);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshTrigger(k => k + 1);
+  }, []);
 
   const handleGuardarRapida = async (data: {
     dosis: number;
@@ -63,7 +65,7 @@ export default function Insulina() {
         ...data,
       });
       setOpenRapido(false);
-      setRefreshKey(k => k + 1);
+      handleRefresh();
     } catch (error) {
       console.error("Error al guardar insulina rápida:", error);
       throw error;
@@ -84,7 +86,7 @@ export default function Insulina() {
         ...data,
       });
       setOpenLento(false);
-      setRefreshKey(k => k + 1);
+      handleRefresh();
     } catch (error) {
       console.error("Error al guardar insulina lenta:", error);
       throw error;
@@ -181,7 +183,7 @@ export default function Insulina() {
                       variant="h4"
                       sx={{ color: "#7AAFD7", fontWeight: "bold" }}
                     >
-                      21.1 UI
+                      {totals.totalRapida.toFixed(1)} UI
                     </Typography>
                   </CardBase>
                 </Grid>
@@ -238,7 +240,7 @@ export default function Insulina() {
             {/* COLUMNA DERECHA */}
             <Grid size={{ xs: 12, md: 7 }}>
               <Box sx={{ width: '100%' }}>
-                <InsulinaHistorial refreshTrigger={refreshKey} />
+                <InsulinaHistorial refreshTrigger={refreshTrigger} />
               </Box>
             </Grid>
           </Grid>
