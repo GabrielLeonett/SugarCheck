@@ -122,14 +122,15 @@ export class NodemailerService implements SendEmailInterface {
     const txt = this.t(lang);
     const urlAccion = `${this.frontendUrl}/restablecer-contrasena?email=${encodeURIComponent(to)}&code=${code}`;
 
-    if (this.isDev && !this.configService.get<string>('EMAIL_USER')) {
+    if (this.isDev) {
       console.log('========================================');
       console.log(`[DEV] ${txt.devLog}`);
       console.log(`  Para: ${to}`);
       console.log(`  ${txt.devCode} ${code}`);
       console.log(`  URL: ${urlAccion}`);
       console.log('========================================');
-      return;
+
+      if (!this.configService.get<string>('EMAIL_USER')) return;
     }
 
     const body = `
