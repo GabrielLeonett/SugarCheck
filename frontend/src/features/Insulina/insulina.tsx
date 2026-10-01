@@ -2,25 +2,27 @@ import Navbar from "../../components/layout/Header/Navbar.tsx";
 import Footer from '../../components/layout/Footer/Footer.tsx';
 import { Typography, Box, Grid } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import { CardBase } from "../../components/ui/Cards/CardBase.tsx";
 import { useState, useEffect, useCallback } from "react";
 import { ButtonBase } from "../../components/ui/Buttons/ButtonBase.tsx";
 import ModalInsulinaLenta from "./components/ModalInsulinaLenta.tsx";
 import ModalInsulinaRapida from "./components/ModalInsulinaRapida.tsx";
+import ModalCorrectionSchema from "./components/ModalCorrectionSchema.tsx";
 import InsulinaHistorial from "./components/insulinaHistorial.tsx";
 import useLanguage from "../../hooks/useLanguage";
 import { insulinaApi, type DailyTotals } from "../../apis/insulina";
+import { preferenceApi } from "../../apis/preference_config";
+import type { CorrectionSchemaItem } from "../../schemas/preference_config";
 
 export default function Insulina() {
   const [openLento, setOpenLento] = useState(false);
   const [openRapido, setOpenRapido] = useState(false);
+  const [openCorrection, setOpenCorrection] = useState(false);
   const [totals, setTotals] = useState<DailyTotals>({ totalRapida: 0, totalLenta: 0, totalGeneral: 0 });
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const { t } = useLanguage('insulina');
-
-  const Rango = ["80 - 120", "121 - 150", "151 - 190", "191 - 250", "> 250"];
-  const unidadesE = ["2 UI", "3 UI", "4 UI", "5 UI", "6 UI"];
 
   const loadTotals = useCallback(async () => {
     try {
@@ -28,6 +30,15 @@ export default function Insulina() {
       setTotals(data);
     } catch {
       console.error("Error al cargar totales de insulina");
+    }
+  }, []);
+
+  const loadCorrectionSchemas = useCallback(async () => {
+    try {
+      const prefs = await preferenceApi.getPreferences();
+      setCorrectionItems(prefs.correctionSchemas ?? []);
+    } catch {
+      console.error("Error al cargar esquemas de corrección");
     }
   }, []);
 
@@ -184,49 +195,43 @@ export default function Insulina() {
                       {t("esquemaCorrector")}
                     </Typography>
 
-                    {/* Tabla de esquema */}
-                    <Box sx={{ display: "flex", gap: 3, justifyContent: "center" }}>
-                      <Box>
-                        <Typography
-                          variant="caption"
-                          sx={{ fontWeight: 600, color: "#475569", display: "block", mb: 0.5 }}
-                        >
-                          {t("mgDl")}
-                        </Typography>
-                        {Rango.map((rango, index) => (
-                          <Typography 
-                            key={index} 
-                            sx={{ 
-                              py: 0.5, 
-                              color: "#7AAFD7",
-                              fontSize: '0.813rem'
-                            }}
-                          >
-                            {rango}
+                    {correctionItems.length === 0 ? (
+                      <Typography variant="body2" sx={{ color: "#94a3b8", mb: 1 }}>
+                        Sin rangos definidos
+                      </Typography>
+                    ) : (
+                      <Box sx={{ display: "flex", gap: 3, justifyContent: "center" }}>
+                        <Box>
+                          <Typography variant="caption" sx={{ fontWeight: 600, color: "#475569", display: "block", mb: 0.5 }}>
+                            {t("mgDl")}
                           </Typography>
-                        ))}
-                      </Box>
-                      <Box>
-                        <Typography
-                          variant="caption"
-                          sx={{ fontWeight: 600, color: "#475569", display: "block", mb: 0.5 }}
-                        >
-                          {t("uiBolus")}
-                        </Typography>
-                        {unidadesE.map((unidad, index) => (
-                          <Typography 
-                            key={index} 
-                            sx={{ 
-                              py: 0.5, 
-                              color: "#7AAFD7",
-                              fontSize: '0.813rem'
-                            }}
-                          >
-                            {unidad}
+                          {correctionItems.map((item, index) => (
+                            <Typography key={index} sx={{ py: 0.5, color: "#7AAFD7", fontSize: '0.813rem' }}>
+                              {item.rangeMin} - {item.rangeMax}
+                            </Typography>
+                          ))}
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" sx={{ fontWeight: 600, color: "#475569", display: "block", mb: 0.5 }}>
+                            {t("uiBolus")}
                           </Typography>
-                        ))}
+                          {correctionItems.map((item, index) => (
+                            <Typography key={index} sx={{ py: 0.5, color: "#7AAFD7", fontSize: '0.813rem' }}>
+                              {item.dose} UI
+                            </Typography>
+                          ))}
+                        </Box>
                       </Box>
-                    </Box>
+                    )}
+
+                    <ButtonBase
+                      onClick={() => setOpenCorrection(true)}
+                      variant="outlined"
+                      startIcon={<EditIcon />}
+                      sx={{ mt: 1.5, fontSize: '0.75rem', textTransform: 'none', borderRadius: 2 }}
+                    >
+                      Editar esquema
+                    </ButtonBase>
                   </CardBase>
                 </Grid>
               </Grid>
@@ -255,6 +260,14 @@ export default function Insulina() {
               setOpenLento(false);
             }}
             onSave={handleGuardarLenta}
+          />
+
+          <ModalCorrectionSchema
+            open={openCorrection}
+            onClose={() => {
+              setOpenCorrection(false);
+              loadCorrectionSchemas();
+            }}
           />
         </Box>
       </Box>

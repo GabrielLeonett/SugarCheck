@@ -55,7 +55,7 @@ export class PrismaGlucoseRepository implements GlucoseRepository {
   async getAllByUserId(userId: UserId): Promise<Result<Glucose[], ErrorAbstract>> {
     try {
       const records = await this.prisma.glucose.findMany({
-        where: { userId: userId.value },
+        where: { userId: userId.value, deletedAt: null },
         orderBy: { date: 'desc' },
       });
       return Result.ok(records.map((r) => this.toDomain(r)));
@@ -68,8 +68,8 @@ export class PrismaGlucoseRepository implements GlucoseRepository {
 
   async getOneById(id: GlucoseId): Promise<Result<Glucose, ErrorAbstract>> {
     try {
-      const record = await this.prisma.glucose.findUnique({
-        where: { id: id.value },
+      const record = await this.prisma.glucose.findFirst({
+        where: { id: id.value, deletedAt: null },
       });
       if (!record) {
         return Result.fail(
@@ -129,8 +129,9 @@ export class PrismaGlucoseRepository implements GlucoseRepository {
 
   async delete(id: GlucoseId): Promise<Result<void, ErrorAbstract>> {
     try {
-      await this.prisma.glucose.delete({
+      await this.prisma.glucose.update({
         where: { id: id.value },
+        data: { deletedAt: new Date() },
       });
       return Result.ok(undefined);
     } catch (error) {

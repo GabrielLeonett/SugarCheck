@@ -5,6 +5,7 @@ interface LoginResponse {
   message: string;
   user: User;
   accessToken: string;
+  isNewUser?: boolean;
 }
 
 interface RegisterPayload {

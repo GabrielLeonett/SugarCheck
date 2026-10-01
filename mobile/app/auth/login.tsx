@@ -52,6 +52,11 @@ export default function LoginScreen() {
     setSocialLoading(provider);
     try {
       await loginWithProvider(provider);
+      const isNew = useAuthStore.getState().isNewUser;
+      useAuthStore.getState().clearNewUserFlag();
+      if (isNew) {
+        router.replace('/auth/complete-profile');
+      }
     } catch (err: any) {
       Alert.alert('Error', err?.message || `Error al iniciar sesión con ${provider}`);
     } finally {
