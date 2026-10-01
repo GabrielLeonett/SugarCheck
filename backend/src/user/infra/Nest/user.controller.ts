@@ -120,19 +120,8 @@ export class UserController {
     return result.getValue().toPlain();
   }
 
-  @Patch(':id')
-  @UseGuards(AuthGuard, RolesGuard)
-  async update(
-    @Param('id') id: string,
-    @Body() updateDto: UpdateUserDto,
-  ) {
-    const result = await this.updateUser.run(id, updateDto);
-
-    if (!result.isValid) throw result.getError();
-
-    return result.getValue().toPlain();
-  }
-
+  // IMPORTANTE: esta ruta debe declararse ANTES que @Patch(':id');
+  // si no, Nest resuelve /user/email como /user/:id con id='email'.
   @Patch('/email')
   @UseGuards(AuthGuard)
   async updateEmail(
@@ -146,6 +135,19 @@ export class UserController {
 
     const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     return { message: this.translationService.translate('EMAIL_UPDATED', lang) };
+  }
+
+  @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  async update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateUserDto,
+  ) {
+    const result = await this.updateUser.run(id, updateDto);
+
+    if (!result.isValid) throw result.getError();
+
+    return result.getValue().toPlain();
   }
 
   @Delete(':id')

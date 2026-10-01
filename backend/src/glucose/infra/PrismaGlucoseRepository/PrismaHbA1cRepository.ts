@@ -47,7 +47,7 @@ export class PrismaHbA1cRepository implements HbA1cRepository {
   async getAllByUserId(userId: UserId): Promise<Result<HbA1c[], ErrorAbstract>> {
     try {
       const records = await this.prisma.hbA1c.findMany({
-        where: { userId: userId.value },
+        where: { userId: userId.value, deletedAt: null },
         orderBy: { examDate: 'desc' },
       });
       return Result.ok(records.map((r) => this.toDomain(r)));
@@ -60,8 +60,8 @@ export class PrismaHbA1cRepository implements HbA1cRepository {
 
   async getOneById(id: HbA1cId): Promise<Result<HbA1c, ErrorAbstract>> {
     try {
-      const record = await this.prisma.hbA1c.findUnique({
-        where: { id: id.value },
+      const record = await this.prisma.hbA1c.findFirst({
+        where: { id: id.value, deletedAt: null },
       });
       if (!record) {
         return Result.fail(
@@ -118,8 +118,9 @@ export class PrismaHbA1cRepository implements HbA1cRepository {
 
   async delete(id: HbA1cId): Promise<Result<void, ErrorAbstract>> {
     try {
-      await this.prisma.hbA1c.delete({
+      await this.prisma.hbA1c.update({
         where: { id: id.value },
+        data: { deletedAt: new Date() },
       });
       return Result.ok(undefined);
     } catch (error) {
