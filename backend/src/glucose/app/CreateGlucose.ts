@@ -78,8 +78,12 @@ export class CreateGlucose {
     }
 
     if (alert) {
-      const alertKey = alert === 'hipoglucemia' ? 'GLUCOSE_ALERT_HYPO' : 'GLUCOSE_ALERT_HYPER';
-      const alertMsg = alert === 'hipoglucemia' ? 'GLUCOSE_ALERT_HYPO_MESSAGE' : 'GLUCOSE_ALERT_HYPER_MESSAGE';
+      const alertKey =
+        alert === 'hipoglucemia' ? 'GLUCOSE_ALERT_HYPO' : 'GLUCOSE_ALERT_HYPER';
+      const alertMsg =
+        alert === 'hipoglucemia'
+          ? 'GLUCOSE_ALERT_HYPO_MESSAGE'
+          : 'GLUCOSE_ALERT_HYPER_MESSAGE';
       const notifResult = await this.createNotification.run({
         userId: data.userId,
         type: 'warning',
@@ -89,19 +93,25 @@ export class CreateGlucose {
         link: '/bitacora/glucemia',
       });
       if (!notifResult.isValid) {
-        console.warn('Notificación de alerta de glucosa no creada:', notifResult.getError().message);
+        console.warn(
+          'Notificación de alerta de glucosa no creada:',
+          notifResult.getError().message,
+        );
       }
     }
 
     const saved = saveResult.getValue();
-    return Result.ok(new Glucose({
-      id: saved.id,
-      userId: saved.userId,
-      valueMgdl: saved.valueMgdl,
-      mealTag: saved.mealTag,
-      date: saved.date,
-      time: saved.time,
-      createdAt: saved.createdAt,
-    }));
+    return Result.ok(
+      new Glucose({
+        id: saved.id,
+        userId: saved.userId,
+        valueMgdl: saved.valueMgdl,
+        mealTag: saved.mealTag,
+        date: saved.date,
+        time: saved.time,
+        createdAt: saved.createdAt,
+        alert,
+      }),
+    );
   }
 }

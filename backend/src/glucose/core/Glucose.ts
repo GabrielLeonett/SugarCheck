@@ -13,6 +13,7 @@ interface GlucoseProps {
   date: GlucoseDate;
   time: GlucoseTime;
   createdAt: Date;
+  alert?: string | null;
 }
 
 export interface GlucosePlain {
@@ -34,6 +35,7 @@ export class Glucose {
   private readonly _date: GlucoseDate;
   private readonly _time: GlucoseTime;
   private readonly _createdAt: Date;
+  private readonly _alert: string | null;
 
   constructor(props: GlucoseProps) {
     this._id = props.id;
@@ -43,17 +45,35 @@ export class Glucose {
     this._date = props.date;
     this._time = props.time;
     this._createdAt = props.createdAt;
+    this._alert = props.alert ?? null;
   }
 
-  get id(): GlucoseId { return this._id; }
-  get userId(): UserId { return this._userId; }
-  get valueMgdl(): GlucoseValue { return this._valueMgdl; }
-  get mealTag(): GlucoseMealTag { return this._mealTag; }
-  get date(): GlucoseDate { return this._date; }
-  get time(): GlucoseTime { return this._time; }
-  get createdAt(): Date { return this._createdAt; }
+  get id(): GlucoseId {
+    return this._id;
+  }
+  get userId(): UserId {
+    return this._userId;
+  }
+  get valueMgdl(): GlucoseValue {
+    return this._valueMgdl;
+  }
+  get mealTag(): GlucoseMealTag {
+    return this._mealTag;
+  }
+  get date(): GlucoseDate {
+    return this._date;
+  }
+  get time(): GlucoseTime {
+    return this._time;
+  }
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+  get alert(): string | null {
+    return this._alert;
+  }
 
-  public toPlain(alert: string | null = null): GlucosePlain {
+  public toPlain(alert?: string | null): GlucosePlain {
     return {
       id: this._id.value,
       userId: this._userId.value,
@@ -62,7 +82,7 @@ export class Glucose {
       date: this._date.value.toISOString(),
       time: this._time.value,
       createdAt: this._createdAt.toISOString(),
-      alert,
+      alert: alert ?? this._alert,
     };
   }
 }

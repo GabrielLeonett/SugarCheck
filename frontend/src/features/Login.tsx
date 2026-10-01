@@ -24,6 +24,8 @@ export default function Login() {
     const theme = useTheme();
     const login = useAuthStore((state) => state.login);
     const loginWithProvider = useAuthStore((state) => state.loginWithProvider);
+    const isNewUser = useAuthStore((state) => state.isNewUser);
+    const clearNewUserFlag = useAuthStore((state) => state.clearNewUserFlag);
 
     // Cambiado al namespace 'login' para cargar las llaves correctas
     const { t } = useLanguage("login");
@@ -245,7 +247,9 @@ export default function Login() {
                                     setIsSubmitting(true);
                                     try {
                                         await loginWithProvider('google');
-                                        navigate("/");
+                                        const isNew = useAuthStore.getState().isNewUser;
+                                        clearNewUserFlag();
+                                        navigate(isNew ? '/completar-registro' : '/');
                                     } catch (err: unknown) {
                                         if (axios.isAxiosError(err)) {
                                             setAuthError({ message: err.response?.data.message || t("errors.unknownError"), statusCode: 0 });
@@ -284,7 +288,9 @@ export default function Login() {
                                     setIsSubmitting(true);
                                     try {
                                         await loginWithProvider('facebook');
-                                        navigate("/");
+                                        const isNew = useAuthStore.getState().isNewUser;
+                                        clearNewUserFlag();
+                                        navigate(isNew ? '/completar-registro' : '/');
                                     } catch (err: unknown) {
                                         if (axios.isAxiosError(err)) {
                                             setAuthError({ message: err.response?.data.message || t("errors.unknownError"), statusCode: 0 });
