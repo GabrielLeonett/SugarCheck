@@ -27,19 +27,22 @@
     "hipoglucemias": "Hipoglicemias",
     "enRango": "Na meta objetivo"
   },
-  "grafico": {
+"grafico": {
     "title": "Evolução da Glicemia",
     "labelSerie": "Nível (mg/dL)",
     "sinDatos": "Nenhum registro para gerar o gráfico",
     "filtros": {
       "hoy": "Hoje",
       "semana": "Semana",
-      "mes": "Mês"
+      "mes": "Mês",
+      "ariaLabel": "Filtros de glicose"
     }
   },
   "tabla": {
     "title": "Histórico de Registros",
+    "ariaLabel": "Tabela de histórico de glicose",
     "headers": {
+      "fecha": "Data",
       "hora": "Hora",
       "nivel": "Nível (mg/dL)",
       "contexto": "Contexto",

@@ -157,7 +157,7 @@ export class AuthController {
     
     if (!result.isValid) throw result.getError();
     
-    const { at, rt, user } = result.getValue();
+    const { at, rt, user, isNewUser } = result.getValue();
     
     res.cookie('access_token', at, this.cookieOptionsAccessToken);
     res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
@@ -166,6 +166,7 @@ export class AuthController {
       message: this.translationService.translate('FIREBASE_LOGIN_SUCCESS', lang, { provider: 'Firebase' }),
       user,
       accessToken: at,
+      isNewUser,
     };
   }
 

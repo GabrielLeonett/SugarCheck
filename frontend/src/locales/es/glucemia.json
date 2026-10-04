@@ -34,12 +34,15 @@
     "filtros": {
       "hoy": "Hoy",
       "semana": "Semana",
-      "mes": "Mes"
+      "mes": "Mes",
+      "ariaLabel": "Filtros de glucosa"
     }
   },
   "tabla": {
     "title": "Historial de Registros",
+    "ariaLabel": "Tabla de historial de glucosa",
     "headers": {
+      "fecha": "Fecha",
       "hora": "Hora",
       "nivel": "Nivel (mg/dL)",
       "contexto": "Contexto",

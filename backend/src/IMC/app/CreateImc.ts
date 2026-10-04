@@ -9,13 +9,14 @@ import { Altura } from '../core/value-objects/altura';
 import { Fecha } from '../core/value-objects/Fecha';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
 import { CreateNotification } from '../../notification/app/CreateNotification';
-import { getImcNotifText } from '../core/imc-notification-translations';
+import { DrasticWeightChangeError } from '../core/errors/DrasticWeightChangeError';
+import { FechaInvalidaError } from '../core/errors/FechaInvalidError';
 
-const CATEGORY_TRANSLATIONS: Record<string, Record<string, string>> = {
-  es: { underweight: 'Bajo peso', normal: 'Normal', overweight: 'Sobrepeso' },
-  en: { underweight: 'Underweight', normal: 'Normal', overweight: 'Overweight' },
-  pt: { underweight: 'Abaixo do peso', normal: 'Normal', overweight: 'Sobrepeso' },
-  ja: { underweight: '\u30d5\u30a9\u30fc\u30b5\u30fc', normal: '\u6a19\u6e96', overweight: '\u30aa\u30fc\u30d0\u30fc' },
+const MAX_WEIGHT_CHANGE_KG = 5;
+const CATEGORY_KEYS: Record<string, string> = {
+  underweight: 'IMC_CATEGORY_UNDERWEIGHT',
+  normal: 'IMC_CATEGORY_NORMAL',
+  overweight: 'IMC_CATEGORY_OVERWEIGHT',
 };
 
 export class CreateImc {
@@ -50,6 +51,30 @@ export class CreateImc {
     const fechaRes = Fecha.crear(data.dia, data.mes, data.anio);
     if (!fechaRes.isValid) return Result.fail(fechaRes.getError());
 
+    const now = new Date();
+    const hoy = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (fechaRes.getValue().valor > hoy) {
+      return Result.fail(
+        new FechaInvalidaError('La fecha no puede ser posterior al día de hoy'),
+      );
+    }
+
+    const lastImcResult = await this.repository.getAllByUserId(userIdRes.getValue());
+    if (lastImcResult.isValid) {
+      const records = lastImcResult.getValue();
+      if (records.length > 0) {
+        const lastWeight = records[0].peso.value;
+        const diff = Math.abs(data.peso - lastWeight);
+        if (diff > MAX_WEIGHT_CHANGE_KG) {
+          return Result.fail(
+            new DrasticWeightChangeError(
+              `El peso no puede cambiar más de ${MAX_WEIGHT_CHANGE_KG} kg de un registro a otro. Peso anterior: ${lastWeight} kg, peso ingresado: ${data.peso} kg`,
+            ),
+          );
+        }
+      }
+    }
+
     const imc = new Imc({
       id: idRes.getValue(),
       userId: userIdRes.getValue(),
@@ -62,8 +87,6 @@ export class CreateImc {
     if (!saveResult.isValid) return saveResult;
 
     const imcValue = saveResult.getValue().toPlain().imcValue;
-    const lang = data.lang || 'es';
-    const cats = CATEGORY_TRANSLATIONS[lang] || CATEGORY_TRANSLATIONS.es;
     let catKey = 'normal';
     if (imcValue < 18.5) catKey = 'underweight';
     else if (imcValue >= 25) catKey = 'overweight';
@@ -71,11 +94,12 @@ export class CreateImc {
     const notifResult = await this.createNotification.run({
       userId: data.userId,
       type: 'info',
-      title: getImcNotifText(lang, 'creationTitle'),
-      message: getImcNotifText(lang, 'creationMessage', {
+      titleKey: 'IMC_CREATION_TITLE',
+      messageKey: 'IMC_CREATION_MESSAGE',
+      params: {
         value: imcValue.toFixed(1),
-        category: cats[catKey],
-      }),
+        categoryKey: CATEGORY_KEYS[catKey],
+      },
       link: '/bitacora/monitoreo-fisico',
     });
     if (!notifResult.isValid) {

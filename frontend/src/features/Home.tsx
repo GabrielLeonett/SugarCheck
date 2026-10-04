@@ -10,6 +10,10 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import { CardBase } from '../components/ui/Cards/CardBase.tsx';
 import useLanguage from '../hooks/useLanguage.tsx';
 import ModalGlucosaForm from '../components/shared/ModalGlucosaForm.tsx';
+import ModalImcForm from '../components/shared/ModalImcForm.tsx';
+import ModalInsulinaRapida from './Insulina/components/ModalInsulinaRapida.tsx';
+import { insulinaApi } from '../apis/insulina';
+import { imcApi } from '../apis/imc';
 
 const MAX = 100;
 const MIN = 0;
@@ -20,17 +24,30 @@ export default function Home() {
   const { t } = useLanguage("home");
 
   const [openGlucosaModal, setOpenGlucosaModal] = useState(false);
+  const [openInsulinaModal, setOpenInsulinaModal] = useState(false);
+  const [openImcModal, setOpenImcModal] = useState(false);
 
-  const handleOpenGlucosaModal = () => {
-    setOpenGlucosaModal(true);
+  const handleOpenGlucosaModal = () => setOpenGlucosaModal(true);
+  const handleCloseGlucosaModal = () => setOpenGlucosaModal(false);
+  const handleSaveGlucosaModal = () => setOpenGlucosaModal(false);
+
+  const handleOpenInsulinaModal = () => setOpenInsulinaModal(true);
+  const handleCloseInsulinaModal = () => setOpenInsulinaModal(false);
+
+  const handleSaveInsulina = async (data: {
+    dosis: number; contexto: string; dia: number; mes: number; anio: number; hora: string; zona: string;
+  }) => {
+    await insulinaApi.create({ tipo: 'RAPIDA', ...data });
+    setOpenInsulinaModal(false);
   };
 
-  const handleCloseGlucosaModal = () => {
-    setOpenGlucosaModal(false);
-  };
+  const handleOpenImcModal = () => setOpenImcModal(true);
+  const handleCloseImcModal = () => setOpenImcModal(false);
 
-  const handleSaveGlucosaModal = () => {
-    setOpenGlucosaModal(false);
+  const handleSaveImc = async (data: { peso: number; altura: number; fecha: string }) => {
+    const parts = data.fecha.split('-');
+    await imcApi.create({ peso: data.peso, altura: data.altura, dia: parseInt(parts[2]), mes: parseInt(parts[1]), anio: parseInt(parts[0]) });
+    setOpenImcModal(false);
   };
 
   // Reconstruimos el array de días usando las llaves del JSON
@@ -68,8 +85,8 @@ export default function Home() {
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1, sm: 4 }, justifyContent: 'center' }}>
             <ButtonBase onClick={handleOpenGlucosaModal} startIcon={<AddIcon />}>{t("actions.registerGlucose")}</ButtonBase>
-            <ButtonBase startIcon={<AddIcon />}>{t("actions.applyInsulin")}</ButtonBase>
-            <ButtonBase startIcon={<AddIcon />}>{t("actions.registerWeight")}</ButtonBase>
+            <ButtonBase onClick={handleOpenInsulinaModal} startIcon={<AddIcon />}>{t("actions.applyInsulin")}</ButtonBase>
+            <ButtonBase onClick={handleOpenImcModal} startIcon={<AddIcon />}>{t("actions.registerWeight")}</ButtonBase>
           </Box>
         </Box>
 
@@ -77,6 +94,18 @@ export default function Home() {
           open={openGlucosaModal}
           onClose={handleCloseGlucosaModal}
           onSave={handleSaveGlucosaModal}
+        />
+
+        <ModalInsulinaRapida
+          open={openInsulinaModal}
+          onClose={handleCloseInsulinaModal}
+          onSave={handleSaveInsulina}
+        />
+
+        <ModalImcForm
+          open={openImcModal}
+          onClose={handleCloseImcModal}
+          onSave={handleSaveImc}
         />
 
         <Grid container spacing={4} sx={{ mt: 5 }}>

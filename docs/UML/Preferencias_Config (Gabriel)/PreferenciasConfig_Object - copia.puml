@@ -1,0 +1,42 @@
+@startuml PreferenciasConfig_Object
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam linetype polyline
+
+object "userConfig : UserConfig" as UC {
+    userId = "uuid-gabriel-123"
+}
+
+object "unit : UnitMeasure" as UM {
+    value = "mg/dL"
+}
+
+object "thresholds : Thresholds" as TH {
+    hypo = 70
+    hyper = 250
+}
+
+object "ratios : InsulinRatios" as IR {
+    breakfast = 10.0
+    lunch = 12.0
+    dinner = 11.0
+}
+
+object "sensitivity : SensitivityFactor" as SF {
+    value = 40
+}
+
+' Relaciones de instancia
+UC o-- UM
+UC o-- TH
+UC o-- IR
+UC o-- SF
+
+note bottom of UC
+  Este objeto representa el estado actual
+  de las preferencias médicas del usuario
+  listas para ser procesadas por el motor
+  de cálculo de bolus.
+end note
+
+@enduml
