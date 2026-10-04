@@ -22,14 +22,15 @@ export class LoginFirebaseUser {
     email: string;
     name: string;
     firebaseUid: string;
-  }): Promise<Result<{ at: string; rt: string; user: any }, ErrorAbstract>> {
+  }): Promise<Result<{ at: string; rt: string; user: any; isNewUser: boolean }, ErrorAbstract>> {
 
-    // 1. Buscar si el usuario ya existe en tu base de datos local por email
     const userResult = await this.GetOneByEmailUser.run({ email: dto.email });
 
     let user: UserPlainInterface;
+    let isNewUser = false;
 
     if (!userResult.isValid) {
+      isNewUser = true;
       const username = this.generateUsernameFromEmail(dto.email);
       const saveResult = await this.SaveUser.run({
         name: dto.name,
@@ -48,7 +49,6 @@ export class LoginFirebaseUser {
 
       user = saveResult.getValue().toPlain();
     } else {
-      // 3. Si ya existía, extraes el usuario
       user = userResult.getValue().toPlain();
     }
 
@@ -70,6 +70,7 @@ export class LoginFirebaseUser {
     return Result.ok({
       at,
       rt,
+      isNewUser,
       user: {
         id: user.id,
         name: user.name,

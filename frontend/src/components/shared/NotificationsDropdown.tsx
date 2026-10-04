@@ -18,7 +18,7 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { useNavigate } from 'react-router-dom';
 import { useNotificationStore } from '../../stores/notificationStore';
 import useLanguage from '../../hooks/useLanguage';
-import type { NotificationType } from '../../types/types';
+import type { NotificationItem, NotificationType } from '../../types/types';
 
 function useTimeAgo() {
   const { t } = useLanguage("notifications");
@@ -51,6 +51,16 @@ function getNotificationIcon(type: NotificationType) {
     default:
       return <InfoIcon {...iconProps} sx={{ color: '#2ecc71', fontSize: 20 }} />;
   }
+}
+
+function translateNotification(notif: NotificationItem, t: (key: string, params?: any) => string): string {
+  if (!notif.messageKey) return notif.message;
+  const params: Record<string, string | number> = { ...(notif.params ?? {}) };
+  if (params.categoryKey) {
+    params.category = t(String(params.categoryKey));
+    delete params.categoryKey;
+  }
+  return t(notif.messageKey, params);
 }
 
 export default function NotificationsDropdown() {
@@ -194,7 +204,7 @@ export default function NotificationsDropdown() {
                   </Box>
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography variant="body2" sx={{ fontWeight: notif.read ? 400 : 600, lineHeight: 1.3 }}>
-                      {notif.message}
+                      {translateNotification(notif, t)}
                     </Typography>
                     <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.25, display: 'block' }}>
                       {getTimeAgo(notif.createdAt)}

@@ -4,6 +4,8 @@ import { ProfileImg } from './value-objects/ProfileImg';
 import { SensitivityFactor } from './value-objects/SensitivityFactor';
 import { Thresholds } from './value-objects/Thresholds';
 import { UnitMeasure } from './value-objects/UnitMeasure';
+import { CorrectionSchemas, type CorrectionSchemaItem } from './value-objects/CorrectionSchemas';
+import { BasalSchemas, type BasalSchemaItem } from './value-objects/BasalSchemas';
 
 interface PreferenceProps {
   userId: UserId;
@@ -12,6 +14,8 @@ interface PreferenceProps {
   thresholds: Thresholds;
   insulinRatios: InsulinRatios;
   sensitivity: SensitivityFactor;
+  correctionSchemas?: CorrectionSchemas;
+  basalSchemas?: BasalSchemas;
 }
 
 export interface PreferencePlain {
@@ -21,6 +25,8 @@ export interface PreferencePlain {
   thresholds: { hypo: number; hiper: number };
   insulinRatios: { breakfast: number; lunch: number; dinner: number };
   sensitivity: number;
+  correctionSchemas: CorrectionSchemaItem[];
+  basalSchemas: BasalSchemaItem[];
 }
 
 export class Preference {
@@ -30,6 +36,8 @@ export class Preference {
   private readonly _thresholds: Thresholds;
   private readonly _insulinRatios: InsulinRatios;
   private readonly _sensitivity: SensitivityFactor;
+  private readonly _correctionSchemas: CorrectionSchemas;
+  private readonly _basalSchemas: BasalSchemas;
 
   constructor(props: PreferenceProps) {
     this._userId = props.userId;
@@ -38,6 +46,8 @@ export class Preference {
     this._thresholds = props.thresholds;
     this._insulinRatios = props.insulinRatios;
     this._sensitivity = props.sensitivity;
+    this._correctionSchemas = props.correctionSchemas ?? CorrectionSchemas.empty();
+    this._basalSchemas = props.basalSchemas ?? BasalSchemas.empty();
   }
 
   // Getters
@@ -47,6 +57,8 @@ export class Preference {
   get thresholds(): Thresholds { return this._thresholds; }
   get insulinRatios(): InsulinRatios { return this._insulinRatios; }
   get sensitivity(): SensitivityFactor { return this._sensitivity; }
+  get correctionSchemas(): CorrectionSchemas { return this._correctionSchemas; }
+  get basalSchemas(): BasalSchemas { return this._basalSchemas; }
 
   public toPlain(): PreferencePlain {
     return {
@@ -63,6 +75,8 @@ export class Preference {
         dinner: this._insulinRatios.dinner,
       },
       sensitivity: this._sensitivity.value,
+      correctionSchemas: this._correctionSchemas.value,
+      basalSchemas: this._basalSchemas.value,
     };
   }
 }

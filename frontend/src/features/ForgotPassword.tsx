@@ -60,7 +60,7 @@ export default function ForgotPassword() {
                 message = error.message;
             }
 
-            setAuthError({ message });
+            setAuthError({ message, statusCode: 0 });
         } finally {
             setIsSubmitting(false);
         }
