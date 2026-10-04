@@ -19,15 +19,16 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import HistoryIcon from '@mui/icons-material/History';
 import MenuIcon from '@mui/icons-material/Menu';
-import MicIcon from '@mui/icons-material/Mic';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import SearchIcon from '@mui/icons-material/Search';
 import SendIcon from '@mui/icons-material/Send';
 import SettingsIcon from '@mui/icons-material/Settings';
+import StopIcon from '@mui/icons-material/Stop';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { usePreferenceConfig } from '../../hooks/usePreferenceConfig';
 import { AVATAR_MAP } from '../../constants/avatars';
+import i18n from '../../stores/i18n';
 import { Logo } from '../../components/ui/Logo';
 import { useOraculoChat } from '../../hooks/useOraculoChat';
 import type { OraculoMessage } from '../../apis/oraculo';
@@ -42,8 +43,11 @@ const USER_GRADIENT = 'linear-gradient(135deg, #3d586c 0%, #558eb9 100%)';
 const ORACLE_GRADIENT = 'linear-gradient(135deg, #95bfdf 0%, #7aafd7 100%)';
 const SIDEBAR_GRADIENT = 'linear-gradient(180deg, #2a475e 0%, #3d586c 60%, #46779c 100%)';
 
-function formatTime(date: Date) {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+/** Id de la burbuja que se está escribiendo en vivo. */
+const STREAMING_ID = '__streaming__';
+
+function formatTime(date: Date, locale: string) {
+  return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 }
 
 export default function ChatIA() {
@@ -63,8 +67,13 @@ export default function ChatIA() {
     selectConversation,
     startNewConversation,
     sendMessage,
+    stopGenerating,
     deleteConversation,
   } = useOraculoChat();
+
+  // `formatTime` sin locale usaba el del navegador, que no siempre es el
+  // idioma que eligió el usuario en la app.
+  const locale = i18n.language || 'es';
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -94,6 +103,7 @@ export default function ChatIA() {
     [conversations, search],
   );
 
+  // El scroll sigue a los trozos que van llegando, no solo al cambiar la lista.
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages, sending]);
@@ -104,6 +114,10 @@ export default function ChatIA() {
     setInput('');
     await sendMessage(content);
   };
+
+  // Mientras el modelo escribe, la burbuja del asistente ya existe: se muestra
+  // un cursor parpadeante en vez de los tres puntitos de "pensando".
+  const isStreaming = (message: OraculoMessage) => message.id === STREAMING_ID;
 
   const handleNewChat = async () => {
     setSearch('');
@@ -541,6 +555,7 @@ export default function ChatIA() {
 
                 {messages.map((message: OraculoMessage) => {
                   const isUser = message.role === 'user';
+                  const streaming = isStreaming(message);
                   return (
                     <Box
                       key={message.id}
@@ -589,14 +604,35 @@ export default function ChatIA() {
                             }}
                           >
                             {message.content}
+                            {streaming && (
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: 'inline-block',
+                                  width: 2,
+                                  height: '1em',
+                                  ml: 0.4,
+                                  verticalAlign: 'text-bottom',
+                                  backgroundColor: theme.palette.primary.main,
+                                  animation: 'caret 1s step-end infinite',
+                                  '@keyframes caret': {
+                                    '0%, 100%': { opacity: 1 },
+                                    '50%': { opacity: 0 },
+                                  },
+                                }}
+                              />
+                            )}
                           </Typography>
                         </Box>
-                        <Typography
-                          variant="caption"
-                          sx={{ color: theme.palette.text.disabled, mt: 0.5, fontSize: '0.68rem' }}
-                        >
-                          {isUser ? 'Tú' : 'Oráculo'} · {formatTime(new Date(message.createdAt))}
-                        </Typography>
+                        {!streaming && (
+                          <Typography
+                            variant="caption"
+                            sx={{ color: theme.palette.text.disabled, mt: 0.5, fontSize: '0.68rem' }}
+                          >
+                            {isUser ? 'Tú' : 'Oráculo'} ·{' '}
+                            {formatTime(new Date(message.createdAt), locale)}
+                          </Typography>
+                        )}
                       </Box>
                       {isUser && (
                         <Avatar
@@ -611,7 +647,7 @@ export default function ChatIA() {
                   );
                 })}
 
-                {sending && (
+                {sending && !messages.some((m) => isStreaming(m)) && (
                   <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1, mb: 2 }}>
                     {oracleAvatar}
                     <Box
@@ -702,30 +738,45 @@ export default function ChatIA() {
                 },
               }}
             />
-            <IconButton
-              sx={{ color: theme.palette.text.secondary }}
-              aria-label="grabar mensaje"
-              onClick={() => setInput((prev) => prev)}
-            >
-              <MicIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              onClick={() => handleSend()}
-              disabled={!input.trim() || sending}
-              aria-label="enviar"
-              sx={{
-                width: 44,
-                height: 44,
-                background: USER_GRADIENT,
-                color: '#fff',
-                borderRadius: '50%',
-                boxShadow: '0 4px 12px rgba(43, 78, 108, 0.35)',
-                '&:hover': { background: 'linear-gradient(135deg, #385f7d 0%, #46779c 100%)' },
-                '&:disabled': { backgroundColor: theme.palette.action.disabledBackground, color: theme.palette.action.disabled, boxShadow: 'none' },
-              }}
-            >
-              <SendIcon fontSize="small" />
-            </IconButton>
+            {sending ? (
+              <IconButton
+                onClick={stopGenerating}
+                aria-label="detener respuesta"
+                sx={{
+                  width: 44,
+                  height: 44,
+                  background: 'linear-gradient(135deg, #c25b5b 0%, #d97777 100%)',
+                  color: '#fff',
+                  borderRadius: '50%',
+                  boxShadow: '0 4px 12px rgba(160, 70, 70, 0.35)',
+                  '&:hover': { background: 'linear-gradient(135deg, #b34e4e 0%, #c96a6a 100%)' },
+                }}
+              >
+                <StopIcon fontSize="small" />
+              </IconButton>
+            ) : (
+              <IconButton
+                onClick={() => handleSend()}
+                disabled={!input.trim()}
+                aria-label="enviar"
+                sx={{
+                  width: 44,
+                  height: 44,
+                  background: USER_GRADIENT,
+                  color: '#fff',
+                  borderRadius: '50%',
+                  boxShadow: '0 4px 12px rgba(43, 78, 108, 0.35)',
+                  '&:hover': { background: 'linear-gradient(135deg, #385f7d 0%, #46779c 100%)' },
+                  '&.Mui-disabled': {
+                    backgroundColor: theme.palette.action.disabledBackground,
+                    color: theme.palette.action.disabled,
+                    boxShadow: 'none',
+                  },
+                }}
+              >
+                <SendIcon fontSize="small" />
+              </IconButton>
+            )}
           </Paper>
         </Box>
       </Box>

@@ -6,20 +6,15 @@ import { MessageId } from '../../core/conversation/message/value-objects/Message
 import { MessageContent } from '../../core/conversation/message/value-objects/MessageContent';
 import { MessageRole } from '../../core/conversation/message/value-objects/MessageRole';
 import { MedicalSafetyPolicy } from '../../core/services/MedicalSafetyPolicy';
+import { ORACLE_SYSTEM_PROMPT, buildLanguageModelHistory } from '../../core/services/OraclePrompt';
 import { UserId } from '../../../shared/core/value-objects/UserId';
 import { GenerateUUIDInterface } from '../../../shared/application/ports/generate-uuid.interface';
 import { ErrorAbstract } from '../../../shared/error-abstract';
 import { Result } from '../../../shared/result';
-import { LanguageModel, LanguageModelMessage, LanguageModelRole } from '../ports/LanguageModel';
+import { LanguageModel } from '../ports/LanguageModel';
 import { GlucoseDataProvider } from '../ports/GlucoseDataProvider';
 
-const SYSTEM_PROMPT = [
-  'Eres Gluco, también llamado "Oráculo Azul", un asistente virtual de apoyo para personas que viven con diabetes.',
-  'Tu objetivo es acompañar, motivar y ayudar a interpretar tendencias generales de glucosa, hábitos y bienestar.',
-  'Responde en español, de forma breve, cálida y clara (máximo 3 párrafos cortos).',
-  'NUNCA des consejos sobre dosis de insulina, ajustes de medicamentos ni tratamientos médicos. Ante esas dudas, recomienda consultar a un profesional de salud.',
-  'Si te proporcionan contexto de glucosa, úsalo para dar una interpretación general, sin alarmar.',
-].join(' ');
+const SYSTEM_PROMPT = ORACLE_SYSTEM_PROMPT;
 
 export interface SendMessageResult {
   conversationId: string;
@@ -75,11 +70,7 @@ export class SendMessage {
     const userSaveRes = await this.repository.addMessage(userMessage);
     if (!userSaveRes.isValid) return Result.fail(userSaveRes.getError());
 
-    const history: LanguageModelMessage[] = conversation.messages.map((m) => ({
-      role: m.role.value as LanguageModelRole,
-      content: m.content.value,
-    }));
-    history.push({ role: 'user', content: contentRes.getValue().value });
+    const history = buildLanguageModelHistory(conversation.messages, contentRes.getValue().value);
 
     let context: string | undefined;
     const contextResult = await this.glucoseDataProvider.getContext(data.userId);
