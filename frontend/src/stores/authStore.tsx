@@ -9,28 +9,33 @@ interface AuthState {
   user: User | null;
   accessToken: string | null;
   isAuthLoading: boolean;
+  isNewUser: boolean;
   refresh: () => Promise<string>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setAuth: (user: User, accessToken: string) => void;
   setLoading: (loading: boolean) => void;
   loginWithProvider: (providerName: 'google' | 'facebook') => Promise<void>;
+  clearNewUserFlag: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   accessToken: null,
   isAuthLoading: true,
+  isNewUser: false,
 
   setAuth: (user: User, accessToken: string) => set({ user, accessToken }),
   setLoading: (loading: boolean) => set({ isAuthLoading: loading }),
+
+  clearNewUserFlag: () => set({ isNewUser: false }),
 
   login: async (username, password) => {
     const response = await apiPrivate.post('/auth/login', { username, password }, { withCredentials: true });
 
     await preferenceStore.getState().load();
     console.log('Login successful, user data:', response.data.user);
-    set({ user: response.data.user, accessToken: response.data.accessToken });
+    set({ user: response.data.user, accessToken: response.data.accessToken, isNewUser: false });
   },
   
   logout: async () => {
@@ -40,7 +45,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       console.error("Error durante el proceso de cierre de sesión:", error);
     } finally {
-      set({ user: null, accessToken: null });
+      set({ user: null, accessToken: null, isNewUser: false });
     }
   },
   
@@ -72,7 +77,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       );
       
       console.log('Login successful, user data:', response.data.user);
-      set({ user: response.data.user, accessToken: response.data.accessToken });
+      set({ user: response.data.user, accessToken: response.data.accessToken, isNewUser: response.data.isNewUser ?? false });
     } catch (error: unknown) {
       console.error(`Error en login federado con ${providerName}:`, error);
       const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || (error as Error).message || 'Error de autenticación';

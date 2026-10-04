@@ -9,6 +9,8 @@ import { Thresholds } from '../../core/value-objects/Thresholds';
 import { InsulinRatios } from '../../core/value-objects/InsulinRatios';
 import { SensitivityFactor } from '../../core/value-objects/SensitivityFactor';
 import { ProfileImg } from '../../core/value-objects/ProfileImg';
+import { CorrectionSchemas } from '../../core/value-objects/CorrectionSchemas';
+import { BasalSchemas } from '../../core/value-objects/BasalSchemas';
 import { ErrorAbstract } from '../../../shared/error-abstract';
 import { Result } from '../../../shared/result';
 import { DatabaseError } from '../../../shared/DatabaseError';
@@ -20,7 +22,6 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
   // --- MAPPERS ---
 
   private toDomain(raw: any): Preference {
-    // Nota: Aquí se asume que los VO tienen métodos estáticos create que retornan un Result
     return new Preference({
       userId: UserId.create(raw.userId).getValue(),
       profileImg: ProfileImg.create(raw.profileImg).getValue(),
@@ -31,7 +32,9 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
         raw.insulinRatios.lunch,
         raw.insulinRatios.dinner,
       ).getValue(),
-      sensitivity: SensitivityFactor.create(raw.sensitivity).getValue()
+      sensitivity: SensitivityFactor.create(raw.sensitivity).getValue(),
+      correctionSchemas: CorrectionSchemas.create(raw.correctionSchemas).getValue(),
+      basalSchemas: BasalSchemas.create(raw.basalSchemas).getValue(),
     });
   }
 
@@ -46,7 +49,9 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
         lunch: preference.insulinRatios.lunch,
         dinner: preference.insulinRatios.dinner,
       },
-      sensitivity: preference.sensitivity.value
+      sensitivity: preference.sensitivity.value,
+      correctionSchemas: preference.correctionSchemas.value,
+      basalSchemas: preference.basalSchemas.value,
     };
   }
 
@@ -54,8 +59,8 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
 
   async getOneById(id: UserId): Promise<Result<Preference, ErrorAbstract>> {
     try {
-      const preference = await this.prisma.preference.findUnique({
-        where: { userId: id.value },
+      const preference = await this.prisma.preference.findFirst({
+        where: { userId: id.value, deletedAt: null },
       });
 
       if (!preference) {
@@ -85,6 +90,38 @@ export class PrismaPreferenceRepository implements PreferenceRepository {
     } catch (error) {
       return Result.fail(
         new DatabaseError('Error crítico al intentar guardar las preferencias'),
+      );
+    }
+  }
+
+  async update(
+    id: UserId,
+    update: Partial<Preference>,
+  ): Promise<Result<Preference, ErrorAbstract>> {
+    try {
+      await this.prisma.preference.update({
+        where: { userId: id.value },
+        data: {
+          profileImg: update.profileImg?.value,
+          unitMeasure: update.unitMeasure?.value,
+          thresholds: update.thresholds
+            ? (update.thresholds.value as unknown as Prisma.InputJsonValue)
+            : undefined,
+          insulinRatios: update.insulinRatios
+            ? {
+                breakfast: update.insulinRatios.breakfast,
+                lunch: update.insulinRatios.lunch,
+                dinner: update.insulinRatios.dinner,
+              }
+            : undefined,
+          sensitivity: update.sensitivity?.value,
+        },
+      });
+
+      return await this.getOneById(id);
+    } catch (error) {
+      return Result.fail(
+        new DatabaseError('Error al actualizar las preferencias'),
       );
     }
   }

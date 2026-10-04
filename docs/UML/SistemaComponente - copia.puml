@@ -1,0 +1,18 @@
+@startuml SistemaComponente
+package "Módulo de Autenticación" {
+    [Auth Controller] <<Component>> as Ctrl
+    [Login Use Case] <<Component>> as UC
+    [JWT Service] <<Component>> as JWT
+    [User Repository] <<Interface>> as Repo
+}
+
+database "PostgreSQL" {
+    [Prisma Client] as DB
+}
+
+HTTP -> Ctrl : "POST /login"
+Ctrl --> UC : "ejecuta"
+UC --> JWT : "firma tokens"
+UC --> Repo : "busca usuario"
+Repo --> DB : "query"
+@enduml

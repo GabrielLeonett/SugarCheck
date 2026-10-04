@@ -6,4 +6,8 @@ import { Preference } from './Preference';
 export interface PreferenceRepository {
   getOneById(id: UserId): Promise<Result<Preference, ErrorAbstract>>;
   save(userConfig: Preference): Promise<Result<Preference, ErrorAbstract>>;
+  update(
+    id: UserId,
+    update: Partial<Preference>,
+  ): Promise<Result<Preference, ErrorAbstract>>;
 }

@@ -79,7 +79,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
   async getAllByUserId(userId: string): Promise<Result<Insulina[], ErrorAbstract>> {
     try {
       const records = await this.prisma.insulina.findMany({
-        where: { userId },
+        where: { userId, deletedAt: null },
         orderBy: { fecha: 'desc' },
       });
 
@@ -91,20 +91,22 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
       }
       return Result.ok(insulinas);
     } catch (error) {
+      console.error('Error en getAllByUserId:', error);
       return Result.fail(new DatabaseError('Error al obtener registros de insulina'));
     }
   }
 
   async getById(id: IdInsulina): Promise<Result<Insulina | null, ErrorAbstract>> {
     try {
-      const record = await this.prisma.insulina.findUnique({
-        where: { id: id.value },
+      const record = await this.prisma.insulina.findFirst({
+        where: { id: id.value, deletedAt: null },
       });
       if (!record) {
         return Result.ok(null);
       }
       return this.toDomain(record);
     } catch (error) {
+      console.error('Error en getById:', error);
       return Result.fail(new DatabaseError('Error al buscar registro de insulina'));
     }
   }
@@ -128,6 +130,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
       if (!domainRes.isValid) return Result.fail(domainRes.getError());
       return Result.ok(domainRes.getValue());
     } catch (error) {
+      console.error('Error en save:', error);
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
         return Result.fail(new DatabaseError('El usuario asociado no existe'));
       }
@@ -165,6 +168,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
       if (!domainRes.isValid) return Result.fail(domainRes.getError());
       return Result.ok(domainRes.getValue());
     } catch (error) {
+      console.error('Error en update:', error);
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         return Result.fail(new DatabaseError('No se pudo actualizar: el registro de insulina no existe'));
       }
@@ -174,11 +178,13 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
 
   async delete(id: IdInsulina): Promise<Result<void, ErrorAbstract>> {
     try {
-      await this.prisma.insulina.delete({
+      await this.prisma.insulina.update({
         where: { id: id.value },
+        data: { deletedAt: new Date() },
       });
       return Result.ok(undefined);
     } catch (error) {
+      console.error('Error en delete:', error);
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         return Result.fail(new DatabaseError('No se pudo eliminar: el registro de insulina no existe'));
       }
@@ -191,6 +197,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
       const records = await this.prisma.insulina.findMany({
         where: {
           userId,
+          deletedAt: null,
           fecha: {
             gte: startDate,
             lte: endDate,
@@ -207,6 +214,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
       }
       return Result.ok(insulinas);
     } catch (error) {
+      console.error('Error en getByUserIdAndDateRange:', error);
       return Result.fail(new DatabaseError('Error al obtener registros de insulina por rango de fechas'));
     }
   }
@@ -221,6 +229,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
       const records = await this.prisma.insulina.findMany({
         where: {
           userId,
+          deletedAt: null,
           fecha: {
             gte: startOfDay,
             lte: endOfDay,
@@ -241,6 +250,7 @@ export class PrismaInsulinaRepository implements InsulinaRepository {
 
       return Result.ok({ totalRapida, totalLenta });
     } catch (error) {
+      console.error('Error en getTotalByUserIdAndDate:', error);
       return Result.fail(new DatabaseError('Error al calcular totales de insulina'));
     }
   }

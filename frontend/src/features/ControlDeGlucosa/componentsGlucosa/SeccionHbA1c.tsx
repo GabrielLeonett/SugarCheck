@@ -5,7 +5,7 @@ import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
 import ModalHbA1cForm from '../../../components/shared/ModalHbA1cForm.tsx';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
-import { GraficoLinea } from '../../../components/shared/GraficoLinea';
+import { GraficoBarra } from '../../../components/shared/GraficoBarra';
 import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 import type { HbA1cData } from '../../../schemas/hba1c';
@@ -38,7 +38,7 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
   ];
 
   const chartComponent = (
-    <GraficoLinea
+    <GraficoBarra
       data={dataHook.resultadosHbA1c}
       labels={dataHook.fechasHbA1c}
       color="#81c784"

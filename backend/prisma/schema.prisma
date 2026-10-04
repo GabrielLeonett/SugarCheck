@@ -24,6 +24,7 @@ model User {
   hba1cRecords      HbA1c[]
 
   insulinas         Insulina[]
+  conversations     Conversation[]
 }
 
 model Preference {
@@ -31,10 +32,15 @@ model Preference {
   profileImg    String   
   unitMeasure   String   
   sensitivity   Float   
-  thresholds    Json     
-  insulinRatios Json     
+  thresholds        Json     
+  insulinRatios     Json     
+  correctionSchemas Json?    
+  basalSchemas      Json?    
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  deletedAt     DateTime?
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ContactEmergence {
@@ -43,6 +49,9 @@ model ContactEmergence {
   name        String
   parentesco  String
   telefono    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  deletedAt   DateTime?
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -56,6 +65,9 @@ model Imc {
   altura    Float
   imcValue  Float
   fecha     DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  deletedAt DateTime?
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -71,6 +83,8 @@ model Glucose {
   date      DateTime
   time      String
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  deletedAt DateTime?
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -84,10 +98,38 @@ model HbA1c {
   valuePercent Float
   examDate     DateTime
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  deletedAt    DateTime?
 
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  userId    String
+  title     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@index([userId])
+  @@index([userId, updatedAt])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  role           String
+  content        String
+  createdAt      DateTime     @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
 }
 
 model Insulina {
@@ -102,6 +144,7 @@ model Insulina {
   contexto    String?  // only for RAPIDA: "DESAYUNO" | "ALMUERZO" | "CENA" | "CORRECCION"
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
