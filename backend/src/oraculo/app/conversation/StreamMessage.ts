@@ -11,18 +11,29 @@ import { UserId } from '../../../shared/core/value-objects/UserId';
 import { GenerateUUIDInterface } from '../../../shared/application/ports/generate-uuid.interface';
 import { ErrorAbstract } from '../../../shared/error-abstract';
 import { Result } from '../../../shared/result';
-import { LanguageModel } from '../ports/LanguageModel';
+import { LanguageModel, LanguageModelMessage } from '../ports/LanguageModel';
 import { GlucoseDataProvider } from '../ports/GlucoseDataProvider';
 
-const SYSTEM_PROMPT = ORACLE_SYSTEM_PROMPT;
+const EMPTY_RESPONSE = 'No pude generar una respuesta. Inténtalo de nuevo.';
 
-export interface SendMessageResult {
+/** Todo lo necesario para responder, resuelto antes de abrir el stream. */
+export interface StreamMessageContext {
   conversationId: string;
   userMessage: MessagePlain;
-  assistantMessage: MessagePlain;
+  systemPrompt: string;
+  history: LanguageModelMessage[];
+  context?: string;
 }
 
-export class SendMessage {
+/**
+ * Igual que SendMessage pero entrega la respuesta por trozos.
+ *
+ * Se divide en tres pasos a propósito: `prepare` corre antes de que el
+ * controlador escriba los headers, así los rechazos (contenido vacío, consulta
+ * fuera del alcance médico, conversación ajena) se responden como errores HTTP
+ * normales en lugar de cortarse un stream a medio escribir.
+ */
+export class StreamMessage {
   constructor(
     private readonly repository: ConversationRepository,
     private readonly generateUUID: GenerateUUIDInterface,
@@ -31,11 +42,11 @@ export class SendMessage {
     private readonly safetyPolicy: MedicalSafetyPolicy,
   ) {}
 
-  public async run(data: {
+  public async prepare(data: {
     userId: string;
     conversationId: string;
     content: string;
-  }): Promise<Result<SendMessageResult, ErrorAbstract>> {
+  }): Promise<Result<StreamMessageContext, ErrorAbstract>> {
     const contentRes = MessageContent.create(data.content);
     if (!contentRes.isValid) return Result.fail(contentRes.getError());
 
@@ -70,43 +81,50 @@ export class SendMessage {
     const userSaveRes = await this.repository.addMessage(userMessage);
     if (!userSaveRes.isValid) return Result.fail(userSaveRes.getError());
 
-    const history = buildLanguageModelHistory(conversation.messages, contentRes.getValue().value);
-
-    let context: string | undefined;
     const contextResult = await this.glucoseDataProvider.getContext(data.userId);
-    if (contextResult.isValid) {
-      context = contextResult.getValue();
-    }
-
-    const generationResult = await this.languageModel.generateResponse({
-      systemPrompt: SYSTEM_PROMPT,
-      messages: history,
-      context,
-    });
-    if (!generationResult.isValid) return Result.fail(generationResult.getError());
-
-    const assistantContent = generationResult.getValue().trim();
-    const assistantContentRes = MessageContent.create(assistantContent || 'No pude generar una respuesta. Inténtalo de nuevo.');
-    if (!assistantContentRes.isValid) return Result.fail(assistantContentRes.getError());
-
-    const assistantMessageIdRes = MessageId.create(this.generateUUID.run());
-    if (!assistantMessageIdRes.isValid) return Result.fail(assistantMessageIdRes.getError());
-
-    const assistantMessage = new Message({
-      id: assistantMessageIdRes.getValue(),
-      conversationId: conversation.id.value,
-      role: MessageRole.assistant,
-      content: assistantContentRes.getValue(),
-      createdAt: new Date(),
-    });
-
-    const assistantSaveRes = await this.repository.addMessage(assistantMessage);
-    if (!assistantSaveRes.isValid) return Result.fail(assistantSaveRes.getError());
+    const context = contextResult.isValid ? contextResult.getValue() : undefined;
 
     return Result.ok({
       conversationId: conversation.id.value,
       userMessage: userMessage.toPlain(),
-      assistantMessage: assistantMessage.toPlain(),
+      systemPrompt: ORACLE_SYSTEM_PROMPT,
+      history: buildLanguageModelHistory(conversation.messages, contentRes.getValue().value),
+      context,
     });
+  }
+
+  public run(prepared: StreamMessageContext, signal?: AbortSignal): AsyncIterable<string> {
+    return this.languageModel.streamResponse(
+      {
+        systemPrompt: prepared.systemPrompt,
+        messages: prepared.history,
+        context: prepared.context,
+      },
+      signal,
+    );
+  }
+
+  public async persist(
+    prepared: StreamMessageContext,
+    text: string,
+  ): Promise<Result<MessagePlain, ErrorAbstract>> {
+    const contentRes = MessageContent.create(text.trim() || EMPTY_RESPONSE);
+    if (!contentRes.isValid) return Result.fail(contentRes.getError());
+
+    const idRes = MessageId.create(this.generateUUID.run());
+    if (!idRes.isValid) return Result.fail(idRes.getError());
+
+    const assistantMessage = new Message({
+      id: idRes.getValue(),
+      conversationId: prepared.conversationId,
+      role: MessageRole.assistant,
+      content: contentRes.getValue(),
+      createdAt: new Date(),
+    });
+
+    const saveRes = await this.repository.addMessage(assistantMessage);
+    if (!saveRes.isValid) return Result.fail(saveRes.getError());
+
+    return Result.ok(assistantMessage.toPlain());
   }
 }
