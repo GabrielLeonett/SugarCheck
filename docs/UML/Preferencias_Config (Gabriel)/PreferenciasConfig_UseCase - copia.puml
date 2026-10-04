@@ -1,0 +1,27 @@
+@startuml PreferenciasConfig_UseCase
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Usuario / Paciente" as User
+
+rectangle "Módulo: Preferencias_Config" {
+  usecase "Configurar Unidades de Medida\n(mg/dL vs mmol/L)" as CU01
+  usecase "Configurar Umbrales de Alerta\n(Hipo / Hiper)" as CU02
+  usecase "Configurar Ratios de Insulina por Comida\n(CH/Insulina)" as CU03
+  usecase "Configurar Factor de Sensibilidad (ISF)" as CU04
+  usecase "Configurar Objetivos Glucémicos" as CU05
+  usecase "Gestionar Recordatorios de Medicación" as CU06
+}
+
+User --> CU01
+User --> CU02
+User --> CU03
+User --> CU04
+User --> CU05
+User --> CU06
+
+note right of CU03
+  Permite definir valores distintos para:
+  Desayuno, Almuerzo y Cena.
+end note
+@enduml

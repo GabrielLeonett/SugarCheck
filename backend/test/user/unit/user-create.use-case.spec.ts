@@ -4,11 +4,13 @@ import { UserFactory } from '../fixtures/user.fixture';
 import { SaveUser } from '../../../src/user/app/SaveUser';
 import { BcryptHasher } from '../mocks/hasher.mock';
 import { GenerateUUID } from '../mocks/generate-uuid.mock';
+import { Result } from '../../../src/shared/result';
 
 describe('SaveUser UseCase', () => {
   let repository: InMemoryUserRepository;
   let hasher: BcryptHasher;
   let generate: GenerateUUID;
+  let savePreferenceStub: { run: (...args: any[]) => Promise<any> };
   let useCase: SaveUser;
 
   beforeEach(() => {
@@ -16,7 +18,15 @@ describe('SaveUser UseCase', () => {
     repository = new InMemoryUserRepository();
     hasher = new BcryptHasher();
     generate = new GenerateUUID();
-    useCase = new SaveUser(repository, hasher, generate);
+    savePreferenceStub = {
+      run: async () => Result.ok(undefined),
+    };
+    useCase = new SaveUser(
+      repository,
+      hasher,
+      generate,
+      savePreferenceStub as any,
+    );
   });
 
   test('debería registrar un nuevo usuario exitosamente', async () => {

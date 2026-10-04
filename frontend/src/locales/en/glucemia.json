@@ -34,12 +34,15 @@
     "filtros": {
       "hoy": "Today",
       "semana": "Week",
-      "mes": "Month"
+      "mes": "Month",
+      "ariaLabel": "Glucose filters"
     }
   },
   "tabla": {
     "title": "Records History",
+    "ariaLabel": "Glucose history table",
     "headers": {
+      "fecha": "Date",
       "hora": "Time",
       "nivel": "Level (mg/dL)",
       "contexto": "Context",

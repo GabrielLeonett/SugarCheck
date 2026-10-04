@@ -1,4 +1,4 @@
-import axios, { type AxiosError } from 'axios';
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../stores/authStore';
 import { ApiError } from './api-error';
 import type { BackendErrorResponse } from '../types/types';
@@ -51,10 +51,11 @@ apiPrivate.interceptors.request.use(
 apiPrivate.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<BackendErrorResponse>) => {
-    const prevRequest = error?.config;
+    const prevRequest = error?.config as InternalAxiosRequestConfig & { sent?: boolean } | undefined;
 
     if (
       error?.response?.status === 401 &&
+      prevRequest &&
       !prevRequest?.sent &&
       !prevRequest?.url?.includes('/auth/refresh')
     ) {

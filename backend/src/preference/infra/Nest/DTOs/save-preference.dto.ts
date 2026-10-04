@@ -3,10 +3,11 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
-  IsUUID,
+  IsOptional,
   ValidateNested,
+  ArrayMinSize,
 } from 'class-validator';
-import { ThresholdsDTO, InsulinRatiosDTO } from './utils.dto';
+import { ThresholdsDTO, InsulinRatiosDTO, CorrectionSchemaItemDTO, BasalSchemaItemDTO } from './utils.dto';
 
 export class SavePreferenceDTO {
 
@@ -33,4 +34,14 @@ export class SavePreferenceDTO {
   @IsNumber({}, { message: 'El factor de sensibilidad debe ser un número' })
   @IsNotEmpty({ message: 'El factor de sensibilidad es obligatorio' })
   sensitivity!: number;
+
+  @IsOptional()
+  @ValidateNested({ each: true, message: 'Los esquemas de corrección tienen un formato incorrecto' })
+  @Type(() => CorrectionSchemaItemDTO)
+  correctionSchemas?: CorrectionSchemaItemDTO[];
+
+  @IsOptional()
+  @ValidateNested({ each: true, message: 'Los esquemas basales tienen un formato incorrecto' })
+  @Type(() => BasalSchemaItemDTO)
+  basalSchemas?: BasalSchemaItemDTO[];
 }

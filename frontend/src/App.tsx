@@ -7,6 +7,7 @@ import Home from "./features/Home";
 import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
+import CompleteRegistration from "./features/CompleteRegistration";
 import Insulina from "./features/Insulina/insulina"
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 import Glucosa from "./features/ControlDeGlucosa/ControlDeGlucosaPage";
@@ -49,6 +50,7 @@ function App() {
             <Routes>
               <Route element={<ProtectedRoute />}>
                 <Route index element={<Home />} />
+                <Route path="completar-registro" element={<CompleteRegistration />} />
                 <Route path="perfil" element={<Profile />} />
                 <Route path="bitacora">
                   <Route path="control-glucosa" element={<Glucosa />} />

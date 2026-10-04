@@ -50,7 +50,7 @@ export class PrismaImcRepository implements ImcRepository {
   async getAllByUserId(userId: UserId): Promise<Result<Imc[], ErrorAbstract>> {
     try {
       const records = await this.prisma.imc.findMany({
-        where: { userId: userId.value },
+        where: { userId: userId.value, deletedAt: null },
         orderBy: { fecha: 'desc' },
       });
       return Result.ok(records.map((r) => this.toDomain(r)));
@@ -63,8 +63,8 @@ export class PrismaImcRepository implements ImcRepository {
 
   async getOneById(id: Id_IMC): Promise<Result<Imc, ErrorAbstract>> {
     try {
-      const record = await this.prisma.imc.findUnique({
-        where: { id: id.value },
+      const record = await this.prisma.imc.findFirst({
+        where: { id: id.value, deletedAt: null },
       });
       if (!record) {
         return Result.fail(
@@ -73,7 +73,9 @@ export class PrismaImcRepository implements ImcRepository {
       }
       return Result.ok(this.toDomain(record));
     } catch (error) {
-      return Result.fail(new DatabaseError('Error técnico al buscar IMC por ID'));
+      return Result.fail(
+        new DatabaseError('Error técnico al buscar IMC por ID'),
+      );
     }
   }
 
@@ -84,10 +86,11 @@ export class PrismaImcRepository implements ImcRepository {
       });
       return Result.ok(this.toDomain(saved));
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
-        return Result.fail(
-          new DatabaseError('El usuario asociado no existe'),
-        );
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
+        return Result.fail(new DatabaseError('El usuario asociado no existe'));
       }
       return Result.fail(
         new DatabaseError('Error crítico al guardar el registro de IMC'),
@@ -95,17 +98,35 @@ export class PrismaImcRepository implements ImcRepository {
     }
   }
 
-  async update(id: Id_IMC, update: Partial<Imc>): Promise<Result<Imc, ErrorAbstract>> {
+  async update(
+    id: Id_IMC,
+    update: Partial<Imc>,
+  ): Promise<Result<Imc, ErrorAbstract>> {
     try {
+      const existing = await this.prisma.imc.findUnique({
+        where: { id: id.value },
+      });
+      if (!existing) {
+        return Result.fail(
+          new ImcNotFoundError(
+            'No se pudo actualizar: el registro IMC no existe',
+          ),
+        );
+      }
+
       const data: any = {};
       if (update.peso) {
         data.peso = update.peso.value;
-        data.imcValue = undefined;
       }
       if (update.altura) {
         data.altura = update.altura.value;
-        data.imcValue = undefined;
       }
+
+      // imcValue es derivado: siempre se recalcula con el par peso/altura resultante
+      const newPeso = data.peso ?? existing.peso;
+      const newAltura = data.altura ?? existing.altura;
+      const alturaM = newAltura / 100;
+      data.imcValue = newPeso / (alturaM * alturaM);
 
       await this.prisma.imc.update({
         where: { id: id.value },
@@ -113,9 +134,14 @@ export class PrismaImcRepository implements ImcRepository {
       });
       return await this.getOneById(id);
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
         return Result.fail(
-          new ImcNotFoundError('No se pudo actualizar: el registro IMC no existe'),
+          new ImcNotFoundError(
+            'No se pudo actualizar: el registro IMC no existe',
+          ),
         );
       }
       return Result.fail(
@@ -126,14 +152,20 @@ export class PrismaImcRepository implements ImcRepository {
 
   async delete(id: Id_IMC): Promise<Result<void, ErrorAbstract>> {
     try {
-      await this.prisma.imc.delete({
+      await this.prisma.imc.update({
         where: { id: id.value },
+        data: { deletedAt: new Date() },
       });
       return Result.ok(undefined);
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
         return Result.fail(
-          new ImcNotFoundError('No se pudo eliminar: el registro IMC no existe'),
+          new ImcNotFoundError(
+            'No se pudo eliminar: el registro IMC no existe',
+          ),
         );
       }
       return Result.fail(

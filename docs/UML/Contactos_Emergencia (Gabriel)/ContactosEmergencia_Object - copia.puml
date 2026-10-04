@@ -1,0 +1,68 @@
+@startuml ContactoEmergencia_Instances
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam linetype polyline
+
+object "contacto1 : ContactoEmergencia" as C1 {
+    id = "cont-001"
+    userId = "uuid-gabriel-123"
+    smsEnabled = true
+    whatsappEnabled = true
+}
+
+object "nombre1 : ContactName" as N1 {
+    value = "Liseth Leonett"
+}
+
+object "phone1 : ContactPhone" as P1 {
+    value = "+58-412-1234567"
+}
+
+object "prioridad1 : ContactPriority" as PR1 {
+    value = 1
+}
+
+object "contacto2 : ContactoEmergencia" as C2 {
+    id = "cont-002"
+    userId = "uuid-gabriel-123"
+    smsEnabled = false
+    whatsappEnabled = true
+}
+
+object "nombre2 : ContactName" as N2 {
+    value = "Josué Leonett"
+}
+
+object "phone2 : ContactPhone" as P2 {
+    value = "+58-414-7654321"
+}
+
+object "prioridad2 : ContactPriority" as PR2 {
+    value = 2
+}
+
+' Relaciones Contacto 1
+C1 o-- N1
+C1 o-- P1
+C1 o-- PR1
+C1 o-- "Relationship::Madre"
+
+' Relaciones Contacto 2
+C2 o-- N2
+C2 o-- P2
+C2 o-- PR2
+C2 o-- "Relationship::Otro"
+
+note right of C1
+  Prioridad Máxima:
+  Se le contactará primero
+  por ambos canales.
+end note
+
+note right of C2
+  Prioridad Secundaria:
+  Solo recibe alertas por 
+  WhatsApp.
+end note
+
+@enduml

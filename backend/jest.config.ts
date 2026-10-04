@@ -1,12 +1,13 @@
 export default {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.', // Indica que busque en todo el proyecto
-  testRegex: '.*\\.spec\\.ts$', // Esto buscará todos tus archivos .spec.ts
+  // Solo tests unitarios (sin BD): integration y e2e corren con `pnpm test:int`
+  testMatch: ['**/unit/**/*.spec.ts'],
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(@faker-js)/)"
+    '/node_modules/(?!.*(@faker-js/faker))',
   ],
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: './coverage',

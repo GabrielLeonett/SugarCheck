@@ -10,5 +10,12 @@
     "minutes": "{{count}} min ago",
     "hours": "{{count}}h ago",
     "days": "{{count}}d ago"
-  }
+  },
+  "IMC_CREATION_TITLE": "New BMI record",
+  "IMC_CREATION_MESSAGE": "You registered a new BMI of {{value}} - {{category}}",
+  "IMC_REMINDER_TITLE": "BMI reminder",
+  "IMC_REMINDER_MESSAGE": "You haven't recorded your weight today. Keep your log up to date.",
+  "IMC_CATEGORY_UNDERWEIGHT": "Underweight",
+  "IMC_CATEGORY_NORMAL": "Normal",
+  "IMC_CATEGORY_OVERWEIGHT": "Overweight"
 }

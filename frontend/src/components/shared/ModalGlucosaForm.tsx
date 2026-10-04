@@ -125,13 +125,13 @@ export default function ModalGlucosaForm({
             label={t('modal.labelContexto')}
             {...register('contexto')}
           >
-            <MenuItem value="Ayunas">
+            <MenuItem value="En Ayunas">
               {t('modal.contextos.ayunas')}
             </MenuItem>
-            <MenuItem value="Después de Comer">
+            <MenuItem value="Despues de comer">
               {t('modal.contextos.despuesComer')}
             </MenuItem>
-            <MenuItem value="Control General">
+            <MenuItem value="Control general">
               {t('modal.contextos.controlGeneral')}
             </MenuItem>
           </Select>
