@@ -12,6 +12,7 @@ import { ConversationRepository } from '../../core/conversation/ConversationRepo
 import { MedicalSafetyPolicy } from '../../core/services/MedicalSafetyPolicy';
 import { StartConversation } from '../../app/conversation/StartConversation';
 import { SendMessage } from '../../app/conversation/SendMessage';
+import { StreamMessage } from '../../app/conversation/StreamMessage';
 import { GetConversationHistory } from '../../app/conversation/GetConversationHistory';
 import { GetUserConversations } from '../../app/conversation/GetUserConversations';
 import { DeleteConversation } from '../../app/conversation/DeleteConversation';
@@ -41,7 +42,7 @@ import { GlucoseDataProvider } from '../../app/ports/GlucoseDataProvider';
       useFactory: (config: ConfigService): LanguageModel => {
         const apiKey = config.get<string>('GEMINI_API_KEY');
         if (apiKey) {
-          const model = config.get<string>('GEMINI_MODEL') ?? 'gemini-2.0-flash';
+          const model = config.get<string>('GEMINI_MODEL') ?? 'gemini-3.1-flash-lite';
           return new GeminiLanguageModel(apiKey, model);
         }
         return new LocalLanguageModel();
@@ -62,6 +63,17 @@ import { GlucoseDataProvider } from '../../app/ports/GlucoseDataProvider';
         glucoseDataProvider: GlucoseDataProvider,
         safetyPolicy: MedicalSafetyPolicy,
       ) => new SendMessage(repo, generate, languageModel, glucoseDataProvider, safetyPolicy),
+      inject: ['ConversationRepository', 'GenerateUUID', 'LanguageModel', 'GlucoseDataProvider', MedicalSafetyPolicy],
+    },
+    {
+      provide: 'StreamMessage',
+      useFactory: (
+        repo: ConversationRepository,
+        generate: GenerateUUID,
+        languageModel: LanguageModel,
+        glucoseDataProvider: GlucoseDataProvider,
+        safetyPolicy: MedicalSafetyPolicy,
+      ) => new StreamMessage(repo, generate, languageModel, glucoseDataProvider, safetyPolicy),
       inject: ['ConversationRepository', 'GenerateUUID', 'LanguageModel', 'GlucoseDataProvider', MedicalSafetyPolicy],
     },
     {
