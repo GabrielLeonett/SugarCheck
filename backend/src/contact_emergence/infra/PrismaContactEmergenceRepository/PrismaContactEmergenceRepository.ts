@@ -47,7 +47,7 @@ export class PrismaContactEmergenceRepository implements ContactEmergenceReposit
   async getAllByUserId(userId: UserId): Promise<Result<ContactEmergence[], ErrorAbstract>> {
     try {
       const contacts = await this.prisma.contactEmergence.findMany({
-        where: { userId: userId.value },
+        where: { userId: userId.value, deletedAt: null },
       });
       return Result.ok(contacts.map((c) => this.toDomain(c)));
     } catch (error) {
@@ -59,8 +59,8 @@ export class PrismaContactEmergenceRepository implements ContactEmergenceReposit
 
   async getOneById(id: ContactEmergenceId): Promise<Result<ContactEmergence, ErrorAbstract>> {
     try {
-      const contact = await this.prisma.contactEmergence.findUnique({
-        where: { id: id.value },
+      const contact = await this.prisma.contactEmergence.findFirst({
+        where: { id: id.value, deletedAt: null },
       });
       if (!contact) {
         return Result.fail(
@@ -117,8 +117,9 @@ export class PrismaContactEmergenceRepository implements ContactEmergenceReposit
 
   async delete(id: ContactEmergenceId): Promise<Result<void, ErrorAbstract>> {
     try {
-      await this.prisma.contactEmergence.delete({
+      await this.prisma.contactEmergence.update({
         where: { id: id.value },
+        data: { deletedAt: new Date() },
       });
       return Result.ok(undefined);
     } catch (error) {
