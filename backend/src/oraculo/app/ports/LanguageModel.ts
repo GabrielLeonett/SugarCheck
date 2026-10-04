@@ -16,4 +16,13 @@ export interface GenerateResponseParams {
 
 export interface LanguageModel {
   generateResponse(params: GenerateResponseParams): Promise<Result<string, ErrorAbstract>>;
+
+  /**
+   * Genera la respuesta emitiendo los trozos de texto a medida que el proveedor
+   * los produce. `signal` permite abortar el stream cuando el cliente desconecta.
+   */
+  streamResponse(
+    params: GenerateResponseParams,
+    signal?: AbortSignal,
+  ): AsyncIterable<string>;
 }
