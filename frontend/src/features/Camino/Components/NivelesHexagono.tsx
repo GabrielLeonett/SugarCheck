@@ -4,7 +4,9 @@ interface HexagonoMundoProps {
     numero?: number | string;
     color?: boolean; 
     size?: number;
-    lines?: boolean; // true = dibuja conector punteado
+    lines?: boolean;
+    onClick?: () => void;
+    bloqueado?: boolean;
 }
 
 export function HexagonoMundo({
@@ -12,6 +14,8 @@ export function HexagonoMundo({
     size = 75, 
     numero = 0,
     lines = false,
+    onClick,
+    bloqueado = false,
 }: HexagonoMundoProps) {
 const num = Number(numero);
 const esPar = num % 2 === 0;
@@ -40,6 +44,7 @@ return (
     >
       {/* 2. CAPA INTERNA: Caja contenedora real del hexágono */}
     <Box
+        onClick={onClick}
         sx={{
             position: "relative",
             width: size,
@@ -47,7 +52,8 @@ return (
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            cursor: "pointer",
+            cursor: bloqueado ? "not-allowed" : "pointer",
+
         }}
     >
         {/* 🌟 LÍNEA CONECTOR PUNTEADA (SVG ABSOLUTO) */}
