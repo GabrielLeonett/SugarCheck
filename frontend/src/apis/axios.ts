@@ -4,7 +4,7 @@ import { ApiError } from './api-error';
 import type { BackendErrorResponse } from '../types/types';
 import i18n from '../stores/i18n';
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 function addLanguageHeader(config: any) {
   if (config.headers) {
