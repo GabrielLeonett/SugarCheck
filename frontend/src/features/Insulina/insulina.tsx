@@ -1,5 +1,5 @@
 import Navbar from "../../components/layout/Header/Navbar.tsx";
-import Footer from '../../components/layout/Footer/Footer.tsx';
+import Footer from "../../components/layout/Footer/Footer.tsx";
 import { Typography, Box, Grid } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -19,10 +19,16 @@ export default function Insulina() {
   const [openLento, setOpenLento] = useState(false);
   const [openRapido, setOpenRapido] = useState(false);
   const [openCorrection, setOpenCorrection] = useState(false);
-  const [totals, setTotals] = useState<DailyTotals>({ totalRapida: 0, totalLenta: 0, totalGeneral: 0 });
+  const [totals, setTotals] = useState<DailyTotals>({
+    totalRapida: 0,
+    totalLenta: 0,
+    totalGeneral: 0,
+  });
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  const { t } = useLanguage('insulina');
+  const [correctionItems, setCorrectionItems] = useState<
+    CorrectionSchemaItem[]
+  >([]);
+  const { t } = useLanguage("insulina");
 
   const loadTotals = useCallback(async () => {
     try {
@@ -47,7 +53,7 @@ export default function Insulina() {
   }, [loadTotals, refreshTrigger]);
 
   const handleRefresh = useCallback(() => {
-    setRefreshTrigger(k => k + 1);
+    setRefreshTrigger((k) => k + 1);
   }, []);
 
   const handleGuardarRapida = async (data: {
@@ -61,7 +67,7 @@ export default function Insulina() {
   }) => {
     try {
       await insulinaApi.create({
-        tipo: 'RAPIDA',
+        tipo: "RAPIDA",
         ...data,
       });
       setOpenRapido(false);
@@ -82,7 +88,7 @@ export default function Insulina() {
   }) => {
     try {
       await insulinaApi.create({
-        tipo: 'LENTA',
+        tipo: "LENTA",
         ...data,
       });
       setOpenLento(false);
@@ -97,13 +103,24 @@ export default function Insulina() {
     <>
       <Navbar />
 
-      <Box sx={{ mx: { xs: 2, sm: 7 }, my: { xs: 4, sm: 10 }, minHeight: 'calc(100vh - 130px)' }}>
-        <Box sx={{ maxWidth: '1200px', width: '100%', margin: '0 auto' }}>
+      <Box
+        sx={{
+          mx: { xs: 2, sm: 7 },
+          my: { xs: 4, sm: 10 },
+          minHeight: "calc(100vh - 130px)",
+        }}
+      >
+        <Box sx={{ maxWidth: "1200px", width: "100%", margin: "0 auto" }}>
           {/* TÍTULO */}
           <Grid container>
             <Grid size={12}>
-              <Typography variant="h3" component="h2" color="primary.main" sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}>
-                {t('monitoreoDiarioDeInsulina')}
+              <Typography
+                variant="h3"
+                component="h2"
+                color="primary.main"
+                sx={{ fontWeight: 700, mb: 8, textAlign: "center" }}
+              >
+                {t("monitoreoDiarioDeInsulina")}
               </Typography>
             </Grid>
           </Grid>
@@ -126,29 +143,29 @@ export default function Insulina() {
                   onClick={() => setOpenRapido(true)}
                   variant="contained"
                   startIcon={<AddIcon />}
-                  sx={{ 
+                  sx={{
                     width: "100%",
                     py: 1.25,
-                    fontSize: '0.875rem',
+                    fontSize: "0.875rem",
                     fontWeight: 500,
-                    textTransform: 'none',
-                    borderRadius: 2
+                    textTransform: "none",
+                    borderRadius: 2,
                   }}
                 >
-                  {t("registrarRapida")} 
+                  {t("registrarRapida")}
                 </ButtonBase>
 
                 <ButtonBase
                   onClick={() => setOpenLento(true)}
                   variant="contained"
                   startIcon={<AddIcon />}
-                  sx={{ 
+                  sx={{
                     width: "100%",
                     py: 1.25,
-                    fontSize: '0.875rem',
+                    fontSize: "0.875rem",
                     fontWeight: 500,
-                    textTransform: 'none',
-                    borderRadius: 2
+                    textTransform: "none",
+                    borderRadius: 2,
                   }}
                 >
                   {t("registrarLenta")}
@@ -157,7 +174,11 @@ export default function Insulina() {
 
               {/* CARD: CRONÓMETRO */}
               <CardBase sx={{ mb: 2, p: 2.5, textAlign: "center" }}>
-                <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, mb: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  component="div"
+                  sx={{ fontWeight: 600, mb: 1 }}
+                >
                   {t("cronometroSeguridad")}
                 </Typography>
                 <Typography
@@ -166,8 +187,12 @@ export default function Insulina() {
                 >
                   {totals.totalGeneral.toFixed(1)} UI
                 </Typography>
-                <Typography variant="caption" sx={{ color: "#94a3b8", display: "block", mt: 0.5 }}>
-                  {t("rapida")}: {totals.totalRapida.toFixed(1)} UI | {t("lenta")}: {totals.totalLenta.toFixed(1)} UI
+                <Typography
+                  variant="caption"
+                  sx={{ color: "#94a3b8", display: "block", mt: 0.5 }}
+                >
+                  {t("rapida")}: {totals.totalRapida.toFixed(1)} UI |{" "}
+                  {t("lenta")}: {totals.totalLenta.toFixed(1)} UI
                 </Typography>
               </CardBase>
 
@@ -175,8 +200,14 @@ export default function Insulina() {
               <Grid container spacing={2}>
                 {/* CARD: UNIDADES TOTALES DEL DÍA */}
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <CardBase sx={{ p: 2.5, textAlign: "center", height: "100%" }}>
-                    <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, mb: 0.75 }}>
+                  <CardBase
+                    sx={{ p: 2.5, textAlign: "center", height: "100%" }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      component="div"
+                      sx={{ fontWeight: 600, mb: 0.75 }}
+                    >
                       {t("unidadesTotalesDia")}
                     </Typography>
                     <Typography
@@ -190,33 +221,78 @@ export default function Insulina() {
 
                 {/* CARD: ESQUEMA CORRECTOR */}
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <CardBase sx={{ p: 2.5, textAlign: "center", height: "100%" }}>
-                    <Typography variant="subtitle1" component="div" sx={{ fontWeight: 600, mb: 1 }}>
+                  <CardBase
+                    sx={{ p: 2.5, textAlign: "center", height: "100%" }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      component="div"
+                      sx={{ fontWeight: 600, mb: 1 }}
+                    >
                       {t("esquemaCorrector")}
                     </Typography>
 
                     {correctionItems.length === 0 ? (
-                      <Typography variant="body2" sx={{ color: "#94a3b8", mb: 1 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#94a3b8", mb: 1 }}
+                      >
                         Sin rangos definidos
                       </Typography>
                     ) : (
-                      <Box sx={{ display: "flex", gap: 3, justifyContent: "center" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 3,
+                          justifyContent: "center",
+                        }}
+                      >
                         <Box>
-                          <Typography variant="caption" sx={{ fontWeight: 600, color: "#475569", display: "block", mb: 0.5 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontWeight: 600,
+                              color: "#475569",
+                              display: "block",
+                              mb: 0.5,
+                            }}
+                          >
                             {t("mgDl")}
                           </Typography>
                           {correctionItems.map((item, index) => (
-                            <Typography key={index} sx={{ py: 0.5, color: "#7AAFD7", fontSize: '0.813rem' }}>
+                            <Typography
+                              key={index}
+                              sx={{
+                                py: 0.5,
+                                color: "#7AAFD7",
+                                fontSize: "0.813rem",
+                              }}
+                            >
                               {item.rangeMin} - {item.rangeMax}
                             </Typography>
                           ))}
                         </Box>
                         <Box>
-                          <Typography variant="caption" sx={{ fontWeight: 600, color: "#475569", display: "block", mb: 0.5 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontWeight: 600,
+                              color: "#475569",
+                              display: "block",
+                              mb: 0.5,
+                            }}
+                          >
                             {t("uiBolus")}
                           </Typography>
                           {correctionItems.map((item, index) => (
-                            <Typography key={index} sx={{ py: 0.5, color: "#7AAFD7", fontSize: '0.813rem' }}>
+                            <Typography
+                              key={index}
+                              sx={{
+                                py: 0.5,
+                                color: "#7AAFD7",
+                                fontSize: "0.813rem",
+                              }}
+                            >
                               {item.dose} UI
                             </Typography>
                           ))}
@@ -228,7 +304,12 @@ export default function Insulina() {
                       onClick={() => setOpenCorrection(true)}
                       variant="outlined"
                       startIcon={<EditIcon />}
-                      sx={{ mt: 1.5, fontSize: '0.75rem', textTransform: 'none', borderRadius: 2 }}
+                      sx={{
+                        mt: 1.5,
+                        fontSize: "0.75rem",
+                        textTransform: "none",
+                        borderRadius: 2,
+                      }}
                     >
                       Editar esquema
                     </ButtonBase>
@@ -239,7 +320,7 @@ export default function Insulina() {
 
             {/* COLUMNA DERECHA */}
             <Grid size={{ xs: 12, md: 7 }}>
-              <Box sx={{ width: '100%' }}>
+              <Box sx={{ width: "100%" }}>
                 <InsulinaHistorial refreshTrigger={refreshTrigger} />
               </Box>
             </Grid>
