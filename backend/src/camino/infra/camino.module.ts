@@ -5,6 +5,7 @@ import { CaminoController } from './camino.controller';
 import { PrismaCaminoProgresoRepository } from './PrismaCaminoProgresoRepository';
 import { GetCaminoProgreso } from '../app/GetCaminoProgreso';
 import { CompletarNivelCamino } from '../app/CompletarNivelCamino';
+import { AuthModule } from '../../auth/infra/auth.module';
 
 @Module({
   imports: [AuthModule],
