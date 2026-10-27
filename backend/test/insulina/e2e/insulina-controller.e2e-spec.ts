@@ -175,9 +175,31 @@ describe('InsulinaController (E2E)', () => {
     expect(res.body.dosis).toBe(7.5);
   });
 
-  it('DELETE /insulina/:id está prohibido por negocio (403)', async () => {
+  it('DELETE /insulina/:id elimina un registro reciente (204)', async () => {
     const res = await request(app.getHttpServer())
       .delete(`/insulina/${createdId}`)
+      .set('Cookie', authCookie(token));
+
+    expect(res.status).toBe(204);
+  });
+
+  it('DELETE /insulina/:id bloquea un registro con más de 15 días (403)', async () => {
+    const old = await prismaService.insulina.create({
+      data: {
+        userId: user.id,
+        tipo: 'RAPIDA',
+        dosis: 5,
+        unidades: 5,
+        fecha: new Date(),
+        hora: '08:30',
+        zona: 'ABDOMEN_DERECHO',
+        contexto: 'DESAYUNO',
+        createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    const res = await request(app.getHttpServer())
+      .delete(`/insulina/${old.id}`)
       .set('Cookie', authCookie(token));
 
     expect(res.status).toBe(403);

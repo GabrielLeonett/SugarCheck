@@ -84,4 +84,60 @@ describe('CreateInsulina UseCase', () => {
     const result = await useCase.run({ ...validParams, dia: 31, mes: 2 });
     expect(result.isValid).toBe(false);
   });
+
+  describe('solapamiento de dosis', () => {
+    test('rechaza un registro duplicado en la misma fecha y hora', async () => {
+      await useCase.run(validParams);
+
+      const result = await useCase.run(validParams);
+
+      expect(result.isValid).toBe(false);
+      expect(result.getError().code).toBe('INSULIN_OVERLAP');
+    });
+
+    test('rechaza dos dosis rápidas dentro del margen de 3 horas', async () => {
+      await useCase.run({ ...validParams, hora: '08:30' });
+
+      const result = await useCase.run({ ...validParams, hora: '10:30' });
+
+      expect(result.isValid).toBe(false);
+      expect(result.getError().code).toBe('INSULIN_OVERLAP');
+    });
+
+    test('permite dos dosis rápidas separadas exactamente 3 horas', async () => {
+      await useCase.run({ ...validParams, hora: '08:30' });
+
+      const result = await useCase.run({ ...validParams, hora: '11:30' });
+
+      expect(result.isValid).toBe(true);
+    });
+
+    test('permite una dosis lenta dentro de las 3 horas de una rápida', async () => {
+      await useCase.run({ ...validParams, tipo: 'RAPIDA', hora: '08:30' });
+
+      const result = await useCase.run({
+        ...validParams,
+        tipo: 'LENTA',
+        contexto: undefined,
+        hora: '10:30',
+      });
+
+      expect(result.isValid).toBe(true);
+    });
+
+    test('rechaza dos dosis lentas en la misma fecha y hora', async () => {
+      const lenta = {
+        ...validParams,
+        tipo: 'LENTA',
+        contexto: undefined,
+        hora: '22:00',
+      };
+      await useCase.run(lenta);
+
+      const result = await useCase.run(lenta);
+
+      expect(result.isValid).toBe(false);
+      expect(result.getError().code).toBe('INSULIN_OVERLAP');
+    });
+  });
 });

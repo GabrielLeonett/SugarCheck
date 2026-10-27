@@ -75,6 +75,24 @@ describe('SavePreference UseCase', () => {
     expect(repository.items.has(USER_ID)).toBe(true);
   });
 
+  test('guarda sin ratios ni sensibilidad usando valores por defecto', async () => {
+    const result = await useCase.run(
+      validArgs.userId,
+      validArgs.profileImg,
+      validArgs.unitMeasure,
+      validArgs.thresholds,
+    );
+
+    expect(result.isValid).toBe(true);
+    const plain = result.getValue().toPlain();
+    expect(plain.insulinRatios).toEqual({
+      breakfast: 100,
+      lunch: 100,
+      dinner: 100,
+    });
+    expect(plain.sensitivity).toBe(1);
+  });
+
   test('actualiza las preferencias existentes (upsert)', async () => {
     await useCase.run(
       validArgs.userId,

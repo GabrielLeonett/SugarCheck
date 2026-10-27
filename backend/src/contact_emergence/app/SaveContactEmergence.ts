@@ -6,6 +6,7 @@ import { UserId } from '../../shared/core/value-objects/UserId';
 import { ContactEmergenceId } from '../core/value-objects/ContactEmergenceId';
 import { ContactName } from '../core/value-objects/ContactName';
 import { ContactParentesco } from '../core/value-objects/ContactParentesco';
+import { ContactPhone } from '../core/value-objects/ContactPhone';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
 
 export class SaveContactEmergence {
@@ -33,12 +34,15 @@ export class SaveContactEmergence {
     const parentescoRes = ContactParentesco.create(data.parentesco);
     if (!parentescoRes.isValid) return Result.fail(parentescoRes.getError());
 
+    const phoneRes = ContactPhone.create(data.telefono);
+    if (!phoneRes.isValid) return Result.fail(phoneRes.getError());
+
     const contact = new ContactEmergence({
       id: idRes.getValue(),
       userId: userIdRes.getValue(),
       name: nameRes.getValue(),
       parentesco: parentescoRes.getValue(),
-      telefono: data.telefono,
+      telefono: phoneRes.getValue()?.value,
     });
 
     return await this.repository.save(contact);
