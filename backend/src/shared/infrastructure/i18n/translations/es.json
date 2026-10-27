@@ -137,5 +137,6 @@
   "GLUCOSE_ALERT_HYPO": "Alerta de Hipoglucemia",
   "GLUCOSE_ALERT_HYPO_MESSAGE": "Tu nivel de glucosa está por debajo del umbral seguro: {{value}} mg/dL",
   "GLUCOSE_ALERT_HYPER": "Alerta de Hiperglucemia",
-  "GLUCOSE_ALERT_HYPER_MESSAGE": "Tu nivel de glucosa está por encima del umbral seguro: {{value}} mg/dL"
+  "GLUCOSE_ALERT_HYPER_MESSAGE": "Tu nivel de glucosa está por encima del umbral seguro: {{value}} mg/dL",
+  "UPDATE_USER_FORBIDDEN": "No tienes permiso para modificar este perfil"
 }

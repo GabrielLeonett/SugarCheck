@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { imcApi, type ImcData } from '../apis/imc';
+import { useUiStore } from '../stores/uiStore';
 import useMetricData from './useMetricData';
 import type { TimeRange } from './useMetricData';
 import type { ImcRecord } from '../data/recordsMock';
@@ -8,7 +9,7 @@ export interface UseImcDataReturn {
   openModal: boolean;
   handleOpenModal: () => void;
   handleCloseModal: () => void;
-  handleSave: (data: { peso: number; altura: number; fecha: string }) => Promise<void>;
+  handleSave: (data: { peso: number; altura: number; fecha: string }) => Promise<boolean>;
   records: ImcRecord[];
   filtro: TimeRange;
   setFiltro: (range: TimeRange) => void;
@@ -45,6 +46,7 @@ export function useImcData(): UseImcDataReturn {
   const [raw, setRaw] = useState<ImcRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const showToast = useUiStore((s) => s.showToast);
 
   const loadData = useCallback(async () => {
     try {
@@ -59,7 +61,7 @@ export function useImcData(): UseImcDataReturn {
   }, []);
 
   useEffect(() => {
-    loadData();
+    loadData(); // eslint-disable-line react-hooks/set-state-in-effect
   }, [loadData]);
 
   const metric = useMetricData<ImcRecord>(raw, 'todos');
@@ -67,28 +69,32 @@ export function useImcData(): UseImcDataReturn {
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
-  const handleSave = async (data: { peso: number; altura: number; fecha: string }) => {
+  const handleSave = async (data: { peso: number; altura: number; fecha: string }): Promise<boolean> => {
     const parts = data.fecha.split('-');
     const anio = parseInt(parts[0], 10);
     const mes = parseInt(parts[1], 10);
     const dia = parseInt(parts[2], 10);
     try {
-      const created = await imcApi.create({
+      await imcApi.create({
         peso: data.peso,
         altura: data.altura,
         dia,
         mes,
         anio,
       });
-      setRaw((prev) => [...prev, toImcRecord(created)]);
+      await loadData();
+      showToast('success', 'Medidas guardadas correctamente.', 'Fortaleza física');
       handleCloseModal();
+      return true;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al guardar';
       setError(message);
+      showToast('error', message, 'Error');
+      return false;
     }
   };
 
-  const ultimo = raw.length > 0 ? raw[raw.length - 1] : null;
+  const ultimo = raw.length > 0 ? raw[0] : null;
 
   return {
     openModal,

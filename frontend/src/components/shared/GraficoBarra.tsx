@@ -35,17 +35,28 @@ export function GraficoBarra({
     );
   }
 
+  // Cada registro debe ocupar su propia categoría aunque dos compartan la misma
+  // etiqueta (dos tomas a la misma hora, por ejemplo). Si se pasan las horas
+  // repetidas como datos del eje, el gráfico las agrupa en una sola barra.
+  const categories = data.map((_, index) => index);
+  const rotateLabels = labels.length > 6;
+
   return (
     <BarChart
       xAxis={[
         {
           scaleType: 'band',
-          data: labels,
+          data: categories,
+          valueFormatter: (value) => labels[Number(value)] ?? String(value),
           label: undefined,
-          tickLabelInterval: () => true,
+          tickLabelInterval: 'auto',
           tickLabelPlacement: 'middle',
           tickSpacing: 0,
-          tickLabelStyle: { fontSize: 11, textAnchor: 'middle' as const },
+          tickLabelStyle: {
+            fontSize: 11,
+            angle: rotateLabels ? -35 : 0,
+            textAnchor: rotateLabels ? 'end' : 'middle',
+          },
         },
       ]}
       yAxis={[
@@ -63,7 +74,7 @@ export function GraficoBarra({
         },
       ]}
       height={height}
-      margin={{ top: 20, bottom: 60, left: 50, right: 40 }}
+      margin={{ top: 20, bottom: rotateLabels ? 85 : 60, left: 50, right: 40 }}
     />
   );
 }

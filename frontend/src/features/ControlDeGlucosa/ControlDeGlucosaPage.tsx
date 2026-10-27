@@ -20,7 +20,7 @@ export default function Glucosa() {
 
   const handleSaveGlucosa = (data: GlucosaData) => {
     const dto = formToCreateGlucoseDto(data);
-    glucoseHookData.handleSaveGlucosa(dto);
+    return glucoseHookData.handleSaveGlucosa(dto);
   };
 
   const handleSaveHbA1c = (data: HbA1cData) => {

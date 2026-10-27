@@ -9,7 +9,8 @@
         "lastBattle": {
             "title": "Última Batalla",
             "unit": "mg/dL",
-            "timeLabel": "Hace {time} (Post-almuerzo)"
+            "timeLabel": "Hace {time} (Post-almuerzo)",
+            "noReadings": "Sin mediciones hoy"
         },
         "securityTimer": {
             "title": "Cronómetro de Seguridad",
@@ -21,14 +22,17 @@
             "alertMessage": "Niveles bajos. Revisa tus registros y actúa"
         },
         "battleHistory": {
-            "title": "Historial de Batallas"
+            "title": "Historial de Batallas",
+            "serieLabel": "Nivel (mg/dL)",
+            "empty": "Aún no hay registros de glucosa para graficar"
         },
         "physicalBalance": {
             "title": "Balance de Fortaleza Física",
             "statusHealthy": "Condición saludable",
             "statusUnderweight": "Bajo peso",
             "statusNormal": "Normal",
-            "statusOverweight": "Sobrepeso"
+            "statusOverweight": "Sobrepeso",
+            "noReadings": "Sin registros de peso"
         }
     },
     "days": {

@@ -14,12 +14,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { glucosaSchema, type GlucosaData } from '../../schemas/glucosa';
 import useLanguage from '../../hooks/useLanguage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ModalGlucosaFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: GlucosaData) => void;
+  onSave: (data: GlucosaData) => void | Promise<boolean>;
 }
 
 export default function ModalGlucosaForm({
@@ -28,6 +28,7 @@ export default function ModalGlucosaForm({
   onSave,
 }: ModalGlucosaFormProps) {
   const { t } = useLanguage('glucemia');
+  const [saving, setSaving] = useState(false);
 
   const obtenerFechaActual = () => {
     const hoy = new Date();
@@ -70,9 +71,14 @@ export default function ModalGlucosaForm({
     }
   }, [open, reset]);
 
-  const onSubmit = (data: GlucosaData) => {
-    onSave(data);
-    onClose();
+  const onSubmit = async (data: GlucosaData) => {
+    setSaving(true);
+    try {
+      const result = await onSave(data);
+      if (result !== false) onClose();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -168,6 +174,7 @@ export default function ModalGlucosaForm({
           variant="contained"
           color="primary"
           fullWidth
+          disabled={saving}
         >
           {t('modal.btnGuardar')}
         </Button>

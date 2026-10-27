@@ -14,7 +14,6 @@ import {
     Switch,
     Paper,
     Modal,
-    Alert,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,19 +32,23 @@ import { DateField } from '@mui/x-date-pickers/DateField';
 import dayjs from 'dayjs';
 import { ButtonBase } from "../../components/ui/Buttons/ButtonBase";
 import NumberSpinner from "../../components/ui/NumberSpinner";
-import { apiPrivate } from "../../apis/axios";
 import { userApi } from "../../apis/user_config";
+import { preferenceApi } from "../../apis/preference_config";
 import { contactEmergenceApi, type ContactEmergenceData } from "../../apis/contact_emergence";
 import { profilePersonalSchema, type ProfilePersonalData } from "../../schemas/profile";
 import { contactEmergenceSchema, type ContactEmergenceData as ContactEmergenceFormData } from "../../schemas/contact_emergence";
+import { preferenceStore } from "../../hooks/usePreferenceConfig";
 import ModalBasalSchema from "./components/ModalBasalSchema";
 import ModalDynamicCorrection from "./components/ModalDynamicCorrection";
 import useLanguage from "../../hooks/useLanguage";
+import { useUiStore } from "../../stores/uiStore";
 
 export function Profile() {
     const { t: tp } = useLanguage("profile");
     const authUser = useAuthStore((state) => state.user);
     const authLogout = useAuthStore((state) => state.logout);
+    const authRefresh = useAuthStore((state) => state.refresh);
+    const showToast = useUiStore((s) => s.showToast);
 
     const [progress] = React.useState(25);
     const [openConfirm, setOpenConfirm] = React.useState(false);
@@ -57,7 +60,6 @@ export function Profile() {
         dinner: 100,
         sensitivity: 1,
     });
-    const [msg, setMsg] = React.useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [contacts, setContacts] = React.useState<ContactEmergenceData[]>([]);
     const [openContactModal, setOpenContactModal] = React.useState(false);
     const [editingContact, setEditingContact] = React.useState<ContactEmergenceData | null>(null);
@@ -101,8 +103,7 @@ export function Profile() {
     };
 
     useEffect(() => {
-        apiPrivate.get('/preference').then((res) => {
-            const prefs = res.data?.data;
+        preferenceApi.getPreferences().then((prefs) => {
             if (prefs) {
                 setPrefForm({
                     hypo: prefs.thresholds?.hypo ?? 90,
@@ -121,47 +122,61 @@ export function Profile() {
         try {
             const userId = authUser?.id;
             if (!userId) {
-                setMsg({ type: 'error', text: tp("usuarioNoAutenticado") });
+                showToast('error', tp("usuarioNoAutenticado"));
                 return;
             }
             await userApi.update(userId, {
-                name: data.username || undefined,
+                username: data.username || undefined,
                 email: data.email || undefined,
                 sexo: data.sexo || undefined,
                 fechaNacimiento: data.fechaNacimiento ? new Date(data.fechaNacimiento) : undefined,
             });
-            setMsg({ type: 'success', text: tp("guardadoExitoPersonal") });
+            // Sincroniza el store con los datos frescos del servidor
+            await authRefresh();
+            showToast('success', tp("guardadoExitoPersonal"));
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorGuardar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorGuardar"));
         }
     };
 
     const handlePrefSave = async () => {
         try {
-            await apiPrivate.get('/preference').then(async (res) => {
-                const current = res.data?.data;
-                if (!current?.userId) {
-                    setMsg({ type: 'error', text: tp("errorCarga") });
-                    return;
-                }
-                await apiPrivate.post('/preference', {
-                    profileImg: current.profileImg,
-                    unitMeasure: current.unitMeasure,
-                    thresholds: { hypo: prefForm.hypo, hiper: prefForm.hiper },
-                    insulinRatios: { breakfast: prefForm.breakfast, lunch: prefForm.lunch, dinner: prefForm.dinner },
-                    sensitivity: prefForm.sensitivity,
-                    correctionSchemas: current.correctionSchemas ?? [],
-                    basalSchemas: current.basalSchemas ?? [],
-                });
-                setMsg({ type: 'success', text: tp("guardadoExitoClinico") });
+            const thresholds = {
+                hypo: Number(prefForm.hypo),
+                hiper: Number(prefForm.hiper),
+            };
+            // Validacion cruzada: hipo debe ser menor a hiper
+            if (!(thresholds.hypo > 0 && thresholds.hiper > 0 && thresholds.hypo < thresholds.hiper)) {
+                showToast('error', tp("errorRangosInvalidos"));
+                return;
+            }
+
+            const current = await preferenceApi.getPreferences();
+            if (!current?.userId) {
+                showToast('error', tp("errorCarga"));
+                return;
+            }
+
+            await preferenceApi.savePreferences({
+                ...current,
+                thresholds,
+                insulinRatios: {
+                    breakfast: Number(prefForm.breakfast),
+                    lunch: Number(prefForm.lunch),
+                    dinner: Number(prefForm.dinner),
+                },
+                sensitivity: Number(prefForm.sensitivity),
             });
+            await preferenceStore.getState().load();
+            showToast('success', tp("guardadoExitoClinico"));
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorGuardar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorGuardar"));
         }
     };
 
     const onContactSave = async (data: ContactEmergenceFormData) => {
         try {
+            const isEditing = Boolean(editingContact);
             if (editingContact) {
                 await contactEmergenceApi.update(editingContact.id, data);
             } else {
@@ -171,9 +186,9 @@ export function Profile() {
             setEditingContact(null);
             resetContact({ name: '', parentesco: '', telefono: '' });
             await loadContacts();
-            setMsg({ type: 'success', text: editingContact ? tp("contactoActualizado") : tp("contactoAgregado") });
+            showToast('success', isEditing ? tp("contactoActualizado") : tp("contactoAgregado"));
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorGuardar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorGuardar"));
         }
     };
 
@@ -197,9 +212,9 @@ export function Profile() {
         try {
             await contactEmergenceApi.delete(id);
             await loadContacts();
-            setMsg({ type: 'success', text: tp("contactoEliminado") });
+            showToast('success', tp("contactoEliminado"));
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorEliminar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorEliminar"));
         }
     };
 
@@ -210,7 +225,7 @@ export function Profile() {
             await userApi.delete(userId);
             await authLogout();
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorEliminar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorEliminar"));
         }
     };
 
@@ -218,11 +233,6 @@ export function Profile() {
         <>
             <Navbar />
             <Box sx={{ minHeight: "100vh", py: 4, px: 2 }}>
-                {msg && (
-                    <Alert severity={msg.type} onClose={() => setMsg(null)} sx={{ maxWidth: 'lg', mx: 'auto', mb: 2 }}>
-                        {msg.text}
-                    </Alert>
-                )}
                 <Grid container spacing={4} sx={{ mx: "auto", maxWidth: 'lg' }}>
                     <Grid size={{ xs: 12, md: 4 }}>
                         <CardBase elevation={4} sx={{ p: 3, borderRadius: 3, textAlign: "center" }}>
@@ -388,14 +398,29 @@ export function Profile() {
                                     <AccordionDetails sx={{ p: 0, mb: 3 }}>
                                         <Grid container spacing={2} sx={{ maxWidth: 500, mx: "auto" }}>
                                             <Grid size={{ sm: 12, md: 6 }}>
-                                                <NumberSpinner label={tp("severeHypoLimit")} min={10} max={40} value={prefForm.hypo} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hypo: _v }); }} />
+                                                <NumberSpinner label={tp("severeHypoLimit")} min={0} max={400} value={prefForm.hypo} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hypo: _v }); }} />
                                             </Grid>
                                             <Grid size={{ sm: 12, md: 6 }}>
-                                                <NumberSpinner label={tp("severeHyperLimit")} min={10} max={40} value={prefForm.hiper} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hiper: _v }); }} />
+                                                <NumberSpinner label={tp("severeHyperLimit")} min={0} max={500} value={prefForm.hiper} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hiper: _v }); }} />
+                                            </Grid>
+                                            <Grid size={12}>
+                                                <Typography variant="body2" sx={{ fontWeight: "bold", textAlign: "center", mt: 2, mb: 1 }}>{tp("insulinRatios")}</Typography>
+                                            </Grid>
+                                            <Grid size={{ sm: 12, md: 4 }}>
+                                                <NumberSpinner label={tp("ratioBreakfast")} min={0} max={100} value={prefForm.breakfast} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, breakfast: _v }); }} />
+                                            </Grid>
+                                            <Grid size={{ sm: 12, md: 4 }}>
+                                                <NumberSpinner label={tp("ratioLunch")} min={0} max={100} value={prefForm.lunch} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, lunch: _v }); }} />
+                                            </Grid>
+                                            <Grid size={{ sm: 12, md: 4 }}>
+                                                <NumberSpinner label={tp("ratioDinner")} min={0} max={100} value={prefForm.dinner} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, dinner: _v }); }} />
+                                            </Grid>
+                                            <Grid size={12}>
+                                                <NumberSpinner label={tp("sensitivityLabel")} min={0} max={1000} value={prefForm.sensitivity} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, sensitivity: _v }); }} />
                                             </Grid>
                                             <Grid size={12} sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
                                                 <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={handlePrefSave}>
-                                                    Guardar Cambios
+                                                    {tp("saveChanges")}
                                                 </ButtonBase>
                                             </Grid>
                                         </Grid>
@@ -408,7 +433,7 @@ export function Profile() {
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ p: 0, mb: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>
                                         <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
-                                            Administre los rangos de glucemia y las dosis de corrección correspondientes.
+                                            {tp("correctionDesc")}
                                         </Typography>
                                         <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={() => setOpenCorrectionModal(true)}>
                                             {tp("addRange")}
@@ -422,7 +447,7 @@ export function Profile() {
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ p: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
                                         <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
-                                            Configure las dosis de insulina basal según la hora del día.
+                                            {tp("basalDesc")}
                                         </Typography>
                                         <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={() => setOpenBasalModal(true)}>
                                             {tp("addSchema")}
@@ -491,7 +516,7 @@ export function Profile() {
                                 <TextField
                                     {...registerContact('name')}
                                     fullWidth
-                                    label="Nombre"
+                                    label={tp("contactName")}
                                     variant="outlined"
                                     size="small"
                                     sx={{ mb: 2 }}
@@ -501,7 +526,7 @@ export function Profile() {
                                 <TextField
                                     {...registerContact('parentesco')}
                                     fullWidth
-                                    label="Parentesco"
+                                    label={tp("contactRelationship")}
                                     variant="outlined"
                                     size="small"
                                     select
@@ -523,7 +548,7 @@ export function Profile() {
                                 <TextField
                                     {...registerContact('telefono')}
                                     fullWidth
-                                    label="Teléfono"
+                                    label={tp("contactPhone")}
                                     variant="outlined"
                                     size="small"
                                     sx={{ mb: 2 }}

@@ -137,5 +137,6 @@
   "GLUCOSE_ALERT_HYPO": "Hypoglycemia Alert",
   "GLUCOSE_ALERT_HYPO_MESSAGE": "Your glucose level is below the safe threshold: {{value}} mg/dL",
   "GLUCOSE_ALERT_HYPER": "Hyperglycemia Alert",
-  "GLUCOSE_ALERT_HYPER_MESSAGE": "Your glucose level is above the safe threshold: {{value}} mg/dL"
+  "GLUCOSE_ALERT_HYPER_MESSAGE": "Your glucose level is above the safe threshold: {{value}} mg/dL",
+  "UPDATE_USER_FORBIDDEN": "You do not have permission to edit this profile"
 }

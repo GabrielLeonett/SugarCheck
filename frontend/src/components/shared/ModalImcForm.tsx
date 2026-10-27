@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import useLanguage from '../../hooks/useLanguage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const imcSchema = z.object({
   peso: z.string()
@@ -20,7 +20,7 @@ type ImcFormData = z.infer<typeof imcSchema>;
 interface ModalImcFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: { peso: number; altura: number; fecha: string }) => void;
+  onSave: (data: { peso: number; altura: number; fecha: string }) => void | Promise<boolean>;
 }
 
 const obtenerFechaActual = () => {
@@ -32,6 +32,7 @@ const obtenerFechaActual = () => {
 
 export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProps) {
   const { t } = useLanguage('monitoreoFisico');
+  const [saving, setSaving] = useState(false);
 
   const {
     register,
@@ -50,9 +51,14 @@ export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProp
     }
   }, [open, reset]);
 
-  const onSubmit = (data: ImcFormData) => {
-    onSave({ peso: Number(data.peso), altura: Number(data.altura), fecha: data.fecha });
-    onClose();
+  const onSubmit = async (data: ImcFormData) => {
+    setSaving(true);
+    try {
+      const result = await onSave({ peso: Number(data.peso), altura: Number(data.altura), fecha: data.fecha });
+      if (result !== false) onClose();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -124,6 +130,7 @@ export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProp
           variant="contained"
           color="primary"
           fullWidth
+          disabled={saving}
         >
           {t('saveButton')}
         </Button>

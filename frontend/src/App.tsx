@@ -19,6 +19,7 @@ import "./App.css";
 import { Profile } from "./features/Profile/Profile";
 import { LoadingScreen } from "./components/ui/LoadingScreen";
 import { useTranslation } from "react-i18next";
+import ToastProvider from "./components/shared/ToastProvider";
 
 function App() {
   const { t } = useTranslation("common");
@@ -42,9 +43,10 @@ function App() {
 
   return (
     <ThemeWrapperContext>
-      {isAuthLoading ? (
+{isAuthLoading ? (
         <LoadingScreen message={t("verificandoSesion")} />
       ) : (
+        <>
         <Suspense fallback={<LoadingScreen />}>
           <Router>
             <Routes>
@@ -70,9 +72,11 @@ function App() {
                <Route path="/register" element={<Register />} />
              </Route>
            </Routes>
-         </Router>
-       </Suspense>
-     )}
+          </Router>
+        </Suspense>
+        <ToastProvider />
+        </>
+      )}
    </ThemeWrapperContext>
    );
 }

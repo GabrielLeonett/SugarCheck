@@ -1,18 +1,46 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { Menu, ChevronUp, CheckSquare } from 'lucide-react-native'; // Asegúrate de tener instalada esta librería
+import { useFocusEffect } from 'expo-router';
 import { Card } from '@/components/card';
 import { ThemedView } from '@/components/themed-view';
 import { useAuthStore } from '@/src/stores/authStore';
 import { H5 } from '@/components/ui/h5';
 import { H1 } from '@/components/ui/h1';
 import { Colors } from '@/constants/theme';
+import { glucoseApi } from '@/src/apis/glucose';
+import type { GlucoseEntry } from '@/src/apis/glucose';
 
-const MOCK_GLUCOSE_DATA = [120, 145, 98, 156, 132, 110, 120];
+function formatRelativeTime(timestamp: Date): string {
+  const diffMinutes = Math.floor((Date.now() - timestamp.getTime()) / 60000);
+  if (diffMinutes < 1) return 'Ahora mismo';
+  if (diffMinutes < 60) return `Hace ${diffMinutes} min`;
+  const hours = Math.floor(diffMinutes / 60);
+  if (hours < 24) return `Hace ${hours} ${hours === 1 ? 'hora' : 'horas'}`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return 'Ayer';
+  if (days < 7) return `Hace ${days} días`;
+  return `Hace ${Math.floor(days / 7)} semanas`;
+}
 
 export default function HomeScreen() {
   const user = useAuthStore((s) => s.user);
-  const lastLevel = MOCK_GLUCOSE_DATA[MOCK_GLUCOSE_DATA.length - 1];
+  const [lastEntry, setLastEntry] = useState<GlucoseEntry | null>(null);
+
+  const loadLastEntry = useCallback(async () => {
+    try {
+      const records = await glucoseApi.getAll();
+      setLastEntry(records[0] ?? null);
+    } catch {
+      setLastEntry(null);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadLastEntry();
+    }, [loadLastEntry])
+  );
 
   return (
     <ThemedView style={styles.container}>
@@ -37,14 +65,18 @@ export default function HomeScreen() {
           <H5 style={styles.cardTitle}>Última Batalla</H5>
 
           <View style={styles.glucoseContainer}>
-            <Text style={styles.glucoseValue}>{lastLevel}</Text>
+            <Text style={styles.glucoseValue}>{lastEntry ? lastEntry.nivel : '--'}</Text>
             <View style={styles.glucoseUnitWrapper}>
               <ChevronUp color={Colors.light.success.main} size={32} strokeWidth={3} />
               <Text style={styles.glucoseUnit}>mg/dL</Text>
             </View>
           </View>
 
-          <Text style={styles.timeSubtitle}>Hace 2 horas (Post-Desayuno)</Text>
+          <Text style={styles.timeSubtitle}>
+            {lastEntry
+              ? `${formatRelativeTime(lastEntry.timestamp)}${lastEntry.contexto ? ` (${lastEntry.contexto})` : ''}`
+              : 'Sin registros'}
+          </Text>
 
           {/* Divisor */}
           <View style={styles.divider} />

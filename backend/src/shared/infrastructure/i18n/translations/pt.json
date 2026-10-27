@@ -122,5 +122,6 @@
   "NOTIFICATION_SAVE_ERROR": "Erro ao salvar notificação",
   "NOTIFICATION_MARK_READ_ERROR": "Erro ao marcar notificação como lida",
   "NOTIFICATION_MARK_ALL_READ_ERROR": "Erro ao marcar todas como lidas",
-  "NOTIFICATION_DELETE_ERROR": "Erro ao excluir notificação"
+  "NOTIFICATION_DELETE_ERROR": "Erro ao excluir notificação",
+  "UPDATE_USER_FORBIDDEN": "Você não tem permissão para editar este perfil"
 }

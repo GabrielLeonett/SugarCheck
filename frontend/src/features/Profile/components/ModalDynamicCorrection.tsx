@@ -6,6 +6,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState, useEffect } from "react";
 import { preferenceApi } from "../../../apis/preference_config";
+import { preferenceStore } from "../../../hooks/usePreferenceConfig";
+import { useUiStore } from "../../../stores/uiStore";
 import type { CorrectionSchemaItem } from "../../../schemas/preference_config";
 
 interface ModalDynamicCorrectionProps {
@@ -15,6 +17,7 @@ interface ModalDynamicCorrectionProps {
 
 export default function ModalDynamicCorrection({ open, onClose }: ModalDynamicCorrectionProps) {
   const theme = useTheme();
+  const showToast = useUiStore((s) => s.showToast);
   const [items, setItems] = useState<CorrectionSchemaItem[]>([]);
   const [rangeMin, setRangeMin] = useState("");
   const [rangeMax, setRangeMax] = useState("");
@@ -79,9 +82,11 @@ export default function ModalDynamicCorrection({ open, onClose }: ModalDynamicCo
         ...current,
         correctionSchemas: items,
       });
+      await preferenceStore.getState().load();
+      showToast('success', 'Rangos de corrección guardados');
       onClose();
     } catch {
-      alert("Error al guardar los rangos de corrección");
+      showToast('error', 'Error al guardar los rangos de corrección');
     } finally {
       setLoading(false);
     }

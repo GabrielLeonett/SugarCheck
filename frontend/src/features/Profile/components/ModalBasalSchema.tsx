@@ -6,6 +6,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState, useEffect } from "react";
 import { preferenceApi } from "../../../apis/preference_config";
+import { preferenceStore } from "../../../hooks/usePreferenceConfig";
+import { useUiStore } from "../../../stores/uiStore";
 import type { BasalSchemaItem } from "../../../schemas/preference_config";
 
 interface ModalBasalSchemaProps {
@@ -15,6 +17,7 @@ interface ModalBasalSchemaProps {
 
 export default function ModalBasalSchema({ open, onClose }: ModalBasalSchemaProps) {
   const theme = useTheme();
+  const showToast = useUiStore((s) => s.showToast);
   const [items, setItems] = useState<BasalSchemaItem[]>([]);
   const [injectionTime, setInjectionTime] = useState("");
   const [dose, setDose] = useState("");
@@ -72,9 +75,11 @@ export default function ModalBasalSchema({ open, onClose }: ModalBasalSchemaProp
         ...current,
         basalSchemas: items,
       });
+      await preferenceStore.getState().load();
+      showToast('success', 'Esquema basal guardado');
       onClose();
     } catch {
-      alert("Error al guardar el esquema basal");
+      showToast('error', 'Error al guardar el esquema basal');
     } finally {
       setLoading(false);
     }
