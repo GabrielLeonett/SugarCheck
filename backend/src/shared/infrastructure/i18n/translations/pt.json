@@ -123,5 +123,7 @@
   "NOTIFICATION_MARK_READ_ERROR": "Erro ao marcar notificação como lida",
   "NOTIFICATION_MARK_ALL_READ_ERROR": "Erro ao marcar todas como lidas",
   "NOTIFICATION_DELETE_ERROR": "Erro ao excluir notificação",
-  "UPDATE_USER_FORBIDDEN": "Você não tem permissão para editar este perfil"
+  "UPDATE_USER_FORBIDDEN": "Você não tem permissão para editar este perfil",
+
+  "MEDICAL_RECORD_EDIT_WINDOW_EXPIRED": "Não é possível editar ou excluir um registro médico após 15 dias da sua criação"
 }
