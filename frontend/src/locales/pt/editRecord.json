@@ -1,0 +1,12 @@
+{
+  "actions": "Ações",
+  "edit": "Editar",
+  "editExpired": "Você só pode editar registros dos últimos 15 dias",
+  "editGlucoseTitle": "Editar medição de glicose",
+  "editHbA1cTitle": "Editar resultado de HbA1c",
+  "editImcTitle": "Editar medidas",
+  "editInsulinTitle": "Editar registro de insulina",
+  "saveChanges": "Salvar alterações",
+  "updateSuccess": "Registro atualizado com sucesso",
+  "updateError": "Não foi possível atualizar o registro"
+}

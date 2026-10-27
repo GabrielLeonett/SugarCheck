@@ -10,6 +10,7 @@ interface ImcProps {
   peso: Peso;
   altura: Altura;
   fecha: Fecha;
+  createdAt?: Date;
 }
 
 export interface ImcPlain {
@@ -20,6 +21,7 @@ export interface ImcPlain {
   imcValue: number;
   categoria: string;
   fecha: string;
+  createdAt: string;
 }
 
 export class Imc {
@@ -29,6 +31,7 @@ export class Imc {
   private _altura: Altura;
   private _fecha: Fecha;
   private _imcValue: number;
+  private readonly _createdAt: Date;
 
   constructor(props: ImcProps) {
     this._id = props.id;
@@ -37,6 +40,7 @@ export class Imc {
     this._altura = props.altura;
     this._fecha = props.fecha;
     this._imcValue = this.calcularImc();
+    this._createdAt = props.createdAt || new Date();
   }
 
   get id(): Id_IMC { return this._id; }
@@ -45,6 +49,7 @@ export class Imc {
   get altura(): Altura { return this._altura; }
   get fecha(): Fecha { return this._fecha; }
   get imcValue(): number { return this._imcValue; }
+  get createdAt(): Date { return new Date(this._createdAt); }
 
   private calcularImc(): number {
     const pesoKg = this._peso.value;
@@ -70,6 +75,10 @@ export class Imc {
     this._imcValue = this.calcularImc();
   }
 
+  actualizarFecha(nuevaFecha: Fecha): void {
+    this._fecha = nuevaFecha;
+  }
+
   public toPlain(): ImcPlain {
     return {
       id: this._id.value,
@@ -79,6 +88,7 @@ export class Imc {
       imcValue: this._imcValue,
       categoria: this.getCategoria(),
       fecha: this._fecha.toISOString(),
+      createdAt: this._createdAt.toISOString(),
     };
   }
 }

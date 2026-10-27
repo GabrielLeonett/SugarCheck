@@ -33,6 +33,7 @@ function mapHbA1cRecord(item: HbA1cBackendRecord): HbA1cRecord {
     resultado: item.valuePercent,
     estimado: `${Math.round(item.eag)} mg/dL`,
     estado: deriveHealthEstado(item.valuePercent),
+    createdAt: item.createdAt,
   };
 }
 
@@ -50,6 +51,11 @@ export const hba1cApi = {
 
   async create(payload: CreateHbA1cPayload): Promise<HbA1cRecord> {
     const res = await apiPrivate.post('/hba1c', payload);
+    return mapHbA1cRecord(res.data as HbA1cBackendRecord);
+  },
+
+  async update(id: string, payload: Partial<CreateHbA1cPayload>): Promise<HbA1cRecord> {
+    const res = await apiPrivate.patch(`/hba1c/${id}`, payload);
     return mapHbA1cRecord(res.data as HbA1cBackendRecord);
   },
 };
