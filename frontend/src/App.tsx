@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
@@ -71,6 +71,8 @@ function App() {
                <Route path="/restablecer-contrasena" element={<ResetPassword />} />
                <Route path="/register" element={<Register />} />
              </Route>
+
+             <Route path="*" element={<Navigate to="/" replace />} />
            </Routes>
           </Router>
         </Suspense>

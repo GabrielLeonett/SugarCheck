@@ -5,6 +5,7 @@ import { Result } from '../../shared/result';
 import { ContactEmergenceId } from '../core/value-objects/ContactEmergenceId';
 import { ContactName } from '../core/value-objects/ContactName';
 import { ContactParentesco } from '../core/value-objects/ContactParentesco';
+import { ContactPhone } from '../core/value-objects/ContactPhone';
 
 export class UpdateContactEmergence {
   constructor(
@@ -35,7 +36,9 @@ export class UpdateContactEmergence {
     }
 
     if (update.telefono !== undefined) {
-      validatedUpdate.telefono = update.telefono;
+      const phoneRes = ContactPhone.create(update.telefono);
+      if (!phoneRes.isValid) return Result.fail(phoneRes.getError());
+      validatedUpdate.telefono = phoneRes.getValue()?.value;
     }
 
     return await this.repository.update(contactId, validatedUpdate);

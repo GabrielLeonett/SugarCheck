@@ -43,9 +43,8 @@ function getPresetRange(preset: Exclude<TimeRange, 'personalizado' | 'todos'>): 
 }
 
 function formatFechaCorta(iso: string): string {
-  const date = new Date(iso);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
+  // Fecha YYYY-MM-DD del backend: parseo por partes para no desplazar el día.
+  const [, month, day] = iso.split('T')[0].split('-');
   return `${day}/${month}`;
 }
 

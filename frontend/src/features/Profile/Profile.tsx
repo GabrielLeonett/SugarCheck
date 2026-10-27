@@ -36,10 +36,12 @@ import { userApi } from "../../apis/user_config";
 import { preferenceApi } from "../../apis/preference_config";
 import { contactEmergenceApi, type ContactEmergenceData } from "../../apis/contact_emergence";
 import { profilePersonalSchema, type ProfilePersonalData } from "../../schemas/profile";
+import { changePasswordSchema, type ChangePasswordData } from "../../schemas/change_password";
 import { contactEmergenceSchema, type ContactEmergenceData as ContactEmergenceFormData } from "../../schemas/contact_emergence";
 import { preferenceStore } from "../../hooks/usePreferenceConfig";
 import ModalBasalSchema from "./components/ModalBasalSchema";
 import ModalDynamicCorrection from "./components/ModalDynamicCorrection";
+import { ExportMedicalDataSection } from "./components/ExportMedicalDataSection";
 import useLanguage from "../../hooks/useLanguage";
 import { useUiStore } from "../../stores/uiStore";
 
@@ -55,10 +57,6 @@ export function Profile() {
     const [prefForm, setPrefForm] = React.useState({
         hypo: 90,
         hiper: 160,
-        breakfast: 100,
-        lunch: 100,
-        dinner: 100,
-        sensitivity: 1,
     });
     const [contacts, setContacts] = React.useState<ContactEmergenceData[]>([]);
     const [openContactModal, setOpenContactModal] = React.useState(false);
@@ -85,6 +83,17 @@ export function Profile() {
     });
 
     const {
+        register: registerPassword,
+        handleSubmit: handleSubmitPassword,
+        reset: resetPassword,
+        formState: { errors: errorsPassword, isSubmitting: isSubmittingPassword },
+    } = useForm<ChangePasswordData>({
+        resolver: zodResolver(changePasswordSchema),
+        mode: "onChange",
+        defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
+    });
+
+    const {
         register: registerContact,
         handleSubmit: handleSubmitContact,
         reset: resetContact,
@@ -108,10 +117,6 @@ export function Profile() {
                 setPrefForm({
                     hypo: prefs.thresholds?.hypo ?? 90,
                     hiper: prefs.thresholds?.hiper ?? 160,
-                    breakfast: prefs.insulinRatios?.breakfast ?? 100,
-                    lunch: prefs.insulinRatios?.lunch ?? 100,
-                    dinner: prefs.insulinRatios?.dinner ?? 100,
-                    sensitivity: prefs.sensitivity ?? 1,
                 });
             }
         }).catch(() => { });
@@ -139,6 +144,16 @@ export function Profile() {
         }
     };
 
+    const onChangePassword = async (data: ChangePasswordData) => {
+        try {
+            await userApi.changePassword(data.currentPassword, data.newPassword);
+            resetPassword({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            showToast('success', tp("passwordUpdated"));
+        } catch (error) {
+            showToast('error', error instanceof Error ? error.message : tp("passwordUpdateError"));
+        }
+    };
+
     const handlePrefSave = async () => {
         try {
             const thresholds = {
@@ -160,12 +175,6 @@ export function Profile() {
             await preferenceApi.savePreferences({
                 ...current,
                 thresholds,
-                insulinRatios: {
-                    breakfast: Number(prefForm.breakfast),
-                    lunch: Number(prefForm.lunch),
-                    dinner: Number(prefForm.dinner),
-                },
-                sensitivity: Number(prefForm.sensitivity),
             });
             await preferenceStore.getState().load();
             showToast('success', tp("guardadoExitoClinico"));
@@ -177,10 +186,15 @@ export function Profile() {
     const onContactSave = async (data: ContactEmergenceFormData) => {
         try {
             const isEditing = Boolean(editingContact);
+            const payload = {
+                ...data,
+                name: data.name.trim(),
+                telefono: data.telefono?.trim() || undefined,
+            };
             if (editingContact) {
-                await contactEmergenceApi.update(editingContact.id, data);
+                await contactEmergenceApi.update(editingContact.id, payload);
             } else {
-                await contactEmergenceApi.create(data);
+                await contactEmergenceApi.create(payload);
             }
             setOpenContactModal(false);
             setEditingContact(null);
@@ -346,16 +360,60 @@ export function Profile() {
                                             helperText={errorsPersonal.email?.message}
                                         />
                                     </Grid>
+                                    <Grid size={12} sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                                        <ButtonBase variant="contained" onClick={handleSubmitPersonal(onPersonalSave)}>{tp("saveChanges")}</ButtonBase>
+                                    </Grid>
+                                </Grid>
+                            </AccordionDetails>
+                        </Accordion>
+
+                        <Accordion sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "2px solid #3182CE", mb: 3 }}>
+                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>{tp("changePasswordTitle")}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails sx={{ p: 0, mb: 4 }}>
+                                <Grid container spacing={3}>
                                     <Grid size={12}>
                                         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("currentPasswordLabel")}</Typography>
-                                        <TextField fullWidth type="password" />
+                                        <TextField
+                                            {...registerPassword('currentPassword')}
+                                            fullWidth
+                                            type="password"
+                                            autoComplete="current-password"
+                                            error={!!errorsPassword.currentPassword}
+                                            helperText={errorsPassword.currentPassword?.message}
+                                        />
                                     </Grid>
                                     <Grid size={12}>
                                         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("newPasswordLabel")}</Typography>
-                                        <TextField fullWidth type="password" />
+                                        <TextField
+                                            {...registerPassword('newPassword')}
+                                            fullWidth
+                                            type="password"
+                                            autoComplete="new-password"
+                                            error={!!errorsPassword.newPassword}
+                                            helperText={errorsPassword.newPassword?.message}
+                                        />
+                                    </Grid>
+                                    <Grid size={12}>
+                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("confirmPasswordLabel")}</Typography>
+                                        <TextField
+                                            {...registerPassword('confirmPassword')}
+                                            fullWidth
+                                            type="password"
+                                            autoComplete="new-password"
+                                            error={!!errorsPassword.confirmPassword}
+                                            helperText={errorsPassword.confirmPassword?.message}
+                                        />
                                     </Grid>
                                     <Grid size={12} sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                                        <ButtonBase variant="contained" onClick={handleSubmitPersonal(onPersonalSave)}>{tp("saveChanges")}</ButtonBase>
+                                        <ButtonBase
+                                            variant="contained"
+                                            disabled={isSubmittingPassword}
+                                            onClick={handleSubmitPassword(onChangePassword)}
+                                        >
+                                            {tp("changePasswordButton")}
+                                        </ButtonBase>
                                     </Grid>
                                 </Grid>
                             </AccordionDetails>
@@ -403,21 +461,6 @@ export function Profile() {
                                             <Grid size={{ sm: 12, md: 6 }}>
                                                 <NumberSpinner label={tp("severeHyperLimit")} min={0} max={500} value={prefForm.hiper} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hiper: _v }); }} />
                                             </Grid>
-                                            <Grid size={12}>
-                                                <Typography variant="body2" sx={{ fontWeight: "bold", textAlign: "center", mt: 2, mb: 1 }}>{tp("insulinRatios")}</Typography>
-                                            </Grid>
-                                            <Grid size={{ sm: 12, md: 4 }}>
-                                                <NumberSpinner label={tp("ratioBreakfast")} min={0} max={100} value={prefForm.breakfast} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, breakfast: _v }); }} />
-                                            </Grid>
-                                            <Grid size={{ sm: 12, md: 4 }}>
-                                                <NumberSpinner label={tp("ratioLunch")} min={0} max={100} value={prefForm.lunch} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, lunch: _v }); }} />
-                                            </Grid>
-                                            <Grid size={{ sm: 12, md: 4 }}>
-                                                <NumberSpinner label={tp("ratioDinner")} min={0} max={100} value={prefForm.dinner} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, dinner: _v }); }} />
-                                            </Grid>
-                                            <Grid size={12}>
-                                                <NumberSpinner label={tp("sensitivityLabel")} min={0} max={1000} value={prefForm.sensitivity} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, sensitivity: _v }); }} />
-                                            </Grid>
                                             <Grid size={12} sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
                                                 <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={handlePrefSave}>
                                                     {tp("saveChanges")}
@@ -454,6 +497,15 @@ export function Profile() {
                                         </ButtonBase>
                                     </AccordionDetails>
                                 </Accordion>
+                            </AccordionDetails>
+                        </Accordion>
+
+                        <Accordion sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "2px solid #3182CE", mb: 3 }}>
+                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>{tp("exportTitle")}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails sx={{ p: 0, mb: 4 }}>
+                                <ExportMedicalDataSection />
                             </AccordionDetails>
                         </Accordion>
 
@@ -498,10 +550,6 @@ export function Profile() {
                                 </Box>
                                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("emergencyMode")}</Typography>
                                 <Grid container spacing={2} sx={{ maxWidth: 400, mx: "auto" }}>
-                                    <Grid size={12} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>{tp("doseOverlapBlock")}</Typography>
-                                        <Switch defaultChecked />
-                                    </Grid>
                                     <Grid size={12} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                         <Typography variant="body2" sx={{ fontWeight: "bold" }}>{tp("sosChannel")}</Typography>
                                         <Switch defaultChecked />
@@ -551,6 +599,9 @@ export function Profile() {
                                     label={tp("contactPhone")}
                                     variant="outlined"
                                     size="small"
+                                    type="tel"
+                                    error={!!errorsContact.telefono}
+                                    helperText={errorsContact.telefono?.message}
                                     sx={{ mb: 2 }}
                                 />
                                 <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>

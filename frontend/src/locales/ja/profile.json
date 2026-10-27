@@ -15,6 +15,11 @@
     "emailLabel": "メールアドレス",
     "currentPasswordLabel": "現在のパスワード",
     "newPasswordLabel": "新しいパスワード",
+    "confirmPasswordLabel": "新しいパスワードの確認",
+    "changePasswordTitle": "パスワードを変更",
+    "changePasswordButton": "パスワードを更新",
+    "passwordUpdated": "パスワードが正常に更新されました",
+    "passwordUpdateError": "パスワードを更新できませんでした",
     "saveChanges": "変更を保存",
     "emergencyContacts": "緊急連絡先",
     "noContacts": "緊急連絡先が登録されていません",
@@ -72,5 +77,15 @@
     "usuarioNoAutenticado": "認証されていません",
     "errorGuardar": "保存エラー",
     "errorEliminar": "削除エラー",
-    "errorCarga": "設定が読み込まれていません"
+    "errorCarga": "設定が読み込まれていません",
+    "exportTitle": "医療データをエクスポート",
+    "exportDescription": "血糖値、HbA1c、インスリン、BMIの臨床記録をダウンロードします。",
+    "exportFrom": "開始日",
+    "exportTo": "終了日",
+    "exportRangeHint": "日付を空欄にすると全履歴をエクスポートします。",
+    "exportPdf": "PDFをダウンロード",
+    "exportCsv": "CSVをダウンロード",
+    "exportSuccess": "ファイルをダウンロードしました",
+    "exportError": "ファイルを生成できませんでした",
+    "exportInvalidRange": "開始日は終了日以前である必要があります"
 }

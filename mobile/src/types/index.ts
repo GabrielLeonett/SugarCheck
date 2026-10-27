@@ -27,12 +27,12 @@ export interface Preference {
     hypo: number;
     hiper: number;
   };
-  insulinRatios: {
+  insulinRatios?: {
     breakfast: number;
     lunch: number;
     dinner: number;
   };
-  sensitivity: number;
+  sensitivity?: number;
   locale: string;
   theme: string;
 }

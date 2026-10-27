@@ -14,7 +14,6 @@ import {
   Inject,
   BadRequestException,
   NotFoundException,
-  ForbiddenException,
   HttpCode,
 } from '@nestjs/common';
 import { CreateInsulina } from '../../app/CreateInsulina';
@@ -26,8 +25,6 @@ import { GetTotalsInsulina } from '../../app/GetTotalsInsulina';
 import { AuthGuard } from '../../../auth/infra/auth.guard';
 import { CreateInsulinaDTO, UpdateInsulinaDTO, QueryInsulinaDTO } from './DTOs/insulina.dto';
 import { InsulinaNotFoundError } from '../../core/errors/InsulinaNotFoundError';
-import { InsulinaNoModificableError } from '../../core/errors/InsulinaNoModificableError';
-import { InsulinaNoEliminableError } from '../../core/errors/InsulinaNoEliminableError';
 import { ErrorAbstract } from '../../../shared/error-abstract';
 
 @Controller('insulina')
@@ -123,21 +120,19 @@ export class InsulinaController {
     if (!result.isValid) {
       const error = result.getError();
       if (error instanceof InsulinaNotFoundError) throw new NotFoundException(error.message);
-      if (error instanceof InsulinaNoModificableError) throw new ForbiddenException(error.message);
-      if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
+      // El resto de errores de dominio los resuelve el filtro global (403 incluido).
       throw error;
     }
     return result.getValue().toPlain();
   }
 
   @Delete(':id')
-  @HttpCode(403)
+  @HttpCode(204)
   async delete(@Param('id') id: string) {
     const result = await this.deleteInsulina.run({ id });
     if (!result.isValid) {
       const error = result.getError();
-      if (error instanceof InsulinaNoEliminableError) throw new ForbiddenException(error.message);
-      if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
+      if (error instanceof InsulinaNotFoundError) throw new NotFoundException(error.message);
       throw error;
     }
     return;

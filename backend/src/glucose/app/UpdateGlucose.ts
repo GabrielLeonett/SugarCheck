@@ -7,9 +7,8 @@ import { GlucoseValue } from '../core/value-objects/GlucoseValue';
 import { GlucoseMealTag } from '../core/value-objects/GlucoseMealTag';
 import { GlucoseDate } from '../core/value-objects/GlucoseDate';
 import { GlucoseTime } from '../core/value-objects/GlucoseTime';
-import { EditWindowExpiredError } from '../core/errors/EditWindowExpiredError';
-
-const EDIT_WINDOW_DAYS = 15;
+import { isWithinMedicalRecordEditWindow } from '../../shared/core/MedicalRecordEditWindow';
+import { MedicalRecordNotEditableError } from '../../shared/core/errors/MedicalRecordNotEditableError';
 
 export class UpdateGlucose {
   constructor(
@@ -30,13 +29,12 @@ export class UpdateGlucose {
     if (!existingResult.isValid) return existingResult;
 
     const existing = existingResult.getValue();
-    const now = new Date();
-    const diffMs = now.getTime() - existing.createdAt.getTime();
-    const diffDays = diffMs / (1000 * 60 * 60 * 24);
 
-    if (diffDays > EDIT_WINDOW_DAYS) {
+    if (!isWithinMedicalRecordEditWindow(existing.createdAt)) {
       return Result.fail(
-        new EditWindowExpiredError('El período de edición de 15 días ha expirado para este registro de glucosa'),
+        new MedicalRecordNotEditableError(
+          'El período de edición de 15 días ha expirado para este registro de glucosa',
+        ),
       );
     }
 
