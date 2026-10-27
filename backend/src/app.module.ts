@@ -14,6 +14,7 @@ import { SyncModule } from './sync/infra/Nest/sync.module';
 import { I18nModule } from './shared/infrastructure/i18n/i18n.module';
 import { GlobalExceptionFilter } from './shared/infrastructure/exception-filter';
 import { TranslationService } from './shared/infrastructure/i18n/translation.service';
+import { CaminoModule } from './camino/infra/camino.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { TranslationService } from './shared/infrastructure/i18n/translation.ser
     InsulinaModule,
     OraculoModule,
     SyncModule,
+    CaminoModule,
   ],
   providers: [
     {

@@ -1,4 +1,4 @@
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {mundosData} from "./Components/dataWorld";
 import {VistaLeccion} from "./Components/nivel"
 import Navbar from "../../components/layout/Header/Navbar";
@@ -9,28 +9,76 @@ import { HexagonoMundo } from "./Components/NivelesHexagono";
 import yelmo_de_sabiduria from "../../assets/insigniasCamino/yelmo_de_sabiduria.png"
 import escudo_de_fibra from "../../assets/insigniasCamino/escudo_de_fribra.png";
 import SeparadorMundo from "./Components/SeparaMundos"
+import { completarNivelCamino, getCaminoProgreso } from "../../apis/camino";
+
+const insigniasCamino = [
+    { img: escudo_de_fibra, mundo: "Mundo 1", name: "Escudo de fibra" },
+    { img: yelmo_de_sabiduria, mundo: "Mundo 2", name: "Yelmo de la sabiduría" },
+    { img: yelmo_de_sabiduria, mundo: "Mundo 3", name: "Yelmo de la sabiduría" },
+    { img: yelmo_de_sabiduria, mundo: "Mundo 4", name: "Yelmo de la sabiduría" },
+    { img: yelmo_de_sabiduria, mundo: "Mundo 5", name: "Yelmo de la sabiduría" },
+]
+
 export function Camino() {
 
 const [mundos, setMundos] = useState(mundosData);
 const [mundoActualId, setMundoActualId] = useState("mundo-1");
 const [nivelActivoId, setNivelActivoId] = useState<number | null>(null);
 
+useEffect(() => {
+    const cargarProgreso = async () => {
+        try {
+            const progreso = await getCaminoProgreso();
+            const ultimo = progreso.ultimoNivelCompletado || 0;
+            setMundos((prevMundos) =>
+                prevMundos.map((mundo) => ({
+                    ...mundo,
+                    niveles: mundo.niveles.map((nivel) => {
+                        const numNivel = Number(nivel.numero);
+                        if (numNivel <= ultimo) {
+                            return { ...nivel, color: true, bloqueado: true };
+                        }
+                        if (numNivel === ultimo + 1) {
+                            return { ...nivel, color: false, bloqueado: true };
+                        }
+                        return { ...nivel, color: false, bloqueado: false };
+                    }),
+                }))
+            );
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    cargarProgreso();
+}, []);
 
-const completarNivel = (numeroNivelActual: number) => {
+const totalNivelesCompletados = mundos.reduce((acc, mundo) => {
+    const completadosMundo = mundo.niveles.filter((nivel) => nivel.color).length;
+    return acc + completadosMundo;
+}, 0);
+
+const insigniasDesbloqueadas = Math.floor(totalNivelesCompletados / 3);
+
+
+const completarNivel = async (numeroNivelActual: number) => {
+    try {
+        await completarNivelCamino(numeroNivelActual);
+    } catch (error) {
+        console.error(error);
+    }
+
     setMundos((prevMundos) =>
         prevMundos.map((mundo) => ({
             ...mundo,
             niveles: mundo.niveles.map((nivel) => {
                 const numNivel = Number(nivel.numero);
 
-                // 1. Si es el nivel que acabamos de terminar -> marcar completado (verde)
                 if (numNivel === numeroNivelActual) {
-                    return { ...nivel, color: true };
+                    return { ...nivel, color: true, bloqueado: true };
                 }
 
-                // 2. Si es el nivel siguiente -> desbloquear
                 if (numNivel === numeroNivelActual + 1) {
-                    return { ...nivel, bloqueado: false };
+                    return { ...nivel, color: false, bloqueado: true };
                 }
 
                 return nivel;
@@ -38,7 +86,6 @@ const completarNivel = (numeroNivelActual: number) => {
         }))
     );
 
-    // Regresar al mapa
     setNivelActivoId(null);
 };
 
@@ -81,9 +128,9 @@ return (
                             numero={nivel.numero} 
                             lines={tieneLineas} 
                             color={nivel.color}
-                            bloqueado={nivel.bloqueado}
+                            bloqueado={!nivel.bloqueado}
                             onClick={() => {
-                                if (nivel.bloqueado) {
+                                if (!nivel.bloqueado) {
                                     console.log("Nivel bloqueado");
                                     return; 
                                 }
@@ -117,15 +164,20 @@ return (
                 zIndex: 10
                 },
                 }}
-                
+                 
                 >
                 <Typography variant="h5" sx={{ color: 'white', textAlign: 'center', fontWeight: 'bold', pt: 4 }}>
                 Colección de Insignias
                 </Typography>
-                <InsigniaCard img={escudo_de_fibra} mundo="Mundo 1" name="escudo de fibra" bloqueado={false}    />
-                <InsigniaCard img={yelmo_de_sabiduria} mundo="Mundo 2" name="yelmo de la sabiduria" bloqueado />
-                <InsigniaCard img={yelmo_de_sabiduria} mundo="Mundo 2" name="yelmo de la sabiduria" bloqueado />
-                <InsigniaCard img={yelmo_de_sabiduria} mundo="Mundo 2" name="yelmo de la sabiduria" bloqueado />
+                {insigniasCamino.map((insignia, index) => (
+                    <InsigniaCard 
+                        key={`${insignia.name}-${index}`}
+                        img={insignia.img} 
+                        mundo={insignia.mundo} 
+                        name={insignia.name} 
+                        bloqueado={index >= insigniasDesbloqueadas}    
+                    />
+                ))}
                 {/* Sección de progreso simulada al fondo del Box */}
                 <Box sx={{ mt: 'auto', pt: 2, color: 'white', textAlign: 'center' }}>
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{("routeProgress")}</Typography>

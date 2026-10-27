@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import { leccionesPorNivel } from "./contenidoData";
 
 interface HexagonoMundoProps {
     numero?: number | string;
@@ -15,10 +16,12 @@ export function HexagonoMundo({
     numero = 0,
     lines = false,
     onClick,
-    bloqueado = false,
+    bloqueado = true,
 }: HexagonoMundoProps) {
 const num = Number(numero);
 const esPar = num % 2 === 0;
+const leccionData = leccionesPorNivel[num];
+const tituloMision = leccionData?.titulo || "";
 
 return (
     // 1. CAPA EXTERNA: Controla el zigzag y la animación al pasar el mouse
@@ -169,13 +172,7 @@ return (
             Misión
             </Typography>
             <Typography variant="body1" sx={{ color: "#1a202c", fontWeight: "bold", textAlign: "center", lineHeight: 1.2 }}>
-            ¡La Larga Distancia!
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#718096", textAlign: "center", fontSize: "13px", mt: 0.5 }}>
-            Carbohidratos Complejos
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#dd6b20", fontWeight: "bold", textAlign: "center", mt: 1 }}>
-            Puntos de Sabiduría: 86
+            {tituloMision}
             </Typography>
         </Box>
 
