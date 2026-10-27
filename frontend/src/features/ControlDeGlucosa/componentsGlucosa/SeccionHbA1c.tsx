@@ -1,12 +1,16 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Typography, Grid, ButtonGroup, Button, Alert, CircularProgress } from '@mui/material';
+import { useState } from 'react';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
 import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
 import ModalHbA1cForm from '../../../components/shared/ModalHbA1cForm.tsx';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import { GraficoBarra } from '../../../components/shared/GraficoBarra';
+import { EditActionButton } from '../../../components/shared/EditActionButton';
 import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
+import { canEditRecord } from '../../../utils/editWindow';
+import { formToCreateHbA1cDto } from '../../../schemas/hba1c';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 import type { HbA1cData } from '../../../schemas/hba1c';
 import type { HbA1cRecord } from '../../../data/recordsMock';
@@ -14,11 +18,13 @@ import type { Column } from '../../../components/shared/HistorialTable';
 
 interface SeccionHbA1cProps {
   dataHook: UseGlucosaDataReturn;
-  onSaveHbA1c: (data: HbA1cData) => void;
+  onSaveHbA1c: (data: HbA1cData) => void | Promise<boolean>;
 }
 
 export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
   const { t } = useLanguage("glicosilada");
+  const { t: tEdit } = useLanguage('editRecord');
+  const [editing, setEditing] = useState<HbA1cRecord | null>(null);
 
   const columns: Column<HbA1cRecord>[] = [
     { key: 'fecha', label: t('tabla.headers.fecha'), render: (row) => row.fecha },
@@ -33,6 +39,18 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
         <Box sx={{ fontWeight: 700, color: obtenerColorEstado(row.estado) }}>
           {row.estado}
         </Box>
+      ),
+    },
+    {
+      key: 'acciones',
+      label: tEdit('actions'),
+      render: (row) => (
+        <EditActionButton
+          canEdit={canEditRecord(row.createdAt)}
+          onClick={() => setEditing(row)}
+          editLabel={tEdit('edit')}
+          expiredLabel={tEdit('editExpired')}
+        />
       ),
     },
   ];
@@ -100,6 +118,18 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
               open={dataHook.openHbA1c}
               onClose={dataHook.handleCloseHbA1c}
               onSave={onSaveHbA1c}
+            />
+
+            <ModalHbA1cForm
+              open={!!editing}
+              onClose={() => setEditing(null)}
+              onSave={async (data) => {
+                if (!editing) return false;
+                return dataHook.handleUpdateHbA1c(editing.id, formToCreateHbA1cDto(data));
+              }}
+              record={editing}
+              title={tEdit('editHbA1cTitle')}
+              submitLabel={tEdit('saveChanges')}
             />
 
             <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 1.5 }}>

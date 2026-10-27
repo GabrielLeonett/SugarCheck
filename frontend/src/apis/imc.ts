@@ -10,6 +10,7 @@ export interface ImcData {
   imcValue: number;
   categoria: string;
   fecha: string;
+  createdAt: string;
 }
 
 export const imcApi = {
@@ -33,22 +34,16 @@ export const imcApi = {
     }
   },
 
-  async update(id: string, data: { peso?: number; altura?: number }): Promise<ImcData> {
+  async update(
+    id: string,
+    data: { peso?: number; altura?: number; dia?: number; mes?: number; anio?: number }
+  ): Promise<ImcData> {
     try {
       const response = await apiPrivate.patch(`/imc/${id}`, data);
       return response.data;
     } catch (error) {
       const err = error as AxiosError<BackendErrorResponse>;
       throw new Error(err.response?.data?.message || 'Error al actualizar registro de IMC');
-    }
-  },
-
-  async delete(id: string): Promise<void> {
-    try {
-      await apiPrivate.delete(`/imc/${id}`);
-    } catch (error) {
-      const err = error as AxiosError<BackendErrorResponse>;
-      throw new Error(err.response?.data?.message || 'Error al eliminar registro de IMC');
     }
   },
 };

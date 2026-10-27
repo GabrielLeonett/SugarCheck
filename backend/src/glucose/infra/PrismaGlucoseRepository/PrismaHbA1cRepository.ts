@@ -98,6 +98,9 @@ export class PrismaHbA1cRepository implements HbA1cRepository {
       if (update.valuePercent) {
         data.valuePercent = update.valuePercent.value;
       }
+      if (update.examDate) {
+        data.examDate = update.examDate.value;
+      }
 
       await this.prisma.hbA1c.update({
         where: { id: id.value },
