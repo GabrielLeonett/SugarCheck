@@ -24,7 +24,6 @@ export default function Login() {
     const theme = useTheme();
     const login = useAuthStore((state) => state.login);
     const loginWithProvider = useAuthStore((state) => state.loginWithProvider);
-    const isNewUser = useAuthStore((state) => state.isNewUser);
     const clearNewUserFlag = useAuthStore((state) => state.clearNewUserFlag);
 
     // Cambiado al namespace 'login' para cargar las llaves correctas

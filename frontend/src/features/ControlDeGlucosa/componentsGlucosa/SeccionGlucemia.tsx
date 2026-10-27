@@ -17,7 +17,7 @@ import type { Column } from '../../../components/shared/HistorialTable';
 
 interface SeccionGlucemiaProps {
   dataHook: UseGlucosaDataReturn;
-  onSaveGlucosa: (data: GlucosaData) => void;
+  onSaveGlucosa: (data: GlucosaData) => void | Promise<boolean>;
 }
 
 export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProps) {

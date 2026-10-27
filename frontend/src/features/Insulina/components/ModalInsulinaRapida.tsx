@@ -1,10 +1,25 @@
-import { Modal, Typography, Box, Grid, TextField, IconButton, Paper, Button, MenuItem, useTheme } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CloseIcon from "@mui/icons-material/Close";
-import { useState, useEffect } from "react";
-import useLanguage from "../../../hooks/useLanguage";
+import {
+  Modal,
+  Box,
+  Typography,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
+  Button,
+  IconButton,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { insulinaRapidaSchema, type InsulinaRapidaData, type ZonaBackend } from '../../../schemas/insulina';
+import useLanguage from '../../../hooks/useLanguage';
+import { useUiStore } from '../../../stores/uiStore';
+import { useEffect, useState } from 'react';
+import ZonaSelector from './ZonaSelector';
 
 interface ModalInsulinaRapidaProps {
   open: boolean;
@@ -29,223 +44,194 @@ const obtenerFechaActual = () => {
 
 const obtenerHoraActual = () => {
   const ahora = new Date();
-  return `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
+  const horas = String(ahora.getHours()).padStart(2, '0');
+  const minutos = String(ahora.getMinutes()).padStart(2, '0');
+  return `${horas}:${minutos}`;
 };
 
 export default function ModalInsulinaRapida({ open, onClose, onSave }: ModalInsulinaRapidaProps) {
-  const theme = useTheme();
-  const { t } = useLanguage("insulina");
-  const [dosis, setDosis] = useState<number>(0);
-  const [contexto, setContexto] = useState<string>("");
-  const [fecha, setFecha] = useState(obtenerFechaActual());
-  const [hora, setHora] = useState(obtenerHoraActual());
+  const { t } = useLanguage('insulina');
+  const showToast = useUiStore((s) => s.showToast);
   const [loading, setLoading] = useState(false);
 
-  const [vistaCuerpo, setVistaCuerpo] = useState<"FRENTE" | "ATRÁS">("FRENTE");
-  const [zonaSeleccionada, setZonaSeleccionada] = useState<string>(t("zoneAbdomenLeft"));
-
-  const zonasFrente = [
-    t("zoneAbdomenRight"),
-    t("zoneAbdomenLeft"),
-    t("zoneThighRight"),
-    t("zoneThighLeft"),
-  ];
-
-  const zonasAtras = [
-    t("zoneArmRight"),
-    t("zoneArmLeft"),
-    t("zoneGluteRight"),
-    t("zoneGluteLeft"),
-  ];
-
-  const zonasActuales = vistaCuerpo === "FRENTE" ? zonasFrente : zonasAtras;
-
-  const getZonaColor = (zona: string, esSeleccionado: boolean) => {
-    if (!esSeleccionado) return "transparent";
-    if (zona.includes("Abdomen")) return theme.palette.error.main;
-    if (zona.includes("Glúteo")) return theme.palette.success.main;
-    if (zona.includes("Muslo")) return theme.palette.warning.main;
-    if (zona.includes("Brazo")) return "#f97316";
-    return theme.palette.text.secondary;
-  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<InsulinaRapidaData>({
+    resolver: zodResolver(insulinaRapidaSchema),
+    mode: 'onChange',
+    defaultValues: {
+      dosis: 0,
+      contexto: '',
+      fecha: obtenerFechaActual(),
+      hora: obtenerHoraActual(),
+      zona: 'ABDOMEN_IZQUIERDO' as ZonaBackend,
+    },
+  });
 
   useEffect(() => {
     if (open) {
-      setDosis(0);
-      setContexto("");
-      setFecha(obtenerFechaActual());
-      setHora(obtenerHoraActual());
-      setZonaSeleccionada(t("zoneAbdomenLeft"));
+      reset({
+        dosis: 0,
+        contexto: '',
+        fecha: obtenerFechaActual(),
+        hora: obtenerHoraActual(),
+        zona: 'ABDOMEN_IZQUIERDO' as ZonaBackend,
+      });
     }
-  }, [open, t]);
+  }, [open, reset]);
 
-  const zonaToBackend = (zona: string): string => {
-    const mapping: Record<string, string> = {
-      [t("zoneAbdomenRight")]: 'ABDOMEN_DERECHO',
-      [t("zoneAbdomenLeft")]: 'ABDOMEN_IZQUIERDO',
-      [t("zoneThighRight")]: 'MUSLO_DERECHO',
-      [t("zoneThighLeft")]: 'MUSLO_IZQUIERDO',
-      [t("zoneArmRight")]: 'BRAZO_DERECHO',
-      [t("zoneArmLeft")]: 'BRAZO_IZQUIERDO',
-      [t("zoneGluteRight")]: 'GLUTEO_DERECHO',
-      [t("zoneGluteLeft")]: 'GLUTEO_IZQUIERDO',
-    };
-    return mapping[zona] || 'ABDOMEN_IZQUIERDO';
-  };
+  const dosisActual = watch('dosis');
+  const setDosis = (valor: number) =>
+    setValue('dosis', valor, { shouldValidate: true });
 
-  const handleGuardar = async () => {
-    if (dosis === 0) {
-      alert(t("pleaseEnterUnits"));
-      return;
-    }
-    if (!contexto) {
-      alert(t("pleaseSelectContext"));
-      return;
-    }
-
+  const onSubmit = async (data: InsulinaRapidaData) => {
     setLoading(true);
     try {
-      const parts = fecha.split('-');
+      const parts = data.fecha.split('-');
       await onSave({
-        dosis,
-        contexto,
+        dosis: data.dosis,
+        contexto: data.contexto,
         dia: parseInt(parts[2], 10),
         mes: parseInt(parts[1], 10),
         anio: parseInt(parts[0], 10),
-        hora,
-        zona: zonaToBackend(zonaSeleccionada),
+        hora: data.hora,
+        zona: data.zona,
       });
       onClose();
     } catch {
-      alert("Error al guardar el registro");
+      showToast('error', t('errorGuardarRegistro'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box sx={{
-        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-        width: { xs: '95%', sm: 800 }, maxWidth: '95vw', maxHeight: '90vh', overflow: 'auto',
-        bgcolor: theme.palette.background.paper, borderRadius: 3, boxShadow: 24,
-      }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 3, borderBottom: `1px solid ${theme.palette.divider}` }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold", color: theme.palette.text.primary }}>
-            {t("modalRapidaTitle")}
+    <Modal open={open} onClose={onClose} aria-labelledby="modal-insulina-rapida-title">
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 450,
+          maxWidth: '95vw',
+          maxHeight: '94vh',
+          overflow: 'auto',
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
+        <Typography
+          id="modal-insulina-rapida-title"
+          variant="h6"
+          component="h2"
+          color="primary.dark"
+          sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}
+        >
+          {t('modalRapidaTitle')}
+        </Typography>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'text.secondary', mb: 1 }}>
+            {t('dosis')}
           </Typography>
-          <IconButton onClick={onClose} size="small" sx={{ color: theme.palette.text.secondary }}>
-            <CloseIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+            <IconButton
+              type="button"
+              onClick={() => setDosis(Math.max(0, dosisActual - 1))}
+              color="primary"
+            >
+              <RemoveIcon />
+            </IconButton>
+            <TextField
+              value={dosisActual === 0 ? '' : dosisActual}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                setDosis(isNaN(val) ? 0 : val);
+              }}
+              type="number"
+              error={!!errors.dosis}
+              helperText={errors.dosis?.message}
+              slotProps={{ htmlInput: { step: 1 } }}
+              sx={{ width: 140, '& input': { textAlign: 'center', fontSize: '1.5rem', fontWeight: 'bold' } }}
+            />
+            <IconButton type="button" onClick={() => setDosis(dosisActual + 1)} color="primary">
+              <AddIcon />
+            </IconButton>
+          </Box>
         </Box>
 
-        <Box sx={{ p: 3 }}>
-          <Grid container spacing={4}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="body2" sx={{ fontWeight: "bold", color: theme.palette.text.secondary, mb: 1 }}>
-                  {t("dosis")}
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1 }}>
-                  <IconButton onClick={() => setDosis((prev) => Math.max(0, prev - 1))}
-                    sx={{ bgcolor: theme.palette.action.hover, color: theme.palette.text.secondary, "&:hover": { bgcolor: theme.palette.action.selected }, borderRadius: 2, width: 40, height: 40 }}>
-                    <RemoveIcon />
-                  </IconButton>
-                  <TextField value={dosis === 0 ? "" : dosis} placeholder="0"
-                    onChange={(e) => { const val = parseInt(e.target.value, 10); setDosis(isNaN(val) ? 0 : val); }}
-                    type="number" slotProps={{ htmlInput: { step: 1 } }}
-                    sx={{ width: 140, "& .MuiOutlinedInput-root": { borderRadius: 2 }, "& input": { textAlign: "center", fontSize: "1.5rem", fontWeight: "bold" } }}
-                  />
-                  <IconButton onClick={() => setDosis((prev) => prev + 1)}
-                    sx={{ bgcolor: theme.palette.action.hover, color: theme.palette.text.secondary, "&:hover": { bgcolor: theme.palette.action.selected }, borderRadius: 2, width: 40, height: 40 }}>
-                    <AddIcon />
-                  </IconButton>
-                </Box>
-                <Typography variant="caption" sx={{ display: "block", textAlign: "center", color: theme.palette.text.disabled, mt: 0.5 }}>
-                  {t("measurementContext")}
-                </Typography>
-              </Box>
+        <FormControl fullWidth margin="normal" error={!!errors.contexto}>
+          <InputLabel id="contexto-insulina-label">
+            {t('applicationContext')}
+          </InputLabel>
+          <Select
+            labelId="contexto-insulina-label"
+            label={t('applicationContext')}
+            {...register('contexto')}
+          >
+            <MenuItem value="DESAYUNO">{t('beforeBreakfast')}</MenuItem>
+            <MenuItem value="ALMUERZO">{t('beforeLunch')}</MenuItem>
+            <MenuItem value="CENA">{t('beforeDinner')}</MenuItem>
+            <MenuItem value="CORRECCION">{t('correction')}</MenuItem>
+          </Select>
+        </FormControl>
 
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" sx={{ fontWeight: "bold", color: theme.palette.text.secondary, mb: 0.5 }}>
-                  {t("applicationContext")}
-                </Typography>
-                <TextField select fullWidth size="small" value={contexto}
-                  onChange={(e) => setContexto(e.target.value)}
-                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}>
-                  <MenuItem value=""><em>{t("selectPlaceholder")}</em></MenuItem>
-                  <MenuItem value="DESAYUNO">{t("beforeBreakfast")}</MenuItem>
-                  <MenuItem value="ALMUERZO">{t("beforeLunch")}</MenuItem>
-                  <MenuItem value="CENA">{t("beforeDinner")}</MenuItem>
-                  <MenuItem value="CORRECCION">{t("correction")}</MenuItem>
-                </TextField>
-              </Box>
-
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 6 }}>
-                  <TextField fullWidth label={t("date")} type="date" value={fecha}
-                    onChange={(e) => setFecha(e.target.value)}
-                    slotProps={{ inputLabel: { shrink: true } }}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }} />
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <TextField fullWidth label={t("time")} type="time" value={hora}
-                    onChange={(e) => setHora(e.target.value)}
-                    slotProps={{ inputLabel: { shrink: true } }}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }} />
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                <Typography variant="body2" sx={{ fontWeight: "bold", color: theme.palette.text.secondary }}>
-                  {t("applicationZone")}
-                </Typography>
-                <Box sx={{ display: "inline-flex", borderRadius: 2, bgcolor: theme.palette.action.hover, p: 0.5 }}>
-                  <Button size="small" onClick={() => setVistaCuerpo("FRENTE")}
-                    sx={{ bgcolor: vistaCuerpo === "FRENTE" ? theme.palette.primary.main : "transparent", color: vistaCuerpo === "FRENTE" ? theme.palette.primary.contrastText : theme.palette.text.secondary, borderRadius: 1, px: 2, py: 0.5, fontSize: "0.75rem", textTransform: "none" }}>
-                    {t("front")}
-                  </Button>
-                  <Button size="small" onClick={() => setVistaCuerpo("ATRÁS")}
-                    sx={{ bgcolor: vistaCuerpo === "ATRÁS" ? theme.palette.primary.main : "transparent", color: vistaCuerpo === "ATRÁS" ? theme.palette.primary.contrastText : theme.palette.text.secondary, borderRadius: 1, px: 2, py: 0.5, fontSize: "0.75rem", textTransform: "none" }}>
-                    {t("back")}
-                  </Button>
-                </Box>
-              </Box>
-
-              <Grid container spacing={1.5}>
-                {zonasActuales.map((zona) => {
-                  const esSeleccionado = zonaSeleccionada === zona;
-                  const color = getZonaColor(zona, esSeleccionado);
-                  return (
-                    <Grid size={{ xs: 6 }} key={zona}>
-                      <Paper onClick={() => setZonaSeleccionada(zona)}
-                        elevation={esSeleccionado ? 3 : 1}
-                        sx={{ p: 1.5, textAlign: "center", borderRadius: 2, cursor: "pointer", transition: "all 0.2s",
-                          bgcolor: esSeleccionado ? color : theme.palette.background.default,
-                          color: esSeleccionado ? theme.palette.common.white : theme.palette.text.secondary,
-                          border: esSeleccionado ? `2px solid ${color}` : `1px solid ${theme.palette.divider}`,
-                          "&:hover": { transform: "translateY(-2px)", boxShadow: 4 },
-                          display: "flex", alignItems: "center", justifyContent: "center", gap: 1,
-                        }}>
-                        <Typography variant="body2" sx={{ fontWeight: esSeleccionado ? "bold" : "normal", fontSize: "0.8rem" }}>
-                          {zona}
-                        </Typography>
-                      </Paper>
-                    </Grid>
-                  );
-                })}
-              </Grid>
-
-              <Button variant="contained" fullWidth startIcon={<CheckCircleIcon />}
-                onClick={handleGuardar} disabled={loading}
-                sx={{ mt: 3, py: 1.5, borderRadius: 2, textTransform: "none" }}>
-                {loading ? "Guardando..." : t("saveMeasurement")}
-              </Button>
-            </Grid>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid size={{ xs: 7 }}>
+            <TextField
+              {...register('fecha')}
+              fullWidth
+              label={t('date')}
+              type="date"
+              slotProps={{ inputLabel: { shrink: true } }}
+              error={!!errors.fecha}
+              helperText={errors.fecha?.message}
+            />
           </Grid>
+          <Grid size={{ xs: 5 }}>
+            <TextField
+              {...register('hora')}
+              fullWidth
+              label={t('time')}
+              type="time"
+              slotProps={{ inputLabel: { shrink: true } }}
+              error={!!errors.hora}
+              helperText={errors.hora?.message}
+            />
+          </Grid>
+        </Grid>
+
+        <Box sx={{ mt: 3 }}>
+          <ZonaSelector
+            value={(watch('zona') as ZonaBackend) || ''}
+            onChange={(zona) => setValue('zona', zona, { shouldValidate: true })}
+            error={!!errors.zona}
+          />
         </Box>
+
+        <Button
+          type="submit"
+          sx={{ mt: 3, py: 1 }}
+          variant="contained"
+          color="primary"
+          fullWidth
+          disabled={loading}
+        >
+          {loading ? t('saving') : t('saveMeasurement')}
+        </Button>
       </Box>
     </Modal>
   );

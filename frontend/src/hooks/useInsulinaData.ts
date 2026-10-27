@@ -42,6 +42,13 @@ function getPresetRange(preset: Exclude<TimeRange, 'personalizado' | 'todos'>): 
   return { start, end };
 }
 
+function formatFechaCorta(iso: string): string {
+  const date = new Date(iso);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}`;
+}
+
 export function useInsulinaData(externalRefreshTrigger?: number): UseInsulinaDataReturn {
   const [rawRegistros, setRawRegistros] = useState<InsulinRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +64,7 @@ export function useInsulinaData(externalRefreshTrigger?: number): UseInsulinaDat
     setLoading(true);
     setError(null);
     try {
-      let params: InsulinQueryParams = {};
+      const params: InsulinQueryParams = {};
 
       if (tipoFilter !== 'todas') {
         params.tipo = tipoFilter === 'lenta' ? 'LENTA' : 'RAPIDA';
@@ -83,14 +90,22 @@ export function useInsulinaData(externalRefreshTrigger?: number): UseInsulinaDat
   }, [timeRange, customRange, tipoFilter, refreshKey, externalRefreshTrigger]);
 
   useEffect(() => {
-    loadRegistros();
+    loadRegistros(); // eslint-disable-line react-hooks/set-state-in-effect
   }, [loadRegistros, externalRefreshTrigger]);
 
   const filteredData = useMemo(() => {
-    return [...rawRegistros].reverse();
+    return [...rawRegistros].sort((a, b) => {
+      const dateDiff = new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
+      if (dateDiff !== 0) return dateDiff;
+      return a.hora.localeCompare(b.hora);
+    });
   }, [rawRegistros]);
 
-  const horasInsulina = filteredData.map(item => item.hora.replace(/\s+/g, ''));
+  const incluirFecha = timeRange !== 'hoy';
+  const horasInsulina = filteredData.map((item) => {
+    const hora = item.hora.replace(/\s+/g, '');
+    return incluirFecha ? `${formatFechaCorta(item.fecha)} ${hora}` : hora;
+  });
   const dosisInsulina = filteredData.map(item => item.dosis);
 
   const refresh = useCallback(() => {

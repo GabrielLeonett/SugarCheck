@@ -5,6 +5,7 @@ import { hba1cApi } from '../apis/hba1c';
 import type { CreateHbA1cPayload } from '../apis/hba1c';
 import { preferenceStore } from './usePreferenceConfig';
 import { useNotificationStore } from '../stores/notificationStore';
+import { useUiStore } from '../stores/uiStore';
 import useMetricData from './useMetricData';
 import type { TimeRange } from './useMetricData';
 import type { GlucosaRecord, HbA1cRecord } from '../data/recordsMock';
@@ -37,7 +38,7 @@ export interface UseGlucosaDataReturn {
   handleCloseGlucosa: () => void;
   handleOpenHbA1c: () => void;
   handleCloseHbA1c: () => void;
-  handleSaveGlucosa: (data: CreateGlucosePayload) => Promise<void>;
+  handleSaveGlucosa: (data: CreateGlucosePayload) => Promise<boolean>;
   handleSaveHbA1c: (data: CreateHbA1cPayload) => Promise<void>;
   glucosaFiltrada: GlucosaRecord[];
   hbA1cFiltrada: HbA1cRecord[];
@@ -74,6 +75,7 @@ export function useGlucosaData(): UseGlucosaDataReturn {
   const [crisisValue, setCrisisValue] = useState<number | null>(null);
 
   const addNotification = useNotificationStore((s) => s.addNotification);
+  const showToast = useUiStore((s) => s.showToast);
 
   const thresholds = preferenceStore((s) => s.preference?.thresholds);
 
@@ -106,10 +108,11 @@ export function useGlucosaData(): UseGlucosaDataReturn {
   const handleOpenHbA1c = () => setOpenHbA1c(true);
   const handleCloseHbA1c = () => setOpenHbA1c(false);
 
-  const handleSaveGlucosa = async (data: Parameters<typeof glucoseApi.create>[0]) => {
+  const handleSaveGlucosa = async (data: Parameters<typeof glucoseApi.create>[0]): Promise<boolean> => {
     try {
       const { record, alert } = await glucoseApi.create(data, thresholds);
-      setGlucosaRaw((prev) => [...prev, record]);
+      await loadData();
+      showToast('success', 'Registro de glucosa guardado correctamente.', 'Glucosa');
       addNotification({
         id: `glucose-${Date.now()}`,
         type: 'info',
@@ -124,8 +127,10 @@ export function useGlucosaData(): UseGlucosaDataReturn {
         setCrisisValue(record.nivel);
       }
       handleCloseGlucosa();
+      return true;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al guardar glucosa';
+      showToast('error', message, 'Error');
       addNotification({
         id: `glucose-err-${Date.now()}`,
         type: 'warning',
@@ -135,6 +140,7 @@ export function useGlucosaData(): UseGlucosaDataReturn {
         createdAt: new Date().toISOString(),
         link: '/bitacora/control-glucosa',
       });
+      return false;
     }
   };
 

@@ -6,6 +6,7 @@ import { AuthModule } from '../../../auth/infra/auth.module';
 import { ConversationController } from './conversation.controller';
 import { PrismaConversationRepository } from '../persistence/PrismaConversationRepository';
 import { PrismaGlucoseDataProvider } from '../glucose/PrismaGlucoseDataProvider';
+import { FallbackLanguageModel } from '../language-model/FallbackLanguageModel';
 import { GeminiLanguageModel } from '../language-model/GeminiLanguageModel';
 import { LocalLanguageModel } from '../language-model/LocalLanguageModel';
 import { ConversationRepository } from '../../core/conversation/ConversationRepository';
@@ -40,12 +41,13 @@ import { GlucoseDataProvider } from '../../app/ports/GlucoseDataProvider';
       provide: 'LanguageModel',
       inject: [ConfigService],
       useFactory: (config: ConfigService): LanguageModel => {
+        const local = new LocalLanguageModel();
         const apiKey = config.get<string>('GEMINI_API_KEY');
         if (apiKey) {
           const model = config.get<string>('GEMINI_MODEL') ?? 'gemini-3.1-flash-lite';
-          return new GeminiLanguageModel(apiKey, model);
+          return new FallbackLanguageModel(new GeminiLanguageModel(apiKey, model), local);
         }
-        return new LocalLanguageModel();
+        return local;
       },
     },
     {
