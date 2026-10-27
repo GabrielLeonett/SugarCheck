@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AuthModule } from '../../auth/infra/auth.module';
 import { PrismaService } from '../../shared/infrastructure/prisma.service';
 import { CaminoController } from './camino.controller';
 import { PrismaCaminoProgresoRepository } from './PrismaCaminoProgresoRepository';
@@ -6,6 +7,7 @@ import { GetCaminoProgreso } from '../app/GetCaminoProgreso';
 import { CompletarNivelCamino } from '../app/CompletarNivelCamino';
 
 @Module({
+  imports: [AuthModule],
   controllers: [CaminoController],
   providers: [
     PrismaService,
