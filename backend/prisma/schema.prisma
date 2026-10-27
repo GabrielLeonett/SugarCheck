@@ -25,6 +25,7 @@ model User {
 
   insulinas         Insulina[]
   conversations     Conversation[]
+  caminoProgreso    CaminoProgreso?
 }
 
 model Preference {
@@ -151,4 +152,13 @@ model Insulina {
   @@index([userId])
   @@index([userId, fecha])
 
+}
+
+model CaminoProgreso {
+  userId                String   @id
+  ultimoNivelCompletado Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @default(now()) @updatedAt
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
