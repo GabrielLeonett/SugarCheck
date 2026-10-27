@@ -13,6 +13,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { glucosaSchema, type GlucosaData } from '../../schemas/glucosa';
+import type { GlucosaRecord } from '../../data/recordsMock';
 import useLanguage from '../../hooks/useLanguage';
 import { useEffect, useState } from 'react';
 
@@ -20,12 +21,18 @@ interface ModalGlucosaFormProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: GlucosaData) => void | Promise<boolean>;
+  record?: GlucosaRecord | null;
+  title?: string;
+  submitLabel?: string;
 }
 
 export default function ModalGlucosaForm({
   open,
   onClose,
   onSave,
+  record,
+  title,
+  submitLabel,
 }: ModalGlucosaFormProps) {
   const { t } = useLanguage('glucemia');
   const [saving, setSaving] = useState(false);
@@ -62,14 +69,23 @@ export default function ModalGlucosaForm({
 
   useEffect(() => {
     if (open) {
-      reset({
-        nivelGlucosa: '',
-        contexto: '',
-        fecha: obtenerFechaActual(),
-        hora: obtenerHoraActual(),
-      });
+      reset(
+        record
+          ? {
+              nivelGlucosa: String(record.nivel),
+              contexto: record.contexto,
+              fecha: record.fechaISO.split('T')[0],
+              hora: record.time,
+            }
+          : {
+              nivelGlucosa: '',
+              contexto: '',
+              fecha: obtenerFechaActual(),
+              hora: obtenerHoraActual(),
+            }
+      );
     }
-  }, [open, reset]);
+  }, [open, reset, record]);
 
   const onSubmit = async (data: GlucosaData) => {
     setSaving(true);
@@ -108,7 +124,7 @@ export default function ModalGlucosaForm({
           color="primary.dark"
           sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}
         >
-          {t('modal.title')}
+          {title ?? t('modal.title')}
         </Typography>
 
         <TextField
@@ -176,7 +192,7 @@ export default function ModalGlucosaForm({
           fullWidth
           disabled={saving}
         >
-          {t('modal.btnGuardar')}
+          {submitLabel ?? t('modal.btnGuardar')}
         </Button>
       </Box>
     </Modal>

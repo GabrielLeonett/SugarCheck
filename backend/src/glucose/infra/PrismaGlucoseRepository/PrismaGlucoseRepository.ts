@@ -109,6 +109,12 @@ export class PrismaGlucoseRepository implements GlucoseRepository {
       if (update.mealTag) {
         data.mealTag = update.mealTag.value;
       }
+      if (update.date) {
+        data.date = update.date.value;
+      }
+      if (update.time) {
+        data.time = update.time.value;
+      }
 
       await this.prisma.glucose.update({
         where: { id: id.value },

@@ -1,0 +1,12 @@
+{
+  "actions": "Actions",
+  "edit": "Edit",
+  "editExpired": "You can only edit records from the last 15 days",
+  "editGlucoseTitle": "Edit glucose reading",
+  "editHbA1cTitle": "Edit HbA1c result",
+  "editImcTitle": "Edit measurements",
+  "editInsulinTitle": "Edit insulin record",
+  "saveChanges": "Save changes",
+  "updateSuccess": "Record updated successfully",
+  "updateError": "Could not update the record"
+}

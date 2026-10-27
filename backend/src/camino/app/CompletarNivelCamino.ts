@@ -1,3 +1,4 @@
+import { CaminoProgreso } from '../core/CaminoProgreso';
 import { CaminoProgresoRepository } from '../core/CaminoProgresoRepository';
 
 export class CompletarNivelCamino {
@@ -6,7 +7,6 @@ export class CompletarNivelCamino {
   async execute(userId: string, nivel: number): Promise<void> {
     const progreso = await this.repo.findByUserId(userId);
     if (!progreso) {
-      const { CaminoProgreso } = await import('../core/CaminoProgreso');
       const nuevo = CaminoProgreso.create(userId, nivel);
       await this.repo.save(nuevo);
       return;

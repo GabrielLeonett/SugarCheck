@@ -12,6 +12,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { insulinaLentaSchema, type InsulinaLentaData, type ZonaBackend } from '../../../schemas/insulina';
+import type { InsulinRecord } from '../../../apis/insulina';
 import useLanguage from '../../../hooks/useLanguage';
 import { useUiStore } from '../../../stores/uiStore';
 import { useEffect, useState } from 'react';
@@ -28,6 +29,9 @@ interface ModalInsulinaLentaProps {
     hora: string;
     zona: string;
   }) => Promise<void>;
+  record?: InsulinRecord | null;
+  title?: string;
+  submitLabel?: string;
 }
 
 const obtenerFechaActual = () => {
@@ -44,7 +48,14 @@ const obtenerHoraActual = () => {
   return `${horas}:${minutos}`;
 };
 
-export default function ModalInsulinaLenta({ open, onClose, onSave }: ModalInsulinaLentaProps) {
+export default function ModalInsulinaLenta({
+  open,
+  onClose,
+  onSave,
+  record,
+  title,
+  submitLabel,
+}: ModalInsulinaLentaProps) {
   const { t } = useLanguage('insulina');
   const showToast = useUiStore((s) => s.showToast);
   const [loading, setLoading] = useState(false);
@@ -69,14 +80,23 @@ export default function ModalInsulinaLenta({ open, onClose, onSave }: ModalInsul
 
   useEffect(() => {
     if (open) {
-      reset({
-        dosis: 0,
-        fecha: obtenerFechaActual(),
-        hora: obtenerHoraActual(),
-        zona: 'ABDOMEN_IZQUIERDO' as ZonaBackend,
-      });
+      reset(
+        record
+          ? {
+              dosis: record.dosis,
+              fecha: record.fecha.split('T')[0],
+              hora: record.hora,
+              zona: (record.zona as ZonaBackend) || 'ABDOMEN_IZQUIERDO',
+            }
+          : {
+              dosis: 0,
+              fecha: obtenerFechaActual(),
+              hora: obtenerHoraActual(),
+              zona: 'ABDOMEN_IZQUIERDO' as ZonaBackend,
+            }
+      );
     }
-  }, [open, reset]);
+  }, [open, reset, record]);
 
   const dosisActual = watch('dosis');
   const setDosis = (valor: number) =>
@@ -95,8 +115,11 @@ export default function ModalInsulinaLenta({ open, onClose, onSave }: ModalInsul
         zona: data.zona,
       });
       onClose();
-    } catch {
-      showToast('error', t('errorGuardarRegistro'));
+    } catch (error) {
+      showToast(
+        'error',
+        error instanceof Error ? error.message : t('errorGuardarRegistro')
+      );
     } finally {
       setLoading(false);
     }
@@ -132,7 +155,7 @@ export default function ModalInsulinaLenta({ open, onClose, onSave }: ModalInsul
           color="primary.dark"
           sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}
         >
-          {t('modalLentaTitle')}
+          {title ?? t('modalLentaTitle')}
         </Typography>
 
         <Box sx={{ mb: 2 }}>
@@ -206,7 +229,7 @@ export default function ModalInsulinaLenta({ open, onClose, onSave }: ModalInsul
           fullWidth
           disabled={loading}
         >
-          {loading ? t('saving') : t('saveMeasurement')}
+          {submitLabel ?? (loading ? t('saving') : t('saveMeasurement'))}
         </Button>
       </Box>
     </Modal>

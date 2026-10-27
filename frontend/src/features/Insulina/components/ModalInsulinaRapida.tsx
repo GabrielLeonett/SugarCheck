@@ -16,6 +16,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { insulinaRapidaSchema, type InsulinaRapidaData, type ZonaBackend } from '../../../schemas/insulina';
+import type { InsulinRecord } from '../../../apis/insulina';
 import useLanguage from '../../../hooks/useLanguage';
 import { useUiStore } from '../../../stores/uiStore';
 import { useEffect, useState } from 'react';
@@ -33,6 +34,9 @@ interface ModalInsulinaRapidaProps {
     hora: string;
     zona: string;
   }) => Promise<void>;
+  record?: InsulinRecord | null;
+  title?: string;
+  submitLabel?: string;
 }
 
 const obtenerFechaActual = () => {
@@ -49,7 +53,14 @@ const obtenerHoraActual = () => {
   return `${horas}:${minutos}`;
 };
 
-export default function ModalInsulinaRapida({ open, onClose, onSave }: ModalInsulinaRapidaProps) {
+export default function ModalInsulinaRapida({
+  open,
+  onClose,
+  onSave,
+  record,
+  title,
+  submitLabel,
+}: ModalInsulinaRapidaProps) {
   const { t } = useLanguage('insulina');
   const showToast = useUiStore((s) => s.showToast);
   const [loading, setLoading] = useState(false);
@@ -75,15 +86,25 @@ export default function ModalInsulinaRapida({ open, onClose, onSave }: ModalInsu
 
   useEffect(() => {
     if (open) {
-      reset({
-        dosis: 0,
-        contexto: '',
-        fecha: obtenerFechaActual(),
-        hora: obtenerHoraActual(),
-        zona: 'ABDOMEN_IZQUIERDO' as ZonaBackend,
-      });
+      reset(
+        record
+          ? {
+              dosis: record.dosis,
+              contexto: record.contexto ?? '',
+              fecha: record.fecha.split('T')[0],
+              hora: record.hora,
+              zona: (record.zona as ZonaBackend) || 'ABDOMEN_IZQUIERDO',
+            }
+          : {
+              dosis: 0,
+              contexto: '',
+              fecha: obtenerFechaActual(),
+              hora: obtenerHoraActual(),
+              zona: 'ABDOMEN_IZQUIERDO' as ZonaBackend,
+            }
+      );
     }
-  }, [open, reset]);
+  }, [open, reset, record]);
 
   const dosisActual = watch('dosis');
   const setDosis = (valor: number) =>
@@ -103,8 +124,11 @@ export default function ModalInsulinaRapida({ open, onClose, onSave }: ModalInsu
         zona: data.zona,
       });
       onClose();
-    } catch {
-      showToast('error', t('errorGuardarRegistro'));
+    } catch (error) {
+      showToast(
+        'error',
+        error instanceof Error ? error.message : t('errorGuardarRegistro')
+      );
     } finally {
       setLoading(false);
     }
@@ -140,7 +164,7 @@ export default function ModalInsulinaRapida({ open, onClose, onSave }: ModalInsu
           color="primary.dark"
           sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}
         >
-          {t('modalRapidaTitle')}
+          {title ?? t('modalRapidaTitle')}
         </Typography>
 
         <Box sx={{ mb: 2 }}>
@@ -230,7 +254,7 @@ export default function ModalInsulinaRapida({ open, onClose, onSave }: ModalInsu
           fullWidth
           disabled={loading}
         >
-          {loading ? t('saving') : t('saveMeasurement')}
+          {submitLabel ?? (loading ? t('saving') : t('saveMeasurement'))}
         </Button>
       </Box>
     </Modal>

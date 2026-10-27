@@ -48,9 +48,11 @@ function mapGlucoseRecord(
     id: item.id,
     fechaISO: item.date,
     hora: formatHourLabel(item.time),
+    time: item.time,
     nivel: item.valueMgdl,
     contexto: item.mealTag,
     estado: deriveEstado(item.valueMgdl, item.alert, thresholds),
+    createdAt: item.createdAt,
   };
 }
 
@@ -80,5 +82,14 @@ export const glucoseApi = {
       record: mapGlucoseRecord(item, thresholds),
       alert: item.alert,
     };
+  },
+
+  async update(
+    id: string,
+    payload: Partial<CreateGlucosePayload>,
+    thresholds?: { hypo: number; hiper: number }
+  ): Promise<GlucosaRecord> {
+    const res = await apiPrivate.patch(`/glucose/${id}`, payload);
+    return mapGlucoseRecord(res.data as GlucoseBackendRecord, thresholds);
   },
 };

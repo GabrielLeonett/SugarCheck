@@ -39,7 +39,9 @@ export interface UseGlucosaDataReturn {
   handleOpenHbA1c: () => void;
   handleCloseHbA1c: () => void;
   handleSaveGlucosa: (data: CreateGlucosePayload) => Promise<boolean>;
-  handleSaveHbA1c: (data: CreateHbA1cPayload) => Promise<void>;
+  handleSaveHbA1c: (data: CreateHbA1cPayload) => Promise<boolean>;
+  handleUpdateGlucosa: (id: string, data: Partial<CreateGlucosePayload>) => Promise<boolean>;
+  handleUpdateHbA1c: (id: string, data: Partial<CreateHbA1cPayload>) => Promise<boolean>;
   glucosaFiltrada: GlucosaRecord[];
   hbA1cFiltrada: HbA1cRecord[];
   horasGlucosa: string[];
@@ -158,6 +160,7 @@ export function useGlucosaData(): UseGlucosaDataReturn {
         link: '/bitacora/control-glucosa',
       });
       handleCloseHbA1c();
+      return true;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al guardar HbA1c';
       addNotification({
@@ -169,6 +172,39 @@ export function useGlucosaData(): UseGlucosaDataReturn {
         createdAt: new Date().toISOString(),
         link: '/bitacora/control-glucosa',
       });
+      return false;
+    }
+  };
+
+  const handleUpdateGlucosa = async (
+    id: string,
+    data: Partial<CreateGlucosePayload>
+  ): Promise<boolean> => {
+    try {
+      await glucoseApi.update(id, data, thresholds);
+      await loadData();
+      showToast('success', 'Registro de glucosa actualizado correctamente.', 'Glucosa');
+      return true;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error al actualizar glucosa';
+      showToast('error', message, 'Error');
+      return false;
+    }
+  };
+
+  const handleUpdateHbA1c = async (
+    id: string,
+    data: Partial<CreateHbA1cPayload>
+  ): Promise<boolean> => {
+    try {
+      await hba1cApi.update(id, data);
+      await loadData();
+      showToast('success', 'Resultado de HbA1c actualizado correctamente.', 'HbA1c');
+      return true;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error al actualizar HbA1c';
+      showToast('error', message, 'Error');
+      return false;
     }
   };
 
@@ -211,6 +247,7 @@ export function useGlucosaData(): UseGlucosaDataReturn {
     handleOpenGlucosa, handleCloseGlucosa,
     handleOpenHbA1c, handleCloseHbA1c,
     handleSaveGlucosa, handleSaveHbA1c,
+    handleUpdateGlucosa, handleUpdateHbA1c,
     glucosaFiltrada: [...glucosa.filteredData].reverse(),
     hbA1cFiltrada: [...hbA1c.filteredData].reverse(),
     horasGlucosa, nivelesGlucosa,

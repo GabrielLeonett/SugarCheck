@@ -5,6 +5,8 @@ import { Result } from '../../shared/result';
 import { GlucoseId } from '../core/value-objects/GlucoseId';
 import { GlucoseValue } from '../core/value-objects/GlucoseValue';
 import { GlucoseMealTag } from '../core/value-objects/GlucoseMealTag';
+import { GlucoseDate } from '../core/value-objects/GlucoseDate';
+import { GlucoseTime } from '../core/value-objects/GlucoseTime';
 import { EditWindowExpiredError } from '../core/errors/EditWindowExpiredError';
 
 const EDIT_WINDOW_DAYS = 15;
@@ -17,6 +19,8 @@ export class UpdateGlucose {
   async run(id: string, update: {
     valueMgdl?: number;
     mealTag?: string;
+    date?: Date | string;
+    time?: string;
   }): Promise<Result<Glucose, ErrorAbstract>> {
     const idRes = GlucoseId.create(id);
     if (!idRes.isValid) return Result.fail(idRes.getError());
@@ -48,6 +52,18 @@ export class UpdateGlucose {
       const mealTagRes = GlucoseMealTag.create(update.mealTag);
       if (!mealTagRes.isValid) return Result.fail(mealTagRes.getError());
       validatedUpdate.mealTag = mealTagRes.getValue();
+    }
+
+    if (update.date !== undefined) {
+      const dateRes = GlucoseDate.create(update.date);
+      if (!dateRes.isValid) return Result.fail(dateRes.getError());
+      validatedUpdate.date = dateRes.getValue();
+    }
+
+    if (update.time !== undefined) {
+      const timeRes = GlucoseTime.create(update.time);
+      if (!timeRes.isValid) return Result.fail(timeRes.getError());
+      validatedUpdate.time = timeRes.getValue();
     }
 
     return await this.repository.update(glucoseId, validatedUpdate);
