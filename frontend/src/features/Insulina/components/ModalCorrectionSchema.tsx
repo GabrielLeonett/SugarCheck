@@ -6,6 +6,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState, useEffect } from "react";
 import { preferenceApi } from "../../../apis/preference_config";
+import { preferenceStore } from "../../../hooks/usePreferenceConfig";
+import { useUiStore } from "../../../stores/uiStore";
 import type { CorrectionSchemaItem } from "../../../schemas/preference_config";
 
 interface ModalCorrectionSchemaProps {
@@ -15,6 +17,7 @@ interface ModalCorrectionSchemaProps {
 
 export default function ModalCorrectionSchema({ open, onClose }: ModalCorrectionSchemaProps) {
   const theme = useTheme();
+  const showToast = useUiStore((s) => s.showToast);
   const [items, setItems] = useState<CorrectionSchemaItem[]>([]);
   const [rangeMin, setRangeMin] = useState("");
   const [rangeMax, setRangeMax] = useState("");
@@ -79,9 +82,11 @@ export default function ModalCorrectionSchema({ open, onClose }: ModalCorrection
         ...current,
         correctionSchemas: items,
       });
+      await preferenceStore.getState().load();
+      showToast('success', 'Esquema corrector guardado');
       onClose();
     } catch {
-      alert("Error al guardar el esquema corrector");
+      showToast('error', 'Error al guardar el esquema corrector');
     } finally {
       setLoading(false);
     }

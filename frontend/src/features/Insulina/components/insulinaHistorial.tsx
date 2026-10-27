@@ -1,7 +1,7 @@
 import { Box, Typography, ButtonGroup, Button } from '@mui/material';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import HistorialTable from '../../../components/shared/HistorialTable';
-import { GraficoLinea } from '../../../components/shared/GraficoLinea';
+import { GraficoBarra } from '../../../components/shared/GraficoBarra';
 import { useInsulinaData } from '../../../hooks/useInsulinaData';
 import useLanguage from '../../../hooks/useLanguage';
 import type { InsulinRecord } from '../../../apis/insulina';
@@ -49,7 +49,15 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
     return `${hour12}:${m} ${ampm}`;
   };
 
+  const formatFecha = (iso: string) => {
+    const date = new Date(iso);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${day}/${month}/${date.getFullYear()}`;
+  };
+
   const columns: Column<InsulinRecord>[] = [
+    { key: 'fecha', label: t('fecha'), render: (row) => formatFecha(row.fecha) },
     { key: 'hora', label: t('hora'), render: (row) => formatHora(row.hora) },
     { key: 'dosis', label: t('dosis'), render: (row) => <Box sx={{ fontWeight: 700 }}>{row.dosis} UI</Box> },
     {
@@ -66,7 +74,7 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
   ];
 
   const chartComponent = (
-    <GraficoLinea
+    <GraficoBarra
       data={dosisInsulina}
       labels={horasInsulina}
       color={tipoFilter === 'lenta' ? '#FFA726' : '#4FC3F7'}
@@ -89,7 +97,7 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
             }}
             variant={timeRange === filtro ? 'contained' : 'outlined'}
           >
-            {filtro === 'hoy' ? t('grafico.filtros.hoy') : filtro === 'semana' ? t('grafico.filtros.semana') : filtro === 'mes' ? t('grafico.filtros.mes') : filtro === 'trimestre' ? t('grafico.filtros.trimestre') : filtro === 'año' ? t('grafico.filtros.año') : t('grafico.filtros.todos')}
+            {filtro === 'hoy' ? t('hoy') : filtro === 'semana' ? t('semana') : filtro === 'mes' ? t('mes') : filtro === 'trimestre' ? t('trimestre') : filtro === 'año' ? t('año') : t('todos')}
           </Button>
         ))}
       </ButtonGroup>

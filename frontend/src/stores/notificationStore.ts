@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { io, type Socket } from 'socket.io-client';
 import { apiPrivate } from '../apis/axios';
 import { useAuthStore } from './authStore';
+import { useUiStore } from './uiStore';
+import i18n from './i18n';
 import type { NotificationItem } from '../types/types';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
@@ -106,6 +108,19 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
     socket.on('new_notification', (notification: NotificationItem) => {
       get().addNotification(notification);
+
+      // Alertas de alta severidad (hipo/hiperglucemia) => toast visual
+      const severity =
+        notification.type === 'alert' ? 'critical' :
+        notification.type === 'warning' ? 'warning' : null;
+
+      if (severity) {
+        const title = notification.titleKey ? i18n.t(notification.titleKey, notification.params) : notification.title;
+        const message = notification.messageKey
+          ? i18n.t(notification.messageKey, notification.params)
+          : notification.message;
+        useUiStore.getState().showToast(severity, message, title);
+      }
     });
 
     socket.on('unread_count', ({ count }: { count: number }) => {

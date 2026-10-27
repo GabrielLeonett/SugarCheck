@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   Inject,
@@ -142,7 +143,18 @@ export class UserController {
   async update(
     @Param('id') id: string,
     @Body() updateDto: UpdateUserDto,
+    @Request() req: any,
   ) {
+    // Seguridad: un usuario autenticado solo puede actualizar su propio perfil
+    if (id !== req.user.sub) {
+      throw new ForbiddenException(
+        this.translationService.translate(
+          'UPDATE_USER_FORBIDDEN',
+          this.translationService.resolveLanguage(req.headers['accept-language'] as string),
+        ),
+      );
+    }
+
     const result = await this.updateUser.run(id, updateDto);
 
     if (!result.isValid) throw result.getError();

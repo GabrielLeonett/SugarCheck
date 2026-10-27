@@ -122,5 +122,6 @@
   "NOTIFICATION_SAVE_ERROR": "通知の保存エラー",
   "NOTIFICATION_MARK_READ_ERROR": "通知を既読にするエラー",
   "NOTIFICATION_MARK_ALL_READ_ERROR": "すべて既読にするエラー",
-  "NOTIFICATION_DELETE_ERROR": "通知の削除エラー"
+  "NOTIFICATION_DELETE_ERROR": "通知の削除エラー",
+  "UPDATE_USER_FORBIDDEN": "このプロフィールを編集する権限がありません"
 }
