@@ -2,13 +2,17 @@ import AddIcon from '@mui/icons-material/Add';
 import {
   Box, Typography, Grid, LinearProgress, Button, ButtonGroup, Alert, CircularProgress,
 } from '@mui/material';
+import { useState } from 'react';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
 import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
 import ModalGlucosaForm from '../../../components/shared/ModalGlucosaForm.tsx';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import { GraficoBarra } from '../../../components/shared/GraficoBarra';
+import { EditActionButton } from '../../../components/shared/EditActionButton';
 import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
+import { canEditRecord } from '../../../utils/editWindow';
+import { formToCreateGlucoseDto } from '../../../schemas/glucosa';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 
 import type { GlucosaData } from '../../../schemas/glucosa';
@@ -22,6 +26,8 @@ interface SeccionGlucemiaProps {
 
 export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProps) {
   const { t } = useLanguage("glucemia");
+  const { t: tEdit } = useLanguage('editRecord');
+  const [editing, setEditing] = useState<GlucosaRecord | null>(null);
 
   const formatDate = (iso: string) => {
     const [aaaa, mm, dd] = iso.split('T')[0].split('-');
@@ -39,6 +45,18 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
         <Box sx={{ fontWeight: 700, color: obtenerColorEstado(row.estado) }}>
           {row.estado}
         </Box>
+      ),
+    },
+    {
+      key: 'acciones',
+      label: tEdit('actions'),
+      render: (row) => (
+        <EditActionButton
+          canEdit={canEditRecord(row.createdAt)}
+          onClick={() => setEditing(row)}
+          editLabel={tEdit('edit')}
+          expiredLabel={tEdit('editExpired')}
+        />
       ),
     },
   ];
@@ -97,6 +115,18 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
               open={dataHook.openGlucosa}
               onClose={dataHook.handleCloseGlucosa}
               onSave={onSaveGlucosa}
+            />
+
+            <ModalGlucosaForm
+              open={!!editing}
+              onClose={() => setEditing(null)}
+              onSave={async (data) => {
+                if (!editing) return false;
+                return dataHook.handleUpdateGlucosa(editing.id, formToCreateGlucoseDto(data));
+              }}
+              record={editing}
+              title={tEdit('editGlucoseTitle')}
+              submitLabel={tEdit('saveChanges')}
             />
 
             {/* Dominio de la Zona Segura (oculta hasta tener >= 2 registros) */}

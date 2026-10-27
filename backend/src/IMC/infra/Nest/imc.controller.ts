@@ -13,6 +13,7 @@ import {
   Inject,
   BadRequestException,
   NotFoundException,
+  ForbiddenException,
   HttpCode,
 } from '@nestjs/common';
 import { CreateImc } from '../../app/CreateImc';
@@ -24,6 +25,8 @@ import { AuthGuard } from '../../../auth/infra/auth.guard';
 import { CreateImcDTO } from './DTOs/create-imc.dto';
 import { UpdateImcDTO } from './DTOs/update-imc.dto';
 import { ImcNotFoundError } from '../../core/errors/ImcNotFoundError';
+import { ImcNoModificableError } from '../../core/errors/ImcNoModificableError';
+import { ImcNoEliminableError } from '../../core/errors/ImcNoEliminableError';
 import { ErrorAbstract } from '../../../shared/error-abstract';
 import { TranslationService } from '../../../shared/infrastructure/i18n/translation.service';
 
@@ -91,6 +94,7 @@ export class ImcController {
     if (!result.isValid) {
       const error = result.getError();
       if (error instanceof ImcNotFoundError) throw new NotFoundException(error.message);
+      if (error instanceof ImcNoModificableError) throw new ForbiddenException(error.message);
       if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
       throw error;
     }
@@ -98,11 +102,12 @@ export class ImcController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(403)
   async delete(@Param('id') id: string) {
     const result = await this.deleteImc.run({ id });
     if (!result.isValid) {
       const error = result.getError();
+      if (error instanceof ImcNoEliminableError) throw new ForbiddenException(error.message);
       if (error instanceof ImcNotFoundError) throw new NotFoundException(error.message);
       if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
       throw error;

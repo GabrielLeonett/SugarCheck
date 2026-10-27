@@ -20,6 +20,7 @@ interface ImcDB {
   altura: number;
   imcValue: number;
   fecha: Date;
+  createdAt: Date;
 }
 
 @Injectable()
@@ -33,6 +34,7 @@ export class PrismaImcRepository implements ImcRepository {
       peso: Peso.create(raw.peso).getValue(),
       altura: Altura.create(raw.altura).getValue(),
       fecha: Fecha.fromDate(raw.fecha).getValue(),
+      createdAt: raw.createdAt,
     });
   }
 
@@ -44,6 +46,7 @@ export class PrismaImcRepository implements ImcRepository {
       altura: imc.altura.value,
       imcValue: imc.imcValue,
       fecha: imc.fecha.valor,
+      createdAt: imc.createdAt,
     };
   }
 
@@ -120,6 +123,9 @@ export class PrismaImcRepository implements ImcRepository {
       }
       if (update.altura) {
         data.altura = update.altura.value;
+      }
+      if (update.fecha) {
+        data.fecha = update.fecha.valor;
       }
 
       // imcValue es derivado: siempre se recalcula con el par peso/altura resultante

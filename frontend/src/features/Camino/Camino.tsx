@@ -22,7 +22,7 @@ const insigniasCamino = [
 export function Camino() {
 
 const [mundos, setMundos] = useState(mundosData);
-const [mundoActualId, setMundoActualId] = useState("mundo-1");
+const [mundoActualId] = useState("mundo-1");
 const [nivelActivoId, setNivelActivoId] = useState<number | null>(null);
 
 useEffect(() => {

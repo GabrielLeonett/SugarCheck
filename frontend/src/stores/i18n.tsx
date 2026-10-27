@@ -24,6 +24,7 @@ import enHbA1c from "../locales/en/hba1c.json";
 import enNotifications from "../locales/en/notifications.json";
 import enResetPassword from "../locales/en/resetPassword.json";
 import enCompleteRegistration from "../locales/en/completeRegistration.json";
+import enEditRecord from "../locales/en/editRecord.json";
 
 // Español (es)
 import esCommon from "../locales/es/common.json";
@@ -44,6 +45,7 @@ import esHbA1c from "../locales/es/hba1c.json";
 import esNotifications from "../locales/es/notifications.json";
 import esResetPassword from "../locales/es/resetPassword.json";
 import esCompleteRegistration from "../locales/es/completeRegistration.json";
+import esEditRecord from "../locales/es/editRecord.json";
 
 // Portugués (pt)
 import ptCommon from "../locales/pt/common.json";
@@ -64,6 +66,7 @@ import ptHbA1c from "../locales/pt/hba1c.json";
 import ptNotifications from "../locales/pt/notifications.json";
 import ptResetPassword from "../locales/pt/resetPassword.json";
 import ptCompleteRegistration from "../locales/pt/completeRegistration.json";
+import ptEditRecord from "../locales/pt/editRecord.json";
 
 // Japonés (ja)
 import jaCommon from "../locales/ja/common.json";
@@ -84,13 +87,14 @@ import jaHbA1c from "../locales/ja/hba1c.json";
 import jaNotifications from "../locales/ja/notifications.json";
 import jaResetPassword from "../locales/ja/resetPassword.json";
 import jaCompleteRegistration from "../locales/ja/completeRegistration.json";
+import jaEditRecord from "../locales/ja/editRecord.json";
 
 // --- RECURSOS UNIFICADOS ---
 const resources = {
-  en: { common: enCommon, nav: enNav, footer: enFooter, insulina: enInsulina, insulinaHistorial: enInsulinaHistorial, login: enLogin, home: enHome, glicosilada: enGlicosilada, glucemia: enGlucemia, register: enRegister, forgotPassword: enForgotPassword, camino: enCamino, monitoreoFisico: enMonitoreoFisico, profile: enProfile, hba1c: enHbA1c, notifications: enNotifications, resetPassword: enResetPassword, completeRegistration: enCompleteRegistration },
-  es: { common: esCommon, nav: esNav, footer: esFooter, insulina: esInsulina, insulinaHistorial: esInsulinaHistorial, login: esLogin, home: esHome, glicosilada: esGlicosilada, glucemia: esGlucemia, register: esRegister, forgotPassword: esForgotPassword, camino: esCamino, monitoreoFisico: esMonitoreoFisico, profile: esProfile, hba1c: esHbA1c, notifications: esNotifications, resetPassword: esResetPassword, completeRegistration: esCompleteRegistration },
-  pt: { common: ptCommon, nav: ptNav, footer: ptFooter, insulina: ptInsulina, insulinaHistorial: ptInsulinaHistorial, login: ptLogin, home: ptHome, glicosilada: ptGlicosilada, glucemia: ptGlucemia, register: ptRegister, forgotPassword: ptForgotPassword, camino: ptCamino, monitoreoFisico: ptMonitoreoFisico, profile: ptProfile, hba1c: ptHbA1c, notifications: ptNotifications, resetPassword: ptResetPassword, completeRegistration: ptCompleteRegistration },
-  ja: { common: jaCommon, nav: jaNav, footer: jaFooter, insulina: jaInsulina, insulinaHistorial: jaInsulinaHistorial, login: jaLogin, home: jaHome, glicosilada: jaGlicosilada, glucemia: jaGlucemia, register: jaRegister, forgotPassword: jaForgotPassword, camino: jaCamino, monitoreoFisico: jaMonitoreoFisico, profile: jaProfile, hba1c: jaHbA1c, notifications: jaNotifications, resetPassword: jaResetPassword, completeRegistration: jaCompleteRegistration },
+  en: { common: enCommon, nav: enNav, footer: enFooter, insulina: enInsulina, insulinaHistorial: enInsulinaHistorial, login: enLogin, home: enHome, glicosilada: enGlicosilada, glucemia: enGlucemia, register: enRegister, forgotPassword: enForgotPassword, camino: enCamino, monitoreoFisico: enMonitoreoFisico, profile: enProfile, hba1c: enHbA1c, notifications: enNotifications, resetPassword: enResetPassword, completeRegistration: enCompleteRegistration, editRecord: enEditRecord },
+  es: { common: esCommon, nav: esNav, footer: esFooter, insulina: esInsulina, insulinaHistorial: esInsulinaHistorial, login: esLogin, home: esHome, glicosilada: esGlicosilada, glucemia: esGlucemia, register: esRegister, forgotPassword: esForgotPassword, camino: esCamino, monitoreoFisico: esMonitoreoFisico, profile: esProfile, hba1c: esHbA1c, notifications: esNotifications, resetPassword: esResetPassword, completeRegistration: esCompleteRegistration, editRecord: esEditRecord },
+  pt: { common: ptCommon, nav: ptNav, footer: ptFooter, insulina: ptInsulina, insulinaHistorial: ptInsulinaHistorial, login: ptLogin, home: ptHome, glicosilada: ptGlicosilada, glucemia: ptGlucemia, register: ptRegister, forgotPassword: ptForgotPassword, camino: ptCamino, monitoreoFisico: ptMonitoreoFisico, profile: ptProfile, hba1c: ptHbA1c, notifications: ptNotifications, resetPassword: ptResetPassword, completeRegistration: ptCompleteRegistration, editRecord: ptEditRecord },
+  ja: { common: jaCommon, nav: jaNav, footer: jaFooter, insulina: jaInsulina, insulinaHistorial: jaInsulinaHistorial, login: jaLogin, home: jaHome, glicosilada: jaGlicosilada, glucemia: jaGlucemia, register: jaRegister, forgotPassword: jaForgotPassword, camino: jaCamino, monitoreoFisico: jaMonitoreoFisico, profile: jaProfile, hba1c: jaHbA1c, notifications: jaNotifications, resetPassword: jaResetPassword, completeRegistration: jaCompleteRegistration, editRecord: jaEditRecord },
 };
 
 // --- INICIALIZACIÓN DE I18NEXT ---
@@ -100,7 +104,7 @@ i18n
   .init({
     resources,
     fallbackLng: "es",
-    ns: ["common", "nav", "footer", "insulina", "login", "home", "glicosilada", "glucemia", "register", "forgotPassword", "camino", "monitoreoFisico", "profile", "hba1c", "notifications", "resetPassword", "completeRegistration"],
+    ns: ["common", "nav", "footer", "insulina", "login", "home", "glicosilada", "glucemia", "register", "forgotPassword", "camino", "monitoreoFisico", "profile", "hba1c", "notifications", "resetPassword", "completeRegistration", "editRecord"],
     defaultNS: "common",
     interpolation: {
       escapeValue: false,

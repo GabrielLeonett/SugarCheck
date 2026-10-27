@@ -4,6 +4,7 @@ import { ErrorAbstract } from '../../shared/error-abstract';
 import { Result } from '../../shared/result';
 import { HbA1cId } from '../core/value-objects/HbA1cId';
 import { HbA1cValue } from '../core/value-objects/HbA1cValue';
+import { HbA1cExamDate } from '../core/value-objects/HbA1cExamDate';
 import { EditWindowExpiredError } from '../core/errors/EditWindowExpiredError';
 
 const EDIT_WINDOW_DAYS = 15;
@@ -15,6 +16,7 @@ export class UpdateHbA1c {
 
   async run(id: string, update: {
     valuePercent?: number;
+    examDate?: Date | string;
   }): Promise<Result<HbA1c, ErrorAbstract>> {
     const idRes = HbA1cId.create(id);
     if (!idRes.isValid) return Result.fail(idRes.getError());
@@ -40,6 +42,12 @@ export class UpdateHbA1c {
       const valueRes = HbA1cValue.create(update.valuePercent);
       if (!valueRes.isValid) return Result.fail(valueRes.getError());
       validatedUpdate.valuePercent = valueRes.getValue();
+    }
+
+    if (update.examDate !== undefined) {
+      const examDateRes = HbA1cExamDate.create(update.examDate);
+      if (!examDateRes.isValid) return Result.fail(examDateRes.getError());
+      validatedUpdate.examDate = examDateRes.getValue();
     }
 
     return await this.repository.update(hba1cId, validatedUpdate);
