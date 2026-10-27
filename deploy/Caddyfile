@@ -1,0 +1,51 @@
+# ============================================================
+# SugarCheck - Caddyfile
+# install.sh reemplaza __DOMAIN__ y __APP_DIR__ automáticamente.
+#
+# Opcional: descomenta el bloque global para recibir avisos de
+# Let's Encrypt (debe ir antes de cualquier site block):
+#
+# {
+#     email tu-correo@ejemplo.com
+# }
+# ============================================================
+
+__DOMAIN__ {
+	encode zstd gzip
+
+	root * __APP_DIR__/frontend/dist
+
+	# --- API NestJS -------------------------------------------------
+	# Todos los prefijos de los controllers del backend.
+	@api path_regexp api "^/(auth|user|notification|insulina|sync|imc|hba1c|glucose|preference|oraculo|export|camino|contact-emergence)(/|$)"
+
+	handle @api {
+		reverse_proxy 127.0.0.1:3000 {
+			# El Oráculo usa Server-Sent Events (text/event-stream).
+			# Caddy ya los detecta, pero lo dejamos explícito para que
+			# ningún buffer intermedio retrase los tokens del chat.
+			flush_interval -1
+		}
+	}
+
+	# --- Socket.IO (namespace /notifications) -----------------------
+	handle /socket.io/* {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	# --- Assets con hash de Vite ------------------------------------
+	@assets path /assets/*
+	handle @assets {
+		header Cache-Control "public, immutable, max-age=31536000"
+		file_server
+	}
+
+	# --- SPA (React Router) -----------------------------------------
+	# Si el archivo no existe, sirve index.html y deja que el router
+	# resuelva la ruta en el navegador.
+	handle {
+		try_files {path} /index.html
+		header Cache-Control "no-store"
+		file_server
+	}
+}

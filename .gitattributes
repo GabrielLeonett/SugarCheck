@@ -1,0 +1,5 @@
+# Scripts y configuración de despliegue: forzar LF (fallan con CRLF en Linux)
+*.sh text eol=lf
+deploy/Caddyfile text eol=lf
+deploy/*.service text eol=lf
+deploy/*.example text eol=lf
