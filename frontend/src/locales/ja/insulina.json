@@ -35,5 +35,13 @@
     "zoneArmRight": "右腕",
     "zoneArmLeft": "左腕",
     "zoneGluteRight": "右臀部",
-    "zoneGluteLeft": "左臀部"
+    "zoneGluteLeft": "左臀部",
+    "dosis": "投与量 (UI)",
+    "saving": "保存中...",
+    "errorGuardarRegistro": "記録の保存中にエラーが発生しました",
+    "pleaseSelectZone": "適用部位を選択してください",
+    "sinRangosDefinidos": "範囲が設定されていません",
+    "editarEsquema": "スキームを編集",
+    "saveSuccess": "インスリン投与量を記録しました",
+    "saveSuccessTitle": "インスリンを記録しました"
 }

@@ -39,5 +39,9 @@
     "zoneArmRight": "Right Arm",
     "zoneArmLeft": "Left Arm",
     "zoneGluteRight": "Right Glute",
-    "zoneGluteLeft": "Left Glute"
+    "zoneGluteLeft": "Left Glute",
+    "sinRangosDefinidos": "No ranges defined",
+    "editarEsquema": "Edit scheme",
+    "saveSuccess": "Insulin dose saved successfully",
+    "saveSuccessTitle": "Insulin saved"
 }

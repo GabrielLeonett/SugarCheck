@@ -1,6 +1,5 @@
 import { Avatar, Box, Divider, Stack, Typography } from '@mui/material';
 import ExitIcon from "@mui/icons-material/ExitToApp";
-import ChangeIcon from "@mui/icons-material/ChangeCircle";
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { useAuthStore } from '../../../stores/authStore.tsx';
 import useLanguage from '../../../hooks/useLanguage.tsx';
@@ -89,7 +88,6 @@ export default function ProfileNavBar({ open }: ProfileNavBarProps) {
             <Stack spacing={0.5} sx={{ p: 1.5 }}>
                 {[
                     { icon: <AccountBoxIcon />, label: t("perfil"), onClick: () => navigate('/perfil') },
-                    { icon: <ChangeIcon />, label: t("cambiarContrasena"), onClick: () => { } },
                     { icon: <ExitIcon />, label: t("cerrarSesion"), onClick: logout },
                 ].map((item, index) => (
                     <Box

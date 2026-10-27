@@ -1,5 +1,7 @@
 {
     "welcomeMessage": "¡Hola, Guerrero {name}!",
+    "insulinSaved": "Dosis de insulina registrada correctamente",
+    "insulinSavedTitle": "Insulina registrada",
     "actions": {
         "registerGlucose": "Registrar Glucosa",
         "applyInsulin": "Aplicar Insulina",

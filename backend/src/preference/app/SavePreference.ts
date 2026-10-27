@@ -11,6 +11,18 @@ import { ProfileImg } from '../core/value-objects/ProfileImg';
 import { CorrectionSchemas, type CorrectionSchemaItem } from '../core/value-objects/CorrectionSchemas';
 import { BasalSchemas, type BasalSchemaItem } from '../core/value-objects/BasalSchemas';
 
+/**
+ * Valores por defecto para los parámetros de insulina retirados de la UI.
+ * Se mantienen para no romper el contrato con clientes antiguos ni el sync,
+ * pero ya no se solicitan al usuario.
+ */
+export const DEFAULT_INSULIN_RATIOS = {
+  breakfast: 100,
+  lunch: 100,
+  dinner: 100,
+};
+export const DEFAULT_SENSITIVITY = 1;
+
 export class SavePreference {
   constructor(private readonly repository: PreferenceRepository) {}
 
@@ -19,8 +31,8 @@ export class SavePreference {
     profileImg: string,
     unitMeasure: string,
     thresholds: { hypo: number; hiper: number },
-    insulinRatios: { breakfast: number; lunch: number; dinner: number },
-    sensitivity: number,
+    insulinRatios?: { breakfast: number; lunch: number; dinner: number },
+    sensitivity?: number,
     correctionSchemas?: CorrectionSchemaItem[],
     basalSchemas?: BasalSchemaItem[],
   ): Promise<Result<Preference, ErrorAbstract>> {
@@ -39,13 +51,15 @@ export class SavePreference {
     if (!thresholdsRes.isValid) return Result.fail(thresholdsRes.getError());
 
     const insulinRatiosRes = InsulinRatios.create(
-      insulinRatios.breakfast,
-      insulinRatios.lunch,
-      insulinRatios.dinner,
+      insulinRatios?.breakfast ?? DEFAULT_INSULIN_RATIOS.breakfast,
+      insulinRatios?.lunch ?? DEFAULT_INSULIN_RATIOS.lunch,
+      insulinRatios?.dinner ?? DEFAULT_INSULIN_RATIOS.dinner,
     );
     if (!insulinRatiosRes.isValid) return Result.fail(insulinRatiosRes.getError());
 
-    const sensitivityRes = SensitivityFactor.create(sensitivity);
+    const sensitivityRes = SensitivityFactor.create(
+      sensitivity ?? DEFAULT_SENSITIVITY,
+    );
     if (!sensitivityRes.isValid) return Result.fail(sensitivityRes.getError());
 
     const correctionSchemasRes = CorrectionSchemas.create(correctionSchemas);

@@ -17,5 +17,9 @@
   "IMC_REMINDER_MESSAGE": "No has registrado tu peso hoy. Mantén tu bitácora al día.",
   "IMC_CATEGORY_UNDERWEIGHT": "Bajo peso",
   "IMC_CATEGORY_NORMAL": "Normal",
-  "IMC_CATEGORY_OVERWEIGHT": "Sobrepeso"
+  "IMC_CATEGORY_OVERWEIGHT": "Sobrepeso",
+  "GLUCOSE_ALERT_HYPO": "Alerta de Hipoglucemia",
+  "GLUCOSE_ALERT_HYPO_MESSAGE": "Tu nivel de glucosa está por debajo del umbral seguro: {{value}} mg/dL",
+  "GLUCOSE_ALERT_HYPER": "Alerta de Hiperglucemia",
+  "GLUCOSE_ALERT_HYPER_MESSAGE": "Tu nivel de glucosa está por encima del umbral seguro: {{value}} mg/dL"
 }

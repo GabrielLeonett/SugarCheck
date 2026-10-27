@@ -36,10 +36,6 @@ export default function PerfilScreen() {
   const [prefForm, setPrefForm] = useState({
     hypo: preference?.thresholds?.hypo?.toString() || '70',
     hiper: preference?.thresholds?.hiper?.toString() || '180',
-    breakfast: preference?.insulinRatios?.breakfast?.toString() || '1',
-    lunch: preference?.insulinRatios?.lunch?.toString() || '1',
-    dinner: preference?.insulinRatios?.dinner?.toString() || '1',
-    sensitivity: preference?.sensitivity?.toString() || '1',
   });
 
   useEffect(() => {
@@ -52,10 +48,6 @@ export default function PerfilScreen() {
       setPrefForm({
         hypo: preference.thresholds?.hypo?.toString() || '70',
         hiper: preference.thresholds?.hiper?.toString() || '180',
-        breakfast: preference.insulinRatios?.breakfast?.toString() || '1',
-        lunch: preference.insulinRatios?.lunch?.toString() || '1',
-        dinner: preference.insulinRatios?.dinner?.toString() || '1',
-        sensitivity: preference.sensitivity?.toString() || '1',
       });
     }
   }, [preference]);
@@ -212,15 +204,6 @@ export default function PerfilScreen() {
             <FormInput label="Límite hipoglucemia" value={prefForm.hypo} onChangeText={(v) => setPrefForm((p) => ({ ...p, hypo: v }))} keyboardType="numeric" />
             <View style={{ width: 12 }} />
             <FormInput label="Límite hiperglucemia" value={prefForm.hiper} onChangeText={(v) => setPrefForm((p) => ({ ...p, hiper: v }))} keyboardType="numeric" />
-          </View>
-          <FormInput label="Sensibilidad a la insulina" value={prefForm.sensitivity} onChangeText={(v) => setPrefForm((p) => ({ ...p, sensitivity: v }))} keyboardType="numeric" />
-          <ThemedText type="defaultSemiBold" style={{ marginBottom: 8 }}>Ratio insulina/raciones</ThemedText>
-          <View style={styles.prefRow}>
-            <FormInput label="Desayuno" value={prefForm.breakfast} onChangeText={(v) => setPrefForm((p) => ({ ...p, breakfast: v }))} keyboardType="numeric" />
-            <View style={{ width: 12 }} />
-            <FormInput label="Almuerzo" value={prefForm.lunch} onChangeText={(v) => setPrefForm((p) => ({ ...p, lunch: v }))} keyboardType="numeric" />
-            <View style={{ width: 12 }} />
-            <FormInput label="Cena" value={prefForm.dinner} onChangeText={(v) => setPrefForm((p) => ({ ...p, dinner: v }))} keyboardType="numeric" />
           </View>
         </Card>
 

@@ -13,5 +13,24 @@
   "zona": "部位",
   "contexto": "状況",
   "noHayRegistrosFiltro": "このフィルターの記録はありません。",
-  "filasPorPagina": "ページあたりの行数:"
+  "filasPorPagina": "ページあたりの行数:",
+  "hoy": "今日",
+  "semana": "週",
+  "mes": "月",
+  "trimestre": "四半期",
+  "año": "年",
+  "todos": "すべて",
+  "tipoLenta": "遅効型 / 基礎",
+  "tipoRapida": "速効型 / ボーラス",
+  "grafico": {
+    "filtros": {
+      "ariaLabel": "インスリンのフィルター"
+    }
+  },
+  "filtroTipo": {
+    "ariaLabel": "インスリン種類で絞り込む"
+  },
+  "tabla": {
+    "ariaLabel": "インスリン履歴テーブル"
+  }
 }
