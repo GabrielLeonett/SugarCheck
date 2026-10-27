@@ -10,6 +10,7 @@ export interface UseImcDataReturn {
   handleOpenModal: () => void;
   handleCloseModal: () => void;
   handleSave: (data: { peso: number; altura: number; fecha: string }) => Promise<boolean>;
+  handleUpdate: (id: string, data: { peso: number; altura: number; fecha: string }) => Promise<boolean>;
   records: ImcRecord[];
   filtro: TimeRange;
   setFiltro: (range: TimeRange) => void;
@@ -32,12 +33,13 @@ function toImcRecord(imc: ImcData): ImcRecord {
     'Sobrepeso';
 
   return {
-    id: parseInt(imc.id, 10) || Date.now(),
+    id: imc.id,
     fechaISO: imc.fecha,
     peso: imc.peso,
     estatura: imc.altura,
     imc: imc.imcValue,
     estado,
+    createdAt: imc.createdAt,
   };
 }
 
@@ -94,6 +96,29 @@ export function useImcData(): UseImcDataReturn {
     }
   };
 
+  const handleUpdate = async (
+    id: string,
+    data: { peso: number; altura: number; fecha: string }
+  ): Promise<boolean> => {
+    const parts = data.fecha.split('-');
+    try {
+      await imcApi.update(id, {
+        peso: data.peso,
+        altura: data.altura,
+        anio: parseInt(parts[0], 10),
+        mes: parseInt(parts[1], 10),
+        dia: parseInt(parts[2], 10),
+      });
+      await loadData();
+      showToast('success', 'Medidas actualizadas correctamente.', 'Fortaleza física');
+      return true;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error al actualizar';
+      showToast('error', message, 'Error');
+      return false;
+    }
+  };
+
   const ultimo = raw.length > 0 ? raw[0] : null;
 
   return {
@@ -101,6 +126,7 @@ export function useImcData(): UseImcDataReturn {
     handleOpenModal,
     handleCloseModal,
     handleSave,
+    handleUpdate,
     records: [...metric.filteredData].reverse(),
     filtro: metric.timeRange,
     setFiltro: metric.setTimeRange,

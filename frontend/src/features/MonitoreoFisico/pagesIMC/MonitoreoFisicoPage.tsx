@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Grid, ButtonGroup, Button, Alert, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Navbar from '../../../components/layout/Header/Navbar';
@@ -9,7 +9,9 @@ import ModalImcForm from '../../../components/shared/ModalImcForm';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import { GraficoBarra } from '../../../components/shared/GraficoBarra';
+import { EditActionButton } from '../../../components/shared/EditActionButton';
 import { useImcData } from '../../../hooks/useImcData';
+import { canEditRecord } from '../../../utils/editWindow';
 import useLanguage from '../../../hooks/useLanguage';
 import type { ImcRecord } from '../../../data/recordsMock';
 import type { Column } from '../../../components/shared/HistorialTable';
@@ -30,7 +32,9 @@ const formatDate = (iso: string) => {
 
 export const PhysicalMonitoringPage: React.FC = () => {
   const { t } = useLanguage('monitoreoFisico');
+  const { t: tEdit } = useLanguage('editRecord');
   const imc = useImcData();
+  const [editing, setEditing] = useState<ImcRecord | null>(null);
 
   const columns: Column<ImcRecord>[] = [
     { key: 'fecha', label: t('tableFecha'), render: (row) => formatDate(row.fechaISO) },
@@ -43,6 +47,18 @@ export const PhysicalMonitoringPage: React.FC = () => {
         <Box sx={{ fontWeight: 700, color: obtenerColorEstado(row.estado) }}>
           {row.estado}
         </Box>
+      ),
+    },
+    {
+      key: 'acciones',
+      label: tEdit('actions'),
+      render: (row) => (
+        <EditActionButton
+          canEdit={canEditRecord(row.createdAt)}
+          onClick={() => setEditing(row)}
+          editLabel={tEdit('edit')}
+          expiredLabel={tEdit('editExpired')}
+        />
       ),
     },
   ];
@@ -166,6 +182,18 @@ export const PhysicalMonitoringPage: React.FC = () => {
         open={imc.openModal}
         onClose={imc.handleCloseModal}
         onSave={imc.handleSave}
+      />
+
+      <ModalImcForm
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        onSave={async (data) => {
+          if (!editing) return false;
+          return imc.handleUpdate(editing.id, data);
+        }}
+        record={editing}
+        title={tEdit('editImcTitle')}
+        submitLabel={tEdit('saveChanges')}
       />
       <Footer />
     </>

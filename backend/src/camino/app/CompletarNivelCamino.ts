@@ -1,3 +1,4 @@
+import { CaminoProgreso } from '../core/CaminoProgreso';
 import { CaminoProgresoRepository } from '../core/CaminoProgresoRepository';
 import { CaminoProgreso } from '../core/CaminoProgreso';
 

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import useLanguage from '../../hooks/useLanguage';
+import type { ImcRecord } from '../../data/recordsMock';
 import { useEffect, useState } from 'react';
 
 const imcSchema = z.object({
@@ -21,6 +22,9 @@ interface ModalImcFormProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: { peso: number; altura: number; fecha: string }) => void | Promise<boolean>;
+  record?: ImcRecord | null;
+  title?: string;
+  submitLabel?: string;
 }
 
 const obtenerFechaActual = () => {
@@ -30,7 +34,14 @@ const obtenerFechaActual = () => {
   return fechaLocal.toISOString().split('T')[0];
 };
 
-export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProps) {
+export default function ModalImcForm({
+  open,
+  onClose,
+  onSave,
+  record,
+  title,
+  submitLabel,
+}: ModalImcFormProps) {
   const { t } = useLanguage('monitoreoFisico');
   const [saving, setSaving] = useState(false);
 
@@ -47,9 +58,17 @@ export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProp
 
   useEffect(() => {
     if (open) {
-      reset({ peso: '', altura: '', fecha: obtenerFechaActual() });
+      reset(
+        record
+          ? {
+              peso: String(record.peso),
+              altura: String(record.estatura),
+              fecha: record.fechaISO.split('T')[0],
+            }
+          : { peso: '', altura: '', fecha: obtenerFechaActual() }
+      );
     }
-  }, [open, reset]);
+  }, [open, reset, record]);
 
   const onSubmit = async (data: ImcFormData) => {
     setSaving(true);
@@ -88,7 +107,7 @@ export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProp
           color="primary.dark"
           sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}
         >
-          {t('modalTitle')}
+          {title ?? t('modalTitle')}
         </Typography>
 
         <TextField
@@ -132,7 +151,7 @@ export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProp
           fullWidth
           disabled={saving}
         >
-          {t('saveButton')}
+          {submitLabel ?? t('saveButton')}
         </Button>
       </Box>
     </Modal>
