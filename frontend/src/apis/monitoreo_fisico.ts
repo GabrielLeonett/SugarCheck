@@ -9,6 +9,7 @@ interface ImcBackendResponse {
   imcValue: number;
   categoria: string;
   fecha: string;
+  createdAt: string;
 }
 
 function mapImcResponse(record: ImcBackendResponse): PhysicalRecord {
@@ -30,6 +31,7 @@ function mapImcResponse(record: ImcBackendResponse): PhysicalRecord {
     estatura: record.altura,
     imc: record.imcValue,
     estado: estadoMap[record.categoria] || 'Normal',
+    createdAt: record.createdAt,
   };
 }
 

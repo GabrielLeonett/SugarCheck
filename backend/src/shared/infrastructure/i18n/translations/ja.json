@@ -123,5 +123,7 @@
   "NOTIFICATION_MARK_READ_ERROR": "通知を既読にするエラー",
   "NOTIFICATION_MARK_ALL_READ_ERROR": "すべて既読にするエラー",
   "NOTIFICATION_DELETE_ERROR": "通知の削除エラー",
-  "UPDATE_USER_FORBIDDEN": "このプロフィールを編集する権限がありません"
+  "UPDATE_USER_FORBIDDEN": "このプロフィールを編集する権限がありません",
+
+  "MEDICAL_RECORD_EDIT_WINDOW_EXPIRED": "医療記録は作成から15日を過ぎると編集・削除できません"
 }

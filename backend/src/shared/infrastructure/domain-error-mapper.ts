@@ -67,8 +67,6 @@ registerErrorMapping('ConfigUnitInvalidErorr', { statusCode: HttpStatus.BAD_REQU
 registerErrorMapping('NotificationNotFoundError', { statusCode: HttpStatus.NOT_FOUND, code: 'NOTIFICATION_NOT_FOUND' });
 
 registerErrorMapping('InsulinaNotFoundError', { statusCode: HttpStatus.NOT_FOUND, code: 'INSULINA_NOT_FOUND' });
-registerErrorMapping('InsulinaNoModificableError', { statusCode: HttpStatus.FORBIDDEN, code: 'INSULINA_NOT_MODIFIABLE' });
-registerErrorMapping('InsulinaNoEliminableError', { statusCode: HttpStatus.FORBIDDEN, code: 'INSULINA_NOT_DELETABLE' });
 registerErrorMapping('IdInsulinaInvalidoError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_INSULIN_ID' });
 registerErrorMapping('DosisInvalidaError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_DOSIS' });
 registerErrorMapping('TipoInsulinaInvalidoError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_INSULIN_TYPE' });
@@ -85,7 +83,7 @@ registerErrorMapping('GlucoseValueInvalidError', { statusCode: HttpStatus.BAD_RE
 registerErrorMapping('GlucoseMealTagInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_MEAL_TAG' });
 registerErrorMapping('HbA1cNotFoundError', { statusCode: HttpStatus.NOT_FOUND, code: 'HBA1C_NOT_FOUND' });
 registerErrorMapping('HbA1cValueInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_HBA1C_VALUE' });
-registerErrorMapping('EditWindowExpiredError', { statusCode: HttpStatus.FORBIDDEN, code: 'EDIT_WINDOW_EXPIRED' });
+registerErrorMapping('MedicalRecordNotEditableError', { statusCode: HttpStatus.FORBIDDEN, code: 'MEDICAL_RECORD_EDIT_WINDOW_EXPIRED' });
 registerErrorMapping('GlucoseIdInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_GLUCOSE_ID' });
 registerErrorMapping('GlucoseDateInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_GLUCOSE_DATE' });
 registerErrorMapping('GlucoseTimeInvalidError', { statusCode: HttpStatus.BAD_REQUEST, code: 'INVALID_GLUCOSE_TIME' });

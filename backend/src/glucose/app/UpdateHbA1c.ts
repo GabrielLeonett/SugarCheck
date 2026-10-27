@@ -5,9 +5,8 @@ import { Result } from '../../shared/result';
 import { HbA1cId } from '../core/value-objects/HbA1cId';
 import { HbA1cValue } from '../core/value-objects/HbA1cValue';
 import { HbA1cExamDate } from '../core/value-objects/HbA1cExamDate';
-import { EditWindowExpiredError } from '../core/errors/EditWindowExpiredError';
-
-const EDIT_WINDOW_DAYS = 15;
+import { isWithinMedicalRecordEditWindow } from '../../shared/core/MedicalRecordEditWindow';
+import { MedicalRecordNotEditableError } from '../../shared/core/errors/MedicalRecordNotEditableError';
 
 export class UpdateHbA1c {
   constructor(
@@ -26,13 +25,12 @@ export class UpdateHbA1c {
     if (!existingResult.isValid) return existingResult;
 
     const existing = existingResult.getValue();
-    const now = new Date();
-    const diffMs = now.getTime() - existing.createdAt.getTime();
-    const diffDays = diffMs / (1000 * 60 * 60 * 24);
 
-    if (diffDays > EDIT_WINDOW_DAYS) {
+    if (!isWithinMedicalRecordEditWindow(existing.createdAt)) {
       return Result.fail(
-        new EditWindowExpiredError('El período de edición de 15 días ha expirado para este examen HbA1c'),
+        new MedicalRecordNotEditableError(
+          'El período de edición de 15 días ha expirado para este examen HbA1c',
+        ),
       );
     }
 

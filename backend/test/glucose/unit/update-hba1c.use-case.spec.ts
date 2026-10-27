@@ -40,4 +40,18 @@ describe('UpdateHbA1c UseCase', () => {
     const result = await useCase.run(hba1c.id.value, { valuePercent: 0 });
     expect(result.isValid).toBe(false);
   });
+
+  test('falla si la ventana de edición de 15 días expiró', async () => {
+    const old = HbA1cFactory.createInstance({
+      userId: USER_ID,
+      createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000),
+    });
+    repository.items.push(old);
+
+    const result = await useCase.run(old.id.value, { valuePercent: 7 });
+
+    expect(result.isValid).toBe(false);
+    expect(result.getError().name).toBe('MedicalRecordNotEditableError');
+    expect(result.getError().message).toContain('15 días');
+  });
 });

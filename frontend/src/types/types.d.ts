@@ -58,6 +58,7 @@ export interface PhysicalRecord {
   estatura: number; // cm
   imc: number;
   estado: MeasurementState;
+  createdAt: string;
 }
 
 export interface PhysicalEvolution {

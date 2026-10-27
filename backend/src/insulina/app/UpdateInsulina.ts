@@ -7,12 +7,14 @@ import { ContextoAplicacion } from '../core/value-objects/ContextoAplicacion';
 import { FechaInsulina } from '../core/value-objects/FechaInsulina';
 import { HoraInsulina } from '../core/value-objects/HoraInsulina';
 import { InsulinaNotFoundError } from '../core/errors/InsulinaNotFoundError';
-import { InsulinaNoModificableError } from '../core/errors/InsulinaNoModificableError';
 import { ContextoAplicacionInvalidoError } from '../core/errors/ContextoAplicacionInvalidoError';
+import {
+  daysSinceMedicalRecordCreation,
+  isWithinMedicalRecordEditWindow,
+} from '../../shared/core/MedicalRecordEditWindow';
+import { MedicalRecordNotEditableError } from '../../shared/core/errors/MedicalRecordNotEditableError';
 import { Result } from '../../shared/result';
 import { ErrorAbstract } from '../../shared/error-abstract';
-
-const DIAS_MODIFICACION = 15;
 
 export class UpdateInsulina {
   constructor(
@@ -40,12 +42,13 @@ export class UpdateInsulina {
       return Result.fail(new InsulinaNotFoundError(params.id));
     }
 
-    const ahora = new Date();
-    const diasTranscurridos = Math.floor(
-      (ahora.getTime() - existing.createdAt.getTime()) / (1000 * 60 * 60 * 24),
-    );
-    if (diasTranscurridos > DIAS_MODIFICACION) {
-      return Result.fail(new InsulinaNoModificableError(diasTranscurridos));
+    if (!isWithinMedicalRecordEditWindow(existing.createdAt)) {
+      const diasTranscurridos = daysSinceMedicalRecordCreation(existing.createdAt);
+      return Result.fail(
+        new MedicalRecordNotEditableError(
+          `No se puede modificar un registro de insulina después de 15 días. Han transcurrido ${diasTranscurridos} días desde su creación.`,
+        ),
+      );
     }
 
     if (params.dosis !== undefined) {
