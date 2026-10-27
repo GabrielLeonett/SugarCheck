@@ -7,9 +7,8 @@ import { Peso } from '../core/value-objects/peso';
 import { Altura } from '../core/value-objects/altura';
 import { Fecha } from '../core/value-objects/Fecha';
 import { FechaInvalidaError } from '../core/errors/FechaInvalidError';
-import { ImcNoModificableError } from '../core/errors/ImcNoModificableError';
-
-const EDIT_WINDOW_DAYS = 15;
+import { isWithinMedicalRecordEditWindow } from '../../shared/core/MedicalRecordEditWindow';
+import { MedicalRecordNotEditableError } from '../../shared/core/errors/MedicalRecordNotEditableError';
 
 export class UpdateImc {
   constructor(
@@ -31,9 +30,12 @@ export class UpdateImc {
     if (!existingResult.isValid) return existingResult;
 
     const existing = existingResult.getValue();
-    const diffDays = (Date.now() - existing.createdAt.getTime()) / (1000 * 60 * 60 * 24);
-    if (diffDays > EDIT_WINDOW_DAYS) {
-      return Result.fail(new ImcNoModificableError());
+    if (!isWithinMedicalRecordEditWindow(existing.createdAt)) {
+      return Result.fail(
+        new MedicalRecordNotEditableError(
+          'El período de edición de 15 días ha expirado para este registro de IMC',
+        ),
+      );
     }
 
     const validatedUpdate: any = {};

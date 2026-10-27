@@ -13,5 +13,24 @@
   "zona": "Zona",
   "contexto": "Contexto",
   "noHayRegistrosFiltro": "Não há registros para este filtro.",
-  "filasPorPagina": "Linhas por página:"
+  "filasPorPagina": "Linhas por página:",
+  "hoy": "Hoje",
+  "semana": "Semana",
+  "mes": "Mês",
+  "trimestre": "Trimestre",
+  "año": "Ano",
+  "todos": "Todos",
+  "tipoLenta": "Lenta / Basal",
+  "tipoRapida": "Rápida / Bolus",
+  "grafico": {
+    "filtros": {
+      "ariaLabel": "Filtros de insulina"
+    }
+  },
+  "filtroTipo": {
+    "ariaLabel": "Filtrar por tipo de insulina"
+  },
+  "tabla": {
+    "ariaLabel": "Tabela de histórico de insulina"
+  }
 }

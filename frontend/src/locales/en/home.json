@@ -1,5 +1,7 @@
 {
     "welcomeMessage": "Hello, Warrior {name}!",
+    "insulinSaved": "Insulin dose saved successfully",
+    "insulinSavedTitle": "Insulin saved",
     "actions": {
         "registerGlucose": "Log Glucose",
         "applyInsulin": "Log Insulin",

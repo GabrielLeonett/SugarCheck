@@ -24,16 +24,16 @@ export class SavePreferenceDTO {
   @IsNotEmpty({ message: 'Los umbrales son obligatorios' })
   thresholds!: ThresholdsDTO;
 
+  @IsOptional()
   @ValidateNested({
     message: 'Los ratios de insulina tienen un formato incorrecto',
   })
   @Type(() => InsulinRatiosDTO)
-  @IsNotEmpty({ message: 'Los ratios de insulina son obligatorios' })
-  insulinRatios!: InsulinRatiosDTO;
+  insulinRatios?: InsulinRatiosDTO;
 
+  @IsOptional()
   @IsNumber({}, { message: 'El factor de sensibilidad debe ser un número' })
-  @IsNotEmpty({ message: 'El factor de sensibilidad es obligatorio' })
-  sensitivity!: number;
+  sensitivity?: number;
 
   @IsOptional()
   @ValidateNested({ each: true, message: 'Los esquemas de corrección tienen un formato incorrecto' })

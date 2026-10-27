@@ -115,9 +115,20 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         notification.type === 'warning' ? 'warning' : null;
 
       if (severity) {
-        const title = notification.titleKey ? i18n.t(notification.titleKey, notification.params) : notification.title;
+        const params: Record<string, string | number> = {
+          ...(notification.params ?? {}),
+        };
+        if (params.categoryKey) {
+          params.category = i18n.t(String(params.categoryKey), {
+            ns: 'notifications',
+          });
+          delete params.categoryKey;
+        }
+        const title = notification.titleKey
+          ? i18n.t(notification.titleKey, { ns: 'notifications', ...params })
+          : notification.title;
         const message = notification.messageKey
-          ? i18n.t(notification.messageKey, notification.params)
+          ? i18n.t(notification.messageKey, { ns: 'notifications', ...params })
           : notification.message;
         useUiStore.getState().showToast(severity, message, title);
       }

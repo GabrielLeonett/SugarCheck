@@ -94,7 +94,7 @@ export class Insulina {
       tipo: this._tipo.toString(),
       unidades: this._dosis.value,
       dosis: this._dosis.value,
-      fecha: this._fecha.toISOString(),
+      fecha: this._fecha.toDateString(),
       hora: this._hora.toString(),
       zona: this._zona.toString(),
       zonaLabel: this._zona.getLabel(),

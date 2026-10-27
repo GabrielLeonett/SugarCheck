@@ -1,5 +1,7 @@
 {
     "welcomeMessage": "こんにちは、戦士 {name}！",
+    "insulinSaved": "インスリン投与量を記録しました",
+    "insulinSavedTitle": "インスリンを記録しました",
     "actions": {
         "registerGlucose": "血糖値を記録",
         "applyInsulin": "インスリンを記録",
