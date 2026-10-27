@@ -7,6 +7,7 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDTO } from './DTOs/login.dto';
@@ -16,6 +17,10 @@ import type { Response, Request } from 'express';
 import { FirebaseAdminService } from './firebase-admin.service';
 import { LoginFirebaseDTO } from './DTOs/login-firebase.dto';
 import { TranslationService } from '../../shared/infrastructure/i18n/translation.service';
+import {
+  ForgotPasswordRateLimitGuard,
+  ResetPasswordRateLimitGuard,
+} from './auth-rate-limit.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -171,6 +176,7 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @UseGuards(ForgotPasswordRateLimitGuard)
   async forgotPassword(
     @Body() body: ForgotPasswordDTO,
     @Req() req: Request,
@@ -184,6 +190,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @UseGuards(ResetPasswordRateLimitGuard)
   async resetPassword(
     @Body() body: ResetPasswordDTO,
     @Req() req: Request,
