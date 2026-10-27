@@ -39,5 +39,9 @@
     "zoneArmRight": "Brazo Derecho",
     "zoneArmLeft": "Brazo Izquierdo",
     "zoneGluteRight": "Glúteo Derecho",
-    "zoneGluteLeft": "Glúteo Izquierdo"
+    "zoneGluteLeft": "Glúteo Izquierdo",
+    "sinRangosDefinidos": "Sin rangos definidos",
+    "editarEsquema": "Editar esquema",
+    "saveSuccess": "Dosis de insulina registrada correctamente",
+    "saveSuccessTitle": "Insulina registrada"
 }

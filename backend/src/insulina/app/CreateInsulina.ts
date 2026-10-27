@@ -11,6 +11,8 @@ import { Result } from '../../shared/result';
 import { ErrorAbstract } from '../../shared/error-abstract';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
 import { ContextoAplicacionInvalidoError } from '../core/errors/ContextoAplicacionInvalidoError';
+import { InsulinaOverlapError } from '../core/errors/InsulinaOverlapError';
+import { findOverlappingInsulin } from '../core/InsulinaOverlap';
 
 export class CreateInsulina {
   constructor(
@@ -55,6 +57,23 @@ export class CreateInsulina {
       const ctxRes = ContextoAplicacion.create(params.contexto);
       if (!ctxRes.isValid) return Result.fail(ctxRes.getError());
       contexto = ctxRes.getValue();
+    }
+
+    const existingRes = await this.repository.getAllByUserId(params.userId);
+    if (!existingRes.isValid) return Result.fail(existingRes.getError());
+
+    const overlap = findOverlappingInsulin(existingRes.getValue(), {
+      fecha: fechaRes.getValue(),
+      hora: horaRes.getValue(),
+      tipo: tipoRes.getValue(),
+    });
+
+    if (overlap) {
+      return Result.fail(
+        new InsulinaOverlapError(
+          'Ya existe un registro de insulina en ese horario o dentro del margen de seguridad de 3 horas.',
+        ).withCode('INSULIN_OVERLAP', 'hora'),
+      );
     }
 
     const insulina = new Insulina({

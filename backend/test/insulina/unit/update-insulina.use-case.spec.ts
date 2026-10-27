@@ -73,4 +73,62 @@ describe('UpdateInsulina UseCase', () => {
     const result = await useCase.run({ id: insulina.id.value, dosis: 100.5 });
     expect(result.isValid).toBe(false);
   });
+
+  describe('solapamiento de dosis', () => {
+    test('rechaza mover un registro al mismo horario que otro', async () => {
+      const primera = InsulinaFactory.createInstance({
+        userId: USER_ID,
+        hora: '08:30',
+      });
+      const segunda = InsulinaFactory.createInstance({
+        userId: USER_ID,
+        hora: '14:30',
+      });
+      repository.items.push(primera, segunda);
+
+      const result = await useCase.run({
+        id: segunda.id.value,
+        hora: '08:30',
+      });
+
+      expect(result.isValid).toBe(false);
+      expect(result.getError().code).toBe('INSULIN_OVERLAP');
+    });
+
+    test('rechaza mover una rápida dentro del margen de 3 horas', async () => {
+      const primera = InsulinaFactory.createInstance({
+        userId: USER_ID,
+        hora: '08:30',
+      });
+      const segunda = InsulinaFactory.createInstance({
+        userId: USER_ID,
+        hora: '14:30',
+      });
+      repository.items.push(primera, segunda);
+
+      const result = await useCase.run({
+        id: segunda.id.value,
+        hora: '10:00',
+      });
+
+      expect(result.isValid).toBe(false);
+      expect(result.getError().code).toBe('INSULIN_OVERLAP');
+    });
+
+    test('permite editar un registro sin cambiar su horario', async () => {
+      const insulina = InsulinaFactory.createInstance({
+        userId: USER_ID,
+        hora: '08:30',
+      });
+      repository.items.push(insulina);
+
+      const result = await useCase.run({
+        id: insulina.id.value,
+        dosis: 6,
+      });
+
+      expect(result.isValid).toBe(true);
+      expect(result.getValue().dosis.value).toBe(6);
+    });
+  });
 });
