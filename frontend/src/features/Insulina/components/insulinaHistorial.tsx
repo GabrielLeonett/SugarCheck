@@ -2,7 +2,8 @@ import { Box, Typography, ButtonGroup, Button } from '@mui/material';
 import { useState } from 'react';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import HistorialTable from '../../../components/shared/HistorialTable';
-import { GraficoBarra } from '../../../components/shared/GraficoBarra';
+import { GraficoLinea } from '../../../components/shared/GraficoLinea';
+import { TimeRangeFilter } from '../../../components/shared/TimeRangeFilter';
 import { EditActionButton } from '../../../components/shared/EditActionButton';
 import ModalInsulinaLenta from './ModalInsulinaLenta';
 import ModalInsulinaRapida from './ModalInsulinaRapida';
@@ -97,7 +98,7 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
   ];
 
   const chartComponent = (
-    <GraficoBarra
+    <GraficoLinea
       data={dosisInsulina}
       labels={horasInsulina}
       color={tipoFilter === 'lenta' ? '#FFA726' : '#4FC3F7'}
@@ -106,52 +107,41 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
     />
   );
 
-  const timeFilterOptions = ['hoy', 'semana', 'mes', 'trimestre', 'año', 'todos'] as const;
-
   const filterComponent = (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center' }}>
-      <ButtonGroup variant="outlined" size="small" aria-label={t('grafico.filtros.ariaLabel')}>
-        {timeFilterOptions.map((filtro) => (
+    <TimeRangeFilter
+      value={timeRange}
+      onChange={setTimeRange}
+      presets={['hoy', 'semana', 'mes', 'trimestre', 'año', 'todos']}
+      customRange={customRange}
+      onCustomRangeChange={setCustomRange}
+      getPresetLabel={(filtro) => t(filtro === 'año' ? 'anio' : filtro)}
+      personalizadoLabel={t('personalizado')}
+      startLabel={t('fechaInicio')}
+      endLabel={t('fechaFin')}
+      ariaLabel={t('filtroTiempoAriaLabel')}
+      extra={
+        <ButtonGroup variant="outlined" size="small" aria-label={t('filtroTipoAriaLabel')} sx={{ ml: { xs: 0, sm: 1 } }}>
           <Button
-            key={filtro}
-            onClick={() => {
-              setTimeRange(filtro);
-              setCustomRange(null);
-            }}
-            variant={timeRange === filtro ? 'contained' : 'outlined'}
+            onClick={() => setTipoFilter('todas')}
+            variant={tipoFilter === 'todas' ? 'contained' : 'outlined'}
           >
-            {filtro === 'hoy' ? t('hoy') : filtro === 'semana' ? t('semana') : filtro === 'mes' ? t('mes') : filtro === 'trimestre' ? t('trimestre') : filtro === 'año' ? t('año') : t('todos')}
+            {t('todas')}
           </Button>
-        ))}
-      </ButtonGroup>
-      {timeRange === 'personalizado' && customRange && (
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', fontSize: '0.75rem', color: 'text.secondary' }}>
-          <Typography variant="caption">{customRange.start}</Typography>
-          <Typography variant="caption">–</Typography>
-          <Typography variant="caption">{customRange.end}</Typography>
-        </Box>
-      )}
-      <ButtonGroup variant="outlined" size="small" aria-label={t('filtroTipo.ariaLabel')} sx={{ ml: { xs: 0, sm: 1 } }}>
-        <Button
-          onClick={() => setTipoFilter('todas')}
-          variant={tipoFilter === 'todas' ? 'contained' : 'outlined'}
-        >
-          {t('todas')}
-        </Button>
-        <Button
-          onClick={() => setTipoFilter('lenta')}
-          variant={tipoFilter === 'lenta' ? 'contained' : 'outlined'}
-        >
-          {t('lenta')}
-        </Button>
-        <Button
-          onClick={() => setTipoFilter('rapida')}
-          variant={tipoFilter === 'rapida' ? 'contained' : 'outlined'}
-        >
-          {t('rapida')}
-        </Button>
-      </ButtonGroup>
-    </Box>
+          <Button
+            onClick={() => setTipoFilter('lenta')}
+            variant={tipoFilter === 'lenta' ? 'contained' : 'outlined'}
+          >
+            {t('lenta')}
+          </Button>
+          <Button
+            onClick={() => setTipoFilter('rapida')}
+            variant={tipoFilter === 'rapida' ? 'contained' : 'outlined'}
+          >
+            {t('rapida')}
+          </Button>
+        </ButtonGroup>
+      }
+    />
   );
 
   const handleUpdate = async (data: {
