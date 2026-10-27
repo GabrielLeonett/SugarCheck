@@ -129,7 +129,7 @@
   "INVALID_MEAL_TAG": "La etiqueta de comida no es válida. Debe ser: En Ayunas, Despues de comer o Control general",
   "HBA1C_NOT_FOUND": "Examen HbA1c no encontrado",
   "INVALID_HBA1C_VALUE": "El valor de HbA1c no es válido. Debe estar entre 0.1 y 20%",
-  "EDIT_WINDOW_EXPIRED": "El período de edición de 15 días ha expirado",
+  "MEDICAL_RECORD_EDIT_WINDOW_EXPIRED": "No se puede modificar ni eliminar un registro médico después de 15 días desde su creación",
   "GLUCOSE_CREATED": "Registro de glucosa creado exitosamente",
   "GLUCOSE_UPDATED": "Registro de glucosa actualizado exitosamente",
   "HBA1C_CREATED": "Examen HbA1c creado exitosamente",
