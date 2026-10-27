@@ -8,6 +8,8 @@ import { FechaInsulina } from '../core/value-objects/FechaInsulina';
 import { HoraInsulina } from '../core/value-objects/HoraInsulina';
 import { InsulinaNotFoundError } from '../core/errors/InsulinaNotFoundError';
 import { ContextoAplicacionInvalidoError } from '../core/errors/ContextoAplicacionInvalidoError';
+import { InsulinaOverlapError } from '../core/errors/InsulinaOverlapError';
+import { findOverlappingInsulin } from '../core/InsulinaOverlap';
 import {
   daysSinceMedicalRecordCreation,
   isWithinMedicalRecordEditWindow,
@@ -86,6 +88,27 @@ export class UpdateInsulina {
         if (!ctxRes.isValid) return Result.fail(ctxRes.getError());
         existing.actualizarContexto(ctxRes.getValue());
       }
+    }
+
+    const recordsRes = await this.repository.getAllByUserId(existing.userId);
+    if (!recordsRes.isValid) return Result.fail(recordsRes.getError());
+
+    const overlap = findOverlappingInsulin(
+      recordsRes.getValue(),
+      {
+        fecha: existing.fecha,
+        hora: existing.hora,
+        tipo: existing.tipo,
+      },
+      existing.id.value,
+    );
+
+    if (overlap) {
+      return Result.fail(
+        new InsulinaOverlapError(
+          'Ya existe un registro de insulina en ese horario o dentro del margen de seguridad de 3 horas.',
+        ).withCode('INSULIN_OVERLAP', 'hora'),
+      );
     }
 
     return this.repository.update(idRes.getValue(), existing);

@@ -75,8 +75,6 @@ export default function CompleteRegistration() {
               hypo: Number(values.glucosaMin) || currentPrefs.thresholds?.hypo,
               hiper: Number(values.glucosaMax) || currentPrefs.thresholds?.hiper,
             },
-            insulinRatios: currentPrefs.insulinRatios,
-            sensitivity: currentPrefs.sensitivity,
             correctionSchemas: currentPrefs.correctionSchemas ?? [],
             basalSchemas: currentPrefs.basalSchemas ?? [],
           });
@@ -85,11 +83,11 @@ export default function CompleteRegistration() {
         console.error('Error al actualizar preferencias:', e);
       }
 
-      if (values.nombreGuardián) {
+      if (values.nombreGuardián?.trim()) {
         await contactEmergenceApi.create({
-          name: values.nombreGuardián,
+          name: values.nombreGuardián.trim(),
           parentesco: values.parentesco || 'otro',
-          telefono: values.telefono || undefined,
+          telefono: values.telefono?.trim() || undefined,
         });
       }
 
@@ -248,49 +246,57 @@ export default function CompleteRegistration() {
               {t("emergencyTitle")}
             </Typography>
 
-            <TextField
-              {...register("nombreGuardián")}
-              fullWidth
-              label={t("guardianNameLabel")}
-              variant="outlined"
-              size="small"
-              error={!!errors.nombreGuardián}
-              helperText={errors.nombreGuardián?.message}
-              sx={textFieldStyles}
-            />
-
-            <TextField
-              {...register("parentesco")}
-              fullWidth
-              label={t("relationshipLabel")}
-              variant="outlined"
-              size="small"
-              select
-              error={!!errors.parentesco}
-              helperText={errors.parentesco?.message}
-              sx={textFieldStyles}
-            >
-              <MenuItem value="madre">{t("relationshipMother")}</MenuItem>
-              <MenuItem value="padre">{t("relationshipFather")}</MenuItem>
-              <MenuItem value="hermano">{t("relationshipBrother")}</MenuItem>
-              <MenuItem value="hermana">{t("relationshipSister")}</MenuItem>
-              <MenuItem value="abuelo">{t("relationshipGrandfather")}</MenuItem>
-              <MenuItem value="abuela">{t("relationshipGrandmother")}</MenuItem>
-              <MenuItem value="tio">{t("relationshipUncle")}</MenuItem>
-              <MenuItem value="tia">{t("relationshipAunt")}</MenuItem>
-              <MenuItem value="tutor">{t("relationshipGuardian")}</MenuItem>
-              <MenuItem value="otro">{t("relationshipOther")}</MenuItem>
-            </TextField>
-
-            <TextField
-              {...register("telefono")}
-              fullWidth
-              label={t("phoneLabel")}
-              variant="outlined"
-              size="small"
-              type="tel"
-              sx={textFieldStyles}
-            />
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <TextField
+                  {...register("nombreGuardián")}
+                  fullWidth
+                  label={t("guardianNameLabel")}
+                  variant="outlined"
+                  size="small"
+                  error={!!errors.nombreGuardián}
+                  helperText={errors.nombreGuardián?.message}
+                  sx={textFieldStyles}
+                />
+              </Grid>
+              <Grid size={6}>
+                <TextField
+                  {...register("parentesco")}
+                  fullWidth
+                  label={t("relationshipLabel")}
+                  variant="outlined"
+                  size="small"
+                  select
+                  error={!!errors.parentesco}
+                  helperText={errors.parentesco?.message}
+                  sx={textFieldStyles}
+                >
+                  <MenuItem value="madre">{t("relationshipMother")}</MenuItem>
+                  <MenuItem value="padre">{t("relationshipFather")}</MenuItem>
+                  <MenuItem value="hermano">{t("relationshipBrother")}</MenuItem>
+                  <MenuItem value="hermana">{t("relationshipSister")}</MenuItem>
+                  <MenuItem value="abuelo">{t("relationshipGrandfather")}</MenuItem>
+                  <MenuItem value="abuela">{t("relationshipGrandmother")}</MenuItem>
+                  <MenuItem value="tio">{t("relationshipUncle")}</MenuItem>
+                  <MenuItem value="tia">{t("relationshipAunt")}</MenuItem>
+                  <MenuItem value="tutor">{t("relationshipGuardian")}</MenuItem>
+                  <MenuItem value="otro">{t("relationshipOther")}</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid size={12}>
+                <TextField
+                  {...register("telefono")}
+                  fullWidth
+                  label={t("phoneLabel")}
+                  variant="outlined"
+                  size="small"
+                  type="tel"
+                  error={!!errors.telefono}
+                  helperText={errors.telefono?.message}
+                  sx={textFieldStyles}
+                />
+              </Grid>
+            </Grid>
 
             <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
               <Button

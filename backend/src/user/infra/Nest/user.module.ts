@@ -15,6 +15,8 @@ import { GenerateUUID } from '../../../shared/infrastructure/generate-uuid';
 import { GenerateUUIDInterface } from '../../../shared/application/ports/generate-uuid.interface';
 import { PasswordHasher } from '../../../shared/application/ports/password-hasher.interface';
 import { UpdateUser } from '../../app/UpdateUser';
+import { UpdatePassword } from '../../app/UpdatePassword';
+import { ChangePassword } from '../../app/ChangePassword';
 import { AuthModule } from '../../../auth/infra/auth.module';
 import { SavePreference } from '../../../preference/app/SavePreference';
 import { PreferenceModule } from '../../../preference/infra/Nest/preference.module';
@@ -37,7 +39,8 @@ import { PreferenceModule } from '../../../preference/infra/Nest/preference.modu
     { provide: 'GetOneByIdUser', useFactory: (repo: UserRepository) => new GetOneByIdUser(repo), inject: ['UserRepository'] },
     { provide: 'DeleteUser', useFactory: (repo: UserRepository) => new DeleteUser(repo), inject: ['UserRepository'] },
     { provide: 'UpdateUserEmail', useFactory: (repo: UserRepository) => new UpdateUserEmail(repo), inject: ['UserRepository'] },
-    { provide: 'UpdatePassword', useClass: PrismaUserRepository },
+    { provide: 'UpdatePassword', useFactory: (repo: UserRepository) => new UpdatePassword(repo), inject: ['UserRepository'] },
+    { provide: 'ChangePassword', useFactory: (repo: UserRepository, hash: PasswordHasher) => new ChangePassword(repo, hash), inject: ['UserRepository', 'BcryptHasher'] },
   ],
   controllers: [UserController],
   exports: ['GetOneByEmailUser', 'GetOneByUsernameUser', 'GetOneByIdUser', 'SaveUser', 'UpdateUserEmail', 'UpdatePassword'],

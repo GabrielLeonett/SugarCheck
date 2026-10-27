@@ -14,6 +14,7 @@ import useLanguage from "../../hooks/useLanguage";
 import { insulinaApi, type DailyTotals } from "../../apis/insulina";
 import { preferenceApi } from "../../apis/preference_config";
 import type { CorrectionSchemaItem } from "../../schemas/preference_config";
+import { useUiStore } from "../../stores/uiStore";
 
 export default function Insulina() {
   const [openLento, setOpenLento] = useState(false);
@@ -29,6 +30,7 @@ export default function Insulina() {
     CorrectionSchemaItem[]
   >([]);
   const { t } = useLanguage("insulina");
+  const showToast = useUiStore((s) => s.showToast);
 
   const loadTotals = useCallback(async () => {
     try {
@@ -52,6 +54,10 @@ export default function Insulina() {
     loadTotals();
   }, [loadTotals, refreshTrigger]);
 
+  useEffect(() => {
+    loadCorrectionSchemas();
+  }, [loadCorrectionSchemas]);
+
   const handleRefresh = useCallback(() => {
     setRefreshTrigger((k) => k + 1);
   }, []);
@@ -72,6 +78,7 @@ export default function Insulina() {
       });
       setOpenRapido(false);
       handleRefresh();
+      showToast("success", t("saveSuccess"), t("saveSuccessTitle"));
     } catch (error) {
       console.error("Error al guardar insulina rápida:", error);
       throw error;
@@ -93,6 +100,7 @@ export default function Insulina() {
       });
       setOpenLento(false);
       handleRefresh();
+      showToast("success", t("saveSuccess"), t("saveSuccessTitle"));
     } catch (error) {
       console.error("Error al guardar insulina lenta:", error);
       throw error;
@@ -214,7 +222,7 @@ export default function Insulina() {
                       variant="h4"
                       sx={{ color: "#7AAFD7", fontWeight: "bold" }}
                     >
-                      {totals.totalRapida.toFixed(1)} UI
+                      {totals.totalGeneral.toFixed(1)} UI
                     </Typography>
                   </CardBase>
                 </Grid>
@@ -237,7 +245,7 @@ export default function Insulina() {
                         variant="body2"
                         sx={{ color: "#94a3b8", mb: 1 }}
                       >
-                        Sin rangos definidos
+                        {t("sinRangosDefinidos")}
                       </Typography>
                     ) : (
                       <Box
@@ -311,7 +319,7 @@ export default function Insulina() {
                         borderRadius: 2,
                       }}
                     >
-                      Editar esquema
+                      {t("editarEsquema")}
                     </ButtonBase>
                   </CardBase>
                 </Grid>
