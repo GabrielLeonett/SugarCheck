@@ -4,9 +4,11 @@
 # SugarCheck API (NestJS) — imagen única de producción
 #
 # La misma imagen se usa para dos cosas:
-#   - migrar:  pnpm exec prisma migrate deploy
+#   - migrar:  node node_modules/prisma/build/index.js migrate deploy
 #   - correr:  node dist/main.js
 # Por eso incluye el CLI de Prisma (devDependency) y prisma/.
+# No se usa pnpm en runtime: `pnpm exec` intenta reinstalar dependencias
+# (verifyDepsBeforeRun) y el usuario `node` no puede escribir en /app.
 # ============================================================
 
 # ---------- build ----------
@@ -35,9 +37,6 @@ FROM node:22-bookworm-slim AS runtime
 RUN apt-get update \
     && apt-get install -y --no-install-recommends openssl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-
-# Necesario para `prisma migrate deploy` en el servicio migrate.
-RUN npm install -g pnpm@11
 
 ENV NODE_ENV=production
 ENV PORT=3000

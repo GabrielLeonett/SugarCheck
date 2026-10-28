@@ -20,7 +20,7 @@ services:
   # ----------------------------------------------------------
   migrate:
     image: ${DOCKERHUB_USER:-gayer12}/sugarcheck:api
-    command: ["pnpm", "exec", "prisma", "migrate", "deploy"]
+    command: ["node", "node_modules/prisma/build/index.js", "migrate", "deploy"]
     env_file: ./backend/.env
     restart: "no"
 
