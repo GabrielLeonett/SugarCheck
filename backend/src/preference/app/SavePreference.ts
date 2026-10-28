@@ -36,7 +36,7 @@ export class SavePreference {
     correctionSchemas?: CorrectionSchemaItem[],
     basalSchemas?: BasalSchemaItem[],
   ): Promise<Result<Preference, ErrorAbstract>> {
-    
+
     // 1. Crear Value Objects
     const idRes = UserId.create(userId);
     if (!idRes.isValid) return Result.fail(idRes.getError());

@@ -15,6 +15,7 @@ import { FirebaseAdminService } from './firebase-admin.service';
 import { LoginFirebaseUser } from '../app/LoginFirebaseUser';
 import { ForgotPassword } from '../app/ForgotPassword';
 import { ResetPassword } from '../app/ResetPassword';
+import { ChangePassword } from '../app/ChangePassword';
 import { NodemailerService } from './email/nodemailer.service';
 import { ResetCodeStore } from './ResetCodeStore';
 import {
@@ -62,6 +63,7 @@ import {
     LoginFirebaseUser,
     ForgotPassword,
     ResetPassword,
+    ChangePassword,
     AuthService,
     FirebaseAdminService,
   ],

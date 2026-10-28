@@ -5,7 +5,8 @@
     "actions": {
         "registerGlucose": "Registrar Glucosa",
         "applyInsulin": "Aplicar Insulina",
-        "registerWeight": "Registrar Peso/Talla"
+        "registerWeight": "Registrar Peso/Talla",
+        "insulinSaved": "Dosis de insulina registrada correctamente"
     },
     "cards": {
         "lastBattle": {

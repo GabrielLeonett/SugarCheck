@@ -5,7 +5,8 @@
     "actions": {
         "registerGlucose": "Log Glucose",
         "applyInsulin": "Log Insulin",
-        "registerWeight": "Log Weight/Height"
+        "registerWeight": "Log Weight/Height",
+        "insulinSaved": "Insulin dose logged successfully"
     },
     "cards": {
         "lastBattle": {

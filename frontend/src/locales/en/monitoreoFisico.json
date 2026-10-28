@@ -26,6 +26,10 @@
     "filterAll": "ALL",
     "filterQuarter": "QUARTER",
     "filterYear": "YEAR",
+    "filterPersonalizado": "CUSTOM",
+    "filterFechaInicio": "Start",
+    "filterFechaFin": "End",
+    "filtrosAriaLabel": "Physical monitoring filters",
     "rowsPerPage": "Rows per page:",
     "displayedRows": "{from}-{to} of {count}",
     "loading": "Loading..."

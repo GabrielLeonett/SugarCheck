@@ -35,6 +35,9 @@
       "hoy": "Today",
       "semana": "Week",
       "mes": "Month",
+      "personalizado": "Custom",
+      "fechaInicio": "Start",
+      "fechaFin": "End",
       "ariaLabel": "Glucose filters"
     }
   },

@@ -22,6 +22,11 @@
       "trimestre": "四半期",
       "año": "年",
       "todos": "すべて",
+      "personalizado": "カスタム",
+      "fechaInicio": "開始",
+      "fechaFin": "終了",
+      "anio": "年",
+      "todosAnios": "すべての年",
       "ariaLabel": "HbA1cフィルター"
     }
   },
