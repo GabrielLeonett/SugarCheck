@@ -1,4 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { randomInt } from 'node:crypto';
 import { Result } from '../../shared/result';
 import { ErrorAbstract } from '../../shared/error-abstract';
 import type { GetOneByEmailInterface } from './ports/GetOneByEmailInterface';
@@ -19,7 +20,8 @@ export class ForgotPassword {
   async run(
     data: { email: string; lang?: string },
   ): Promise<Result<{ message: string }, ErrorAbstract>> {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // randomInt es criptográficamente seguro (Math.random no lo es)
+    const code = randomInt(100000, 1000000).toString();
 
     const userResult = await this.getOneByEmailUser.run({ email: data.email });
 

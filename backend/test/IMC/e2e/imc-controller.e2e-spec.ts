@@ -147,6 +147,45 @@ describe('ImcController (E2E)', () => {
     expect(res.body.peso).toBe(78);
   });
 
+  it('PATCH /imc/:id bloquea registros con más de 15 días (403)', async () => {
+    const old = await prismaService.imc.create({
+      data: {
+        userId: user.id,
+        peso: 80,
+        altura: 170,
+        imcValue: 80 / (1.7 * 1.7),
+        fecha: new Date(),
+        createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    const res = await request(app.getHttpServer())
+      .patch(`/imc/${old.id}`)
+      .set('Cookie', authCookie(token))
+      .send({ peso: 75 });
+
+    expect(res.status).toBe(403);
+  });
+
+  it('DELETE /imc/:id bloquea registros con más de 15 días (403)', async () => {
+    const old = await prismaService.imc.create({
+      data: {
+        userId: user.id,
+        peso: 80,
+        altura: 170,
+        imcValue: 80 / (1.7 * 1.7),
+        fecha: new Date(),
+        createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    const res = await request(app.getHttpServer())
+      .delete(`/imc/${old.id}`)
+      .set('Cookie', authCookie(token));
+
+    expect(res.status).toBe(403);
+  });
+
   it('DELETE /imc/:id elimina el registro (204)', async () => {
     const res = await request(app.getHttpServer())
       .delete(`/imc/${createdId}`)

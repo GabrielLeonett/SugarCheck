@@ -17,6 +17,10 @@ import { ForgotPassword } from '../app/ForgotPassword';
 import { ResetPassword } from '../app/ResetPassword';
 import { NodemailerService } from './email/nodemailer.service';
 import { ResetCodeStore } from './ResetCodeStore';
+import {
+  ForgotPasswordRateLimitGuard,
+  ResetPasswordRateLimitGuard,
+} from './auth-rate-limit.guard';
 
 @Module({
   imports: [
@@ -50,6 +54,8 @@ import { ResetCodeStore } from './ResetCodeStore';
       provide: 'ResetCodeStore',
       useClass: ResetCodeStore,
     },
+    ForgotPasswordRateLimitGuard,
+    ResetPasswordRateLimitGuard,
     LoginUser,
     RefreshAccessToken,
     Logout,

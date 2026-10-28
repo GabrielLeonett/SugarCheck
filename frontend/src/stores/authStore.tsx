@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { apiPrivate } from '../apis/axios.js';
+import { apiPrivate, apiPublic } from '../apis/axios.js';
 import type { User } from '../types/types.js';
 import { authFirebase } from '../config/firebase.js';
 import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, signOut } from 'firebase/auth';
@@ -31,7 +31,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   clearNewUserFlag: () => set({ isNewUser: false }),
 
   login: async (username, password) => {
-    const response = await apiPrivate.post('/auth/login', { username, password }, { withCredentials: true });
+    // El login es un endpoint público: si se usara apiPrivate, el interceptor
+    // intentaría refrescar la sesión ante un 401 (credenciales inválidas) y
+    // ocultaría el error real con un "no se encontró token".
+    const response = await apiPublic.post('/auth/login', { username, password }, { withCredentials: true });
 
     await preferenceStore.getState().load();
     console.log('Login successful, user data:', response.data.user);
@@ -70,11 +73,11 @@ export const useAuthStore = create<AuthState>((set) => ({
         const userCredential = await signInWithPopup(authFirebase, provider);
         const firebaseToken = await userCredential.user.getIdToken();
         
-        const response = await apiPrivate.post(
+        const response = await apiPublic.post(
           '/auth/firebase-login',
           { token: firebaseToken },
-        { withCredentials: true }
-      );
+          { withCredentials: true }
+        );
       
       console.log('Login successful, user data:', response.data.user);
       set({ user: response.data.user, accessToken: response.data.accessToken, isNewUser: response.data.isNewUser ?? false });

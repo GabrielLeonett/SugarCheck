@@ -19,6 +19,8 @@ import { GetOneByIdUser } from '../../../src/user/app/GetOneByIdUser';
 import { GetOneByUsernameUser } from '../../../src/user/app/GetOneByUsernameUser';
 import { UpdateUserEmail } from '../../../src/user/app/UpdateUserEmail';
 import { UpdateUser } from '../../../src/user/app/UpdateUser';
+import { UpdatePassword } from '../../../src/user/app/UpdatePassword';
+import { ChangePassword } from '../../../src/user/app/ChangePassword';
 import { BcryptHasher } from '../../../src/shared/infrastructure/security/bcrypt-hasher';
 import { GenerateUUID } from '../../../src/shared/infrastructure/generate-uuid';
 import { GetOneByIdPreference } from '../../../src/preference/app/GetOneByUserIdPreference';
@@ -125,7 +127,17 @@ describe('UserController (E2E)', () => {
             new GetOneByIdPreference(repo),
           inject: ['PreferenceRepository'],
         },
-        { provide: 'UpdatePassword', useClass: PrismaUserRepository },
+        {
+          provide: 'UpdatePassword',
+          useFactory: (repo: UserRepository) => new UpdatePassword(repo),
+          inject: ['UserRepository'],
+        },
+        {
+          provide: 'ChangePassword',
+          useFactory: (repo: UserRepository, hasher: PasswordHasher) =>
+            new ChangePassword(repo, hasher),
+          inject: ['UserRepository', 'BcryptHasher'],
+        },
         { provide: TranslationService, useValue: stubTranslationService() },
       ],
     }).compile();

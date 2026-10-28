@@ -19,6 +19,7 @@ import { Altura } from '../../IMC/core/value-objects/altura';
 import { Fecha } from '../../IMC/core/value-objects/Fecha';
 import { ContactName } from '../../contact_emergence/core/value-objects/ContactName';
 import { ContactParentesco } from '../../contact_emergence/core/value-objects/ContactParentesco';
+import { ContactPhone } from '../../contact_emergence/core/value-objects/ContactPhone';
 import { ProfileImg } from '../../preference/core/value-objects/ProfileImg';
 import { UnitMeasure } from '../../preference/core/value-objects/UnitMeasure';
 import { Thresholds } from '../../preference/core/value-objects/Thresholds';
@@ -41,6 +42,10 @@ interface ValidatedRecord {
   data?: Record<string, unknown>;
   error?: string;
 }
+
+/** Defaults para parámetros de insulina retirados de la UI. */
+const DEFAULT_INSULIN_RATIOS = { breakfast: 100, lunch: 100, dinner: 100 };
+const DEFAULT_SENSITIVITY = 1;
 
 export class PushChanges {
   constructor(private readonly syncRepository: SyncRepository) {}
@@ -459,7 +464,9 @@ export class PushChanges {
       const telefonoStr = this.asString(rec.telefono);
       if (telefonoStr === undefined)
         return { error: 'telefono debe ser un string o null' };
-      telefono = telefonoStr;
+      const phoneRes = ContactPhone.create(telefonoStr);
+      if (!phoneRes.isValid) return { error: phoneRes.getError().message };
+      telefono = phoneRes.getValue()?.value ?? null;
     }
 
     return { data: { name, parentesco, telefono } };
@@ -510,22 +517,19 @@ export class PushChanges {
         ? (ratiosRaw as any).dinner
         : undefined,
     );
-    if (
-      breakfast === undefined ||
-      lunch === undefined ||
-      dinner === undefined
-    ) {
-      return {
-        error:
-          'insulinRatios con breakfast, lunch y dinner numéricos es requerido',
-      };
-    }
-    const ratiosRes = InsulinRatios.create(breakfast, lunch, dinner);
+    // Parámetros retirados de la UI: si el cliente no los envía se usan
+    // valores por defecto para mantener compatibilidad con clientes antiguos.
+    const resolvedBreakfast = breakfast ?? DEFAULT_INSULIN_RATIOS.breakfast;
+    const resolvedLunch = lunch ?? DEFAULT_INSULIN_RATIOS.lunch;
+    const resolvedDinner = dinner ?? DEFAULT_INSULIN_RATIOS.dinner;
+    const ratiosRes = InsulinRatios.create(
+      resolvedBreakfast,
+      resolvedLunch,
+      resolvedDinner,
+    );
     if (!ratiosRes.isValid) return { error: ratiosRes.getError().message };
 
-    const sensitivity = this.asNumber(rec.sensitivity);
-    if (sensitivity === undefined)
-      return { error: 'sensitivity es requerido y debe ser numérico' };
+    const sensitivity = this.asNumber(rec.sensitivity) ?? DEFAULT_SENSITIVITY;
     const sensitivityRes = SensitivityFactor.create(sensitivity);
     if (!sensitivityRes.isValid)
       return { error: sensitivityRes.getError().message };
@@ -548,7 +552,11 @@ export class PushChanges {
         profileImg,
         unitMeasure,
         thresholds: { hypo, hiper },
-        insulinRatios: { breakfast, lunch, dinner },
+        insulinRatios: {
+          breakfast: resolvedBreakfast,
+          lunch: resolvedLunch,
+          dinner: resolvedDinner,
+        },
         sensitivity,
         correctionSchemas: correctionSchemas ?? null,
         basalSchemas: basalSchemas ?? null,

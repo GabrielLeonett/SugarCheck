@@ -20,8 +20,6 @@ import { AuthGuard } from '../../../auth/infra/auth.guard';
 import { CreateGlucoseDTO } from './DTOs/create-glucose.dto';
 import { UpdateGlucoseDTO } from './DTOs/update-glucose.dto';
 import { GlucoseNotFoundError } from '../../core/errors/GlucoseNotFoundError';
-import { EditWindowExpiredError } from '../../core/errors/EditWindowExpiredError';
-import { ErrorAbstract } from '../../../shared/error-abstract';
 import { TranslationService } from '../../../shared/infrastructure/i18n/translation.service';
 
 @Controller('glucose')
@@ -69,8 +67,7 @@ export class GlucoseController {
     if (!result.isValid) {
       const error = result.getError();
       if (error instanceof GlucoseNotFoundError) throw new NotFoundException(error.message);
-      if (error instanceof EditWindowExpiredError) throw new BadRequestException(error.message);
-      if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
+      // El resto de errores de dominio los resuelve el filtro global (403 incluido).
       throw error;
     }
     return result.getValue().toPlain();
