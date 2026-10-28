@@ -16,6 +16,7 @@ import ModalImcForm from '../components/shared/ModalImcForm.tsx';
 import ModalInsulinaRapida from './Insulina/components/ModalInsulinaRapida.tsx';
 import { insulinaApi } from '../apis/insulina';
 import { formToCreateGlucoseDto } from '../schemas/glucosa';
+import { useUiStore } from '../stores/uiStore';
 import type { GlucosaData } from '../schemas/glucosa';
 
 const MAX = 100;
@@ -32,6 +33,7 @@ export default function Home() {
 
   const dataGlucosa = useGlucosaData();
   const dataImc = useImcData();
+  const showToast = useUiStore((state) => state.showToast);
 
   const handleOpenGlucosaModal = () => setOpenGlucosaModal(true);
   const handleCloseGlucosaModal = () => setOpenGlucosaModal(false);
@@ -46,6 +48,7 @@ export default function Home() {
   }) => {
     await insulinaApi.create({ tipo: 'RAPIDA', ...data });
     setOpenInsulinaModal(false);
+    showToast('success', t('actions.insulinSaved'), 'Insulina');
   };
 
   const handleOpenImcModal = () => setOpenImcModal(true);

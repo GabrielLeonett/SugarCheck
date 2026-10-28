@@ -68,7 +68,7 @@ export function useInsulinaData(externalRefreshTrigger?: number): UseInsulinaDat
   const metric = useMetricData<InsulinRecord>(rawRegistros, 'mes', {
     dateAccessor: getFecha,
     getType: getTipoToken,
-    initialTypeFilter: 'todas',
+    initialTypeFilter: 'lenta',
   });
 
   const incluirFecha = metric.timeRange !== 'hoy';

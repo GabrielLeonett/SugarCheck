@@ -22,6 +22,11 @@ export const userApi = {
     return response.data;
   },
 
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
+    const response = await apiPrivate.post('/auth/change-password', { currentPassword, newPassword });
+    return response.data;
+  },
+
   async delete(id: string): Promise<void> {
     await apiPrivate.delete(`/user/${id}`);
   },

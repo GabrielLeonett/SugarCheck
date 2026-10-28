@@ -17,5 +17,9 @@
   "IMC_REMINDER_MESSAGE": "今日の体重がまだ記録されていません。ログを更新してください。",
   "IMC_CATEGORY_UNDERWEIGHT": "フォーサー",
   "IMC_CATEGORY_NORMAL": "標準",
-  "IMC_CATEGORY_OVERWEIGHT": "オーバー"
+  "IMC_CATEGORY_OVERWEIGHT": "オーバー",
+  "GLUCOSE_ALERT_HYPO": "低血糖アラート",
+  "GLUCOSE_ALERT_HYPO_MESSAGE": "血糖値が安全な閾値を下回っています: {{value}} mg/dL",
+  "GLUCOSE_ALERT_HYPER": "高血糖アラート",
+  "GLUCOSE_ALERT_HYPER_MESSAGE": "血糖値が安全な閾値を上回っています: {{value}} mg/dL"
 }

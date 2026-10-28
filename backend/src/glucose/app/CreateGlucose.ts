@@ -90,7 +90,7 @@ export class CreateGlucose {
         titleKey: alertKey,
         messageKey: alertMsg,
         params: { value: String(data.valueMgdl) },
-        link: '/bitacora/glucemia',
+        link: '/bitacora/control-glucosa',
       });
       if (!notifResult.isValid) {
         console.warn(

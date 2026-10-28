@@ -19,12 +19,10 @@ export class SavePreference {
     profileImg: string,
     unitMeasure: string,
     thresholds: { hypo: number; hiper: number },
-    insulinRatios: { breakfast: number; lunch: number; dinner: number },
-    sensitivity: number,
     correctionSchemas?: CorrectionSchemaItem[],
     basalSchemas?: BasalSchemaItem[],
   ): Promise<Result<Preference, ErrorAbstract>> {
-    
+
     // 1. Crear Value Objects
     const idRes = UserId.create(userId);
     if (!idRes.isValid) return Result.fail(idRes.getError());
@@ -38,14 +36,12 @@ export class SavePreference {
     const thresholdsRes = Thresholds.create({ ...thresholds });
     if (!thresholdsRes.isValid) return Result.fail(thresholdsRes.getError());
 
-    const insulinRatiosRes = InsulinRatios.create(
-      insulinRatios.breakfast,
-      insulinRatios.lunch,
-      insulinRatios.dinner,
-    );
+    // Ratios de insulina y factor de sensibilidad fueron retirados del producto.
+    // Se mantienen internamente con valores neutros para no romper el esquema persistido.
+    const insulinRatiosRes = InsulinRatios.create(1, 1, 1);
     if (!insulinRatiosRes.isValid) return Result.fail(insulinRatiosRes.getError());
 
-    const sensitivityRes = SensitivityFactor.create(sensitivity);
+    const sensitivityRes = SensitivityFactor.create(1);
     if (!sensitivityRes.isValid) return Result.fail(sensitivityRes.getError());
 
     const correctionSchemasRes = CorrectionSchemas.create(correctionSchemas);

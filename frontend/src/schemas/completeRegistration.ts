@@ -25,7 +25,14 @@ export const emergencyContactSchema = z.object({
     ["madre", "padre", "hermano", "hermana", "abuelo", "abuela", "tio", "tia", "tutor", "otro"] as const,
     { message: "Selecciona un parentesco" },
   ).optional(),
-  telefono: z.string().optional(),
+  telefono: z
+    .string()
+    .trim()
+    .optional()
+    .refine(
+      (val) => !val || /^\+?[\d\s()-]{7,20}$/.test(val),
+      "Ingresa un número telefónico válido",
+    ),
 });
 
 export const completeRegistrationSchema = healthStepSchema.merge(emergencyContactSchema);

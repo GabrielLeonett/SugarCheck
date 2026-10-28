@@ -53,8 +53,6 @@ export class PreferenceController {
       body.profileImg,
       body.unitMeasure,
       body.thresholds,
-      body.insulinRatios,
-      body.sensitivity,
       body.correctionSchemas,
       body.basalSchemas,
     );

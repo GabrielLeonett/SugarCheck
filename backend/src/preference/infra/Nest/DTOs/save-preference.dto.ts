@@ -1,13 +1,11 @@
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
-  IsNumber,
   IsString,
   IsOptional,
   ValidateNested,
-  ArrayMinSize,
 } from 'class-validator';
-import { ThresholdsDTO, InsulinRatiosDTO, CorrectionSchemaItemDTO, BasalSchemaItemDTO } from './utils.dto';
+import { ThresholdsDTO, CorrectionSchemaItemDTO, BasalSchemaItemDTO } from './utils.dto';
 
 export class SavePreferenceDTO {
 
@@ -23,17 +21,6 @@ export class SavePreferenceDTO {
   @Type(() => ThresholdsDTO)
   @IsNotEmpty({ message: 'Los umbrales son obligatorios' })
   thresholds!: ThresholdsDTO;
-
-  @ValidateNested({
-    message: 'Los ratios de insulina tienen un formato incorrecto',
-  })
-  @Type(() => InsulinRatiosDTO)
-  @IsNotEmpty({ message: 'Los ratios de insulina son obligatorios' })
-  insulinRatios!: InsulinRatiosDTO;
-
-  @IsNumber({}, { message: 'El factor de sensibilidad debe ser un número' })
-  @IsNotEmpty({ message: 'El factor de sensibilidad es obligatorio' })
-  sensitivity!: number;
 
   @IsOptional()
   @ValidateNested({ each: true, message: 'Los esquemas de corrección tienen un formato incorrecto' })
