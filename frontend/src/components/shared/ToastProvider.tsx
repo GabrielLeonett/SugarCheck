@@ -1,4 +1,4 @@
-import { Alert, Box, Slide, Typography } from '@mui/material';
+import { Alert, Box, Slide, Typography, useTheme } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -29,6 +29,8 @@ function SeverityIcon({ severity }: { severity: ToastSeverity }) {
 }
 
 export default function ToastProvider() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const toasts = useUiStore((s) => s.toasts);
   const dismissToast = useUiStore((s) => s.dismissToast);
 
@@ -65,10 +67,14 @@ export default function ToastProvider() {
                 borderRadius: 2,
                 fontWeight: 500,
                 bgcolor: styles.bgcolor,
-                color: isCritical ? '#ffffff' : 'text.primary',
+                color: isCritical ? '#ffffff' : isDark ? '#1a1a1a' : 'text.primary',
                 '& .MuiAlert-icon': {
                   alignItems: 'center',
                   fontSize: 24,
+                  color: isCritical ? '#ffffff' : styles.iconColor,
+                },
+                '& .MuiAlert-action': {
+                  color: isCritical ? '#ffffff' : isDark ? '#1a1a1a' : 'inherit',
                 },
                 animation: 'toast-slide-in 0.25s ease-out',
                 '@keyframes toast-slide-in': {
