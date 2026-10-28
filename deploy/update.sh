@@ -11,6 +11,15 @@ cd "$(dirname "$0")/.."
 
 log() { echo -e "\n\033[1;34m==>\033[0m $*"; }
 
+# En el servidor SÍ hace falta: es lo que inyecta las variables a los
+# contenedores. En el compose está como `required: false` para que el
+# build/push funcione en tu PC.
+if [[ ! -f backend/.env ]]; then
+  echo "[x] Falta backend/.env"
+  echo "    cp deploy/backend.env.example backend/.env  y rellénalo"
+  exit 1
+fi
+
 log "Git pull"
 git pull --ff-only || true
 
