@@ -1,11 +1,14 @@
+# pnpm 11 exige aprobar explícitamente los paquetes que ejecutan scripts
+# de instalación. Si no, `pnpm install` falla con ERR_PNPM_IGNORED_BUILDS.
+#
+# En el backend NO basta con silenciar el error: @prisma/engines descarga
+# los binarios de Prisma en su postinstall y bcrypt compila su binding
+# nativo. Sin esos scripts el backend no arranca.
 allowBuilds:
-  '@firebase/util': false
-  '@nestjs/core': false
-  '@parcel/watcher': false
-  '@prisma/engines': false
-  bcrypt: false
-  esbuild: false
-  prisma: false
-  protobufjs: false
-  unrs-resolver: false
-  workerd: false
+  '@parcel/watcher': true
+  '@prisma/engines': true
+  bcrypt: true
+  esbuild: true
+  prisma: true
+  protobufjs: true
+  unrs-resolver: true

@@ -19,7 +19,7 @@ RUN npm install -g pnpm@11
 WORKDIR /app
 
 # Capa de dependencias (se cachea si no cambia el lockfile)
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile || pnpm install
 
 COPY . .
