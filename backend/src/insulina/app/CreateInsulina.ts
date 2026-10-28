@@ -11,6 +11,23 @@ import { Result } from '../../shared/result';
 import { ErrorAbstract } from '../../shared/error-abstract';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
 import { ContextoAplicacionInvalidoError } from '../core/errors/ContextoAplicacionInvalidoError';
+import { InsulinaSolapadaError } from '../core/errors/InsulinaSolapadaError';
+import { ZonaRepetidaError } from '../core/errors/ZonaRepetidaError';
+import { IntervaloInsuficienteError } from '../core/errors/IntervaloInsuficienteError';
+
+const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
+
+function aFechaHora(dosis: Insulina): Date {
+  return new Date(
+    dosis.fecha.anio,
+    dosis.fecha.mes - 1,
+    dosis.fecha.dia,
+    dosis.hora.hours,
+    dosis.hora.minutes,
+    0,
+    0,
+  );
+}
 
 export class CreateInsulina {
   constructor(
@@ -55,6 +72,37 @@ export class CreateInsulina {
       const ctxRes = ContextoAplicacion.create(params.contexto);
       if (!ctxRes.isValid) return Result.fail(ctxRes.getError());
       contexto = ctxRes.getValue();
+    }
+
+    // Prevención de solapamiento: rechaza una dosis del mismo tipo a la misma fecha y hora.
+    const fecha = fechaRes.getValue();
+    const inicioDia = new Date(fecha.anio, fecha.mes - 1, fecha.dia, 0, 0, 0, 0);
+    const finDia = new Date(fecha.anio, fecha.mes - 1, fecha.dia, 23, 59, 59, 999);
+    const existentes = await this.repository.getByUserIdAndDateRange(userId, inicioDia, finDia);
+    if (existentes.isValid) {
+      const solapada = existentes.getValue().some(
+        (dosis) =>
+          dosis.tipo.equals(tipoRes.getValue()) &&
+          dosis.hora.equals(horaRes.getValue()),
+      );
+      if (solapada) return Result.fail(new InsulinaSolapadaError());
+    }
+
+    // Reglas de seguridad: última inyección hace > 2 horas y en zona distinta.
+    const historial = await this.repository.getAllByUserId(userId);
+    if (historial.isValid && historial.getValue().length > 0) {
+      const ultima = historial.getValue().reduce((anterior, actual) =>
+        aFechaHora(actual).getTime() > aFechaHora(anterior).getTime() ? actual : anterior
+      );
+      const ultimaFechaHora = aFechaHora(ultima);
+
+      if (Date.now() - ultimaFechaHora.getTime() < DOS_HORAS_MS) {
+        return Result.fail(new IntervaloInsuficienteError());
+      }
+
+      if (ultima.zona.equals(zonaRes.getValue())) {
+        return Result.fail(new ZonaRepetidaError());
+      }
     }
 
     const insulina = new Insulina({

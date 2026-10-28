@@ -1,6 +1,5 @@
 import { CaminoProgreso } from '../core/CaminoProgreso';
 import { CaminoProgresoRepository } from '../core/CaminoProgresoRepository';
-import { CaminoProgreso } from '../core/CaminoProgreso';
 
 export class CompletarNivelCamino {
   constructor(private readonly repo: CaminoProgresoRepository) {}
