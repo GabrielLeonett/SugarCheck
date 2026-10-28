@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import useLanguage from "../../../hooks/useLanguage";
 
 interface SeparadorMundoProps {
     texto: string; 
@@ -11,6 +12,7 @@ function SeparadorMundo({
     numero = "1", 
     bool = true
 }: SeparadorMundoProps) {
+    const { t } = useLanguage("camino");
 return (
     <Box
     sx={{
@@ -45,7 +47,7 @@ return (
             whiteSpace: "nowrap",     // Evita que el texto se rompa en dos renglones si la pantalla se achica
         }}
     >
-        Mundo {numero} : {texto}
+        {t("world")} {numero} : {texto}
     </Typography>
 
       {/* Línea Derecha */}

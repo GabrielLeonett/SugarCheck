@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Box,
     LinearProgress,
@@ -42,6 +42,20 @@ import ModalBasalSchema from "./components/ModalBasalSchema";
 import ModalDynamicCorrection from "./components/ModalDynamicCorrection";
 import useLanguage from "../../hooks/useLanguage";
 import { useUiStore } from "../../stores/uiStore";
+import { getCaminoProgreso } from "../../apis/camino";
+import yelmo_de_sabiduria from "../../assets/insigniasCamino/yelmo_de_sabiduria.png";
+import escudo_de_fibra from "../../assets/insigniasCamino/escudo_de_fribra.png";
+import lanzas from "../../assets/insigniasCamino/lanzas.png";
+import imagen_8 from "../../assets/insigniasCamino/image 8.svg";
+import imagen_9 from "../../assets/insigniasCamino/image 9.svg";
+
+const insigniasCaminoPerfil = [
+    { img: escudo_de_fibra, mundo: "Mundo 1", name: "Escudo de fibra" },
+    { img: yelmo_de_sabiduria, mundo: "Mundo 2", name: "Yelmo de la sabiduría" },
+    { img: imagen_8, mundo: "Mundo 3", name: "Peto de Precisión" },
+    { img: imagen_9, mundo: "Mundo 4", name: "Gradas de equilibrio" },
+    { img: lanzas, mundo: "Mundo 5", name: "Lanceta del Elegido" },
+];
 
 export function Profile() {
     const { t: tp } = useLanguage("profile");
@@ -50,7 +64,8 @@ export function Profile() {
     const authRefresh = useAuthStore((state) => state.refresh);
     const showToast = useUiStore((s) => s.showToast);
 
-    const [progress] = React.useState(25);
+    const [totalNivelesCompletados, setTotalNivelesCompletados] = useState(0);
+    const [insigniasDesbloqueadas, setInsigniasDesbloqueadas] = useState(0);
     const [openConfirm, setOpenConfirm] = React.useState(false);
     const [prefForm, setPrefForm] = React.useState({
         hypo: 90,
@@ -116,6 +131,11 @@ export function Profile() {
             }
         }).catch(() => { });
         loadContacts();
+        getCaminoProgreso().then((progreso) => {
+            const completados = progreso.ultimoNivelCompletado || 0;
+            setTotalNivelesCompletados(completados);
+            setInsigniasDesbloqueadas(Math.floor(completados / 3));
+        }).catch(() => { });
     }, []);
 
     const onPersonalSave = async (data: ProfilePersonalData) => {
@@ -242,28 +262,40 @@ export function Profile() {
                                     {authUser?.username || 'Guerrero'}
                                 </Typography>
                             </Box>
-                            <Box sx={{ mb: 4, p: 2, borderRadius: 2 }}>
-                                <Typography variant="subtitle2" color="#4A5568">{tp("streaks")}</Typography>
-                                <Typography variant="h3" sx={{ my: 1, color: "success.light" }}>7</Typography>
-                                <Typography variant="caption" color="#718096">{tp("daysInSafeZone")}</Typography>
-                            </Box>
                             <Box sx={{ mb: 4 }}>
                                 <Typography variant="subtitle1" align="center">{tp("warriorPath")}</Typography>
                                 <Box sx={{ display: "flex", alignItems: "center", mt: 1, mb: 0.5 }}>
-                                    <LinearProgress variant="determinate" value={progress} sx={{ flexGrow: 1, height: 20, borderRadius: 5, bgcolor: 'primary.dark' }} />
-                                    <Typography variant="body2" sx={{ ml: 1, fontWeight: "bold" }}>{progress}%</Typography>
+                                    <LinearProgress variant="determinate" value={Math.round((totalNivelesCompletados / 15) * 100)} sx={{ flexGrow: 1, height: 20, borderRadius: 5, bgcolor: 'primary.dark' }} />
+                                    <Typography variant="body2" sx={{ ml: 1, fontWeight: "bold" }}>{Math.round((totalNivelesCompletados / 15) * 100)}%</Typography>
                                 </Box>
-                                <Typography variant="body2" sx={{ mt: 2 }}>{tp("currentLevel")}</Typography>
-                                <Typography variant="caption" sx={{ mt: 4 }}>{tp("badMission")}</Typography>
+                                <Typography variant="caption" sx={{ mt: 1, display: "block" }}>
+                                    {totalNivelesCompletados} / 15 niveles completados
+                                </Typography>
                             </Box>
                             <Box sx={{ textAlign: "left" }}>
                                 <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>{tp("badges")}</Typography>
-                                <Box sx={{ bgcolor: 'primary.500', display: "flex", alignItems: "center", justifyContent: 'center', p: 1.5, borderRadius: 2, gap: 2 }}>
-                                    <Box component="img" src={Medal} alt="Medalla" sx={{ width: 50, height: 50 }} />
-                                    <Box>
-                                        <Typography variant="body2">{tp("badgeShield")}</Typography>
-                                        <Typography variant="caption">{tp("badgeWorld")}</Typography>
-                                    </Box>
+                                <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                                    {insigniasCaminoPerfil.map((insignia, index) => (
+                                        <Box
+                                            key={`${insignia.name}-${index}`}
+                                            sx={{
+                                                bgcolor: index < insigniasDesbloqueadas ? 'primary.500' : 'rgba(255,255,255,0.3)',
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: 'flex-start',
+                                                p: 1.5,
+                                                borderRadius: 2,
+                                                gap: 2,
+                                                filter: index < insigniasDesbloqueadas ? 'none' : 'grayscale(100%) opacity(40%)',
+                                            }}
+                                        >
+                                            <Box component="img" src={insignia.img} alt={insignia.name} sx={{ width: 50, height: 50, objectFit: "contain" }} />
+                                            <Box>
+                                                <Typography variant="body2" sx={{ color: index < insigniasDesbloqueadas ? 'inherit' : '#8e8e8e' }}>{insignia.name}</Typography>
+                                                <Typography variant="caption" sx={{ color: index < insigniasDesbloqueadas ? '#4caf50' : '#8e8e8e', textTransform: 'uppercase' }}>{insignia.mundo}</Typography>
+                                            </Box>
+                                        </Box>
+                                    ))}
                                 </Box>
                             </Box>
                         </CardBase>
