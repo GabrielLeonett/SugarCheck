@@ -1,4 +1,9 @@
+# pnpm 11 exige aprobar explícitamente los paquetes que ejecutan scripts
+# de instalación. Si no, `pnpm install` falla con ERR_PNPM_IGNORED_BUILDS.
+#
+# Ninguno de estos es imprescindible para el build de Vite, pero aprobarlos
+# (en vez de permitir todos) mantiene el install reproducible.
 allowBuilds:
-  '@firebase/util': false
-  core-js-pure: false
-  protobufjs: false
+  '@firebase/util': true
+  core-js-pure: true
+  protobufjs: true

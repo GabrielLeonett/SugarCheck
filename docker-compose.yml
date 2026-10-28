@@ -21,7 +21,7 @@ services:
       context: ./backend
       target: build
     command: ["pnpm", "exec", "prisma", "migrate", "deploy"]
-    env_file: ./backend/.env.production
+    env_file: ./backend/.env
     restart: "no"
 
   # ----------------------------------------------------------
@@ -30,7 +30,7 @@ services:
   api:
     build:
       context: ./backend
-    env_file: ./backend/.env.production
+    env_file: ./backend/.env
     restart: unless-stopped
     expose:
       - "3000"
