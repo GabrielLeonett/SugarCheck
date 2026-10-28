@@ -35,5 +35,13 @@
     "zoneArmRight": "Braço Direito",
     "zoneArmLeft": "Braço Esquerdo",
     "zoneGluteRight": "Glúteo Direito",
-    "zoneGluteLeft": "Glúteo Esquerdo"
+    "zoneGluteLeft": "Glúteo Esquerdo",
+    "dosis": "Dose (UI)",
+    "saving": "Salvando...",
+    "errorGuardarRegistro": "Erro ao salvar o registro",
+    "pleaseSelectZone": "Selecione uma zona de aplicação",
+    "sinRangosDefinidos": "Sem faixas definidas",
+    "editarEsquema": "Editar esquema",
+    "saveSuccess": "Dose de insulina registrada com sucesso",
+    "saveSuccessTitle": "Insulina registrada"
 }

@@ -49,7 +49,7 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
   };
 
   const obtenerTipoLabel = (tipo: string) => {
-    return tipo === 'LENTA' ? 'Lenta / Basal' : 'Rápida / Bolus';
+    return tipo === 'LENTA' ? t('tipoLenta') : t('tipoRapida');
   };
 
   const formatHora = (hora: string) => {
@@ -61,10 +61,10 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
   };
 
   const formatFecha = (iso: string) => {
-    const date = new Date(iso);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    return `${day}/${month}/${date.getFullYear()}`;
+    // El backend entrega la fecha como YYYY-MM-DD; parseamos por partes para
+    // evitar desfases de zona horaria al usar new Date().
+    const [year, month, day] = iso.split('T')[0].split('-');
+    return `${day}/${month}/${year}`;
   };
 
   const columns: Column<InsulinRecord>[] = [

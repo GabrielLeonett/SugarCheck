@@ -15,6 +15,11 @@
     "emailLabel": "Correo Electrónico",
     "currentPasswordLabel": "Contraseña Actual",
     "newPasswordLabel": "Nueva Contraseña",
+    "confirmPasswordLabel": "Confirmar Nueva Contraseña",
+    "changePasswordTitle": "Cambiar Contraseña",
+    "changePasswordButton": "Actualizar Contraseña",
+    "passwordUpdated": "Contraseña actualizada exitosamente",
+    "passwordUpdateError": "No se pudo actualizar la contraseña",
     "saveChanges": "Guardar Cambios",
     "emergencyContacts": "Contactos de Emergencia",
     "noContacts": "No hay contactos de emergencia registrados",
@@ -80,5 +85,15 @@
     "usuarioNoAutenticado": "Usuario no autenticado",
     "errorGuardar": "Error al guardar",
     "errorEliminar": "Error al eliminar",
-    "errorCargar": "No hay preferencias cargadas"
+    "errorCargar": "No hay preferencias cargadas",
+    "exportTitle": "Exportar datos médicos",
+    "exportDescription": "Descarga tus registros clínicos de glucosa, HbA1c, insulina e IMC.",
+    "exportFrom": "Desde",
+    "exportTo": "Hasta",
+    "exportRangeHint": "Deja las fechas vacías para exportar todo el historial.",
+    "exportPdf": "Descargar PDF",
+    "exportCsv": "Descargar CSV",
+    "exportSuccess": "Archivo descargado",
+    "exportError": "No se pudo generar el archivo",
+    "exportInvalidRange": "La fecha inicial debe ser anterior o igual a la final"
 }

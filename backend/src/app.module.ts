@@ -15,6 +15,7 @@ import { I18nModule } from './shared/infrastructure/i18n/i18n.module';
 import { GlobalExceptionFilter } from './shared/infrastructure/exception-filter';
 import { TranslationService } from './shared/infrastructure/i18n/translation.service';
 import { CaminoModule } from './camino/infra/camino.module';
+import { ExportModule } from './export/infra/Nest/export.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { CaminoModule } from './camino/infra/camino.module';
     OraculoModule,
     SyncModule,
     CaminoModule,
+    ExportModule,
   ],
   providers: [
     {
