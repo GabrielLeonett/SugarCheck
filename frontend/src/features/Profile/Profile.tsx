@@ -24,7 +24,6 @@ import { CardBase } from "../../components/ui/Cards/CardBase";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { AvatarProfile } from "./components/AvatarProfile";
-import Medal from '../../assets/icons/medal.svg';
 import { useAuthStore } from "../../stores/authStore";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';

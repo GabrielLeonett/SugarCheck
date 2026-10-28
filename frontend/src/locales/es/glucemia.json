@@ -35,6 +35,9 @@
       "hoy": "Hoy",
       "semana": "Semana",
       "mes": "Mes",
+      "personalizado": "Personalizado",
+      "fechaInicio": "Inicio",
+      "fechaFin": "Fin",
       "ariaLabel": "Filtros de glucosa"
     }
   },

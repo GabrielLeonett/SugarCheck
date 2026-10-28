@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import { Box, useTheme, Typography, TextField, Link, Alert, MenuItem } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DateField } from '@mui/x-date-pickers/DateField';
-import dayjs from 'dayjs';
 import { LogoGA } from "../components/ui/LogoGA";
 import LoginIcon from '@mui/icons-material/Login';
 import { CardBase } from '../components/ui/Cards/CardBase';
@@ -28,7 +24,6 @@ export default function Register() {
 
   const {
     register,
-    control,
     setError,
     formState: { errors },
     handleSubmit,
@@ -38,7 +33,6 @@ export default function Register() {
       username: '',
       nombre: '',
       fechaNacimiento: '',
-      sexo: '' as any,
       email: '',
       password: '',
       confirmPassword: '',
@@ -180,33 +174,23 @@ export default function Register() {
               label={t("nameLabel")}
               variant="outlined"
               size="small"
+              error={!!errors.nombre}
+              helperText={errors.nombre?.message}
               sx={textFieldStyles}
             />
 
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Controller
-                name="fechaNacimiento"
-                control={control}
-                render={({ field: { onChange, value, ...rest } }) => (
-                  <DateField
-                    {...rest}
-                    fullWidth
-                    label={t("birthDateLabel")}
-                    format="DD/MM/YYYY"
-                    value={value ? dayjs(value) : null}
-                    onChange={(newValue) => onChange(newValue ? newValue.toISOString() : '')}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        sx: textFieldStyles,
-                        error: !!errors.fechaNacimiento,
-                        helperText: errors.fechaNacimiento?.message,
-                      }
-                    }}
-                  />
-                )}
-              />
-            </LocalizationProvider>
+            <TextField
+              {...register("fechaNacimiento")}
+              fullWidth
+              label={t("birthDateLabel")}
+              type="date"
+              variant="outlined"
+              size="small"
+              slotProps={{ inputLabel: { shrink: true } }}
+              error={!!errors.fechaNacimiento}
+              helperText={errors.fechaNacimiento?.message}
+              sx={textFieldStyles}
+            />
 
             <TextField
               {...register("sexo")}
@@ -231,7 +215,7 @@ export default function Register() {
               size="small"
               type="email"
               error={!!errors.email}
-              helperText={errors.email?.message || ''}
+              helperText={errors.email?.message}
               sx={textFieldStyles}
             />
 

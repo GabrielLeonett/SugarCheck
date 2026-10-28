@@ -7,7 +7,7 @@ import { preferenceStore } from './usePreferenceConfig';
 import { useNotificationStore } from '../stores/notificationStore';
 import { useUiStore } from '../stores/uiStore';
 import useMetricData from './useMetricData';
-import type { TimeRange } from './useMetricData';
+import type { CustomDateRange, TimeRange } from './useMetricData';
 import type { GlucosaRecord, HbA1cRecord } from '../data/recordsMock';
 
 export const obtenerColorEstado = (estado: string) => {
@@ -24,8 +24,15 @@ export interface UseGlucosaDataReturn {
   openHbA1c: boolean;
   filtroGlucosa: TimeRange;
   setFiltroGlucosa: (range: TimeRange) => void;
+  customRangeGlucosa: CustomDateRange | null;
+  setCustomRangeGlucosa: (range: CustomDateRange | null) => void;
   filtroHbA1c: TimeRange;
   setFiltroHbA1c: (range: TimeRange) => void;
+  customRangeHbA1c: CustomDateRange | null;
+  setCustomRangeHbA1c: (range: CustomDateRange | null) => void;
+  yearFilterHbA1c: number | null;
+  setYearFilterHbA1c: (year: number | null) => void;
+  hbA1cYears: number[];
   pageGlucosa: number;
   setPageGlucosa: (page: number) => void;
   rowsPerPageGlucosa: number;
@@ -230,12 +237,23 @@ export function useGlucosaData(): UseGlucosaDataReturn {
 
   const ultimoHbA1c = hbA1cRaw.length > 0 ? hbA1cRaw[hbA1cRaw.length - 1] : null;
 
+  const hbA1cYears = Array.from(
+    new Set(hbA1cRaw.map((item) => parseInt(item.fechaISO.slice(0, 4), 10)))
+  ).sort((a, b) => b - a);
+
   return {
     openGlucosa, openHbA1c,
     filtroGlucosa: glucosa.timeRange,
     setFiltroGlucosa: glucosa.setTimeRange,
+    customRangeGlucosa: glucosa.customRange,
+    setCustomRangeGlucosa: glucosa.setCustomRange,
     filtroHbA1c: hbA1c.timeRange,
     setFiltroHbA1c: hbA1c.setTimeRange,
+    customRangeHbA1c: hbA1c.customRange,
+    setCustomRangeHbA1c: hbA1c.setCustomRange,
+    yearFilterHbA1c: hbA1c.yearFilter,
+    setYearFilterHbA1c: hbA1c.setYearFilter,
+    hbA1cYears,
     pageGlucosa: glucosa.page,
     setPageGlucosa: glucosa.setPage,
     rowsPerPageGlucosa: glucosa.rowsPerPage,
