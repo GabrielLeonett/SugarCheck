@@ -12,12 +12,5 @@ export const profileThresholdsSchema = z.object({
   hiper: z.number().min(10, "Mínimo 10").max(400, "Máximo 400"),
 });
 
-export const profileInsulinRatiosSchema = z.object({
-  breakfast: z.number().nonnegative("Debe ser un valor positivo"),
-  lunch: z.number().nonnegative("Debe ser un valor positivo"),
-  dinner: z.number().nonnegative("Debe ser un valor positivo"),
-});
-
 export type ProfilePersonalData = z.infer<typeof profilePersonalSchema>;
 export type ProfileThresholdsData = z.infer<typeof profileThresholdsSchema>;
-export type ProfileInsulinRatiosData = z.infer<typeof profileInsulinRatiosSchema>;

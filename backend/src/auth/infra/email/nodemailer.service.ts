@@ -122,14 +122,15 @@ export class NodemailerService implements SendEmailInterface {
     const txt = this.t(lang);
     const urlAccion = `${this.frontendUrl}/restablecer-contrasena?email=${encodeURIComponent(to)}&code=${code}`;
 
-    if (this.isDev && !this.configService.get<string>('EMAIL_USER')) {
+    if (this.isDev) {
       console.log('========================================');
       console.log(`[DEV] ${txt.devLog}`);
       console.log(`  Para: ${to}`);
       console.log(`  ${txt.devCode} ${code}`);
       console.log(`  URL: ${urlAccion}`);
       console.log('========================================');
-      return;
+
+      if (!this.configService.get<string>('EMAIL_USER')) return;
     }
 
     const body = `
@@ -147,11 +148,34 @@ export class NodemailerService implements SendEmailInterface {
       <p style="margin: 0; font-size: 14px; color: #4a5568; line-height: 1.6;">${txt.securityText}</p>
     </div>`;
 
-    await this.transporter.sendMail({
-      from: `"SugarCheck" <${this.from}>`,
-      to,
-      subject: txt.subject,
-      html: this.baseHtml(body, lang),
-    });
+    try {
+      await this.transporter.sendMail({
+        from: `"SugarCheck" <${this.from}>`,
+        to,
+        subject: txt.subject,
+        html: this.baseHtml(body, lang),
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      // En desarrollo el código ya quedó impreso en consola, así que no
+      // bloqueamos el flujo si el SMTP no está configurado o falla.
+      if (this.isDev) {
+        console.warn('========================================');
+        console.warn('[DEV] No se pudo enviar el correo de recuperación.');
+        console.warn(`[DEV] Usa el código mostrado arriba para: ${to}`);
+        console.warn(`[DEV] Detalle: ${message}`);
+        if (message.includes('534') || /WebLoginRequired/i.test(message)) {
+          console.warn(
+            '[DEV] Gmail pide verificar la cuenta: inicia sesión en el navegador y visita https://accounts.google.com/DisplayUnlockCaptcha',
+          );
+        }
+        console.warn('========================================');
+        return;
+      }
+
+      console.error('[EMAIL_ERROR] No se pudo enviar el correo de recuperación', error);
+      throw error;
+    }
   }
 }

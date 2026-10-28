@@ -1,0 +1,41 @@
+@startuml Glicosilada_Object
+skinparam monochrome true
+skinparam linetype ortho
+
+' Instancia de la Entidad Principal
+object "examenGlicosilada : Glicosilada" as glicosilada
+
+' Instancias de los Value Objects
+object "id : GlicosiladaId" as glicosiladaId {
+  value = "gli-550e8400-e29b"
+}
+
+object "usuario_id : UserId" as userId {
+  value = "usr-8f7d9a2b"
+}
+
+object "valor_porcentaje : GlicosiladaValor" as valor {
+  value = 7.5
+}
+
+object "eAG : GlicosiladaEAG" as eag {
+  value = 169.0
+}
+
+object "fecha_examen : Date" as fecha {
+  value = Date("2026-04-10T08:30:00Z")
+}
+
+object "created_at : Date" as createdAt {
+  value = Date("2026-04-11T10:00:00Z")
+}
+
+' Relaciones que muestran cómo la entidad agrupa a los objetos
+glicosilada *-- glicosiladaId : _id
+glicosilada *-- userId : _usuario_id
+glicosilada *-- valor : _valor_porcentaje
+glicosilada *-- eag : _eAG
+glicosilada *-- fecha : _fecha_examen
+glicosilada *-- createdAt : _created_at
+
+@enduml

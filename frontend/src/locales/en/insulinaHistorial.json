@@ -6,11 +6,31 @@
   "dosisUi": "Dose (UI)",
   "noHayRegistrosGraficar": "No records to graph",
   "historialRegistros": "Record History",
+  "fecha": "Date",
   "hora": "Time",
   "dosis": "Dose (UI)",
   "tipo": "Type",
   "zona": "Area",
   "contexto": "Context",
   "noHayRegistrosFiltro": "No records for this filter.",
-  "filasPorPagina": "Rows per page:"
+  "filasPorPagina": "Rows per page:",
+  "hoy": "Today",
+  "semana": "Week",
+  "mes": "Month",
+  "trimestre": "Quarter",
+  "año": "Year",
+  "todos": "All",
+  "tipoLenta": "Slow / Basal",
+  "tipoRapida": "Fast / Bolus",
+  "grafico": {
+    "filtros": {
+      "ariaLabel": "Insulin filters"
+    }
+  },
+  "filtroTipo": {
+    "ariaLabel": "Filter by insulin type"
+  },
+  "tabla": {
+    "ariaLabel": "Insulin history table"
+  }
 }

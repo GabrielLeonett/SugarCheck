@@ -1,336 +1,236 @@
-import { Typography, Box, Grid, TextField, IconButton, Paper } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useState } from "react";
-import { ButtonBase } from "../../../components/ui/Buttons/ButtonBase.tsx";
-import { Modal } from "../../../components/ui/Modals/Modals.tsx";
-import useLanguage from "../../../hooks/useLanguage";
-
+import {
+  Modal,
+  Box,
+  Typography,
+  TextField,
+  Grid,
+  Button,
+  IconButton,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { insulinaLentaSchema, type InsulinaLentaData, type ZonaBackend } from '../../../schemas/insulina';
+import type { InsulinRecord } from '../../../apis/insulina';
+import useLanguage from '../../../hooks/useLanguage';
+import { useUiStore } from '../../../stores/uiStore';
+import { useEffect, useState } from 'react';
+import ZonaSelector from './ZonaSelector';
 
 interface ModalInsulinaLentaProps {
   open: boolean;
   onClose: () => void;
+  onSave: (data: {
+    dosis: number;
+    dia: number;
+    mes: number;
+    anio: number;
+    hora: string;
+    zona: string;
+  }) => Promise<void>;
+  record?: InsulinRecord | null;
+  title?: string;
+  submitLabel?: string;
 }
 
-export default function ModalInsulinaLenta({ open, onClose }: ModalInsulinaLentaProps) {
-  const { t } = useLanguage("insulina");
-  const [unidades, setUnidades] = useState<number>(0);
-  const [fecha, setFecha] = useState({ dd: "23", mm: "06", yyyy: "2026" });
-  const [hora, setHora] = useState("14:11");
+const obtenerFechaActual = () => {
+  const hoy = new Date();
+  const offset = hoy.getTimezoneOffset();
+  const fechaLocal = new Date(hoy.getTime() - offset * 60 * 1000);
+  return fechaLocal.toISOString().split('T')[0];
+};
 
-  const [vistaCuerpo, setVistaCuerpo] = useState<"FRENTE" | "ATRÁS">("FRENTE");
-  const [zonaSeleccionada, setZonaSeleccionada] = useState<string>(t("zoneAbdomenLeft"));
+const obtenerHoraActual = () => {
+  const ahora = new Date();
+  const horas = String(ahora.getHours()).padStart(2, '0');
+  const minutos = String(ahora.getMinutes()).padStart(2, '0');
+  return `${horas}:${minutos}`;
+};
 
-  const zonasFrente = [
-    t("zoneAbdomenRight"),
-    t("zoneAbdomenLeft"),
-    t("zoneThighRight"),
-    t("zoneThighLeft"),
-  ];
-  
-  const zonasAtras = [
-    t("zoneArmRight"),
-    t("zoneArmLeft"),
-    t("zoneGluteRight"),
-    t("zoneGluteLeft"),
-  ];
+export default function ModalInsulinaLenta({
+  open,
+  onClose,
+  onSave,
+  record,
+  title,
+  submitLabel,
+}: ModalInsulinaLentaProps) {
+  const { t } = useLanguage('insulina');
+  const showToast = useUiStore((s) => s.showToast);
+  const [loading, setLoading] = useState(false);
 
-  const zonasActuales = vistaCuerpo === "FRENTE" ? zonasFrente : zonasAtras;
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<InsulinaLentaData>({
+    resolver: zodResolver(insulinaLentaSchema),
+    mode: 'onChange',
+    defaultValues: {
+      dosis: 0,
+      fecha: obtenerFechaActual(),
+      hora: obtenerHoraActual(),
+      zona: 'ABDOMEN_IZQUIERDO' as ZonaBackend,
+    },
+  });
 
-  // Función para obtener el color según la zona
-  const getZonaColor = (zona: string, esSeleccionado: boolean) => {
-    if (!esSeleccionado) return "#e2e8f0";
-    
-    if (zona.includes("Abdomen")) return "#ef4444";
-    if (zona.includes("Glúteo")) return "#22c55e";
-    if (zona.includes("Muslo")) return "#f59e0b";
-    if (zona.includes("Brazo")) return "#f97316";
-    return "#64748b";
-  };
+  useEffect(() => {
+    if (open) {
+      reset(
+        record
+          ? {
+              dosis: record.dosis,
+              fecha: record.fecha.split('T')[0],
+              hora: record.hora,
+              zona: (record.zona as ZonaBackend) || 'ABDOMEN_IZQUIERDO',
+            }
+          : {
+              dosis: 0,
+              fecha: obtenerFechaActual(),
+              hora: obtenerHoraActual(),
+              zona: 'ABDOMEN_IZQUIERDO' as ZonaBackend,
+            }
+      );
+    }
+  }, [open, reset, record]);
 
-  // Función para obtener el icono de la zona
-  const getZonaIcon = (zona: string) => {
-    if (zona.includes("Abdomen")) return "⬤";
-    if (zona.includes("Glúteo")) return "⬤";
-    if (zona.includes("Muslo")) return "⬤";
-    if (zona.includes("Brazo")) return "⬤";
-    return "⬤";
+  const dosisActual = watch('dosis');
+  const setDosis = (valor: number) =>
+    setValue('dosis', valor, { shouldValidate: true });
+
+  const onSubmit = async (data: InsulinaLentaData) => {
+    setLoading(true);
+    try {
+      const parts = data.fecha.split('-');
+      await onSave({
+        dosis: data.dosis,
+        dia: parseInt(parts[2], 10),
+        mes: parseInt(parts[1], 10),
+        anio: parseInt(parts[0], 10),
+        hora: data.hora,
+        zona: data.zona,
+      });
+      onClose();
+    } catch (error) {
+      showToast(
+        'error',
+        error instanceof Error ? error.message : t('errorGuardarRegistro')
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box sx={{ p: 0, maxWidth: 900, mx: "auto" }}>
-        {/* Header con título y porcentaje */}
-        <Box
-          sx={{
-            bgcolor: "#f8fafc",
-            p: 3,
-            borderBottom: "1px solid #e2e8f0",
-            borderRadius: "12px 12px 0 0",
-          }}
+    <Modal open={open} onClose={onClose} aria-labelledby="modal-insulina-lenta-title">
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 450,
+          maxWidth: '95vw',
+          maxHeight: '94vh',
+          overflow: 'auto',
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
+        <Typography
+          id="modal-insulina-lenta-title"
+          variant="h6"
+          component="h2"
+          color="primary.dark"
+          sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}
         >
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", color: "#1e293b" }}>
-              {t("modalLentaTitle")}
-            </Typography>
-            <Box sx={{ textAlign: "right" }}>
-            </Box>
+          {title ?? t('modalLentaTitle')}
+        </Typography>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'text.secondary', mb: 1 }}>
+            {t('dosis')}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+            <IconButton
+              type="button"
+              onClick={() => setDosis(Math.max(0, dosisActual - 1))}
+              color="primary"
+            >
+              <RemoveIcon />
+            </IconButton>
+            <TextField
+              value={dosisActual === 0 ? '' : dosisActual}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                setDosis(isNaN(val) ? 0 : val);
+              }}
+              type="number"
+              error={!!errors.dosis}
+              helperText={errors.dosis?.message}
+              slotProps={{ htmlInput: { step: 1 } }}
+              sx={{ width: 140, '& input': { textAlign: 'center', fontSize: '1.5rem', fontWeight: 'bold' } }}
+            />
+            <IconButton type="button" onClick={() => setDosis(dosisActual + 1)} color="primary">
+              <AddIcon />
+            </IconButton>
           </Box>
-         
         </Box>
 
-        <Box sx={{ p: 3 }}>
-          <Grid container spacing={4}>
-            {/* COLUMNA IZQUIERDA: Formulario */}
-            <Grid>
-              {/* Unidades */}
-              <Box sx={{ mb: 3 }}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: "bold", color: "#475569", mb: 1 }}
-                >
-                  {t("glucoseLevel")}
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 1,
-                  }}
-                >
-                  <IconButton
-                    onClick={() => setUnidades((prev) => Math.max(0, prev - 1))}
-                    sx={{
-                      bgcolor: "#e2e8f0",
-                      color: "#475569",
-                      "&:hover": { bgcolor: "#cbd5e1" },
-                      borderRadius: 2,
-                      width: 40,
-                      height: 40,
-                    }}
-                  >
-                    <RemoveIcon />
-                  </IconButton>
-                  <TextField
-                    value={unidades === 0 ? "" : unidades}
-                    placeholder="0"
-                    onChange={(e) => setUnidades(Number(e.target.value))}
-                    type="number"
-                    sx={{
-                      width: 140,
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 2,
-                        bgcolor: "#f8fafc",
-                      },
-                      "& input": {
-                        textAlign: "center",
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                      },
-                    }}
-                  />
-                  <IconButton
-                    onClick={() => setUnidades((prev) => prev + 1)}
-                    sx={{
-                      bgcolor: "#e2e8f0",
-                      color: "#475569",
-                      "&:hover": { bgcolor: "#cbd5e1" },
-                      borderRadius: 2,
-                      width: 40,
-                      height: 40,
-                    }}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Box>
-                <Typography
-                  variant="caption"
-                  sx={{ display: "block", textAlign: "center", color: "#94a3b8", mt: 0.5 }}
-                >
-                  {t("measurementContext")}
-                </Typography>
-              </Box>
-
-              {/* Fecha y Hora */}
-                {/* Fecha y Hora */}
-              <Grid container spacing={2}>
-                <Grid>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: "bold", color: "#475569", mb: 0.5 }}
-                  >
-                    {t("date")}
-                  </Typography>
-                  <TextField
-                    placeholder="DD/MM/YYYY"
-                    size="small"
-                    value={`${fecha.dd}/${fecha.mm}/${fecha.yyyy}`}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '');
-                      if (value.length <= 8) {
-                        let dd = value.slice(0, 2);
-                        let mm = value.slice(2, 4);
-                        let yyyy = value.slice(4, 8);
-                        setFecha({ dd, mm, yyyy });
-                      }
-                    }}
-                    sx={{
-                      width: '100%',
-                      "& .MuiOutlinedInput-root": { 
-                        borderRadius: 2, 
-                        bgcolor: "#f8fafc",
-                        "& input": { 
-                          textAlign: "center",
-                          letterSpacing: "2px",
-                          fontSize: "16px"
-                        }
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: "bold", color: "#475569", mb: 0.5 }}
-                  >
-                    {t("time")}
-                  </Typography>
-                  <TextField
-                    size="small"
-                    fullWidth
-                    value={hora}
-                    onChange={(e) => setHora(e.target.value)}
-                    sx={{
-                      "& .MuiOutlinedInput-root": { borderRadius: 2, bgcolor: "#f8fafc" },
-                    }}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-
-            {/* COLUMNA DERECHA: Selector del Mapa Corporal */}
-            <Grid>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 2,
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: "bold", color: "#475569" }}>
-                  {t("alertFrequency")}
-                </Typography>
-
-                <Box
-                  sx={{
-                    display: "inline-flex",
-                    borderRadius: 2,
-                    bgcolor: "#e2e8f0",
-                    p: 0.5,
-                  }}
-                >
-                  <ButtonBase
-                    size="small"
-                    onClick={() => setVistaCuerpo("FRENTE")}
-                    sx={{
-                      bgcolor: vistaCuerpo === "FRENTE" ? "#1e293b" : "transparent",
-                      color: vistaCuerpo === "FRENTE" ? "white" : "#475569",
-                      borderRadius: 1,
-                      px: 2,
-                      py: 0.5,
-                      fontSize: "0.75rem",
-                    }}
-                  >
-                    {t("front")}
-                  </ButtonBase>
-
-                  <ButtonBase
-                    size="small"
-                    onClick={() => setVistaCuerpo("ATRÁS")}
-                    sx={{
-                      bgcolor: vistaCuerpo === "ATRÁS" ? "#1e293b" : "transparent",
-                      color: vistaCuerpo === "ATRÁS" ? "white" : "#475569",
-                      borderRadius: 1,
-                      px: 2,
-                      py: 0.5,
-                      fontSize: "0.75rem",
-                    }}
-                  >
-                    {t("back")}
-                  </ButtonBase>
-                </Box>
-              </Box>
-
-              {/* Zonas del cuerpo */}
-              <Grid container spacing={1.5}>
-                {zonasActuales.map((zona) => {
-                  const esSeleccionado = zonaSeleccionada === zona;
-                  const color = getZonaColor(zona, esSeleccionado);
-
-                  return (
-                    <Grid key={zona}>
-                      <Paper
-                        onClick={() => setZonaSeleccionada(zona)}
-                        elevation={esSeleccionado ? 3 : 1}
-                        sx={{
-                          p: 1.5,
-                          textAlign: "center",
-                          borderRadius: 2,
-                          cursor: "pointer",
-                          transition: "all 0.2s",
-                          bgcolor: esSeleccionado ? color : "white",
-                          color: esSeleccionado ? "white" : "#475569",
-                          border: esSeleccionado ? "2px solid" : "1px solid #e2e8f0",
-                          borderColor: esSeleccionado ? color : "#e2e8f0",
-                          "&:hover": {
-                            transform: "translateY(-2px)",
-                            boxShadow: 4,
-                          },
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 1,
-                        }}
-                      >
-                        <span style={{ fontSize: "1.2rem" }}>{getZonaIcon(zona)}</span>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: esSeleccionado ? "bold" : "normal",
-                            fontSize: "0.8rem",
-                          }}
-                        >
-                          {zona}
-                        </Typography>
-                      </Paper>
-                    </Grid>
-                  );
-                })}
-
-                 {/* Botón Guardar Medición */}
-              <Box sx={{ mt: 3 }}>
-                <ButtonBase
-                  variant="contained"
-                  fullWidth
-                  startIcon={<CheckCircleIcon />}
-                  onClick={onClose}
-                  sx={{
-                    bgcolor: "#1e293b",
-                    "&:hover": { bgcolor: "#0f172a" },
-                    py: 1.5,
-                    borderRadius: 2,
-                  }}
-                >
-                  {t("saveMeasurement")}
-                </ButtonBase>
-              </Box>
-              </Grid>
-            </Grid>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid size={{ xs: 7 }}>
+            <TextField
+              {...register('fecha')}
+              fullWidth
+              label={t('date')}
+              type="date"
+              slotProps={{ inputLabel: { shrink: true } }}
+              error={!!errors.fecha}
+              helperText={errors.fecha?.message}
+            />
           </Grid>
+          <Grid size={{ xs: 5 }}>
+            <TextField
+              {...register('hora')}
+              fullWidth
+              label={t('time')}
+              type="time"
+              slotProps={{ inputLabel: { shrink: true } }}
+              error={!!errors.hora}
+              helperText={errors.hora?.message}
+            />
+          </Grid>
+        </Grid>
+
+        <Box sx={{ mt: 3 }}>
+          <ZonaSelector
+            value={(watch('zona') as ZonaBackend) || ''}
+            onChange={(zona) => setValue('zona', zona, { shouldValidate: true })}
+            error={!!errors.zona}
+          />
         </Box>
+
+        <Button
+          type="submit"
+          sx={{ mt: 3, py: 1 }}
+          variant="contained"
+          color="primary"
+          fullWidth
+          disabled={loading}
+        >
+          {submitLabel ?? (loading ? t('saving') : t('saveMeasurement'))}
+        </Button>
       </Box>
     </Modal>
   );

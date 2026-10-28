@@ -1,0 +1,12 @@
+{
+  "actions": "操作",
+  "edit": "編集",
+  "editExpired": "過去15日以内の記録のみ編集できます",
+  "editGlucoseTitle": "血糖値の記録を編集",
+  "editHbA1cTitle": "HbA1c結果を編集",
+  "editImcTitle": "測定値を編集",
+  "editInsulinTitle": "インスリン記録を編集",
+  "saveChanges": "変更を保存",
+  "updateSuccess": "記録を更新しました",
+  "updateError": "記録を更新できませんでした"
+}

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
@@ -7,6 +7,7 @@ import Home from "./features/Home";
 import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
+import CompleteRegistration from "./features/CompleteRegistration";
 import Insulina from "./features/Insulina/insulina"
 import { PhysicalMonitoringPage } from "./features/MonitoreoFisico/pagesIMC/MonitoreoFisicoPage";
 import Glucosa from "./features/ControlDeGlucosa/ControlDeGlucosaPage";
@@ -18,6 +19,7 @@ import "./App.css";
 import { Profile } from "./features/Profile/Profile";
 import { LoadingScreen } from "./components/ui/LoadingScreen";
 import { useTranslation } from "react-i18next";
+import ToastProvider from "./components/shared/ToastProvider";
 
 function App() {
   const { t } = useTranslation("common");
@@ -41,14 +43,16 @@ function App() {
 
   return (
     <ThemeWrapperContext>
-      {isAuthLoading ? (
+{isAuthLoading ? (
         <LoadingScreen message={t("verificandoSesion")} />
       ) : (
+        <>
         <Suspense fallback={<LoadingScreen />}>
           <Router>
             <Routes>
               <Route element={<ProtectedRoute />}>
                 <Route index element={<Home />} />
+                <Route path="completar-registro" element={<CompleteRegistration />} />
                 <Route path="perfil" element={<Profile />} />
                 <Route path="bitacora">
                   <Route path="control-glucosa" element={<Glucosa />} />
@@ -67,10 +71,14 @@ function App() {
                <Route path="/restablecer-contrasena" element={<ResetPassword />} />
                <Route path="/register" element={<Register />} />
              </Route>
+
+             <Route path="*" element={<Navigate to="/" replace />} />
            </Routes>
-         </Router>
-       </Suspense>
-     )}
+          </Router>
+        </Suspense>
+        <ToastProvider />
+        </>
+      )}
    </ThemeWrapperContext>
    );
 }

@@ -1,5 +1,7 @@
 {
     "welcomeMessage": "Hello, Warrior {name}!",
+    "insulinSaved": "Insulin dose saved successfully",
+    "insulinSavedTitle": "Insulin saved",
     "actions": {
         "registerGlucose": "Log Glucose",
         "applyInsulin": "Log Insulin",
@@ -9,7 +11,8 @@
         "lastBattle": {
             "title": "Last Battle",
             "unit": "mg/dL",
-            "timeLabel": "{time} ago (Post-lunch)"
+            "timeLabel": "{time} ago (Post-lunch)",
+            "noReadings": "No readings today"
         },
         "securityTimer": {
             "title": "Security Timer",
@@ -21,14 +24,17 @@
             "alertMessage": "Low levels. Check your logs and take action"
         },
         "battleHistory": {
-            "title": "Battle History"
+            "title": "Battle History",
+            "serieLabel": "Level (mg/dL)",
+            "empty": "No glucose logs yet to chart"
         },
         "physicalBalance": {
             "title": "Physical Strength Balance",
             "statusHealthy": "Healthy condition",
             "statusUnderweight": "Underweight",
             "statusNormal": "Normal",
-            "statusOverweight": "Overweight"
+            "statusOverweight": "Overweight",
+            "noReadings": "No weight logs"
         }
     },
     "days": {

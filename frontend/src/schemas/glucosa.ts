@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { CreateGlucosePayload } from '../apis/glucose';
 
 export const glucosaSchema = z.object({
   nivelGlucosa: z.string()
@@ -13,3 +14,12 @@ export const glucosaSchema = z.object({
 });
 
 export type GlucosaData = z.infer<typeof glucosaSchema>;
+
+export function formToCreateGlucoseDto(formData: GlucosaData): CreateGlucosePayload {
+  return {
+    valueMgdl: Number(formData.nivelGlucosa),
+    mealTag: formData.contexto,
+    date: formData.fecha,
+    time: formData.hora,
+  };
+}

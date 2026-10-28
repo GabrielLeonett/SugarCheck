@@ -1,10 +1,10 @@
-import axios, { type AxiosError } from 'axios';
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../stores/authStore';
 import { ApiError } from './api-error';
 import type { BackendErrorResponse } from '../types/types';
 import i18n from '../stores/i18n';
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || '';
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 function addLanguageHeader(config: any) {
   if (config.headers) {
@@ -48,15 +48,29 @@ apiPrivate.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Endpoints de autenticación que nunca deben disparar un refresh automático:
+// un 401 en ellos significa credenciales/token inválidos, no una sesión expirada.
+const AUTH_ENDPOINTS_WITHOUT_REFRESH = [
+  '/auth/login',
+  '/auth/refresh',
+  '/auth/firebase-login',
+];
+
+function shouldSkipRefresh(url?: string) {
+  if (!url) return false;
+  return AUTH_ENDPOINTS_WITHOUT_REFRESH.some((endpoint) => url.includes(endpoint));
+}
+
 apiPrivate.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<BackendErrorResponse>) => {
-    const prevRequest = error?.config;
+    const prevRequest = error?.config as InternalAxiosRequestConfig & { sent?: boolean } | undefined;
 
     if (
       error?.response?.status === 401 &&
+      prevRequest &&
       !prevRequest?.sent &&
-      !prevRequest?.url?.includes('/auth/refresh')
+      !shouldSkipRefresh(prevRequest?.url)
     ) {
       prevRequest.sent = true;
       try {

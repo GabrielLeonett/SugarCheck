@@ -5,6 +5,7 @@ import { UserNotFoundError } from '../../../src/user/core/errors/UserNotFoundErr
 import { User } from '../../../src/user/core/User';
 import { UserRepository } from '../../../src/user/core/UserRepository';
 import { UserEmail } from '../../../src/user/core/value-objects/UserEmail';
+import { UserPassword } from '../../../src/user/core/value-objects/UserPassword';
 
 export class InMemoryUserRepository implements UserRepository {
   private users: User[] = [];
@@ -48,6 +49,28 @@ export class InMemoryUserRepository implements UserRepository {
     }
 
     return Result.ok(user);
+  }
+
+  async updatePassword(
+    id: string,
+    hashedPassword: string,
+  ): Promise<Result<void, ErrorAbstract>> {
+    const index = this.users.findIndex((u) => u.id.value === id);
+
+    if (index === -1) {
+      return Result.fail(
+        new UserNotFoundError(`Usuario con ID ${id} no encontrado`),
+      );
+    }
+
+    const password = UserPassword.create(hashedPassword);
+    if (!password.isValid) return Result.fail(password.getError());
+
+    // El mock reemplaza la contraseña manteniendo el resto de datos del usuario.
+    (this.users[index] as unknown as { _password: UserPassword })._password =
+      password.getValue();
+
+    return Result.ok(undefined);
   }
 
   async delete(id: UserId): Promise<Result<void, ErrorAbstract>> {

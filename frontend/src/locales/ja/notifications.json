@@ -10,5 +10,16 @@
     "minutes": "{{count}}分前",
     "hours": "{{count}}時間前",
     "days": "{{count}}日前"
-  }
+  },
+  "IMC_CREATION_TITLE": "新しいBMI記録",
+  "IMC_CREATION_MESSAGE": "新しいBMI {{value}} - {{category}} を記録しました",
+  "IMC_REMINDER_TITLE": "BMIリマインダー",
+  "IMC_REMINDER_MESSAGE": "今日の体重がまだ記録されていません。ログを更新してください。",
+  "IMC_CATEGORY_UNDERWEIGHT": "低体重",
+  "IMC_CATEGORY_NORMAL": "標準",
+  "IMC_CATEGORY_OVERWEIGHT": "過体重",
+  "GLUCOSE_ALERT_HYPO": "低血糖アラート",
+  "GLUCOSE_ALERT_HYPO_MESSAGE": "血糖値が安全なしきい値を下回っています: {{value}} mg/dL",
+  "GLUCOSE_ALERT_HYPER": "高血糖アラート",
+  "GLUCOSE_ALERT_HYPER_MESSAGE": "血糖値が安全なしきい値を上回っています: {{value}} mg/dL"
 }

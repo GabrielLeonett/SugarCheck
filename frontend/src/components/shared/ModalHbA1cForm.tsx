@@ -2,21 +2,29 @@ import { Modal, Box, Typography, TextField, Button } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { hba1cSchema, type HbA1cData } from '../../schemas/hba1c';
-import { useEffect } from 'react';
+import type { HbA1cRecord } from '../../data/recordsMock';
+import { useEffect, useState } from 'react';
 import useLanguage from "../../hooks/useLanguage";
 
 interface ModalHbA1cFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: HbA1cData) => void;
+  onSave: (data: HbA1cData) => void | Promise<boolean>;
+  record?: HbA1cRecord | null;
+  title?: string;
+  submitLabel?: string;
 }
 
 export default function ModalHbA1cForm({
   open,
   onClose,
   onSave,
+  record,
+  title,
+  submitLabel,
 }: ModalHbA1cFormProps) {
   const { t } = useLanguage("hba1c");
+  const [saving, setSaving] = useState(false);
 
   const {
     register,
@@ -34,6 +42,13 @@ export default function ModalHbA1cForm({
 
   useEffect(() => {
     if (open) {
+      if (record) {
+        reset({
+          resultadoHbA1c: String(record.resultado),
+          fecha: record.fechaISO.split('T')[0],
+        });
+        return;
+      }
       const hoy = new Date();
       const offset = hoy.getTimezoneOffset();
       const fechaLocal = new Date(hoy.getTime() - offset * 60 * 1000);
@@ -42,11 +57,16 @@ export default function ModalHbA1cForm({
         fecha: fechaLocal.toISOString().split('T')[0],
       });
     }
-  }, [open, reset]);
+  }, [open, reset, record]);
 
-  const onSubmit = (data: HbA1cData) => {
-    onSave(data);
-    onClose();
+  const onSubmit = async (data: HbA1cData) => {
+    setSaving(true);
+    try {
+      const result = await onSave(data);
+      if (result !== false) onClose();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -76,7 +96,7 @@ export default function ModalHbA1cForm({
           color="primary.dark"
           sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}
         >
-          {t("modalTitle")}
+          {title ?? t("modalTitle")}
         </Typography>
 
         <TextField
@@ -107,8 +127,9 @@ export default function ModalHbA1cForm({
           variant="contained"
           color="primary"
           fullWidth
+          disabled={saving}
         >
-          {t("saveButton")}
+          {submitLabel ?? t("saveButton")}
         </Button>
       </Box>
     </Modal>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 import { FormInput } from '@/components/FormInput';
@@ -16,6 +16,7 @@ export default function LoginScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const isDark = colorScheme === 'dark';
   const login = useAuthStore((s) => s.login);
+  const user = useAuthStore((s) => s.user);
   const loginWithProvider = useAuthStore((s) => s.loginWithProvider);
 
   const [email, setEmail] = useState('');
@@ -51,12 +52,21 @@ export default function LoginScreen() {
     setSocialLoading(provider);
     try {
       await loginWithProvider(provider);
+      const isNew = useAuthStore.getState().isNewUser;
+      useAuthStore.getState().clearNewUserFlag();
+      if (isNew) {
+        router.replace('/auth/complete-profile');
+      }
     } catch (err: any) {
       Alert.alert('Error', err?.message || `Error al iniciar sesión con ${provider}`);
     } finally {
       setSocialLoading(null);
     }
   };
+
+  if (user) {
+    return <Redirect href="/(tabs)" />;
+  }
 
   return (
     <ThemedView style={styles.container}>

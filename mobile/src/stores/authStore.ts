@@ -9,25 +9,30 @@ interface AuthState {
   user: User | null;
   accessToken: string | null;
   isAuthLoading: boolean;
+  isNewUser: boolean;
   refresh: () => Promise<string | null>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setAuth: (user: User, accessToken: string) => void;
   setLoading: (loading: boolean) => void;
   loginWithProvider: (providerName: 'google' | 'facebook') => Promise<void>;
+  clearNewUserFlag: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   accessToken: null,
   isAuthLoading: true,
+  isNewUser: false,
 
   setAuth: (user: User, accessToken: string) => set({ user, accessToken }),
   setLoading: (loading: boolean) => set({ isAuthLoading: loading }),
 
+  clearNewUserFlag: () => set({ isNewUser: false }),
+
   login: async (email, password) => {
     const response = await authApi.login(email, password);
-    set({ user: response.user, accessToken: response.accessToken });
+    set({ user: response.user, accessToken: response.accessToken, isNewUser: false });
   },
 
   logout: async () => {
@@ -37,7 +42,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       console.error('Error durante cierre de sesión:', error);
     } finally {
-      set({ user: null, accessToken: null });
+      set({ user: null, accessToken: null, isNewUser: false });
     }
   },
 
@@ -62,7 +67,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const userCredential = await signInWithPopup(authFirebase, provider);
       const firebaseToken = await userCredential.user.getIdToken();
       const response = await authApi.firebaseLogin(firebaseToken);
-      set({ user: response.user, accessToken: response.accessToken });
+      set({ user: response.user, accessToken: response.accessToken, isNewUser: response.isNewUser ?? false });
     } catch (error: unknown) {
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||

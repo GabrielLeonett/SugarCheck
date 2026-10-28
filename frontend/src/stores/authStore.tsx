@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { apiPrivate } from '../apis/axios.js';
+import { apiPrivate, apiPublic } from '../apis/axios.js';
 import type { User } from '../types/types.js';
 import { authFirebase } from '../config/firebase.js';
 import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, signOut } from 'firebase/auth';
@@ -9,28 +9,36 @@ interface AuthState {
   user: User | null;
   accessToken: string | null;
   isAuthLoading: boolean;
+  isNewUser: boolean;
   refresh: () => Promise<string>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setAuth: (user: User, accessToken: string) => void;
   setLoading: (loading: boolean) => void;
   loginWithProvider: (providerName: 'google' | 'facebook') => Promise<void>;
+  clearNewUserFlag: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   accessToken: null,
   isAuthLoading: true,
+  isNewUser: false,
 
   setAuth: (user: User, accessToken: string) => set({ user, accessToken }),
   setLoading: (loading: boolean) => set({ isAuthLoading: loading }),
 
+  clearNewUserFlag: () => set({ isNewUser: false }),
+
   login: async (username, password) => {
-    const response = await apiPrivate.post('/auth/login', { username, password }, { withCredentials: true });
+    // El login es un endpoint público: si se usara apiPrivate, el interceptor
+    // intentaría refrescar la sesión ante un 401 (credenciales inválidas) y
+    // ocultaría el error real con un "no se encontró token".
+    const response = await apiPublic.post('/auth/login', { username, password }, { withCredentials: true });
 
     await preferenceStore.getState().load();
     console.log('Login successful, user data:', response.data.user);
-    set({ user: response.data.user, accessToken: response.data.accessToken });
+    set({ user: response.data.user, accessToken: response.data.accessToken, isNewUser: false });
   },
   
   logout: async () => {
@@ -40,7 +48,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       console.error("Error durante el proceso de cierre de sesión:", error);
     } finally {
-      set({ user: null, accessToken: null });
+      set({ user: null, accessToken: null, isNewUser: false });
     }
   },
   
@@ -65,14 +73,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         const userCredential = await signInWithPopup(authFirebase, provider);
         const firebaseToken = await userCredential.user.getIdToken();
         
-        const response = await apiPrivate.post(
+        const response = await apiPublic.post(
           '/auth/firebase-login',
           { token: firebaseToken },
-        { withCredentials: true }
-      );
+          { withCredentials: true }
+        );
       
       console.log('Login successful, user data:', response.data.user);
-      set({ user: response.data.user, accessToken: response.data.accessToken });
+      set({ user: response.data.user, accessToken: response.data.accessToken, isNewUser: response.data.isNewUser ?? false });
     } catch (error: unknown) {
       console.error(`Error en login federado con ${providerName}:`, error);
       const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || (error as Error).message || 'Error de autenticación';

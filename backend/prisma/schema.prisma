@@ -20,6 +20,12 @@ model User {
   preference      Preference? 
   contactEmergences ContactEmergence[]
   imcRecords        Imc[]
+  glucoseRecords    Glucose[]
+  hba1cRecords      HbA1c[]
+
+  insulinas         Insulina[]
+  conversations     Conversation[]
+  caminoProgreso    CaminoProgreso?
 }
 
 model Preference {
@@ -27,10 +33,15 @@ model Preference {
   profileImg    String   
   unitMeasure   String   
   sensitivity   Float   
-  thresholds    Json     
-  insulinRatios Json     
+  thresholds        Json     
+  insulinRatios     Json     
+  correctionSchemas Json?    
+  basalSchemas      Json?    
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  deletedAt     DateTime?
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ContactEmergence {
@@ -39,6 +50,9 @@ model ContactEmergence {
   name        String
   parentesco  String
   telefono    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  deletedAt   DateTime?
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -52,8 +66,99 @@ model Imc {
   altura    Float
   imcValue  Float
   fecha     DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  deletedAt DateTime?
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+
+model Glucose {
+  id        String   @id @default(uuid())
+  userId    String
+  valueMgdl Float
+  mealTag   String
+  date      DateTime
+  time      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  deletedAt DateTime?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, date])
+}
+
+model HbA1c {
+  id           String   @id @default(uuid())
+  userId       String
+  valuePercent Float
+  examDate     DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  deletedAt    DateTime?
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  userId    String
+  title     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@index([userId])
+  @@index([userId, updatedAt])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  role           String
+  content        String
+  createdAt      DateTime     @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
+
+model Insulina {
+  id          String   @id @default(uuid())
+  userId      String
+  tipo        String   // "RAPIDA" | "LENTA"
+  dosis       Float
+  unidades    Float
+  fecha       DateTime
+  hora        String   // HH:mm format
+  zona        String   // injection site
+  contexto    String?  // only for RAPIDA: "DESAYUNO" | "ALMUERZO" | "CENA" | "CORRECCION"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, fecha])
+
+}
+
+model CaminoProgreso {
+  userId                String   @id
+  ultimoNivelCompletado Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @default(now()) @updatedAt
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

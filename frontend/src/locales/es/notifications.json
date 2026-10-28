@@ -10,5 +10,16 @@
     "minutes": "Hace {{count}} min",
     "hours": "Hace {{count}}h",
     "days": "Hace {{count}}d"
-  }
+  },
+  "IMC_CREATION_TITLE": "Nuevo registro de IMC",
+  "IMC_CREATION_MESSAGE": "Has registrado un nuevo IMC de {{value}} - {{category}}",
+  "IMC_REMINDER_TITLE": "Recordatorio de IMC",
+  "IMC_REMINDER_MESSAGE": "No has registrado tu peso hoy. Mantén tu bitácora al día.",
+  "IMC_CATEGORY_UNDERWEIGHT": "Bajo peso",
+  "IMC_CATEGORY_NORMAL": "Normal",
+  "IMC_CATEGORY_OVERWEIGHT": "Sobrepeso",
+  "GLUCOSE_ALERT_HYPO": "Alerta de Hipoglucemia",
+  "GLUCOSE_ALERT_HYPO_MESSAGE": "Tu nivel de glucosa está por debajo del umbral seguro: {{value}} mg/dL",
+  "GLUCOSE_ALERT_HYPER": "Alerta de Hiperglucemia",
+  "GLUCOSE_ALERT_HYPER_MESSAGE": "Tu nivel de glucosa está por encima del umbral seguro: {{value}} mg/dL"
 }

@@ -55,6 +55,8 @@ export class PreferenceController {
       body.thresholds,
       body.insulinRatios,
       body.sensitivity,
+      body.correctionSchemas,
+      body.basalSchemas,
     );
 
     if (!result.isValid) throw result.getError();

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   Inject,
@@ -20,11 +21,13 @@ import { GetOneByUsernameUser } from '../../app/GetOneByUsernameUser';
 import { SaveUser } from '../../app/SaveUser';
 import { UpdateUser } from '../../app/UpdateUser';
 import { UpdateUserEmail } from '../../app/UpdateUserEmail';
+import { ChangePassword } from '../../app/ChangePassword';
 import { FindUserIdDTO } from '../../../shared/infrastructure/DTOs/find-user-id.dto';
 import { FindUserEmailDTO } from './DTOs/find-user-email.dto';
 import { CreateUserDTO } from './DTOs/create-user.dto';
 import { UpdateUserDto } from './DTOs/update-user.dto';
 import { UpdateEmailDTO } from './DTOs/update-email.dto';
+import { ChangePasswordDTO } from './DTOs/change-password.dto';
 import { AuthGuard } from '../../../auth/infra/auth.guard';
 import { RolesGuard } from '../../../auth/infra/roles.guard';
 import { Roles } from '../../../auth/infra/roles.decorator';
@@ -42,6 +45,7 @@ export class UserController {
     @Inject('GetOneByUsernameUser') private readonly getOneByUsernameUser: GetOneByUsernameUser,
     @Inject('SaveUser') private readonly saveUser: SaveUser,
     @Inject('UpdateUserEmail') private readonly updateUserEmail: UpdateUserEmail,
+    @Inject('ChangePassword') private readonly changePassword: ChangePassword,
     private readonly translationService: TranslationService,
   ) {}
 
@@ -120,19 +124,8 @@ export class UserController {
     return result.getValue().toPlain();
   }
 
-  @Patch(':id')
-  @UseGuards(AuthGuard, RolesGuard)
-  async update(
-    @Param('id') id: string,
-    @Body() updateDto: UpdateUserDto,
-  ) {
-    const result = await this.updateUser.run(id, updateDto);
-
-    if (!result.isValid) throw result.getError();
-
-    return result.getValue().toPlain();
-  }
-
+  // IMPORTANTE: esta ruta debe declararse ANTES que @Patch(':id');
+  // si no, Nest resuelve /user/email como /user/:id con id='email'.
   @Patch('/email')
   @UseGuards(AuthGuard)
   async updateEmail(
@@ -146,6 +139,48 @@ export class UserController {
 
     const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     return { message: this.translationService.translate('EMAIL_UPDATED', lang) };
+  }
+
+  @Patch('/password')
+  @UseGuards(AuthGuard)
+  async changePasswordRoute(
+    @Body() body: ChangePasswordDTO,
+    @Req() req: any,
+  ) {
+    const result = await this.changePassword.run({
+      userId: req.user.sub,
+      currentPassword: body.currentPassword,
+      newPassword: body.newPassword,
+    });
+
+    if (!result.isValid) throw result.getError();
+
+    const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
+    return { message: this.translationService.translate('PASSWORD_UPDATED', lang) };
+  }
+
+  @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  async update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateUserDto,
+    @Request() req: any,
+  ) {
+    // Seguridad: un usuario autenticado solo puede actualizar su propio perfil
+    if (id !== req.user.sub) {
+      throw new ForbiddenException(
+        this.translationService.translate(
+          'UPDATE_USER_FORBIDDEN',
+          this.translationService.resolveLanguage(req.headers['accept-language'] as string),
+        ),
+      );
+    }
+
+    const result = await this.updateUser.run(id, updateDto);
+
+    if (!result.isValid) throw result.getError();
+
+    return result.getValue().toPlain();
   }
 
   @Delete(':id')
