@@ -1,26 +1,24 @@
 # ============================================================
-# SugarCheck - Caddyfile
-# install.sh reemplaza __DOMAIN__ y __APP_DIR__ automáticamente.
+# SugarCheck - Caddyfile (Docker)
 #
-# Opcional: descomenta el bloque global para recibir avisos de
-# Let's Encrypt (debe ir antes de cualquier site block):
+# `web` = servicio de docker-compose.yml que corre Caddy y sirve
+# /srv (el build de Vite). `api` = backend NestJS en :3000.
 #
-# {
-#     email tu-correo@ejemplo.com
-# }
+# Si cambias de dominio: edita este archivo Y el build-arg
+# VITE_BACKEND_URL en docker-compose.yml, luego reconstruye.
 # ============================================================
 
-__DOMAIN__ {
+sugarcheck.duckdns.org {
 	encode zstd gzip
 
-	root * __APP_DIR__/frontend/dist
+	root * /srv
 
 	# --- API NestJS -------------------------------------------------
 	# Todos los prefijos de los controllers del backend.
 	@api path_regexp api "^/(auth|user|notification|insulina|sync|imc|hba1c|glucose|preference|oraculo|export|camino|contact-emergence)(/|$)"
 
 	handle @api {
-		reverse_proxy 127.0.0.1:3000 {
+		reverse_proxy api:3000 {
 			# El Oráculo usa Server-Sent Events (text/event-stream).
 			# Caddy ya los detecta, pero lo dejamos explícito para que
 			# ningún buffer intermedio retrase los tokens del chat.
@@ -30,7 +28,7 @@ __DOMAIN__ {
 
 	# --- Socket.IO (namespace /notifications) -----------------------
 	handle /socket.io/* {
-		reverse_proxy 127.0.0.1:3000
+		reverse_proxy api:3000
 	}
 
 	# --- Assets con hash de Vite ------------------------------------
