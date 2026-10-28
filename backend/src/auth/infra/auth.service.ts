@@ -5,6 +5,7 @@ import { Logout } from '../app/LogoutUser';
 import { LoginFirebaseUser } from '../app/LoginFirebaseUser';
 import { ForgotPassword } from '../app/ForgotPassword';
 import { ResetPassword } from '../app/ResetPassword';
+import { ChangePassword } from '../app/ChangePassword';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,7 @@ export class AuthService {
     private readonly LoginFirebaseUser: LoginFirebaseUser,
     private readonly forgotPasswordUseCase: ForgotPassword,
     private readonly resetPasswordUseCase: ResetPassword,
+    private readonly changePasswordUseCase: ChangePassword,
   ) { }
 
   async login(username: string, pass: string) {
@@ -47,5 +49,9 @@ export class AuthService {
 
   async resetPassword(email: string, code: string, password: string) {
     return await this.resetPasswordUseCase.run({ email, code, password });
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    return await this.changePasswordUseCase.run({ userId, currentPassword, newPassword });
   }
 }

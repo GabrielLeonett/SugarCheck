@@ -11,20 +11,6 @@ export class ThresholdsDTO {
   hiper!: number;
 }
 
-export class InsulinRatiosDTO {
-  @IsNumber({}, { message: 'El ratio del desayuno debe ser un número' })
-  @IsNotEmpty({ message: 'El ratio del desayuno es obligatorio' })
-  breakfast!: number;
-
-  @IsNumber({}, { message: 'El ratio del almuerzo debe ser un número' })
-  @IsNotEmpty({ message: 'El ratio del almuerzo es obligatorio' })
-  lunch!: number;
-
-  @IsNumber({}, { message: 'El ratio de la cena debe ser un número' })
-  @IsNotEmpty({ message: 'El ratio de la cena es obligatorio' })
-  dinner!: number;
-}
-
 export class CorrectionSchemaItemDTO {
   @IsNumber({}, { message: 'rangeMin debe ser un número' })
   @Min(0, { message: 'rangeMin debe ser mayor o igual a 0' })
