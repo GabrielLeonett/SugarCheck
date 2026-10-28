@@ -21,7 +21,10 @@ services:
   migrate:
     image: ${DOCKERHUB_USER:-gayer12}/sugarcheck:api
     command: ["node", "node_modules/prisma/build/index.js", "migrate", "deploy"]
-    env_file: ./backend/.env
+    env_file:
+      # En tu PC no existe: solo se necesita en el servidor.
+      - path: ./backend/.env
+        required: false
     restart: "no"
 
   # ----------------------------------------------------------
@@ -31,7 +34,10 @@ services:
     image: ${DOCKERHUB_USER:-gayer12}/sugarcheck:api
     build:
       context: ./backend
-    env_file: ./backend/.env
+    env_file:
+      # En tu PC no existe: solo se necesita en el servidor.
+      - path: ./backend/.env
+        required: false
     restart: unless-stopped
     expose:
       - "3000"
