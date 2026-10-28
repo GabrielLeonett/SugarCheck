@@ -1,25 +1,25 @@
 # ============================================================
 # SugarCheck — despliegue con Docker Compose
 #
-# Uso:
-#   docker compose up -d --build
-#   docker compose logs -f
-#   docker compose down
+# Las imágenes se construyen en tu PC y se suben a Docker Hub.
+# El servidor solo hace `pull`.
 #
-# Requiere backend/.env.production (no se versiona).
+# En tu PC:      ./deploy/push.sh
+# En el server:  ./deploy/update.sh
+#
+# Requiere un .env en la raíz con DOCKERHUB_USER=tu-usuario
+# y backend/.env con las variables de la aplicación.
 # ============================================================
 
 name: sugarcheck
 
 services:
   # ----------------------------------------------------------
-  # Migraciones de Prisma. Corre una vez y termina; `api`
-  # espera a que salga con código 0.
+  # Migraciones de Prisma. Usa la MISMA imagen que `api`.
+  # Corre una vez y termina; `api` espera a que salga con 0.
   # ----------------------------------------------------------
   migrate:
-    build:
-      context: ./backend
-      target: build
+    image: ${DOCKERHUB_USER:?define DOCKERHUB_USER en el .env de la raíz}/sugarcheck-api:latest
     command: ["pnpm", "exec", "prisma", "migrate", "deploy"]
     env_file: ./backend/.env
     restart: "no"
@@ -28,6 +28,7 @@ services:
   # API NestJS (solo accesible desde la red interna de Docker)
   # ----------------------------------------------------------
   api:
+    image: ${DOCKERHUB_USER:?define DOCKERHUB_USER en el .env de la raíz}/sugarcheck-api:latest
     build:
       context: ./backend
     env_file: ./backend/.env
@@ -52,6 +53,7 @@ services:
   # Frontend estático + Caddy (HTTPS automático)
   # ----------------------------------------------------------
   web:
+    image: ${DOCKERHUB_USER:?define DOCKERHUB_USER en el .env de la raíz}/sugarcheck-web:latest
     build:
       context: ./frontend
       args:

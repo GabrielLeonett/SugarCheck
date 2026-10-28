@@ -1,35 +1,68 @@
-# Despliegue de SugarCheck con Docker
+# Despliegue de SugarCheck con Docker Hub
 
-Backend NestJS + frontend Vite + Caddy (HTTPS automático) en tres contenedores.
-El móvil (Expo) no se despliega aquí.
+Las imágenes se construyen en tu PC y se suben a Docker Hub. El servidor solo
+las descarga: no compila nada y no necesita Node ni pnpm.
+
+```
+TU PC                          DOCKER HUB                 SERVIDOR
+docker compose build   ──►   sugarcheck-api:latest  ──►   docker compose pull
+docker compose push          sugarcheck-web:latest        docker compose up -d
+```
 
 ## Contenido
 
 | Archivo | Para qué |
 |---|---|
-| `docker-compose.yml` (raíz) | Orquesta `migrate`, `api` y `web` |
-| `backend/Dockerfile` | Imagen de la API (multi-stage) |
+| `docker-compose.yml` | Servicios `migrate`, `api` y `web` |
+| `.env.example` | Usuario de Docker Hub (raíz del repo) |
+| `backend/Dockerfile` | Imagen de la API (una sola, sirve para migrar y correr) |
 | `frontend/Dockerfile` | Build de Vite + Caddy sirviendo el estático |
 | `deploy/Caddyfile` | Proxy, SPA y SSE (se monta en el contenedor) |
-| `deploy/update.sh` | `git pull` + rebuild + up |
+| `deploy/push.sh` | Build + push (se ejecuta en tu PC) |
+| `deploy/update.sh` | Pull + up (se ejecuta en el servidor) |
 | `deploy/backend.env.example` | Plantilla del `backend/.env` |
 
-## Requisitos
+## En tu PC
 
-- Docker + Docker Compose v2.
-- DNS: registro **A** `sugarcheck.duckdns.org` → IP pública de la VM.
-- Puertos **80 y 443** abiertos también en el firewall del proveedor
-  (en GCP: VPC network → Firewall, no basta `ufw`).
+### 1. Cuenta de Docker Hub
 
-## 1. Instalar Docker (Debian)
+```bash
+docker login
+```
+
+Si no tienes cuenta: https://hub.docker.com/signup. Los repositorios
+`sugarcheck-api` y `sugarcheck-web` se crean solos en el primer push.
+
+### 2. Configurar el usuario
+
+```bash
+cp .env.example .env
+```
+
+Edita `.env` y pon tu usuario:
+
+```env
+DOCKERHUB_USER=tu-usuario
+```
+
+### 3. Construir y subir
+
+```bash
+./deploy/push.sh
+```
+
+Hace `docker compose build` y `docker compose push`. La primera vez tarda
+bastante (compila Vite y el backend); las siguientes reutilizan caché.
+
+## En el servidor
+
+### 1. Docker
 
 ```bash
 curl -fsSL https://get.docker.com | sh
-docker --version
-docker compose version
 ```
 
-## 2. Liberar los puertos 80/443
+### 2. Liberar los puertos 80 y 443
 
 Si antes intentaste el despliegue nativo, Caddy y el servicio systemd siguen
 ocupando los puertos:
@@ -41,10 +74,20 @@ rm -f /etc/systemd/system/sugarcheck-api.service
 systemctl daemon-reload
 ```
 
-## 3. Variables de entorno
+### 3. Código y usuario de Docker Hub
 
 ```bash
 cd /opt/sugarcheck
+git config --global --add safe.directory /opt/sugarcheck
+git pull
+
+cp .env.example .env
+nano .env        # DOCKERHUB_USER=tu-usuario
+```
+
+### 4. Variables de la aplicación
+
+```bash
 cp deploy/backend.env.example backend/.env
 nano backend/.env
 ```
@@ -59,48 +102,77 @@ Mínimo obligatorio:
 
 Opcionales: email (Gmail) y `GEMINI_API_KEY`.
 
-> El archivo **no** se versiona (`.gitignore` cubre `.env*`). Compose lo lee con
-> `env_file`, así que los valores llegan al contenedor como variables de entorno.
+> `backend/.env` no se versiona ni se copia a la imagen. Compose lo inyecta en
+> tiempo de ejecución con `env_file`.
 
-## 4. Levantar
-
-```bash
-cd /opt/sugarcheck
-docker compose up -d --build
-docker compose ps
-```
-
-Orden: `migrate` aplica las migraciones y termina → arranca `api` → Caddy emite
-el certificado.
-
-Ver logs:
+### 5. Liberar espacio (si ya habías intentado compilar aquí)
 
 ```bash
-docker compose logs -f
-docker compose logs -f api
-docker compose logs -f web
+docker builder prune -af
+docker image prune -af
+rm -rf node_modules backend/node_modules frontend/node_modules mobile/node_modules
+df -h /
 ```
 
-Al terminar: **https://sugarcheck.duckdns.org**
+> **No** uses `docker system prune --volumes`: borraría `caddy_data`, donde
+> viven los certificados.
 
-## Actualizar
+### 6. Levantar
 
 ```bash
 cd /opt/sugarcheck
 ./deploy/update.sh
 ```
 
-Hace `git pull`, reconstruye las imágenes (incluye migraciones) y reinicia.
-
-## Comandos útiles
+O a mano:
 
 ```bash
-docker compose ps                 # estado
-docker compose logs -f api        # logs del backend
-docker compose restart api        # reiniciar solo la API
-docker compose exec api sh        # shell dentro del contenedor
-docker compose down               # parar todo
-docker compose up -d --build      # reconstruir
+docker compose pull
+docker compose up -d --no-build
+docker compose ps
+```
+
+## Verificar
+
+```bash
+docker compose ps
+```
+
+Debe mostrar `migrate` como `exited (0)` y `api` / `web` como `running`.
+
+```bash
+docker compose logs migrate
+docker compose logs -f api
+docker compose logs -f web
+```
+
+Desde fuera:
+
+```bash
+curl -I https://sugarcheck.duckdns.org
+```
+
+## Día a día
+
+En tu PC, tras cambiar código:
+
+```bash
+./deploy/push.sh
+```
+
+En el servidor:
+
+```bash
+cd /opt/sugarcheck && ./deploy/update.sh
+```
+
+Otros comandos:
+
+```bash
+docker compose logs -f api      # logs del backend
+docker compose restart api      # reiniciar solo la API
+docker compose ps               # estado
+docker compose down             # parar todo
 ```
 
 ## Cómo funciona el proxy
@@ -116,16 +188,15 @@ docker compose up -d --build      # reconstruir
 ## Notas
 
 - **`VITE_BACKEND_URL` se hornea en el build.** Si cambias de dominio, edita el
-  build-arg en `docker-compose.yml` y `deploy/Caddyfile`, y reconstruye con
-  `docker compose up -d --build`.
-- Los certificados viven en el volumen `caddy_data`; sobreviven a los rebuilds.
-  Para empezar de cero: `docker compose down -v` (borra también los certs).
+  build-arg en `docker-compose.yml` y `deploy/Caddyfile`, y vuelve a hacer
+  `./deploy/push.sh`.
+- `migrate` usa la **misma imagen** que `api` con otro comando, así que el
+  servidor solo guarda dos imágenes.
+- Los certificados viven en el volumen `caddy_data`; sobreviven a los updates.
 - `api` no publica puertos: solo Caddy habla con él dentro de la red de Docker.
-- `backend/.env` **no** se copia a la imagen (`.dockerignore` excluye `.env*`);
-  Compose lo inyecta en tiempo de ejecución con `env_file`.
-- La imagen del backend copia `node_modules` del stage de build porque
-  `@prisma/client` está en `devDependencies` y se genera con `prisma generate`.
-  Si algún día lo mueves a `dependencies`, se puede adelgazar la imagen.
+- El servidor necesita **80 y 443 abiertos** en el firewall del proveedor
+  (en GCP: VPC network → Firewall). `ufw` no basta.
+- El DNS `A` de `sugarcheck.duckdns.org` debe apuntar a la IP pública de la VM.
 
 ## Seguridad
 
