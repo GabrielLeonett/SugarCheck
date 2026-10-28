@@ -19,7 +19,7 @@ services:
   # Corre una vez y termina; `api` espera a que salga con 0.
   # ----------------------------------------------------------
   migrate:
-    image: ${DOCKERHUB_USER:?define DOCKERHUB_USER en el .env de la raíz}/sugarcheck-api:latest
+    image: ${DOCKERHUB_USER:-gayer12}/sugarcheck:api
     command: ["pnpm", "exec", "prisma", "migrate", "deploy"]
     env_file: ./backend/.env
     restart: "no"
@@ -28,7 +28,7 @@ services:
   # API NestJS (solo accesible desde la red interna de Docker)
   # ----------------------------------------------------------
   api:
-    image: ${DOCKERHUB_USER:?define DOCKERHUB_USER en el .env de la raíz}/sugarcheck-api:latest
+    image: ${DOCKERHUB_USER:-gayer12}/sugarcheck:api
     build:
       context: ./backend
     env_file: ./backend/.env
@@ -53,7 +53,7 @@ services:
   # Frontend estático + Caddy (HTTPS automático)
   # ----------------------------------------------------------
   web:
-    image: ${DOCKERHUB_USER:?define DOCKERHUB_USER en el .env de la raíz}/sugarcheck-web:latest
+    image: ${DOCKERHUB_USER:-gayer12}/sugarcheck:web
     build:
       context: ./frontend
       args:
