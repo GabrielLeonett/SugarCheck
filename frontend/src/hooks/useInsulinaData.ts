@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { insulinaApi, type InsulinRecord, type InsulinQueryParams } from '../apis/insulina';
-import type { TimeRange } from './useMetricData';
+import { useState, useEffect, useCallback } from 'react';
+import { insulinaApi, type InsulinRecord } from '../apis/insulina';
+import useMetricData from './useMetricData';
+import type { CustomDateRange, TimeRange } from './useMetricData';
+
+export type TipoInsulinaFilter = 'todas' | 'lenta' | 'rapida';
 
 export interface UseInsulinaDataReturn {
   registros: InsulinRecord[];
@@ -8,10 +11,10 @@ export interface UseInsulinaDataReturn {
   error: string | null;
   timeRange: TimeRange;
   setTimeRange: (range: TimeRange) => void;
-  customRange: { start: string; end: string } | null;
-  setCustomRange: (range: { start: string; end: string } | null) => void;
-  tipoFilter: 'todas' | 'lenta' | 'rapida';
-  setTipoFilter: (filter: 'todas' | 'lenta' | 'rapida') => void;
+  customRange: CustomDateRange | null;
+  setCustomRange: (range: CustomDateRange | null) => void;
+  tipoFilter: TipoInsulinaFilter;
+  setTipoFilter: (filter: TipoInsulinaFilter) => void;
   page: number;
   setPage: (page: number) => void;
   rowsPerPage: number;
@@ -21,119 +24,77 @@ export interface UseInsulinaDataReturn {
   refresh: () => void;
 }
 
-const PRESET_RANGES: Record<Exclude<TimeRange, 'personalizado' | 'todos'>, { days: number }> = {
-  hoy: { days: 0 },
-  semana: { days: 7 },
-  mes: { days: 30 },
-  trimestre: { days: 90 },
-  año: { days: 365 },
-};
-
-function dateToStr(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
-
-function getPresetRange(preset: Exclude<TimeRange, 'personalizado' | 'todos'>): { start: string; end: string } {
-  const now = new Date();
-  const end = dateToStr(now);
-  const startDate = new Date(now);
-  startDate.setDate(now.getDate() - PRESET_RANGES[preset].days);
-  const start = dateToStr(startDate);
-  return { start, end };
-}
-
 function formatFechaCorta(iso: string): string {
   // Fecha YYYY-MM-DD del backend: parseo por partes para no desplazar el día.
   const [, month, day] = iso.split('T')[0].split('-');
   return `${day}/${month}`;
 }
 
+const getTipoToken = (item: InsulinRecord): string =>
+  item.tipo === 'LENTA' ? 'lenta' : item.tipo === 'RAPIDA' ? 'rapida' : 'todas';
+
+const getFecha = (item: InsulinRecord): string => item.fecha;
+
 export function useInsulinaData(externalRefreshTrigger?: number): UseInsulinaDataReturn {
   const [rawRegistros, setRawRegistros] = useState<InsulinRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [timeRange, setTimeRange] = useState<TimeRange>('mes');
-  const [customRange, setCustomRange] = useState<{ start: string; end: string } | null>(null);
-  const [tipoFilter, setTipoFilter] = useState<'todas' | 'lenta' | 'rapida'>('todas');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(4);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const loadRegistros = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const params: InsulinQueryParams = {};
-
-      if (tipoFilter !== 'todas') {
-        params.tipo = tipoFilter === 'lenta' ? 'LENTA' : 'RAPIDA';
-      }
-
-      if (timeRange === 'personalizado' && customRange) {
-        params.startDate = customRange.start;
-        params.endDate = customRange.end;
-      } else if (timeRange !== 'todos') {
-        const range = getPresetRange(timeRange as Exclude<TimeRange, 'personalizado' | 'todos'>);
-        params.startDate = range.start;
-        params.endDate = range.end;
-      }
-
-      const data = await insulinaApi.getAll(params);
-      setRawRegistros(data);
+      const data = await insulinaApi.getAll();
+      const sorted = [...data].sort((a, b) => {
+        const dateDiff = a.fecha.localeCompare(b.fecha);
+        if (dateDiff !== 0) return dateDiff;
+        return a.hora.localeCompare(b.hora);
+      });
+      setRawRegistros(sorted);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al cargar registros de insulina';
       setError(message);
     } finally {
       setLoading(false);
     }
-  }, [timeRange, customRange, tipoFilter, refreshKey, externalRefreshTrigger]);
+  }, []);
 
   useEffect(() => {
     loadRegistros(); // eslint-disable-line react-hooks/set-state-in-effect
-  }, [loadRegistros, externalRefreshTrigger]);
+  }, [loadRegistros, refreshKey, externalRefreshTrigger]);
 
-  const filteredData = useMemo(() => {
-    return [...rawRegistros].sort((a, b) => {
-      const dateDiff = new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
-      if (dateDiff !== 0) return dateDiff;
-      return a.hora.localeCompare(b.hora);
-    });
-  }, [rawRegistros]);
+  const metric = useMetricData<InsulinRecord>(rawRegistros, 'mes', {
+    dateAccessor: getFecha,
+    getType: getTipoToken,
+    initialTypeFilter: 'lenta',
+  });
 
-  const incluirFecha = timeRange !== 'hoy';
-  const horasInsulina = filteredData.map((item) => {
+  const incluirFecha = metric.timeRange !== 'hoy';
+  const horasInsulina = metric.filteredData.map((item) => {
     const hora = item.hora.replace(/\s+/g, '');
     return incluirFecha ? `${formatFechaCorta(item.fecha)} ${hora}` : hora;
   });
-  const dosisInsulina = filteredData.map(item => item.dosis);
+  const dosisInsulina = metric.filteredData.map((item) => item.dosis);
 
   const refresh = useCallback(() => {
-    setRefreshKey(k => k + 1);
+    setRefreshKey((k) => k + 1);
   }, []);
 
   return {
-    registros: filteredData,
+    registros: metric.filteredData,
     loading,
     error,
-    timeRange,
-    setTimeRange: (range: TimeRange) => {
-      setTimeRange(range);
-      setPage(0);
-    },
-    customRange,
-    setCustomRange: (range: { start: string; end: string } | null) => {
-      setCustomRange(range);
-      setPage(0);
-    },
-    tipoFilter,
-    setTipoFilter: (filter: 'todas' | 'lenta' | 'rapida') => {
-      setTipoFilter(filter);
-      setPage(0);
-    },
-    page,
-    setPage,
-    rowsPerPage,
-    setRowsPerPage,
+    timeRange: metric.timeRange,
+    setTimeRange: metric.setTimeRange,
+    customRange: metric.customRange,
+    setCustomRange: metric.setCustomRange,
+    tipoFilter: metric.typeFilter as TipoInsulinaFilter,
+    setTipoFilter: (filter: TipoInsulinaFilter) => metric.setTypeFilter(filter),
+    page: metric.page,
+    setPage: metric.setPage,
+    rowsPerPage: metric.rowsPerPage,
+    setRowsPerPage: metric.setRowsPerPage,
     horasInsulina,
     dosisInsulina,
     refresh,

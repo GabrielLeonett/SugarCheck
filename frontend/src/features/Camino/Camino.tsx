@@ -27,7 +27,6 @@ export function Camino() {
 const { t } = useLanguage("camino");
 
 const [mundos, setMundos] = useState(mundosData);
-const [mundoActualId] = useState("mundo-1");
 const [nivelActivoId, setNivelActivoId] = useState<number | null>(null);
 
 useEffect(() => {
