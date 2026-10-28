@@ -1,0 +1,74 @@
+# ============================================================
+# SugarCheck — despliegue con Docker Compose
+#
+# Uso:
+#   docker compose up -d --build
+#   docker compose logs -f
+#   docker compose down
+#
+# Requiere backend/.env.production (no se versiona).
+# ============================================================
+
+name: sugarcheck
+
+services:
+  # ----------------------------------------------------------
+  # Migraciones de Prisma. Corre una vez y termina; `api`
+  # espera a que salga con código 0.
+  # ----------------------------------------------------------
+  migrate:
+    build:
+      context: ./backend
+      target: build
+    command: ["pnpm", "exec", "prisma", "migrate", "deploy"]
+    env_file: ./backend/.env.production
+    restart: "no"
+
+  # ----------------------------------------------------------
+  # API NestJS (solo accesible desde la red interna de Docker)
+  # ----------------------------------------------------------
+  api:
+    build:
+      context: ./backend
+    env_file: ./backend/.env.production
+    restart: unless-stopped
+    expose:
+      - "3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000/').then(()=>process.exit(0)).catch(()=>process.exit(1))
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ----------------------------------------------------------
+  # Frontend estático + Caddy (HTTPS automático)
+  # ----------------------------------------------------------
+  web:
+    build:
+      context: ./frontend
+      args:
+        # Cambia esto si cambias de dominio (y reconstruye la imagen).
+        VITE_BACKEND_URL: https://sugarcheck.duckdns.org
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  caddy_data:
+  caddy_config:
