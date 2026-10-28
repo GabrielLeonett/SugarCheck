@@ -2,7 +2,8 @@ export const  mundosData = [
     {
         id: "mundo-1",
         numeroMundo: "1",
-        tituloSeparador: "Camino de la energía",
+        tituloSeparador: "El Reino del Autoconocimiento",
+        tituloSeparadorKey: "worldPath1",
         bloqueado: false,
         niveles: [
             { numero: 1, color: true, lines: true, bloqueado: true },
@@ -13,7 +14,8 @@ export const  mundosData = [
     {
         id: "mundo-2",
         numeroMundo: "2",
-        tituloSeparador: "Camino de la fibra",
+        tituloSeparador: "El Valle de las Alertas (Hipo e Hiper)",
+        tituloSeparadorKey: "worldPath2",
         bloqueado: false,
         niveles: [
             { numero: 4, color: false, lines: true, bloqueado: false },
@@ -24,7 +26,8 @@ export const  mundosData = [
     {
         id: "mundo-3",
         numeroMundo: "3",
-        tituloSeparador: "Camino de la fibra",
+        tituloSeparador: "La Isla del Nutri-Saber",
+        tituloSeparadorKey: "worldPath3",
         bloqueado: false,
         niveles: [
             { numero: 7, color: false, lines: true, bloqueado: false },
@@ -35,7 +38,8 @@ export const  mundosData = [
     {
         id: "mundo-4",
         numeroMundo: "4",
-        tituloSeparador: "Camino de la fibra",
+        tituloSeparador: "El Templo de la Insulina",
+        tituloSeparadorKey: "worldPath4",
         bloqueado: false,
         niveles: [
             { numero: 10, color: false, lines: true, bloqueado: false },
@@ -46,7 +50,8 @@ export const  mundosData = [
     {
         id: "mundo-5",
         numeroMundo: "5",
-        tituloSeparador: "Camino de la fibra",
+        tituloSeparador: "La Cumbre de la Vida Activa",
+        tituloSeparadorKey: "worldPath5",
         bloqueado: false,
         niveles: [
             { numero: 13, color: false, lines: true, bloqueado: false },

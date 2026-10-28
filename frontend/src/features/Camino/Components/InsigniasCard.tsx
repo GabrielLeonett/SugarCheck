@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import useLanguage from "../../../hooks/useLanguage";
 
 
 // 1. Definimos el "contrato" de qué datos puede recibir esta tarjeta
@@ -16,6 +17,7 @@ function InsigniaCard({
   mundo, 
   bloqueado = false
 }: InsigniaCardProps) {
+  const { t } = useLanguage("camino");
   
   return (
     <Box 
@@ -54,7 +56,7 @@ function InsigniaCard({
         <img 
           src={img} 
           alt={name}  
-        style={{ width: "100%", height: "100%", objectFit: "contain"  }}/>
+        style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", maxWidth: "100%", maxHeight: "100%" }} />
       </Box>
 
       {/* Textos de la tarjeta */}
@@ -67,7 +69,7 @@ function InsigniaCard({
           fontSize: "0.95rem",              // Tamaño de letra estilizado y legible
           lineHeight: 1.2
         }}>
-          {name}
+          {t(name) !== name ? t(name) : name}
         </Typography>
         <Typography
         variant="caption"                   // Letra más pequeña para etiquetas secundarias
@@ -77,7 +79,7 @@ function InsigniaCard({
           mt: 0.5,                          
           color: bloqueado ? "inherit" : "#4caf50", 
           textTransform: "uppercase"}}>
-          {mundo}
+          {t(mundo) !== mundo ? t(mundo) : mundo}
         </Typography>
         
         

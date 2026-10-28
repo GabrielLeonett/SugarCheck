@@ -6,6 +6,7 @@ import { PrismaCaminoProgresoRepository } from './PrismaCaminoProgresoRepository
 import { GetCaminoProgreso } from '../app/GetCaminoProgreso';
 import { CompletarNivelCamino } from '../app/CompletarNivelCamino';
 
+
 @Module({
   imports: [AuthModule],
   controllers: [CaminoController],

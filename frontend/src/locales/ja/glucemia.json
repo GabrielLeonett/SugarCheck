@@ -35,6 +35,9 @@
       "hoy": "今日",
       "semana": "今週",
       "mes": "今月",
+      "personalizado": "カスタム",
+      "fechaInicio": "開始",
+      "fechaFin": "終了",
       "ariaLabel": "血糖値フィルター"
     }
   },

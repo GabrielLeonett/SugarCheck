@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Typography, Grid, ButtonGroup, Button, Alert, CircularProgress } from '@mui/material';
+import { Box, Typography, Grid, Alert, CircularProgress, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useState } from 'react';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
 import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
@@ -7,6 +7,7 @@ import ModalHbA1cForm from '../../../components/shared/ModalHbA1cForm.tsx';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import { GraficoBarra } from '../../../components/shared/GraficoBarra';
+import { TimeRangeFilter } from '../../../components/shared/TimeRangeFilter';
 import { EditActionButton } from '../../../components/shared/EditActionButton';
 import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
 import { canEditRecord } from '../../../utils/editWindow';
@@ -66,27 +67,39 @@ export function SeccionHbA1c({ dataHook, onSaveHbA1c }: SeccionHbA1cProps) {
   );
 
   const filterComponent = (
-    <ButtonGroup variant="outlined" size="small" aria-label={t('grafico.filtros.ariaLabel')} sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
-      <Button
-        onClick={() => { dataHook.setFiltroHbA1c('todos'); dataHook.setPageHbA1c(0); }}
-        variant={dataHook.filtroHbA1c === 'todos' ? 'contained' : 'outlined'}
-      >
-        {t('grafico.filtros.todos')}
-      </Button>
-      <Button
-        onClick={() => { dataHook.setFiltroHbA1c('trimestre'); dataHook.setPageHbA1c(0); }}
-        variant={dataHook.filtroHbA1c === 'trimestre' ? 'contained' : 'outlined'}
-      >
-        {t('grafico.filtros.trimestre')}
-      </Button>
-      <Button
-        onClick={() => { dataHook.setFiltroHbA1c('año'); dataHook.setPageHbA1c(0); }}
-        variant={dataHook.filtroHbA1c === 'año' ? 'contained' : 'outlined'}
-      >
-        {t('grafico.filtros.año')}
-      </Button>
-      
-    </ButtonGroup>
+    <TimeRangeFilter
+      value={dataHook.filtroHbA1c}
+      onChange={dataHook.setFiltroHbA1c}
+      presets={['todos', 'trimestre', 'año']}
+      customRange={dataHook.customRangeHbA1c}
+      onCustomRangeChange={dataHook.setCustomRangeHbA1c}
+      getPresetLabel={(filtro) => t(`grafico.filtros.${filtro}`)}
+      personalizadoLabel={t('grafico.filtros.personalizado')}
+      startLabel={t('grafico.filtros.fechaInicio')}
+      endLabel={t('grafico.filtros.fechaFin')}
+      ariaLabel={t('grafico.filtros.ariaLabel')}
+      extra={
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel id="hbA1c-year-label">{t('grafico.filtros.anio')}</InputLabel>
+          <Select
+            labelId="hbA1c-year-label"
+            label={t('grafico.filtros.anio')}
+            value={dataHook.yearFilterHbA1c === null ? '' : String(dataHook.yearFilterHbA1c)}
+            onChange={(event) => {
+              const raw = event.target.value;
+              dataHook.setYearFilterHbA1c(raw === '' ? null : Number(raw));
+            }}
+          >
+            <MenuItem value="">{t('grafico.filtros.todosAnios')}</MenuItem>
+            {dataHook.hbA1cYears.map((anio) => (
+              <MenuItem key={anio} value={String(anio)}>
+                {anio}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      }
+    />
   );
 
   if (dataHook.error && dataHook.hbA1cFiltrada.length === 0) {

@@ -26,6 +26,10 @@
     "filterAll": "TODOS",
     "filterQuarter": "TRIMESTRE",
     "filterYear": "AÑO",
+    "filterPersonalizado": "PERSONALIZADO",
+    "filterFechaInicio": "Inicio",
+    "filterFechaFin": "Fin",
+    "filtrosAriaLabel": "Filtros de monitoreo físico",
     "rowsPerPage": "Filas por página:",
     "displayedRows": "{from}-{to} de {count}",
     "loading": "Cargando..."

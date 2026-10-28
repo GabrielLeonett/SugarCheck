@@ -13,6 +13,22 @@ import { GenerateUUIDInterface } from '../../shared/application/ports/generate-u
 import { ContextoAplicacionInvalidoError } from '../core/errors/ContextoAplicacionInvalidoError';
 import { InsulinaOverlapError } from '../core/errors/InsulinaOverlapError';
 import { findOverlappingInsulin } from '../core/InsulinaOverlap';
+import { ZonaRepetidaError } from '../core/errors/ZonaRepetidaError';
+import { IntervaloInsuficienteError } from '../core/errors/IntervaloInsuficienteError';
+
+const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
+
+function aFechaHora(dosis: Insulina): Date {
+  return new Date(
+    dosis.fecha.anio,
+    dosis.fecha.mes - 1,
+    dosis.fecha.dia,
+    dosis.hora.hours,
+    dosis.hora.minutes,
+    0,
+    0,
+  );
+}
 
 export class CreateInsulina {
   constructor(
@@ -74,6 +90,23 @@ export class CreateInsulina {
           'Ya existe un registro de insulina en ese horario o dentro del margen de seguridad de 3 horas.',
         ).withCode('INSULIN_OVERLAP', 'hora'),
       );
+    }
+
+    // Reglas de seguridad: última inyección hace > 2 horas y en zona distinta.
+    const historial = existingRes.getValue();
+    if (historial.length > 0) {
+      const ultima = historial.reduce((anterior, actual) =>
+        aFechaHora(actual).getTime() > aFechaHora(anterior).getTime() ? actual : anterior
+      );
+      const ultimaFechaHora = aFechaHora(ultima);
+
+      if (Date.now() - ultimaFechaHora.getTime() < DOS_HORAS_MS) {
+        return Result.fail(new IntervaloInsuficienteError());
+      }
+
+      if (ultima.zona.equals(zonaRes.getValue())) {
+        return Result.fail(new ZonaRepetidaError());
+      }
     }
 
     const insulina = new Insulina({

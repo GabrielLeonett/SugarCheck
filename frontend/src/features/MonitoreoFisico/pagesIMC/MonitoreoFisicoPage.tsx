@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid, ButtonGroup, Button, Alert, CircularProgress } from '@mui/material';
+import { Box, Typography, Grid, Alert, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Navbar from '../../../components/layout/Header/Navbar';
 import Footer from '../../../components/layout/Footer/Footer';
@@ -9,6 +9,7 @@ import ModalImcForm from '../../../components/shared/ModalImcForm';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import { GraficoBarra } from '../../../components/shared/GraficoBarra';
+import { TimeRangeFilter } from '../../../components/shared/TimeRangeFilter';
 import { EditActionButton } from '../../../components/shared/EditActionButton';
 import { useImcData } from '../../../hooks/useImcData';
 import { canEditRecord } from '../../../utils/editWindow';
@@ -74,17 +75,24 @@ export const PhysicalMonitoringPage: React.FC = () => {
   );
 
   const filterComponent = (
-    <ButtonGroup variant="outlined" size="small" aria-label="Filtros">
-      {(['todos', 'trimestre', 'año'] as const).map((filtro) => (
-        <Button
-          key={filtro}
-          onClick={() => { imc.setFiltro(filtro); imc.setPage(0); }}
-          variant={imc.filtro === filtro ? 'contained' : 'outlined'}
-        >
-          {filtro === 'todos' ? t('filterAll') : filtro === 'trimestre' ? t('filterQuarter') : t('filterYear')}
-        </Button>
-      ))}
-    </ButtonGroup>
+    <TimeRangeFilter
+      value={imc.filtro}
+      onChange={imc.setFiltro}
+      presets={['todos', 'trimestre', 'año']}
+      customRange={imc.customRange}
+      onCustomRangeChange={imc.setCustomRange}
+      getPresetLabel={(filtro) =>
+        filtro === 'todos'
+          ? t('filterAll')
+          : filtro === 'trimestre'
+            ? t('filterQuarter')
+            : t('filterYear')
+      }
+      personalizadoLabel={t('filterPersonalizado')}
+      startLabel={t('filterFechaInicio')}
+      endLabel={t('filterFechaFin')}
+      ariaLabel={t('filtrosAriaLabel')}
+    />
   );
 
   if (imc.error && imc.records.length === 0) {

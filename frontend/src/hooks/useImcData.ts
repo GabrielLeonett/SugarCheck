@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { imcApi, type ImcData } from '../apis/imc';
 import { useUiStore } from '../stores/uiStore';
 import useMetricData from './useMetricData';
-import type { TimeRange } from './useMetricData';
+import type { CustomDateRange, TimeRange } from './useMetricData';
 import type { ImcRecord } from '../data/recordsMock';
 
 export interface UseImcDataReturn {
@@ -14,6 +14,8 @@ export interface UseImcDataReturn {
   records: ImcRecord[];
   filtro: TimeRange;
   setFiltro: (range: TimeRange) => void;
+  customRange: CustomDateRange | null;
+  setCustomRange: (range: CustomDateRange | null) => void;
   page: number;
   setPage: (page: number) => void;
   rowsPerPage: number;
@@ -130,6 +132,8 @@ export function useImcData(): UseImcDataReturn {
     records: [...metric.filteredData].reverse(),
     filtro: metric.timeRange,
     setFiltro: metric.setTimeRange,
+    customRange: metric.customRange,
+    setCustomRange: metric.setCustomRange,
     page: metric.page,
     setPage: metric.setPage,
     rowsPerPage: metric.rowsPerPage,
