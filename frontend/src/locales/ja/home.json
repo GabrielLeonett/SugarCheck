@@ -5,8 +5,7 @@
     "actions": {
         "registerGlucose": "血糖値を記録",
         "applyInsulin": "インスリンを記録",
-        "registerWeight": "体重・身長を記録",
-        "insulinSaved": "インスリンの投与量を記録しました"
+        "registerWeight": "体重・身長を記録"
     },
     "cards": {
         "lastBattle": {

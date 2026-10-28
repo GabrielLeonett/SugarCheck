@@ -24,7 +24,6 @@ import { CardBase } from "../../components/ui/Cards/CardBase";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { AvatarProfile } from "./components/AvatarProfile";
-import Medal from '../../assets/icons/medal.svg';
 import { useAuthStore } from "../../stores/authStore";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -119,17 +118,6 @@ export function Profile() {
         defaultValues: { name: '', parentesco: '', telefono: '' },
     });
 
-    const {
-        register: registerPassword,
-        handleSubmit: handleSubmitPassword,
-        reset: resetPassword,
-        formState: { errors: errorsPassword },
-    } = useForm<ChangePasswordData>({
-        resolver: zodResolver(changePasswordSchema),
-        mode: "onChange",
-        defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
-    });
-
     const loadContacts = async () => {
         try {
             const data = await contactEmergenceApi.getAll();
@@ -209,16 +197,6 @@ export function Profile() {
             });
             await preferenceStore.getState().load();
             showToast('success', tp("guardadoExitoClinico"));
-        } catch (error) {
-            showToast('error', error instanceof Error ? error.message : tp("errorGuardar"));
-        }
-    };
-
-    const onChangePassword = async (data: ChangePasswordData) => {
-        try {
-            await userApi.changePassword(data.currentPassword, data.newPassword);
-            resetPassword({ currentPassword: '', newPassword: '', confirmPassword: '' });
-            showToast('success', tp("changePasswordSuccess"));
         } catch (error) {
             showToast('error', error instanceof Error ? error.message : tp("errorGuardar"));
         }
