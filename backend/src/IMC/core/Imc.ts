@@ -40,7 +40,7 @@ export class Imc {
     this._altura = props.altura;
     this._fecha = props.fecha;
     this._imcValue = this.calcularImc();
-    this._createdAt = props.createdAt || new Date();
+    this._createdAt = props.createdAt ?? new Date();
   }
 
   get id(): Id_IMC { return this._id; }

@@ -45,6 +45,7 @@ export class InMemoryImcRepository implements ImcRepository {
       peso: (update.peso as unknown as Imc['peso']) ?? existing.peso,
       altura: (update.altura as unknown as Imc['altura']) ?? existing.altura,
       fecha: existing.fecha,
+      createdAt: existing.createdAt,
     });
     this.items[index] = updated;
     return Result.ok(updated);

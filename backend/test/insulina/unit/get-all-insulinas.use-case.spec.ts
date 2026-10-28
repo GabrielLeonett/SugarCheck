@@ -53,8 +53,8 @@ describe('GetAllInsulinas UseCase', () => {
 
     const result = await useCase.run({
       userId: USER_ID,
-      startDate: new Date(2026, 0, 1).toISOString(),
-      endDate: new Date(2026, 0, 31).toISOString(),
+      startDate: '2026-01-01',
+      endDate: '2026-01-31',
     });
 
     expect(result.isValid).toBe(true);

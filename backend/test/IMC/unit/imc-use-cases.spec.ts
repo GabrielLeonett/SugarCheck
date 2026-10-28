@@ -92,6 +92,32 @@ describe('UpdateImc UseCase', () => {
     const result = await useCase.run(imc.id.value, { peso: 0 });
     expect(result.isValid).toBe(false);
   });
+
+  test('permite actualizar un registro creado hace 15 días', async () => {
+    const imc = ImcFactory.createInstance({
+      peso: 80,
+      createdAt: new Date(Date.now() - (15 * 24 * 60 * 60 * 1000 - 60 * 1000)),
+    });
+    repository.items.push(imc);
+
+    const result = await useCase.run(imc.id.value, { peso: 75 });
+
+    expect(result.isValid).toBe(true);
+    expect(result.getValue().peso.value).toBe(75);
+  });
+
+  test('bloquea la actualización después de 15 días', async () => {
+    const imc = ImcFactory.createInstance({
+      peso: 80,
+      createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000),
+    });
+    repository.items.push(imc);
+
+    const result = await useCase.run(imc.id.value, { peso: 75 });
+
+    expect(result.isValid).toBe(false);
+    expect(result.getError().name).toBe('MedicalRecordNotEditableError');
+  });
 });
 
 describe('DeleteImc UseCase', () => {
@@ -111,6 +137,19 @@ describe('DeleteImc UseCase', () => {
 
     expect(result.isValid).toBe(true);
     expect(repository.items).toHaveLength(0);
+  });
+
+  test('bloquea la eliminación después de 15 días', async () => {
+    const imc = ImcFactory.createInstance({
+      createdAt: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000),
+    });
+    repository.items.push(imc);
+
+    const result = await useCase.run({ id: imc.id.value });
+
+    expect(result.isValid).toBe(false);
+    expect(result.getError().name).toBe('MedicalRecordNotEditableError');
+    expect(repository.items).toHaveLength(1);
   });
 
   test('falla cuando el registro no existe', async () => {

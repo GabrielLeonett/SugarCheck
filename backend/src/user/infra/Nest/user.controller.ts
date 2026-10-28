@@ -21,11 +21,13 @@ import { GetOneByUsernameUser } from '../../app/GetOneByUsernameUser';
 import { SaveUser } from '../../app/SaveUser';
 import { UpdateUser } from '../../app/UpdateUser';
 import { UpdateUserEmail } from '../../app/UpdateUserEmail';
+import { ChangePassword } from '../../app/ChangePassword';
 import { FindUserIdDTO } from '../../../shared/infrastructure/DTOs/find-user-id.dto';
 import { FindUserEmailDTO } from './DTOs/find-user-email.dto';
 import { CreateUserDTO } from './DTOs/create-user.dto';
 import { UpdateUserDto } from './DTOs/update-user.dto';
 import { UpdateEmailDTO } from './DTOs/update-email.dto';
+import { ChangePasswordDTO } from './DTOs/change-password.dto';
 import { AuthGuard } from '../../../auth/infra/auth.guard';
 import { RolesGuard } from '../../../auth/infra/roles.guard';
 import { Roles } from '../../../auth/infra/roles.decorator';
@@ -43,6 +45,7 @@ export class UserController {
     @Inject('GetOneByUsernameUser') private readonly getOneByUsernameUser: GetOneByUsernameUser,
     @Inject('SaveUser') private readonly saveUser: SaveUser,
     @Inject('UpdateUserEmail') private readonly updateUserEmail: UpdateUserEmail,
+    @Inject('ChangePassword') private readonly changePassword: ChangePassword,
     private readonly translationService: TranslationService,
   ) {}
 
@@ -136,6 +139,24 @@ export class UserController {
 
     const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     return { message: this.translationService.translate('EMAIL_UPDATED', lang) };
+  }
+
+  @Patch('/password')
+  @UseGuards(AuthGuard)
+  async changePasswordRoute(
+    @Body() body: ChangePasswordDTO,
+    @Req() req: any,
+  ) {
+    const result = await this.changePassword.run({
+      userId: req.user.sub,
+      currentPassword: body.currentPassword,
+      newPassword: body.newPassword,
+    });
+
+    if (!result.isValid) throw result.getError();
+
+    const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
+    return { message: this.translationService.translate('PASSWORD_UPDATED', lang) };
   }
 
   @Patch(':id')

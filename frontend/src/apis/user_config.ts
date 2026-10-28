@@ -17,8 +17,13 @@ export const userApi = {
     return response.data;
   },
 
-  async update(id: string, data: Partial<{ name: string; username: string; email: string; sexo: string; fechaNacimiento: Date; password: string }>): Promise<UserData> {
+  async update(id: string, data: Partial<{ name: string; username: string; email: string; sexo: string; fechaNacimiento: Date }>): Promise<UserData> {
     const response = await apiPrivate.patch(`/user/${id}`, data);
+    return response.data;
+  },
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
+    const response = await apiPrivate.patch('/user/password', { currentPassword, newPassword });
     return response.data;
   },
 

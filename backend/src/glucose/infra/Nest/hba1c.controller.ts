@@ -18,8 +18,6 @@ import { AuthGuard } from '../../../auth/infra/auth.guard';
 import { CreateHbA1cDTO } from './DTOs/create-hba1c.dto';
 import { UpdateHbA1cDTO } from './DTOs/update-hba1c.dto';
 import { HbA1cNotFoundError } from '../../core/errors/HbA1cNotFoundError';
-import { EditWindowExpiredError } from '../../core/errors/EditWindowExpiredError';
-import { ErrorAbstract } from '../../../shared/error-abstract';
 import { TranslationService } from '../../../shared/infrastructure/i18n/translation.service';
 
 @Controller('hba1c')
@@ -65,8 +63,7 @@ export class HbA1cController {
     if (!result.isValid) {
       const error = result.getError();
       if (error instanceof HbA1cNotFoundError) throw new NotFoundException(error.message);
-      if (error instanceof EditWindowExpiredError) throw new BadRequestException(error.message);
-      if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
+      // El resto de errores de dominio los resuelve el filtro global (403 incluido).
       throw error;
     }
     return result.getValue().toPlain();

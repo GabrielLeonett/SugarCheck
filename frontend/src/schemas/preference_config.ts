@@ -24,12 +24,16 @@ export const PreferenceSchema = z.object({
     hypo: z.number().positive(),
     hiper: z.number().positive(),
   }),
-  insulinRatios: z.object({
-    breakfast: z.number().nonnegative(),
-    lunch: z.number().nonnegative(),
-    dinner: z.number().nonnegative(),
-  }),
-  sensitivity: z.number().positive(),
+  // Parámetros retirados de la UI. Se mantienen opcionales por compatibilidad
+  // con respuestas antiguas del backend.
+  insulinRatios: z
+    .object({
+      breakfast: z.number().nonnegative(),
+      lunch: z.number().nonnegative(),
+      dinner: z.number().nonnegative(),
+    })
+    .optional(),
+  sensitivity: z.number().positive().optional(),
   correctionSchemas: z.array(CorrectionSchemaItemSchema).optional().default([]),
   basalSchemas: z.array(BasalSchemaItemSchema).optional().default([]),
   locale: LocaleSchema,

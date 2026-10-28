@@ -58,6 +58,39 @@ describe('SaveContactEmergence UseCase', () => {
     expect(result.isValid).toBe(true);
     expect(result.getValue().telefono).toBeUndefined();
   });
+
+  test('rechaza un teléfono con formato inválido', async () => {
+    const result = await useCase.run({
+      userId: USER_ID,
+      name: 'Papá',
+      parentesco: 'padre',
+      telefono: 'abc-123',
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.getError().code).toBe('CONTACT_PHONE_INVALID');
+  });
+
+  test('rechaza un teléfono demasiado corto', async () => {
+    const result = await useCase.run({
+      userId: USER_ID,
+      name: 'Papá',
+      parentesco: 'padre',
+      telefono: '12345',
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.getError().code).toBe('CONTACT_PHONE_INVALID');
+  });
+
+  test('normaliza el teléfono eliminando espacios externos', async () => {
+    const result = await useCase.run({
+      userId: USER_ID,
+      name: 'Mamá',
+      parentesco: 'madre',
+      telefono: '  +57 300 000 0000  ',
+    });
+    expect(result.isValid).toBe(true);
+    expect(result.getValue().telefono).toBe('+57 300 000 0000');
+  });
 });
 
 describe('GetAllContactsByUserId UseCase', () => {

@@ -44,8 +44,6 @@ export default function CompleteProfileScreen() {
             hypo: Number(formData.glucosaMin) || 70,
             hiper: Number(formData.glucosaMax) || 180,
           },
-          insulinRatios: { breakfast: 1, lunch: 1, dinner: 1 },
-          sensitivity: 1,
           locale: 'es',
           theme: 'light',
         } as any).catch(() => {});
