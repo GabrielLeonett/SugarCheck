@@ -8,18 +8,23 @@ import InsigniaCard from "./Components/InsigniasCard";
 import { HexagonoMundo } from "./Components/NivelesHexagono";
 import yelmo_de_sabiduria from "../../assets/insigniasCamino/yelmo_de_sabiduria.png"
 import escudo_de_fibra from "../../assets/insigniasCamino/escudo_de_fribra.png";
+import lanzas from "../../assets/insigniasCamino/lanzas.png";
+import imagen_8 from "../../assets/insigniasCamino/image 8.svg";
+import imagen_9 from "../../assets/insigniasCamino/image 9.svg";
 import SeparadorMundo from "./Components/SeparaMundos"
 import { completarNivelCamino, getCaminoProgreso } from "../../apis/camino";
+import useLanguage from "../../hooks/useLanguage";
 
 const insigniasCamino = [
     { img: escudo_de_fibra, mundo: "Mundo 1", name: "Escudo de fibra" },
     { img: yelmo_de_sabiduria, mundo: "Mundo 2", name: "Yelmo de la sabiduría" },
-    { img: yelmo_de_sabiduria, mundo: "Mundo 3", name: "Yelmo de la sabiduría" },
-    { img: yelmo_de_sabiduria, mundo: "Mundo 4", name: "Yelmo de la sabiduría" },
-    { img: yelmo_de_sabiduria, mundo: "Mundo 5", name: "Yelmo de la sabiduría" },
+    { img: imagen_8, mundo: "Mundo 3", name: "Peto de Precisión" },
+    { img: imagen_9, mundo: "Mundo 4", name: "Gradas de equilibrio" },
+    { img: lanzas, mundo: "Mundo 5", name: "lanceta del elegido" },
 ]
 
 export function Camino() {
+const { t } = useLanguage("camino");
 
 const [mundos, setMundos] = useState(mundosData);
 const [mundoActualId] = useState("mundo-1");
@@ -106,7 +111,7 @@ return (
         <Grid container  sx={{ mt: 2, width: "100%" }}>
             <Grid size={{ xs: 12, md: 8 }}>
                 <Typography variant="h3" sx={{ textAlign: "center" }}>
-                    Camino del guerrero
+                    {t("title")}
                 </Typography>
                 <Box sx={{ border: "2px", p: 2, height: "100%" }}>
                     {mundos.map((mundo) => (
@@ -114,7 +119,7 @@ return (
                 
                     <SeparadorMundo 
                         numero={mundo.numeroMundo} 
-                        texto={mundo.tituloSeparador} 
+                        texto={t(mundo.tituloSeparadorKey) !== mundo.tituloSeparadorKey ? t(mundo.tituloSeparadorKey) : mundo.tituloSeparador} 
                         bool={!mundo.bloqueado} 
                     />
 
@@ -140,7 +145,7 @@ return (
                         );
                         })}
 
-                <Typography>Estás en el mundo ID: {mundoActualId}</Typography>
+                
 
                 </Box>
             ))}
@@ -167,7 +172,7 @@ return (
                  
                 >
                 <Typography variant="h5" sx={{ color: 'white', textAlign: 'center', fontWeight: 'bold', pt: 4 }}>
-                Colección de Insignias
+                {t("badgeCollection")}
                 </Typography>
                 {insigniasCamino.map((insignia, index) => (
                     <InsigniaCard 
@@ -178,10 +183,17 @@ return (
                         bloqueado={index >= insigniasDesbloqueadas}    
                     />
                 ))}
-                {/* Sección de progreso simulada al fondo del Box */}
-                <Box sx={{ mt: 'auto', pt: 2, color: 'white', textAlign: 'center' }}>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{("routeProgress")}</Typography>
-                {/* Tu barra de progreso irá aquí */}
+                {/* Barra de progreso del camino */}
+                <Box sx={{ mt: 'auto', px: 3, pb: 3, color: 'white', textAlign: 'center' }}>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        {Math.round((totalNivelesCompletados / 15) * 100)}% {t("routeProgress").toLowerCase()}
+                    </Typography>
+                    <Box sx={{ width: '100%', height: 12, bgcolor: 'rgba(255,255,255,0.4)', borderRadius: 6, overflow: 'hidden' }}>
+                        <Box sx={{ width: `${(totalNivelesCompletados / 15) * 100}%`, height: '100%', bgcolor: '#2196f3', transition: 'width 0.4s ease' }} />
+                    </Box>
+                    <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
+                        {totalNivelesCompletados} / 15 {t("levelsCompleted")}
+                    </Typography>
                 </Box>
                 </Box>
             </Grid>

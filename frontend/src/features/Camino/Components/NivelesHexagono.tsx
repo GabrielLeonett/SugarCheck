@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { leccionesPorNivel } from "./contenidoData";
+import useLanguage from "../../../hooks/useLanguage";
 
 interface HexagonoMundoProps {
     numero?: number | string;
@@ -18,10 +19,12 @@ export function HexagonoMundo({
     onClick,
     bloqueado = true,
 }: HexagonoMundoProps) {
+const { t } = useLanguage("camino");
 const num = Number(numero);
 const esPar = num % 2 === 0;
 const leccionData = leccionesPorNivel[num];
 const tituloMision = leccionData?.titulo || "";
+const tituloTraducido = t(`level${num}Title`);
 
 return (
     // 1. CAPA EXTERNA: Controla el zigzag y la animación al pasar el mouse
@@ -169,10 +172,10 @@ return (
             }}
         >
             <Typography variant="caption" sx={{ color: "#3182ce", fontWeight: "600", display: "block", textAlign: "center", mb: 0.5 }}>
-            Misión
+            {t("mission")}
             </Typography>
             <Typography variant="body1" sx={{ color: "#1a202c", fontWeight: "bold", textAlign: "center", lineHeight: 1.2 }}>
-            {tituloMision}
+            {tituloTraducido !== `level${num}Title` ? tituloTraducido : tituloMision}
             </Typography>
         </Box>
 
