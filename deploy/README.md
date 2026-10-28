@@ -12,7 +12,7 @@ El móvil (Expo) no se despliega aquí.
 | `frontend/Dockerfile` | Build de Vite + Caddy sirviendo el estático |
 | `deploy/Caddyfile` | Proxy, SPA y SSE (se monta en el contenedor) |
 | `deploy/update.sh` | `git pull` + rebuild + up |
-| `deploy/backend.env.production.example` | Plantilla del `.env.production` |
+| `deploy/backend.env.example` | Plantilla del `backend/.env` |
 
 ## Requisitos
 
@@ -45,8 +45,8 @@ systemctl daemon-reload
 
 ```bash
 cd /opt/sugarcheck
-cp deploy/backend.env.production.example backend/.env.production
-nano backend/.env.production
+cp deploy/backend.env.example backend/.env
+nano backend/.env
 ```
 
 Mínimo obligatorio:
@@ -121,6 +121,8 @@ docker compose up -d --build      # reconstruir
 - Los certificados viven en el volumen `caddy_data`; sobreviven a los rebuilds.
   Para empezar de cero: `docker compose down -v` (borra también los certs).
 - `api` no publica puertos: solo Caddy habla con él dentro de la red de Docker.
+- `backend/.env` **no** se copia a la imagen (`.dockerignore` excluye `.env*`);
+  Compose lo inyecta en tiempo de ejecución con `env_file`.
 - La imagen del backend copia `node_modules` del stage de build porque
   `@prisma/client` está en `devDependencies` y se genera con `prisma generate`.
   Si algún día lo mueves a `dependencies`, se puede adelgazar la imagen.
