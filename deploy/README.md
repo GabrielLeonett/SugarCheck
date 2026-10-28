@@ -14,7 +14,6 @@ docker compose push          sugarcheck-web:latest        docker compose up -d
 | Archivo | Para qué |
 |---|---|
 | `docker-compose.yml` | Servicios `migrate`, `api` y `web` |
-| `.env.example` | Usuario de Docker Hub (raíz del repo) |
 | `backend/Dockerfile` | Imagen de la API (una sola, sirve para migrar y correr) |
 | `frontend/Dockerfile` | Build de Vite + Caddy sirviendo el estático |
 | `deploy/Caddyfile` | Proxy, SPA y SSE (se monta en el contenedor) |
@@ -30,29 +29,22 @@ docker compose push          sugarcheck-web:latest        docker compose up -d
 docker login
 ```
 
-Si no tienes cuenta: https://hub.docker.com/signup. Los repositorios
-`sugarcheck-api` y `sugarcheck-web` se crean solos en el primer push.
+Si no tienes cuenta: https://hub.docker.com/signup. El repo
+`gayer12/sugarcheck` ya está creado; los tags se suben solos.
 
-### 2. Configurar el usuario
-
-```bash
-cp .env.example .env
-```
-
-Edita `.env` y pon tu usuario:
-
-```env
-DOCKERHUB_USER=tu-usuario
-```
-
-### 3. Construir y subir
+### 2. Construir y subir
 
 ```bash
 ./deploy/push.sh
 ```
 
-Hace `docker compose build` y `docker compose push`. La primera vez tarda
-bastante (compila Vite y el backend); las siguientes reutilizan caché.
+Sube dos tags al repo `gayer12/sugarcheck`:
+
+- `:api` → backend NestJS
+- `:web` → frontend Vite + Caddy
+
+La primera vez tarda bastante (compila Vite y el backend); las siguientes
+reutilizan caché.
 
 ## En el servidor
 
@@ -74,15 +66,12 @@ rm -f /etc/systemd/system/sugarcheck-api.service
 systemctl daemon-reload
 ```
 
-### 3. Código y usuario de Docker Hub
+### 3. Código
 
 ```bash
 cd /opt/sugarcheck
 git config --global --add safe.directory /opt/sugarcheck
 git pull
-
-cp .env.example .env
-nano .env        # DOCKERHUB_USER=tu-usuario
 ```
 
 ### 4. Variables de la aplicación
