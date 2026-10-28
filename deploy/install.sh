@@ -118,6 +118,10 @@ if grep -qE '<REF>|<PASSWORD>|^JWT_SECRET=""|^RESET_TOKEN_SECRET=""' "$ENV_FILE"
   exit 0
 fi
 
+if ! grep -q '^NODE_ENV=production' "$ENV_FILE"; then
+  warn "NODE_ENV no es 'production' en $ENV_FILE. Las cookies saldrán sin Secure."
+fi
+
 FRONT_ENV="$APP_DIR/frontend/.env.production"
 sed "s|__DOMAIN__|$DOMAIN|g" \
   "$APP_DIR/deploy/frontend.env.production.example" > "$FRONT_ENV"
@@ -127,20 +131,29 @@ chown "$APP_USER:$APP_USER" "$FRONT_ENV"
 # 8. Dependencias, migraciones y build
 # ------------------------------------------------------------
 run_app() {
-  sudo -u "$APP_USER" -H bash -lc "cd '$APP_DIR/$1' && $2"
+  local dir="$1"
+  shift
+  sudo -u "$APP_USER" -H bash -lc "cd '$APP_DIR/$dir' && $*"
 }
 
+# Prisma (prisma.config.ts) lee DIRECT_URL del entorno. No hacemos `source`
+# del .env porque un valor sin comillas con espacios rompería el shell.
+DIRECT_URL_VALUE="$(sed -n 's/^DIRECT_URL=//p' "$ENV_FILE" | head -n1 | sed 's/^"//; s/"$//')"
+[[ -n "$DIRECT_URL_VALUE" ]] || die "DIRECT_URL está vacío en $ENV_FILE"
+
+# --prod=false: el servidor necesita devDependencies (nest CLI, prisma,
+# typescript) para poder compilar.
 log "Instalando dependencias del backend"
-run_app backend "pnpm install --frozen-lockfile || pnpm install"
+run_app backend "pnpm install --prod=false --frozen-lockfile || pnpm install --prod=false"
 
 log "Aplicando migraciones de Prisma"
-run_app backend "pnpm exec dotenv-cli -e .env.production -- prisma migrate deploy"
+run_app backend "DIRECT_URL='$DIRECT_URL_VALUE' pnpm exec prisma migrate deploy"
 
 log "Compilando backend"
-run_app backend "pnpm exec dotenv-cli -e .env.production -- pnpm build"
+run_app backend "pnpm build"
 
 log "Instalando dependencias del frontend"
-run_app frontend "pnpm install --frozen-lockfile || pnpm install"
+run_app frontend "pnpm install --prod=false --frozen-lockfile || pnpm install --prod=false"
 
 log "Compilando frontend"
 run_app frontend "pnpm build"
@@ -149,11 +162,15 @@ run_app frontend "pnpm build"
 # 9. Servicio systemd del backend
 # ------------------------------------------------------------
 log "Configurando servicio systemd"
+UNIT_TMP="$(mktemp)"
 sed -e "s|__APP_DIR__|$APP_DIR|g" -e "s|__APP_USER__|$APP_USER|g" \
-  "$APP_DIR/deploy/sugarcheck-api.service" \
-  > /etc/systemd/system/sugarcheck-api.service
+  "$APP_DIR/deploy/sugarcheck-api.service" > "$UNIT_TMP"
+install -m 644 "$UNIT_TMP" /etc/systemd/system/sugarcheck-api.service
+rm -f "$UNIT_TMP"
 
 systemctl daemon-reload
+# Un intento anterior pudo dejar la unidad enmascarada.
+systemctl unmask sugarcheck-api >/dev/null 2>&1 || true
 systemctl enable sugarcheck-api
 systemctl restart sugarcheck-api \
   || warn "El backend no arrancó. Revisa: journalctl -u sugarcheck-api -n 100 --no-pager"
@@ -162,13 +179,23 @@ systemctl restart sugarcheck-api \
 # 10. Caddy
 # ------------------------------------------------------------
 log "Configurando Caddy"
+# Escribimos a un temporal y solo reemplazamos el Caddyfile real si la
+# validación pasa. Así un error no deja /etc/caddy/Caddyfile vacío.
+CADDY_TMP="$(mktemp)"
 sed -e "s|__DOMAIN__|$DOMAIN|g" -e "s|__APP_DIR__|$APP_DIR|g" \
-  "$APP_DIR/deploy/Caddyfile" > /etc/caddy/Caddyfile
+  "$APP_DIR/deploy/Caddyfile" > "$CADDY_TMP"
 
 # Caddy corre como usuario "caddy": necesita poder leer el build.
 chmod 755 /opt "$APP_DIR" "$APP_DIR/frontend" "$APP_DIR/frontend/dist" 2>/dev/null || true
 
-caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+if ! caddy validate --config "$CADDY_TMP" --adapter caddyfile; then
+  rm -f "$CADDY_TMP"
+  die "El Caddyfile generado no es válido. Revisa $APP_DIR/deploy/Caddyfile"
+fi
+
+install -m 644 "$CADDY_TMP" /etc/caddy/Caddyfile
+rm -f "$CADDY_TMP"
+
 systemctl enable caddy
 systemctl restart caddy
 
