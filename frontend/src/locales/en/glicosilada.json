@@ -22,6 +22,11 @@
       "trimestre": "Quarter",
       "año": "Year",
       "todos": "All",
+      "personalizado": "Custom",
+      "fechaInicio": "Start",
+      "fechaFin": "End",
+      "anio": "Year",
+      "todosAnios": "All years",
       "ariaLabel": "HbA1c filters"
     }
   },

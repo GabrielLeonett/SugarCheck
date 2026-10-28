@@ -22,6 +22,11 @@
       "trimestre": "Trimestre",
       "año": "Año",
       "todos": "Todos",
+      "personalizado": "Personalizado",
+      "fechaInicio": "Inicio",
+      "fechaFin": "Fin",
+      "anio": "Año",
+      "todosAnios": "Todos los años",
       "ariaLabel": "Filtros de HbA1c"
     }
   },
