@@ -22,6 +22,12 @@ const BasePreference = {
     hypo: 90,
     hiper: 160
   },
+  insulinRatios: {
+    breakfast: 100,
+    lunch: 100,
+    dinner: 100
+  },
+  sensitivity: 1
 };
 
 export class SaveUser {
@@ -92,7 +98,9 @@ export class SaveUser {
       idRes.getValue().value,
       BasePreference.profileImg,
       BasePreference.unitMeasure,
-      BasePreference.thresholds
+      BasePreference.thresholds,
+      BasePreference.insulinRatios,
+      BasePreference.sensitivity
     );
 
     if (!preferenceResult.isValid) {

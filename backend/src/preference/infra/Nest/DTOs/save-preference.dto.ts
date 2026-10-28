@@ -1,11 +1,13 @@
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
+  IsNumber,
   IsString,
   IsOptional,
   ValidateNested,
+  ArrayMinSize,
 } from 'class-validator';
-import { ThresholdsDTO, CorrectionSchemaItemDTO, BasalSchemaItemDTO } from './utils.dto';
+import { ThresholdsDTO, InsulinRatiosDTO, CorrectionSchemaItemDTO, BasalSchemaItemDTO } from './utils.dto';
 
 export class SavePreferenceDTO {
 

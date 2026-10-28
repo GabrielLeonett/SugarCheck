@@ -4,12 +4,16 @@ import { Result } from '../../shared/result';
 import { Preference } from '../core/Preference';
 import { PreferenceRepository } from '../core/PreferenceRepository';
 import { UnitMeasure } from '../core/value-objects/UnitMeasure';
+import { InsulinRatios } from '../core/value-objects/InsulinRatios';
+import { SensitivityFactor } from '../core/value-objects/SensitivityFactor';
 import { Thresholds } from '../core/value-objects/Thresholds';
 
 // Definimos un DTO para agrupar los datos opcionales a actualizar
 export interface UpdatePreferenceDTO {
   unitMeasure?: string;
   thresholds?: { hypo: number; hiper: number };
+  insulinRatios?: { breakfast: number; lunch: number; dinner: number };
+  sensitivity?: number;
 }
 
 export class UpdatePreference {
@@ -39,6 +43,22 @@ export class UpdatePreference {
       const thresholdsRes = Thresholds.create({ ...data.thresholds });
       if (!thresholdsRes.isValid) return Result.fail(thresholdsRes.getError());
       updateProps.thresholds = thresholdsRes.getValue();
+    }
+
+    if (data.insulinRatios !== undefined) {
+      const insulinRatiosRes = InsulinRatios.create(
+        data.insulinRatios.breakfast,
+        data.insulinRatios.lunch,
+        data.insulinRatios.dinner,
+      );
+      if (!insulinRatiosRes.isValid) return Result.fail(insulinRatiosRes.getError());
+      updateProps.insulinRatios = insulinRatiosRes.getValue();
+    }
+
+    if (data.sensitivity !== undefined) {
+      const sensitivityRes = SensitivityFactor.create(data.sensitivity);
+      if (!sensitivityRes.isValid) return Result.fail(sensitivityRes.getError());
+      updateProps.sensitivity = sensitivityRes.getValue();
     }
 
     // 4. Si el objeto está vacío, no hay nada que actualizar
