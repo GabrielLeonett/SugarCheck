@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import {
-  Box, Typography, Grid, LinearProgress, Button, ButtonGroup, Alert, CircularProgress,
+  Box, Typography, Grid, LinearProgress, Alert, CircularProgress,
 } from '@mui/material';
 import { useState } from 'react';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
@@ -9,6 +9,7 @@ import ModalGlucosaForm from '../../../components/shared/ModalGlucosaForm.tsx';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import { GraficoBarra } from '../../../components/shared/GraficoBarra';
+import { TimeRangeFilter } from '../../../components/shared/TimeRangeFilter';
 import { EditActionButton } from '../../../components/shared/EditActionButton';
 import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
 import { canEditRecord } from '../../../utils/editWindow';
@@ -72,17 +73,18 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
   );
 
   const filterComponent = (
-    <ButtonGroup variant="outlined" size="small" aria-label={t('grafico.filtros.ariaLabel')} sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
-      {(['hoy', 'semana', 'mes'] as const).map((filtro) => (
-        <Button
-          key={filtro}
-          onClick={() => { dataHook.setFiltroGlucosa(filtro); dataHook.setPageGlucosa(0); }}
-          variant={dataHook.filtroGlucosa === filtro ? 'contained' : 'outlined'}
-        >
-          {t(`grafico.filtros.${filtro}`)}
-        </Button>
-      ))}
-    </ButtonGroup>
+    <TimeRangeFilter
+      value={dataHook.filtroGlucosa}
+      onChange={dataHook.setFiltroGlucosa}
+      presets={['hoy', 'semana', 'mes']}
+      customRange={dataHook.customRangeGlucosa}
+      onCustomRangeChange={dataHook.setCustomRangeGlucosa}
+      getPresetLabel={(filtro) => t(`grafico.filtros.${filtro}`)}
+      personalizadoLabel={t('grafico.filtros.personalizado')}
+      startLabel={t('grafico.filtros.fechaInicio')}
+      endLabel={t('grafico.filtros.fechaFin')}
+      ariaLabel={t('grafico.filtros.ariaLabel')}
+    />
   );
 
   if (dataHook.error && dataHook.glucosaFiltrada.length === 0) {
