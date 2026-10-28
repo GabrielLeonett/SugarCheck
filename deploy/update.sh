@@ -17,13 +17,14 @@ git pull --ff-only
 
 log "Backend: dependencias, build y migraciones"
 cd "$APP_DIR/backend"
-pnpm install --frozen-lockfile || pnpm install
-pnpm exec dotenv-cli -e .env.production -- pnpm build
-pnpm exec dotenv-cli -e .env.production -- prisma migrate deploy
+pnpm install --prod=false --frozen-lockfile || pnpm install --prod=false
+pnpm build
+DIRECT_URL="$(sed -n 's/^DIRECT_URL=//p' .env.production | head -n1 | sed 's/^"//; s/"$//')" \
+  pnpm exec prisma migrate deploy
 
 log "Frontend: dependencias y build"
 cd "$APP_DIR/frontend"
-pnpm install --frozen-lockfile || pnpm install
+pnpm install --prod=false --frozen-lockfile || pnpm install --prod=false
 pnpm build
 
 log "Reiniciando servicios"
