@@ -75,8 +75,6 @@ export default function CompleteRegistration() {
               hypo: Number(values.glucosaMin) || currentPrefs.thresholds?.hypo,
               hiper: Number(values.glucosaMax) || currentPrefs.thresholds?.hiper,
             },
-            insulinRatios: currentPrefs.insulinRatios,
-            sensitivity: currentPrefs.sensitivity,
             correctionSchemas: currentPrefs.correctionSchemas ?? [],
             basalSchemas: currentPrefs.basalSchemas ?? [],
           });
@@ -289,6 +287,8 @@ export default function CompleteRegistration() {
               variant="outlined"
               size="small"
               type="tel"
+              error={!!errors.telefono}
+              helperText={errors.telefono?.message}
               sx={textFieldStyles}
             />
 

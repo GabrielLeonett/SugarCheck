@@ -7,17 +7,20 @@ export const profilePersonalSchema = z.object({
   fechaNacimiento: z.string().optional(),
 });
 
-export const profileThresholdsSchema = z.object({
-  hypo: z.number().min(10, "Mínimo 10").max(300, "Máximo 300"),
-  hiper: z.number().min(10, "Mínimo 10").max(400, "Máximo 400"),
-});
-
-export const profileInsulinRatiosSchema = z.object({
-  breakfast: z.number().nonnegative("Debe ser un valor positivo"),
-  lunch: z.number().nonnegative("Debe ser un valor positivo"),
-  dinner: z.number().nonnegative("Debe ser un valor positivo"),
-});
-
 export type ProfilePersonalData = z.infer<typeof profilePersonalSchema>;
-export type ProfileThresholdsData = z.infer<typeof profileThresholdsSchema>;
-export type ProfileInsulinRatiosData = z.infer<typeof profileInsulinRatiosSchema>;
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "La contraseña actual es obligatoria"),
+    newPassword: z
+      .string()
+      .min(8, "La nueva contraseña debe tener al menos 8 caracteres")
+      .regex(/\d/, "La nueva contraseña debe incluir al menos un número"),
+    confirmPassword: z.string().min(1, "Confirma la nueva contraseña"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
+
+export type ChangePasswordData = z.infer<typeof changePasswordSchema>;

@@ -7,15 +7,18 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDTO } from './DTOs/login.dto';
 import { ForgotPasswordDTO } from './DTOs/forgot-password.dto';
 import { ResetPasswordDTO } from './DTOs/reset-password.dto';
+import { ChangePasswordDTO } from './DTOs/change-password.dto';
 import type { Response, Request } from 'express';
 import { FirebaseAdminService } from './firebase-admin.service';
 import { LoginFirebaseDTO } from './DTOs/login-firebase.dto';
 import { TranslationService } from '../../shared/infrastructure/i18n/translation.service';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -194,6 +197,20 @@ export class AuthController {
 
     const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     return { message: this.translationService.translate('PASSWORD_RESET_SUCCESS', lang) };
+  }
+
+  @Post('change-password')
+  @UseGuards(AuthGuard)
+  async changePassword(
+    @Body() body: ChangePasswordDTO,
+    @Req() req: Request,
+  ) {
+    const userId = (req as unknown as { user: { sub: string } }).user.sub;
+    const result = await this.authService.changePassword(userId, body.currentPassword, body.newPassword);
+
+    if (!result.isValid) throw result.getError();
+
+    return result.getValue();
   }
   
 }

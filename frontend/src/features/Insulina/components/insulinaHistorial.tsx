@@ -2,7 +2,7 @@ import { Box, Typography, ButtonGroup, Button } from '@mui/material';
 import { useState } from 'react';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import HistorialTable from '../../../components/shared/HistorialTable';
-import { GraficoLinea } from '../../../components/shared/GraficoLinea';
+import { GraficoBarra } from '../../../components/shared/GraficoBarra';
 import { TimeRangeFilter } from '../../../components/shared/TimeRangeFilter';
 import { EditActionButton } from '../../../components/shared/EditActionButton';
 import ModalInsulinaLenta from './ModalInsulinaLenta';
@@ -98,7 +98,7 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
   ];
 
   const chartComponent = (
-    <GraficoLinea
+    <GraficoBarra
       data={dosisInsulina}
       labels={horasInsulina}
       color={tipoFilter === 'lenta' ? '#FFA726' : '#4FC3F7'}
@@ -111,7 +111,7 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
     <TimeRangeFilter
       value={timeRange}
       onChange={setTimeRange}
-      presets={['hoy', 'semana', 'mes', 'trimestre', 'año', 'todos']}
+      presets={['hoy', 'semana', 'mes']}
       customRange={customRange}
       onCustomRangeChange={setCustomRange}
       getPresetLabel={(filtro) => t(filtro === 'año' ? 'anio' : filtro)}
@@ -121,12 +121,6 @@ export default function InsulinaHistorial({ refreshTrigger = 0 }: InsulinaHistor
       ariaLabel={t('filtroTiempoAriaLabel')}
       extra={
         <ButtonGroup variant="outlined" size="small" aria-label={t('filtroTipoAriaLabel')} sx={{ ml: { xs: 0, sm: 1 } }}>
-          <Button
-            onClick={() => setTipoFilter('todas')}
-            variant={tipoFilter === 'todas' ? 'contained' : 'outlined'}
-          >
-            {t('todas')}
-          </Button>
           <Button
             onClick={() => setTipoFilter('lenta')}
             variant={tipoFilter === 'lenta' ? 'contained' : 'outlined'}
