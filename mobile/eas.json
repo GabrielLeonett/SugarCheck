@@ -7,18 +7,21 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "node": "22.13.0"
+      "node": "22.13.0",
+      "packageManager": "pnpm"
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
       },
-      "node": "22.13.0"
+      "node": "22.13.0",
+      "packageManager": "pnpm"
     },
     "production": {
       "autoIncrement": true,
-      "node": "22.13.0"
+      "node": "22.13.0",
+      "packageManager": "pnpm"
     }
   },
   "submit": {
