@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SugarCheck",
-    "slug": "MiSuperApp",
+    "slug": "misuperapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
