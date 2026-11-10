@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "SugarCheck",
-    "slug": "misuperapp",
+    "slug": "MiSuperApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "misuperapp",
+    "scheme": "sugarcheck",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -19,7 +19,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.gabrielleonett.MiSuperApp"
+      "package": "com.gabrielleonett.sugarcheck"
     },
     "web": {
       "output": "static",
