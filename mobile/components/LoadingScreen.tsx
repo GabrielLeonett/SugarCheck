@@ -1,19 +1,20 @@
 import React from 'react';
-import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+
+import { Fonts } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface LoadingScreenProps {
   message?: string;
 }
 
 export function LoadingScreen({ message = 'Cargando...' }: LoadingScreenProps) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colors } = useTheme();
 
   return (
-    <View style={[styles.container, { backgroundColor: Colors[colorScheme].background }]}>
-      <ActivityIndicator size="large" color={Colors[colorScheme].tint} />
-      <Text style={[styles.text, { color: Colors[colorScheme].text }]}>{message}</Text>
+    <View style={[styles.container, { backgroundColor: colors.background.default }]}>
+      <ActivityIndicator size="large" color={colors.primary.main} />
+      <Text style={[styles.text, { color: colors.text.secondary }]}>{message}</Text>
     </View>
   );
 }
@@ -27,6 +28,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: Fonts.regular,
   },
 });

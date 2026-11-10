@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  type TextInputProps,
+} from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+
+import { Fonts, Shape } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface FormInputProps {
   label?: string;
@@ -11,10 +19,11 @@ interface FormInputProps {
   placeholder?: string;
   secureTextEntry?: boolean;
   error?: string;
-  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+  keyboardType?: TextInputProps['keyboardType'];
   multiline?: boolean;
   numberOfLines?: number;
   editable?: boolean;
+  autoCapitalize?: TextInputProps['autoCapitalize'];
 }
 
 export function FormInput({
@@ -28,58 +37,65 @@ export function FormInput({
   multiline = false,
   numberOfLines = 1,
   editable = true,
+  autoCapitalize = 'none',
 }: FormInputProps) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colors } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState(false);
 
-  const isDark = colorScheme === 'dark';
+  const borderColor = error
+    ? colors.error.main
+    : focused
+      ? colors.primary.main
+      : colors.border;
 
   return (
     <View style={styles.container}>
-      {label && (
-        <Text style={[styles.label, { color: isDark ? '#ccc' : '#555' }]}>{label}</Text>
-      )}
+      {label && <Text style={[styles.label, { color: colors.text.secondary }]}>{label}</Text>}
+
       <View style={styles.inputWrapper}>
         <TextInput
           style={[
             styles.input,
             {
-              backgroundColor: isDark ? '#1E1E1E' : '#F5F5F5',
-              color: Colors[colorScheme].text,
-              borderColor: error ? '#d32f2f' : focused ? Colors[colorScheme].tint : 'transparent',
+              backgroundColor: editable ? colors.inputBackground : colors.action.disabledBackground,
+              color: colors.text.primary,
+              borderColor,
               minHeight: multiline ? numberOfLines * 24 + 20 : 48,
             },
           ]}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={isDark ? '#666' : '#999'}
+          placeholderTextColor={colors.text.disabled}
           secureTextEntry={secureTextEntry && !showPassword}
           keyboardType={keyboardType}
           multiline={multiline}
           numberOfLines={numberOfLines}
           editable={editable}
+          autoCapitalize={autoCapitalize}
+          selectionColor={colors.primary.main}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          autoCapitalize="none"
         />
+
         {secureTextEntry && (
           <TouchableOpacity
             style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}
+            onPress={() => setShowPassword((previous) => !previous)}
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
           >
             <FontAwesome
               name={showPassword ? 'eye' : 'eye-slash'}
               size={20}
-              color={isDark ? '#999' : '#666'}
+              color={colors.text.secondary}
             />
           </TouchableOpacity>
         )}
       </View>
-      {error && (
-        <Text style={[styles.errorText, { color: '#d32f2f' }]}>{error}</Text>
-      )}
+
+      {error && <Text style={[styles.errorText, { color: colors.error.main }]}>{error}</Text>}
     </View>
   );
 }
@@ -91,17 +107,17 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     marginBottom: 6,
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily: Fonts.semiBold,
   },
   inputWrapper: {
     position: 'relative',
   },
   input: {
-    borderRadius: 12,
+    borderRadius: Shape.inputRadius,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: Fonts.regular,
     borderWidth: 1.5,
   },
   eyeIcon: {
@@ -110,10 +126,11 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     justifyContent: 'center',
+    paddingHorizontal: 4,
   },
   errorText: {
     fontSize: 12,
     marginTop: 4,
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: Fonts.regular,
   },
 });

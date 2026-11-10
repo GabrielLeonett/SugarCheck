@@ -1,46 +1,52 @@
 import { Link, Stack } from 'expo-router';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Fonts } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+
+const ACTIONS = [
+  { href: '/bitacora/glucosa', icon: 'heartbeat', label: 'Registrar glucosa' },
+  { href: '/bitacora/insulina', icon: 'clock-o', label: 'Registrar insulina' },
+  { href: '/bitacora/monitoreo-fisico', icon: 'balance-scale', label: 'Monitoreo físico' },
+  { href: '/camino', icon: 'road', label: 'Camino del Guerrero' },
+] as const;
 
 export default function ModalScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: 'Acciones rápidas', headerShown: true }} />
-      <ThemedText type="title" style={{ marginBottom: 24 }}>Acciones rápidas</ThemedText>
+      <Stack.Screen options={{ headerShown: false }} />
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        <ThemedText type="h4" style={styles.title}>
+          Acciones rápidas
+        </ThemedText>
 
-      <Link href={'/bitacora/glucosa' as any} asChild>
-        <TouchableOpacity style={[styles.actionItem, { borderColor: Colors[colorScheme].tint }]}>
-          <FontAwesome name="heartbeat" size={24} color={Colors[colorScheme].tint} />
-          <ThemedText type="defaultSemiBold" style={{ marginLeft: 16 }}>Registrar glucosa</ThemedText>
-        </TouchableOpacity>
-      </Link>
-
-      <Link href={'/bitacora/insulina' as any} asChild>
-        <TouchableOpacity style={[styles.actionItem, { borderColor: Colors[colorScheme].tint }]}>
-          <FontAwesome name="clock-o" size={24} color={Colors[colorScheme].tint} />
-          <ThemedText type="defaultSemiBold" style={{ marginLeft: 16 }}>Registrar insulina</ThemedText>
-        </TouchableOpacity>
-      </Link>
-
-      <Link href={'/bitacora/monitoreo-fisico' as any} asChild>
-        <TouchableOpacity style={[styles.actionItem, { borderColor: Colors[colorScheme].tint }]}>
-          <FontAwesome name="balance-scale" size={24} color={Colors[colorScheme].tint} />
-          <ThemedText type="defaultSemiBold" style={{ marginLeft: 16 }}>Monitoreo físico</ThemedText>
-        </TouchableOpacity>
-      </Link>
-
-      <Link href={'/camino' as any} asChild>
-        <TouchableOpacity style={[styles.actionItem, { borderColor: Colors[colorScheme].tint }]}>
-          <FontAwesome name="road" size={24} color={Colors[colorScheme].tint} />
-          <ThemedText type="defaultSemiBold" style={{ marginLeft: 16 }}>Camino del Guerrero</ThemedText>
-        </TouchableOpacity>
-      </Link>
+        {ACTIONS.map((action) => (
+          <Link key={action.href} href={action.href as any} asChild>
+            <TouchableOpacity
+              style={[styles.actionItem, { borderColor: colors.primary.main }]}
+              activeOpacity={0.8}
+            >
+              <FontAwesome name={action.icon as any} size={24} color={colors.primary.main} />
+              <ThemedText type="defaultSemiBold" style={styles.actionLabel}>
+                {action.label}
+              </ThemedText>
+            </TouchableOpacity>
+          </Link>
+        ))}
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -48,7 +54,12 @@ export default function ModalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+  },
+  content: {
+    paddingHorizontal: 20,
+  },
+  title: {
+    marginBottom: 24,
   },
   actionItem: {
     flexDirection: 'row',
@@ -57,5 +68,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1.5,
     borderRadius: 12,
+  },
+  actionLabel: {
+    marginLeft: 16,
+    fontFamily: Fonts.semiBold,
   },
 });

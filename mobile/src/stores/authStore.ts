@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { authApi } from '../apis/auth';
-import { preferenceStore } from './preferenceStore';
 import { signOut } from 'firebase/auth';
 import { authFirebase } from '../config/firebase';
 import type { User } from '../types';
@@ -51,7 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const response = await authApi.refresh();
       set({ user: response.user, accessToken: response.accessToken });
       return response.accessToken;
-    } catch (error) {
+    } catch {
       set({ user: null, accessToken: null });
       return null;
     }

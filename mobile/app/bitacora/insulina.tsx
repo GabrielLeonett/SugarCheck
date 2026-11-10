@@ -1,34 +1,35 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
   Alert,
-  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Text,
   TextInput,
-  ActivityIndicator,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
-import { Card } from '@/components/card';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { Button } from '@/components/Button';
+import { Card } from '@/components/card';
 import { DatePickerField } from '@/components/DatePicker';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
 import { ZoneSelector } from '@/components/ZoneSelector';
+import { Fonts } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { insulinaApi } from '@/src/apis/insulina';
 import { CONTEXTOS_INSULINA } from '@/src/types';
 import type { DailyInsulinTotals } from '@/src/types';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const TIEMPO_SEGURIDAD = 3 * 60 * 60;
 
 export default function InsulinaScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
-  const colors = Colors[colorScheme];
 
   const [activeTab, setActiveTab] = useState<'RAPIDA' | 'LENTA'>('RAPIDA');
   const [dosis, setDosis] = useState('');
@@ -49,7 +50,9 @@ export default function InsulinaScreen() {
     try {
       const data = await insulinaApi.getTotals();
       setTotals(data);
-    } catch { console.error('Error al cargar totales'); }
+    } catch {
+      console.error('Error al cargar totales');
+    }
   }, []);
 
   const loadUltimaDosisRapida = useCallback(async () => {
@@ -58,7 +61,9 @@ export default function InsulinaScreen() {
       if (records.length > 0) {
         setUltimaRapida(new Date(records[0].createdAt));
       }
-    } catch { console.error('Error al cargar última dosis'); }
+    } catch {
+      console.error('Error al cargar última dosis');
+    }
   }, []);
 
   useEffect(() => {
@@ -68,28 +73,40 @@ export default function InsulinaScreen() {
 
   useEffect(() => {
     if (!ultimaRapida) return;
+
     const calcular = () => {
       const ahora = new Date();
       const diff = (ahora.getTime() - ultimaRapida.getTime()) / 1000;
       setSegundosRestantes(Math.max(0, TIEMPO_SEGURIDAD - diff));
     };
+
     calcular();
     const interval = setInterval(calcular, 1000);
     return () => clearInterval(interval);
   }, [ultimaRapida]);
 
   const formatTimer = (segundos: number) => {
-    const h = Math.floor(segundos / 3600);
-    const m = Math.floor((segundos % 3600) / 60);
-    const s = Math.floor(segundos % 60);
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    const hours = Math.floor(segundos / 3600);
+    const minutes = Math.floor((segundos % 3600) / 60);
+    const seconds = Math.floor(segundos % 60);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   const safetyStatus = () => {
-    if (!ultimaRapida) return { color: '#999', label: 'Sin registro', icon: 'clock-o' as const };
-    if (segundosRestantes <= 0) return { color: '#22c55e', label: 'Zona segura', icon: 'check-circle' as const };
-    if (segundosRestantes < 1800) return { color: '#f59e0b', label: 'Próximo a vencer', icon: 'exclamation-triangle' as const };
-    return { color: '#ef4444', label: 'Espera...', icon: 'hourglass' as const };
+    if (!ultimaRapida) {
+      return { color: colors.text.disabled, label: 'Sin registro', icon: 'clock-o' as const };
+    }
+    if (segundosRestantes <= 0) {
+      return { color: colors.success.main, label: 'Zona segura', icon: 'check-circle' as const };
+    }
+    if (segundosRestantes < 1800) {
+      return {
+        color: colors.warning.main,
+        label: 'Próximo a vencer',
+        icon: 'exclamation-triangle' as const,
+      };
+    }
+    return { color: colors.error.main, label: 'Espera...', icon: 'hourglass' as const };
   };
 
   const handleSave = async () => {
@@ -107,7 +124,10 @@ export default function InsulinaScreen() {
       const dia = fecha.getDate();
       const mes = fecha.getMonth() + 1;
       const anio = fecha.getFullYear();
-      const horaStr = `${hora.getHours().toString().padStart(2, '0')}:${hora.getMinutes().toString().padStart(2, '0')}`;
+      const horaStr = `${hora.getHours().toString().padStart(2, '0')}:${hora
+        .getMinutes()
+        .toString()
+        .padStart(2, '0')}`;
 
       await insulinaApi.create({
         tipo: activeTab,
@@ -126,12 +146,12 @@ export default function InsulinaScreen() {
       }
 
       Alert.alert('Guardado', `Insulina ${activeTab === 'RAPIDA' ? 'rápida' : 'lenta'} registrada`, [
-        { text: 'OK', onPress: () => router.back() as any },
+        { text: 'OK', onPress: () => router.back() },
       ]);
       await loadTotals();
     } catch (error: any) {
-      const msg = error?.response?.data?.message || 'Error al guardar';
-      Alert.alert('Error', msg);
+      const message = error?.response?.data?.message || 'Error al guardar';
+      Alert.alert('Error', message);
     } finally {
       setLoading(false);
     }
@@ -141,96 +161,132 @@ export default function InsulinaScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        <TouchableOpacity onPress={() => router.back() as any} style={styles.backButton}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 40 },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+          accessibilityRole="button"
+          accessibilityLabel="Volver"
+        >
           <FontAwesome name="arrow-left" size={20} color={colors.text.primary} />
         </TouchableOpacity>
 
-        <ThemedText type="title" style={{ marginBottom: 20 }}>
+        <ThemedText type="h4" style={styles.title}>
           Insulina
         </ThemedText>
 
-        {/* Tabs */}
-        <View style={[styles.tabRow, { backgroundColor: colors.card }]}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'RAPIDA' && { backgroundColor: colors.tint }]}
-            onPress={() => { setActiveTab('RAPIDA'); setContexto(''); }}
-          >
-            <FontAwesome name="bolt" size={14} color={activeTab === 'RAPIDA' ? '#fff' : colors.text.primary} />
-            <Text style={[styles.tabText, { color: activeTab === 'RAPIDA' ? '#fff' : colors.text.primary }]}>
-              Rápida
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'LENTA' && { backgroundColor: colors.tint }]}
-            onPress={() => setActiveTab('LENTA')}
-          >
-            <FontAwesome name="clock-o" size={14} color={activeTab === 'LENTA' ? '#fff' : colors.text.primary} />
-            <Text style={[styles.tabText, { color: activeTab === 'LENTA' ? '#fff' : colors.text.primary }]}>
-              Lenta
-            </Text>
-          </TouchableOpacity>
+        <View style={[styles.tabRow, { backgroundColor: colors.background.paper }]}>
+          {(['RAPIDA', 'LENTA'] as const).map((tab) => {
+            const isActive = activeTab === tab;
+            const label = tab === 'RAPIDA' ? 'Rápida' : 'Lenta';
+            const icon = tab === 'RAPIDA' ? 'bolt' : 'clock-o';
+
+            return (
+              <TouchableOpacity
+                key={tab}
+                style={[styles.tab, isActive && { backgroundColor: colors.primary.main }]}
+                onPress={() => {
+                  setActiveTab(tab);
+                  if (tab === 'RAPIDA') setContexto('');
+                }}
+                activeOpacity={0.8}
+              >
+                <FontAwesome
+                  name={icon}
+                  size={14}
+                  color={isActive ? colors.primary.contrastText : colors.text.primary}
+                />
+                <Text
+                  style={[
+                    styles.tabText,
+                    {
+                      color: isActive ? colors.primary.contrastText : colors.text.primary,
+                    },
+                  ]}
+                >
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        {/* Formulario */}
         <Card style={styles.card}>
           <Text style={[styles.fieldLabel, { color: colors.text.primary }]}>Dosis (UI)</Text>
           <View style={styles.dosisRow}>
             <TouchableOpacity
-              style={[styles.dosisBtn, { backgroundColor: colors.background.default }]}
+              style={[styles.dosisBtn, { backgroundColor: colors.inputBackground }]}
               onPress={() => {
-                const val = parseFloat(dosis || '0');
-                setDosis(Math.max(0, val - 1).toString());
+                const value = parseFloat(dosis || '0');
+                setDosis(Math.max(0, value - 1).toString());
               }}
+              activeOpacity={0.8}
             >
               <FontAwesome name="minus" size={16} color={colors.text.primary} />
             </TouchableOpacity>
+
             <TextInput
-              style={[styles.dosisInput, { backgroundColor: colors.background.default, color: colors.text.primary }]}
+              style={[
+                styles.dosisInput,
+                { backgroundColor: colors.inputBackground, color: colors.text.primary },
+              ]}
               value={dosis}
               onChangeText={setDosis}
               placeholder="0"
               placeholderTextColor={colors.text.disabled}
               keyboardType="decimal-pad"
             />
+
             <TouchableOpacity
-              style={[styles.dosisBtn, { backgroundColor: colors.background.default }]}
+              style={[styles.dosisBtn, { backgroundColor: colors.inputBackground }]}
               onPress={() => {
-                const val = parseFloat(dosis || '0');
-                setDosis((val + 1).toString());
+                const value = parseFloat(dosis || '0');
+                setDosis((value + 1).toString());
               }}
+              activeOpacity={0.8}
             >
               <FontAwesome name="plus" size={16} color={colors.text.primary} />
             </TouchableOpacity>
           </View>
 
           {activeTab === 'RAPIDA' && (
-            <View style={{ marginBottom: 16 }}>
+            <View style={styles.contextContainer}>
               <Text style={[styles.fieldLabel, { color: colors.text.primary }]}>Contexto</Text>
               <View style={styles.contextGrid}>
-                {CONTEXTOS_INSULINA.map((ctx) => (
-                  <TouchableOpacity
-                    key={ctx.key}
-                    style={[
-                      styles.contextChip,
-                      {
-                        backgroundColor: contexto === ctx.key ? colors.tint : 'transparent',
-                        borderColor: colors.tint,
-                      },
-                    ]}
-                    onPress={() => setContexto(ctx.key)}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        color: contexto === ctx.key ? '#fff' : colors.tint,
-                        fontFamily: 'Montserrat-SemiBold',
-                      }}
+                {CONTEXTOS_INSULINA.map((context) => {
+                  const isSelected = contexto === context.key;
+
+                  return (
+                    <TouchableOpacity
+                      key={context.key}
+                      style={[
+                        styles.contextChip,
+                        {
+                          backgroundColor: isSelected ? colors.primary.main : 'transparent',
+                          borderColor: colors.primary.main,
+                        },
+                      ]}
+                      onPress={() => setContexto(context.key)}
+                      activeOpacity={0.8}
                     >
-                      {ctx.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: isSelected ? colors.primary.contrastText : colors.primary.main,
+                          fontFamily: Fonts.semiBold,
+                        }}
+                      >
+                        {context.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
           )}
@@ -240,13 +296,17 @@ export default function InsulinaScreen() {
 
           <ZoneSelector selectedZone={zona} onSelectZone={setZona} />
 
-          <Button title={loading ? 'Guardando...' : 'Guardar'} onPress={handleSave} loading={loading} disabled={loading} />
+          <Button
+            title={loading ? 'Guardando...' : 'Guardar'}
+            onPress={handleSave}
+            loading={loading}
+            disabled={loading}
+          />
         </Card>
 
-        {/* Timer de seguridad */}
         <Card style={[styles.timerCard, { borderColor: safety.color }]}>
           <FontAwesome name={safety.icon} size={28} color={safety.color} />
-          <ThemedText style={{ marginTop: 8, fontWeight: '600' }}>Cronómetro de seguridad</ThemedText>
+          <ThemedText style={styles.timerTitle}>Cronómetro de seguridad</ThemedText>
           {segundosRestantes > 0 ? (
             <>
               <Text style={[styles.timerValue, { color: safety.color }]}>
@@ -257,26 +317,33 @@ export default function InsulinaScreen() {
           ) : (
             <Text style={[styles.timerValue, { color: safety.color }]}>{safety.label}</Text>
           )}
-          <ThemedText style={{ fontSize: 11, opacity: 0.5, textAlign: 'center', marginTop: 8 }}>
+          <ThemedText muted style={styles.timerHint}>
             Tiempo recomendado entre dosis rápidas: 3 horas
           </ThemedText>
         </Card>
 
-        {/* Totales del día */}
         <Card style={styles.card}>
-          <ThemedText type="defaultSemiBold" style={{ marginBottom: 16 }}>Totales del día</ThemedText>
+          <ThemedText type="defaultSemiBold" style={styles.totalsTitle}>
+            Totales del día
+          </ThemedText>
           <View style={styles.totalsRow}>
             <View style={styles.totalItem}>
-              <Text style={[styles.totalValue, { color: '#4FC3F7' }]}>{totals.totalRapida.toFixed(1)}</Text>
-              <ThemedText style={{ fontSize: 12 }}>Rápida</ThemedText>
+              <Text style={[styles.totalValue, { color: colors.info.main }]}>
+                {totals.totalRapida.toFixed(1)}
+              </Text>
+              <ThemedText style={styles.totalLabel}>Rápida</ThemedText>
             </View>
             <View style={styles.totalItem}>
-              <Text style={[styles.totalValue, { color: '#FFA726' }]}>{totals.totalLenta.toFixed(1)}</Text>
-              <ThemedText style={{ fontSize: 12 }}>Lenta</ThemedText>
+              <Text style={[styles.totalValue, { color: colors.warning.main }]}>
+                {totals.totalLenta.toFixed(1)}
+              </Text>
+              <ThemedText style={styles.totalLabel}>Lenta</ThemedText>
             </View>
             <View style={styles.totalItem}>
-              <Text style={[styles.totalValue, { color: colors.tint }]}>{totals.totalGeneral.toFixed(1)}</Text>
-              <ThemedText style={{ fontSize: 12 }}>Total</ThemedText>
+              <Text style={[styles.totalValue, { color: colors.primary.main }]}>
+                {totals.totalGeneral.toFixed(1)}
+              </Text>
+              <ThemedText style={styles.totalLabel}>Total</ThemedText>
             </View>
           </View>
         </Card>
@@ -287,17 +354,16 @@ export default function InsulinaScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingTop: 60, paddingBottom: 40 },
+  scrollContent: { paddingHorizontal: 16 },
   backButton: { marginBottom: 16, width: 40 },
+  title: { marginBottom: 20 },
   tabRow: {
     flexDirection: 'row',
     borderRadius: 12,
     padding: 4,
     marginBottom: 8,
     elevation: 2,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.1)',
   },
   tab: {
     flex: 1,
@@ -308,9 +374,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
   },
-  tabText: { fontSize: 14, fontFamily: 'Montserrat-SemiBold' },
+  tabText: { fontSize: 14, fontFamily: Fonts.semiBold },
   card: { padding: 20, marginBottom: 16 },
-  fieldLabel: { fontSize: 14, fontWeight: '600', marginBottom: 8, fontFamily: 'Montserrat-SemiBold' },
+  fieldLabel: {
+    fontSize: 14,
+    marginBottom: 8,
+    fontFamily: Fonts.semiBold,
+  },
   dosisRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -332,9 +402,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     textAlign: 'center',
     fontSize: 24,
-    fontWeight: 'bold',
-    fontFamily: 'Montserrat-Bold',
+    fontFamily: Fonts.bold,
   },
+  contextContainer: { marginBottom: 16 },
   contextGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   contextChip: {
     paddingHorizontal: 14,
@@ -348,9 +418,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 2,
   },
-  timerValue: { fontSize: 40, fontWeight: 'bold', marginTop: 8, fontFamily: 'Montserrat-Bold' },
-  timerStatus: { fontSize: 14, marginTop: 4, fontFamily: 'Montserrat-SemiBold' },
+  timerTitle: { marginTop: 8, fontFamily: Fonts.semiBold },
+  timerValue: { fontSize: 40, fontFamily: Fonts.bold, marginTop: 8 },
+  timerStatus: { fontSize: 14, marginTop: 4, fontFamily: Fonts.semiBold },
+  timerHint: { fontSize: 11, textAlign: 'center', marginTop: 8 },
+  totalsTitle: { marginBottom: 16 },
   totalsRow: { flexDirection: 'row', justifyContent: 'space-around' },
   totalItem: { alignItems: 'center' },
-  totalValue: { fontSize: 28, fontWeight: 'bold', fontFamily: 'Montserrat-Bold' },
+  totalValue: { fontSize: 28, fontFamily: Fonts.bold },
+  totalLabel: { fontSize: 12 },
 });

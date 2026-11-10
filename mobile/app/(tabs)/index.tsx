@@ -1,13 +1,15 @@
 import React, { useCallback, useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from 'react-native';
-import { Menu, ChevronUp, CheckSquare } from 'lucide-react-native'; // Asegúrate de tener instalada esta librería
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { CheckSquare, ChevronUp, Menu } from 'lucide-react-native';
 import { useFocusEffect } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { Card } from '@/components/card';
 import { ThemedView } from '@/components/themed-view';
-import { useAuthStore } from '@/src/stores/authStore';
 import { H5 } from '@/components/ui/h5';
-import { H1 } from '@/components/ui/h1';
-import { Colors } from '@/constants/theme';
+import { Fonts } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useAuthStore } from '@/src/stores/authStore';
 import { glucoseApi } from '@/src/apis/glucose';
 import type { GlucoseEntry } from '@/src/apis/glucose';
 
@@ -24,6 +26,8 @@ function formatRelativeTime(timestamp: Date): string {
 }
 
 export default function HomeScreen() {
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
   const [lastEntry, setLastEntry] = useState<GlucoseEntry | null>(null);
 
@@ -44,80 +48,53 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
-        {/* Cabecera Principal */}
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
-          <Text style={styles.pageTitle}>Home</Text>
-          <TouchableOpacity>
-            <Menu color={Colors.light.primary.main} size={32} strokeWidth={2.5} />
-          </TouchableOpacity>
+          <Text style={[styles.pageTitle, { color: colors.primary.main }]}>Home</Text>
         </View>
 
-        {/* Saludo */}
-        <Text style={styles.greeting}>
+        <Text style={[styles.greeting, { color: colors.text.primary }]}>
           ¡Hola, Guerrero {user?.name || 'David'}!
         </Text>
 
-        {/* TARJETA 1: Última Batalla y Cronómetro */}
-        <Card style={styles.mainCard}>
-          {/* Sección: Última Batalla */}
-          <H5 style={styles.cardTitle}>Última Batalla</H5>
+        <Card style={[styles.mainCard, { backgroundColor: colors.surface }]}>
+          <H5 style={[styles.cardTitle, { color: colors.accent.blue }]}>Última Batalla</H5>
 
           <View style={styles.glucoseContainer}>
-            <Text style={styles.glucoseValue}>{lastEntry ? lastEntry.nivel : '--'}</Text>
+            <Text style={[styles.glucoseValue, { color: colors.success.main }]}>
+              {lastEntry ? lastEntry.nivel : '--'}
+            </Text>
             <View style={styles.glucoseUnitWrapper}>
-              <ChevronUp color={Colors.light.success.main} size={32} strokeWidth={3} />
-              <Text style={styles.glucoseUnit}>mg/dL</Text>
+              <ChevronUp color={colors.success.main} size={32} strokeWidth={3} />
+              <Text style={[styles.glucoseUnit, { color: colors.success.main }]}>mg/dL</Text>
             </View>
           </View>
 
-          <Text style={styles.timeSubtitle}>
+          <Text style={[styles.timeSubtitle, { color: colors.success.main }]}>
             {lastEntry
               ? `${formatRelativeTime(lastEntry.timestamp)}${lastEntry.contexto ? ` (${lastEntry.contexto})` : ''}`
               : 'Sin registros'}
           </Text>
 
-          {/* Divisor */}
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
-          {/* Sección: Cronómetro de Seguridad */}
-          <H5 style={[styles.cardTitle, { width: '70%' }]}>
+          <H5 style={[styles.cardTitle, styles.timerTitle, { color: colors.accent.blue }]}>
             Cronómetro de Seguridad
           </H5>
-          <Text style={styles.insulinSubtitle}>Última Insulina Rápida</Text>
+          <Text style={[styles.insulinSubtitle, { color: colors.text.secondary }]}>
+            Última Insulina Rápida
+          </Text>
 
           <View style={styles.timerContainer}>
-            <Text style={styles.timerValue}>2:15</Text>
-            <Text style={styles.timerUnit}>Horas transcurridas</Text>
+            <Text style={[styles.timerValue, { color: colors.success.main }]}>2:15</Text>
+            <Text style={[styles.timerUnit, { color: colors.success.main }]}>Horas transcurridas</Text>
           </View>
 
-          <Text style={styles.safeZoneText}>Zona Segura</Text>
+          <Text style={[styles.safeZoneText, { color: colors.success.main }]}>Zona Segura</Text>
         </Card>
-
-        {/* TARJETA 2: Misiones del Día */}
-        <Card style={styles.missionCard}>
-          <H5 style={styles.cardTitle}>Misiones del Día</H5>
-          <Text style={styles.missionSubtitle}>Entrenamiento de Hoy</Text>
-
-          <View style={styles.checkList}>
-            <TouchableOpacity style={styles.checkItem}>
-              <CheckSquare color={Colors.light.textSecondary} size={24} />
-              <Text style={styles.checkText}>Desayuno</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.checkItem}>
-              <CheckSquare color={Colors.light.textSecondary} size={24} />
-              <Text style={styles.checkText}>Almuerzo</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.checkItem}>
-              <CheckSquare color={Colors.light.textSecondary} size={24} />
-              <Text style={styles.checkText}>Cena</Text>
-            </TouchableOpacity>
-          </View>
-        </Card>
-
       </ScrollView>
     </ThemedView>
   );
@@ -126,144 +103,119 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background // Color de fondo general (#E4EFF7)
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 100 // Espacio para el Tab Bar inferior
+    paddingBottom: 100,
   },
-
-  // Header y Saludo
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16
+    marginBottom: 16,
   },
   pageTitle: {
     fontSize: 40,
-    fontWeight: '800',
-    color: Colors.light.primary.main,
+    fontFamily: Fonts.extraBold,
   },
   greeting: {
     fontSize: 20,
-    fontWeight: '700',
-    color: Colors.light.text,
+    fontFamily: Fonts.bold,
     marginBottom: 20,
   },
-
-  // Estilos de las Tarjetas
   mainCard: {
     padding: 24,
     marginBottom: 24,
     borderRadius: 20,
-    backgroundColor: '#d7e7f3', // Un tono ligeramente más gris/azulado para la tarjeta según la imagen
-    elevation: 0, // Quitamos la sombra para que se vea plano como en el diseño
+    elevation: 0,
+    boxShadow: 'none',
   },
   cardTitle: {
-    color: Colors.light.primary.light, // Azul claro de los títulos de tarjeta
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
     fontSize: 20,
-    marginBottom: 12
+    marginBottom: 12,
   },
-
-  // Sección Última Batalla
+  timerTitle: {
+    width: '70%',
+  },
   glucoseContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8
+    marginBottom: 8,
   },
   glucoseValue: {
     fontSize: 80,
-    fontWeight: '800',
-    color: Colors.light.success.main,
+    fontFamily: Fonts.extraBold,
     lineHeight: 85,
   },
   glucoseUnitWrapper: {
     alignItems: 'center',
     marginLeft: 8,
-    marginTop: 10
+    marginTop: 10,
   },
   glucoseUnit: {
     fontSize: 14,
-    fontWeight: '700',
-    color: Colors.light.success.main,
+    fontFamily: Fonts.bold,
   },
   timeSubtitle: {
     textAlign: 'center',
     fontSize: 14,
-    fontWeight: '600',
-    color: Colors.light.success.main,
-    marginBottom: 20
+    fontFamily: Fonts.semiBold,
+    marginBottom: 20,
   },
-
-  // Divisor
   divider: {
     height: 1,
-    backgroundColor: Colors.light.icon,
-    opacity: 0.3,
-    marginBottom: 20
+    marginBottom: 20,
   },
-
-  // Sección Cronómetro
   insulinSubtitle: {
     fontSize: 14,
-    fontWeight: '600',
-    color: Colors.light.textSecondary,
-    marginBottom: 12
+    fontFamily: Fonts.semiBold,
+    marginBottom: 12,
   },
   timerContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'center',
-    marginBottom: 16
+    marginBottom: 16,
   },
   timerValue: {
     fontSize: 64,
-    fontWeight: '800',
-    color: Colors.light.success.main,
+    fontFamily: Fonts.extraBold,
     lineHeight: 70,
   },
   timerUnit: {
     fontSize: 14,
-    fontWeight: '600',
-    color: Colors.light.success.main,
-    marginLeft: 8
+    fontFamily: Fonts.semiBold,
+    marginLeft: 8,
   },
   safeZoneText: {
     textAlign: 'center',
     fontSize: 18,
-    fontWeight: '700',
-    color: Colors.light.success.main,
+    fontFamily: Fonts.bold,
   },
-
-  // Tarjeta de Misiones
   missionCard: {
     padding: 24,
     marginBottom: 24,
     borderRadius: 20,
-    backgroundColor: '#d7e7f3',
     elevation: 0,
+    boxShadow: 'none',
   },
   missionSubtitle: {
     fontSize: 16,
-    fontWeight: '700',
-    color: Colors.light.text,
-    marginBottom: 16
+    fontFamily: Fonts.bold,
+    marginBottom: 16,
   },
   checkList: {
-    gap: 16
+    gap: 16,
   },
   checkItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12
+    gap: 12,
   },
   checkText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: Colors.light.textSecondary
-  }
+    fontFamily: Fonts.medium,
+  },
 });

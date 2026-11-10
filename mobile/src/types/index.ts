@@ -35,6 +35,8 @@ export interface Preference {
   sensitivity?: number;
   locale: string;
   theme: string;
+  correctionSchemas?: any;
+  basalSchemas?: any;
 }
 
 export interface ContactEmergenceData {

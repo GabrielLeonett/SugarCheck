@@ -1,11 +1,21 @@
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { Fonts, Typography, type TypographyVariant } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+
+export type ThemedTextType =
+  | TypographyVariant
+  | 'default'
+  | 'defaultSemiBold'
+  | 'title'
+  | 'subtitle'
+  | 'link';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+  type?: ThemedTextType;
+  muted?: boolean;
 };
 
 export function ThemedText({
@@ -13,48 +23,48 @@ export function ThemedText({
   lightColor,
   darkColor,
   type = 'default',
+  muted = false,
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const { colors, colorScheme } = useTheme();
+  const customColor = colorScheme === 'dark' ? darkColor : lightColor;
+
+  const variantStyle = getVariantStyle(type);
+  const defaultColor = muted
+    ? colors.text.secondary
+    : type === 'link'
+      ? colors.primary.main
+      : colors.text.primary;
 
   return (
     <Text
-      style={[
-        { color },
-        type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
-        type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
-        style,
-      ]}
+      style={[variantStyle, { color: customColor ?? defaultColor }, style]}
       {...rest}
     />
   );
 }
 
+function getVariantStyle(type: ThemedTextType) {
+  switch (type) {
+    case 'default':
+      return Typography.body1;
+    case 'defaultSemiBold':
+      return styles.defaultSemiBold;
+    case 'title':
+      return Typography.h4;
+    case 'subtitle':
+      return Typography.h6;
+    case 'link':
+      return Typography.body1;
+    default:
+      return Typography[type];
+  }
+}
+
 const styles = StyleSheet.create({
-  default: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
   defaultSemiBold: {
+    fontFamily: Fonts.semiBold,
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: '600',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    lineHeight: 32,
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  link: {
-    lineHeight: 30,
-    fontSize: 16,
-    color: '#0a7ea4',
   },
 });

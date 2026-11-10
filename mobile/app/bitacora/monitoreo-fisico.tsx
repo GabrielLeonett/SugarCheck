@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, FlatList, Alert, TouchableOpacity } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
-import { FormInput } from '@/components/FormInput';
-import { Button } from '@/components/Button';
-import { Modal } from '@/components/Modal';
-import { DatePickerField } from '@/components/DatePicker';
-import { Card } from '@/components/card';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { Button } from '@/components/Button';
+import { Card } from '@/components/card';
+import { DatePickerField } from '@/components/DatePicker';
+import { FormInput } from '@/components/FormInput';
+import { Modal } from '@/components/Modal';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface PhysicalRecord {
   id: string;
@@ -27,8 +28,16 @@ const INITIAL_RECORDS: PhysicalRecord[] = [
   { id: '3', fecha: '02/03/2026', peso: 65.0, estatura: 157, imc: 26.4, estado: 'Sobrepeso' },
 ];
 
+function withAlpha(hex: string, opacity: number) {
+  const alpha = Math.round(opacity * 255)
+    .toString(16)
+    .padStart(2, '0');
+  return hex.length === 7 ? `${hex}${alpha}` : hex;
+}
+
 export default function MonitoreoFisicoScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const [records, setRecords] = useState<PhysicalRecord[]>(INITIAL_RECORDS);
   const [showModal, setShowModal] = useState(false);
@@ -43,6 +52,7 @@ export default function MonitoreoFisicoScreen() {
       Alert.alert('Error', 'Ingresa peso y estatura');
       return;
     }
+
     const pesoNum = parseFloat(peso);
     const estaturaNum = parseFloat(estatura);
     const estaturaMetros = estaturaNum / 100;
@@ -68,61 +78,104 @@ export default function MonitoreoFisicoScreen() {
     Alert.alert('Guardado', 'Medición registrada');
   };
 
+  const getStatusColor = (estado: string) =>
+    estado === 'Normal' ? colors.success.main : colors.warning.main;
+
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <TouchableOpacity onPress={() => router.back() as any} style={styles.backButton}>
-          <FontAwesome name="arrow-left" size={20} color={Colors[colorScheme].text} />
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 40 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+          accessibilityRole="button"
+          accessibilityLabel="Volver"
+        >
+          <FontAwesome name="arrow-left" size={20} color={colors.text.primary} />
         </TouchableOpacity>
 
         <View style={styles.header}>
-          <ThemedText type="title" style={{ fontSize: 24 }}>Monitoreo físico</ThemedText>
+          <ThemedText type="h4" style={styles.title}>
+            Monitoreo físico
+          </ThemedText>
           <Button
             title="Nuevo"
             onPress={() => setShowModal(true)}
-            icon={<FontAwesome name="plus" size={14} color="#fff" style={{ marginRight: 6 }} />}
-            style={{ paddingVertical: 8, paddingHorizontal: 16, minHeight: 36 }}
+            icon={
+              <FontAwesome
+                name="plus"
+                size={14}
+                color={colors.primary.contrastText}
+                style={styles.addIcon}
+              />
+            }
+            fullWidth={false}
+            style={styles.addButton}
           />
         </View>
 
         {latest && (
           <Card style={styles.currentCard}>
-            <ThemedText type="defaultSemiBold" style={{ textAlign: 'center', marginBottom: 16 }}>Última medición</ThemedText>
+            <ThemedText type="defaultSemiBold" style={styles.currentTitle}>
+              Última medición
+            </ThemedText>
             <View style={styles.metricsRow}>
               <View style={styles.metric}>
-                <ThemedText type="title" style={{ fontSize: 28 }}>{latest.peso}</ThemedText>
-                <ThemedText style={{ fontSize: 12, opacity: 0.6 }}>kg</ThemedText>
+                <ThemedText type="h3" style={styles.metricValue}>
+                  {latest.peso}
+                </ThemedText>
+                <ThemedText muted style={styles.metricUnit}>
+                  kg
+                </ThemedText>
               </View>
               <View style={styles.metric}>
-                <ThemedText type="title" style={{ fontSize: 28 }}>{latest.estatura}</ThemedText>
-                <ThemedText style={{ fontSize: 12, opacity: 0.6 }}>cm</ThemedText>
+                <ThemedText type="h3" style={styles.metricValue}>
+                  {latest.estatura}
+                </ThemedText>
+                <ThemedText muted style={styles.metricUnit}>
+                  cm
+                </ThemedText>
               </View>
               <View style={styles.metric}>
-                <ThemedText type="title" style={{ fontSize: 28, color: latest.imc >= 18.5 && latest.imc < 25 ? '#2e7d32' : '#f57c00' }}>
+                <ThemedText type="h3" style={[styles.metricValue, { color: getStatusColor(latest.estado) }]}>
                   {latest.imc}
                 </ThemedText>
-                <ThemedText style={{ fontSize: 12, opacity: 0.6 }}>IMC</ThemedText>
+                <ThemedText muted style={styles.metricUnit}>
+                  IMC
+                </ThemedText>
               </View>
             </View>
-            <View style={[styles.estadoBadge, { backgroundColor: latest.estado === 'Normal' ? '#2e7d3220' : '#f57c0020' }]}>
-              <ThemedText style={{ color: latest.estado === 'Normal' ? '#2e7d32' : '#f57c00', fontSize: 14 }}>
+            <View
+              style={[
+                styles.estadoBadge,
+                { backgroundColor: withAlpha(getStatusColor(latest.estado), 0.15) },
+              ]}
+            >
+              <ThemedText style={{ color: getStatusColor(latest.estado), fontSize: 14 }}>
                 {latest.estado}
               </ThemedText>
             </View>
           </Card>
         )}
 
-        <ThemedText type="defaultSemiBold" style={{ marginBottom: 12 }}>Historial</ThemedText>
+        <ThemedText type="defaultSemiBold" style={styles.historyTitle}>
+          Historial
+        </ThemedText>
         {records.map((record) => (
           <Card key={record.id} style={styles.recordCard}>
             <View style={styles.recordRow}>
-              <View style={{ flex: 1 }}>
+              <View style={styles.recordContent}>
                 <ThemedText type="defaultSemiBold">{record.fecha}</ThemedText>
-                <ThemedText style={{ fontSize: 12, opacity: 0.6 }}>
+                <ThemedText muted style={styles.recordDetail}>
                   {record.peso} kg · {record.estatura} cm · IMC {record.imc}
                 </ThemedText>
               </View>
-              <ThemedText style={{ color: record.estado === 'Normal' ? '#2e7d32' : '#f57c00', fontSize: 12 }}>
+              <ThemedText style={{ color: getStatusColor(record.estado), fontSize: 12 }}>
                 {record.estado}
               </ThemedText>
             </View>
@@ -131,11 +184,25 @@ export default function MonitoreoFisicoScreen() {
       </ScrollView>
 
       <Modal visible={showModal} onClose={() => setShowModal(false)}>
-        <ThemedText type="title" style={{ fontSize: 20, marginBottom: 20 }}>Registrar medición</ThemedText>
-        <FormInput label="Peso (kg)" value={peso} onChangeText={setPeso} placeholder="Ej: 70" keyboardType="numeric" />
-        <FormInput label="Estatura (cm)" value={estatura} onChangeText={setEstatura} placeholder="Ej: 170" keyboardType="numeric" />
+        <ThemedText type="h6" style={styles.modalTitle}>
+          Registrar medición
+        </ThemedText>
+        <FormInput
+          label="Peso (kg)"
+          value={peso}
+          onChangeText={setPeso}
+          placeholder="Ej: 70"
+          keyboardType="numeric"
+        />
+        <FormInput
+          label="Estatura (cm)"
+          value={estatura}
+          onChangeText={setEstatura}
+          placeholder="Ej: 170"
+          keyboardType="numeric"
+        />
         <DatePickerField label="Fecha" value={fecha} onChange={setFecha} />
-        <Button title="Guardar" onPress={handleSave} style={{ marginTop: 16 }} />
+        <Button title="Guardar" onPress={handleSave} style={styles.saveButton} />
       </Modal>
     </ThemedView>
   );
@@ -143,13 +210,34 @@ export default function MonitoreoFisicoScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingTop: 60, paddingBottom: 100 },
+  scrollContent: { paddingHorizontal: 16 },
   backButton: { marginBottom: 16, width: 40 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  title: { flex: 1 },
+  addButton: { paddingVertical: 8, paddingHorizontal: 16, minHeight: 36 },
+  addIcon: { marginRight: 6 },
   currentCard: { padding: 24, marginBottom: 24 },
+  currentTitle: { textAlign: 'center', marginBottom: 16 },
   metricsRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 16 },
   metric: { alignItems: 'center' },
-  estadoBadge: { alignSelf: 'center', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20 },
+  metricValue: { fontSize: 28 },
+  metricUnit: { fontSize: 12 },
+  estadoBadge: {
+    alignSelf: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  historyTitle: { marginBottom: 12 },
   recordCard: { padding: 16, marginBottom: 8 },
   recordRow: { flexDirection: 'row', alignItems: 'center' },
+  recordContent: { flex: 1 },
+  recordDetail: { fontSize: 12 },
+  modalTitle: { marginBottom: 20 },
+  saveButton: { marginTop: 16 },
 });

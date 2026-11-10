@@ -1,21 +1,35 @@
+import { useTheme } from '@/contexts/ThemeContext';
+import type { ThemeColors } from '@/constants/theme';
+
 /**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
+ * Hook de compatibilidad para componentes que necesitan un color del tema.
+ * Para código nuevo se recomienda usar `useTheme().colors` directamente.
  */
-
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
 export function useThemeColor(
   props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark
+  colorName: keyof ThemeColors
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
+  const { colors, colorScheme } = useTheme();
+  const colorFromProps = props[colorScheme];
 
   if (colorFromProps) {
     return colorFromProps;
-  } else {
-    return Colors[theme][colorName];
   }
+
+  const color = colors[colorName];
+
+  if (typeof color === 'string') {
+    return color;
+  }
+
+  // Compatibilidad con la API plana anterior de Expo.
+  if (colorName === 'text') {
+    return colors.text.primary;
+  }
+
+  if (colorName === 'background') {
+    return colors.background.default;
+  }
+
+  return colors.primary.main;
 }

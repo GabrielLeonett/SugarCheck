@@ -1,16 +1,36 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+
+import { Fonts, Shape } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+
+export type ButtonColor =
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'error'
+  | 'warning'
+  | 'info'
+  | 'danger';
+
+export type ButtonVariant = 'contained' | 'outlined' | 'text';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'contained' | 'outlined' | 'text';
-  color?: 'primary' | 'secondary' | 'danger';
+  variant?: ButtonVariant;
+  color?: ButtonColor;
   loading?: boolean;
   disabled?: boolean;
-  style?: ViewStyle;
+  fullWidth?: boolean;
+  style?: StyleProp<ViewStyle>;
   icon?: React.ReactNode;
 }
 
@@ -21,55 +41,62 @@ export function Button({
   color = 'primary',
   loading = false,
   disabled = false,
+  fullWidth = true,
   style,
   icon,
 }: ButtonProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const isDark = colorScheme === 'dark';
+  const { colors } = useTheme();
+  const isDisabled = disabled || loading;
 
-  const getColors = () => {
-    switch (color) {
-      case 'primary':
-        return { main: Colors[colorScheme].tint, contrast: '#fff' };
-      case 'secondary':
-        return { main: isDark ? '#555' : '#e0e0e0', contrast: isDark ? '#fff' : '#000' };
-      case 'danger':
-        return { main: '#d32f2f', contrast: '#fff' };
-      default:
-        return { main: Colors[colorScheme].tint, contrast: '#fff' };
-    }
-  };
+  const semanticColor = getSemanticColor(color, colors);
+  const isSecondary = color === 'secondary';
 
-  const theme = getColors();
+  const mainColor = isSecondary ? colors.text.primary : semanticColor?.main ?? colors.primary.main;
+  const contrastColor = isSecondary
+    ? colors.text.inverse
+    : semanticColor?.contrastText ?? colors.primary.contrastText;
+  const secondaryBackground = colors.surface;
 
   const containerStyle: ViewStyle =
     variant === 'contained'
       ? {
-          backgroundColor: disabled ? '#999' : theme.main,
+          backgroundColor: isDisabled
+            ? colors.action.disabledBackground
+            : isSecondary
+              ? secondaryBackground
+              : mainColor,
           borderWidth: 0,
         }
       : variant === 'outlined'
         ? {
             backgroundColor: 'transparent',
             borderWidth: 1.5,
-            borderColor: disabled ? '#999' : theme.main,
+            borderColor: isDisabled ? colors.action.disabled : isSecondary ? colors.border : mainColor,
           }
         : {
             backgroundColor: 'transparent',
             borderWidth: 0,
           };
 
-  const textColor = variant === 'contained' ? theme.contrast : disabled ? '#999' : theme.main;
+  const textColor = isDisabled
+    ? colors.action.disabled
+    : variant === 'contained'
+      ? contrastColor
+      : isSecondary
+        ? colors.text.primary
+        : mainColor;
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      disabled={disabled || loading}
-      style={[styles.button, containerStyle, style]}
-      activeOpacity={0.7}
+      disabled={isDisabled}
+      style={[styles.button, fullWidth && styles.fullWidth, containerStyle, style]}
+      activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
       {loading ? (
-        <ActivityIndicator color={textColor} size="small" />
+        <ActivityIndicator color={variant === 'contained' ? contrastColor : mainColor} size="small" />
       ) : (
         <>
           {icon}
@@ -80,19 +107,43 @@ export function Button({
   );
 }
 
+function getSemanticColor(
+  color: ButtonColor,
+  colors: ReturnType<typeof useTheme>['colors']
+) {
+  switch (color) {
+    case 'success':
+      return colors.success;
+    case 'error':
+    case 'danger':
+      return colors.error;
+    case 'warning':
+      return colors.warning;
+    case 'info':
+      return colors.info;
+    case 'primary':
+      return colors.primary;
+    default:
+      return null;
+  }
+}
+
 const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
+    paddingVertical: 12,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: Shape.buttonRadius,
     minHeight: 48,
   },
+  fullWidth: {
+    alignSelf: 'stretch',
+  },
   text: {
-    fontSize: 16,
-    fontWeight: '600',
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily: Fonts.semiBold,
+    fontSize: 14,
+    letterSpacing: 1.25,
   },
 });

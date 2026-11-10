@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import { FormInput } from '@/components/FormInput';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { Button } from '@/components/Button';
-import { ThemedView } from '@/components/themed-view';
+import { FormInput } from '@/components/FormInput';
 import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Fonts } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
 import { preferenceApi } from '@/src/apis/preference';
 import { contactEmergenceApi } from '@/src/apis/contact-emergence';
 
 export default function CompleteProfileScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme() ?? 'light';
-  const isDark = colorScheme === 'dark';
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -26,35 +28,36 @@ export default function CompleteProfileScreen() {
     parentesco: '',
     telefono: '',
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
   const updateField = (key: string, value: any) =>
-    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFormData((previous) => ({ ...previous, [key]: value }));
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
       if (formData.peso && formData.talla) {
-        const now = new Date();
-        await preferenceApi.savePreferences({
-          userId: useAuthStore.getState().user?.id || '',
-          profileImg: 'default',
-          unitMeasure: 'mg/dL',
-          thresholds: {
-            hypo: Number(formData.glucosaMin) || 70,
-            hiper: Number(formData.glucosaMax) || 180,
-          },
-          locale: 'es',
-          theme: 'light',
-        } as any).catch(() => {});
+        await preferenceApi
+          .savePreferences({
+            userId: useAuthStore.getState().user?.id || '',
+            profileImg: 'default',
+            unitMeasure: 'mg/dL',
+            thresholds: {
+              hypo: Number(formData.glucosaMin) || 70,
+              hiper: Number(formData.glucosaMax) || 180,
+            },
+            locale: 'es',
+            theme: 'light',
+          } as any)
+          .catch(() => {});
       }
 
       if (formData.nombreGuardian) {
-        await contactEmergenceApi.create({
-          name: formData.nombreGuardian,
-          parentesco: formData.parentesco || 'otro',
-          telefono: formData.telefono || undefined,
-        }).catch(() => {});
+        await contactEmergenceApi
+          .create({
+            name: formData.nombreGuardian,
+            parentesco: formData.parentesco || 'otro',
+            telefono: formData.telefono || undefined,
+          })
+          .catch(() => {});
       }
 
       router.replace('/(tabs)');
@@ -71,33 +74,88 @@ export default function CompleteProfileScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        <ThemedText type="title" style={{ textAlign: 'center', marginBottom: 24 }}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 40 },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <ThemedText type="h4" style={styles.title}>
           Completa tu perfil
         </ThemedText>
-        <ThemedText style={{ textAlign: 'center', marginBottom: 24, color: isDark ? '#aaa' : '#666' }}>
+        <ThemedText muted style={styles.subtitle}>
           Prepara tus estadísticas y convoca a tus guardianes
         </ThemedText>
 
         <View style={styles.form}>
-          <ThemedText style={styles.sectionTitle}>Datos de Salud</ThemedText>
+          <ThemedText type="defaultSemiBold" style={styles.sectionTitle}>
+            Datos de Salud
+          </ThemedText>
 
-          <FormInput label="Peso (kg)" value={formData.peso} onChangeText={(v) => updateField('peso', v)} placeholder="Ej: 70" keyboardType="numeric" error={errors.peso} />
-          <FormInput label="Talla (cm)" value={formData.talla} onChangeText={(v) => updateField('talla', v)} placeholder="Ej: 170" keyboardType="numeric" error={errors.talla} />
-          <FormInput label="Glucosa mínima (hipo)" value={formData.glucosaMin} onChangeText={(v) => updateField('glucosaMin', v)} placeholder="Ej: 70" keyboardType="numeric" />
-          <FormInput label="Glucosa máxima (hiper)" value={formData.glucosaMax} onChangeText={(v) => updateField('glucosaMax', v)} placeholder="Ej: 180" keyboardType="numeric" />
+          <FormInput
+            label="Peso (kg)"
+            value={formData.peso}
+            onChangeText={(value) => updateField('peso', value)}
+            placeholder="Ej: 70"
+            keyboardType="numeric"
+          />
+          <FormInput
+            label="Talla (cm)"
+            value={formData.talla}
+            onChangeText={(value) => updateField('talla', value)}
+            placeholder="Ej: 170"
+            keyboardType="numeric"
+          />
+          <FormInput
+            label="Glucosa mínima (hipo)"
+            value={formData.glucosaMin}
+            onChangeText={(value) => updateField('glucosaMin', value)}
+            placeholder="Ej: 70"
+            keyboardType="numeric"
+          />
+          <FormInput
+            label="Glucosa máxima (hiper)"
+            value={formData.glucosaMax}
+            onChangeText={(value) => updateField('glucosaMax', value)}
+            placeholder="Ej: 180"
+            keyboardType="numeric"
+          />
 
-          <ThemedText style={styles.sectionTitle}>Contacto de Emergencia</ThemedText>
+          <ThemedText type="defaultSemiBold" style={styles.sectionTitle}>
+            Contacto de Emergencia
+          </ThemedText>
 
-          <FormInput label="Nombre del contacto" value={formData.nombreGuardian} onChangeText={(v) => updateField('nombreGuardian', v)} placeholder="Nombre del familiar/amigo" />
-          <FormInput label="Parentesco" value={formData.parentesco} onChangeText={(v) => updateField('parentesco', v)} placeholder="madre, padre, tutor, otro" />
-          <FormInput label="Teléfono (opcional)" value={formData.telefono} onChangeText={(v) => updateField('telefono', v)} placeholder="+58 412..." keyboardType="phone-pad" />
+          <FormInput
+            label="Nombre del contacto"
+            value={formData.nombreGuardian}
+            onChangeText={(value) => updateField('nombreGuardian', value)}
+            placeholder="Nombre del familiar/amigo"
+            autoCapitalize="words"
+          />
+          <FormInput
+            label="Parentesco"
+            value={formData.parentesco}
+            onChangeText={(value) => updateField('parentesco', value)}
+            placeholder="madre, padre, tutor, otro"
+          />
+          <FormInput
+            label="Teléfono (opcional)"
+            value={formData.telefono}
+            onChangeText={(value) => updateField('telefono', value)}
+            placeholder="+58 412..."
+            keyboardType="phone-pad"
+          />
         </View>
 
         <View style={styles.buttons}>
-          <Button title="Omitir" onPress={handleSkip} variant="outlined" style={{ flex: 1 }} />
-          <Button title="Guardar" onPress={handleSubmit} loading={isSubmitting} style={{ flex: 1 }} />
+          <Button title="Omitir" onPress={handleSkip} variant="outlined" style={styles.button} />
+          <Button title="Guardar" onPress={handleSubmit} loading={isSubmitting} style={styles.button} />
         </View>
+
+        <ThemedText muted style={[styles.footer, { color: colors.text.secondary }]}>
+          Podrás cambiar estos datos más tarde desde tu perfil.
+        </ThemedText>
       </ScrollView>
     </ThemedView>
   );
@@ -105,8 +163,17 @@ export default function CompleteProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { flexGrow: 1, paddingHorizontal: 24, paddingTop: 60, paddingBottom: 40 },
+  scrollContent: { flexGrow: 1, paddingHorizontal: 24 },
+  title: { textAlign: 'center', marginBottom: 8 },
+  subtitle: { textAlign: 'center', marginBottom: 24 },
   form: { gap: 4 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 16, marginBottom: 8, fontFamily: 'Montserrat-Bold' },
+  sectionTitle: {
+    fontSize: 18,
+    marginTop: 16,
+    marginBottom: 8,
+    fontFamily: Fonts.bold,
+  },
   buttons: { flexDirection: 'row', gap: 12, marginTop: 24 },
+  button: { flex: 1 },
+  footer: { textAlign: 'center', marginTop: 16, fontSize: 12 },
 });

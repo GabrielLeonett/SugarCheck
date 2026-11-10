@@ -1,6 +1,5 @@
-import type { AxiosError } from 'axios';
 import { apiPrivate } from './axios';
-import type { User, BackendErrorResponse } from '../types';
+import type { User } from '../types';
 
 export const userApi = {
   async getById(id: string): Promise<User> {

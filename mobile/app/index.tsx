@@ -1,18 +1,18 @@
 import { Redirect } from 'expo-router';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+
+import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function Index() {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colors } = useTheme();
   const user = useAuthStore((s) => s.user);
   const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
 
   if (isAuthLoading) {
     return (
-      <View style={[styles.loading, { backgroundColor: Colors[colorScheme].background }]}>
-        <ActivityIndicator size="large" color={Colors[colorScheme].tint} />
+      <View style={[styles.loading, { backgroundColor: colors.background.default }]}>
+        <ActivityIndicator size="large" color={colors.primary.main} />
       </View>
     );
   }
