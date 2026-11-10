@@ -11,6 +11,7 @@ import type { AxiosError } from "axios";
 import type { BackendErrorResponse } from "../types/types";
 import axios from "axios";
 import GlucoSaludando from '../assets/gluco-saludo.png';
+import Icon from '../assets/icons/SugarCheck.svg';
 import { ConfigRow } from "../components/ui/ConfigRow";
 import useLanguage from "../hooks/useLanguage";
 import { CardBase } from "../components/ui/Cards/CardBase";
@@ -79,7 +80,14 @@ export default function Login() {
             justifyContent: 'center',
             alignItems: 'center',
             bgcolor: 'background.default',
+            py: { xs: 4, md: 6 },
         }}>
+            <Box sx={{ mb: { xs: 3, md: 5 }, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+                <Typography variant="h2" color="primary" sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: { xs: '2.5rem', sm: '3.125rem' }  }}>
+                    SugarCheck
+                </Typography>
+                <Box component="img" src={Icon} alt="Ilustración de Bienvenida" sx={{ width: { xs: '50px', sm: '70px' }, height: 'auto', mb: 1 }} />
+            </Box>
             {/* Contenedor de las dos tarjetas */}
             <Box sx={{
                 display: 'flex',
