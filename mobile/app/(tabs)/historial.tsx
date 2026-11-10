@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, FlatList, Dimensions } from 'react-native';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import { Card } from '@/components/card';
-import { ThemedView } from '@/components/themed-view';
-import { ThemedText } from '@/components/themed-text';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { Card } from '@/components/card';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Fonts, type ThemeColors } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { insulinaApi } from '@/src/apis/insulina';
 import type { InsulinRecord } from '@/src/types';
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
 
 const TABS = [
   { key: 'glucosa', label: 'Glucosa', icon: 'heartbeat' },
@@ -48,15 +48,23 @@ function formatHora(hora: string) {
   return `${hour12}:${m} ${ampm}`;
 }
 
-function getGlucoseColor(nivel: number) {
-  if (nivel < 70) return '#d32f2f';
-  if (nivel <= 140) return '#2e7d32';
-  if (nivel <= 180) return '#f57c00';
-  return '#d32f2f';
+function withAlpha(hex: string, opacity: number) {
+  const alpha = Math.round(opacity * 255)
+    .toString(16)
+    .padStart(2, '0');
+  return hex.length === 7 ? `${hex}${alpha}` : hex;
+}
+
+function getGlucoseColor(nivel: number, colors: ThemeColors) {
+  if (nivel < 70) return colors.error.main;
+  if (nivel <= 140) return colors.success.main;
+  if (nivel <= 180) return colors.warning.main;
+  return colors.error.main;
 }
 
 export default function HistorialScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabKey>('insulina');
   const [insulinRecords, setInsulinRecords] = useState<InsulinRecord[]>([]);
   const [loadingInsulin, setLoadingInsulin] = useState(false);
@@ -84,24 +92,26 @@ export default function HistorialScreen() {
 
   const renderTab = (tab: (typeof TABS)[number]) => {
     const isActive = activeTab === tab.key;
+
     return (
       <TouchableOpacity
         key={tab.key}
         style={[
           styles.tab,
-          { backgroundColor: isActive ? Colors[colorScheme].tint : 'transparent' },
+          { backgroundColor: isActive ? colors.primary.main : 'transparent' },
         ]}
         onPress={() => setActiveTab(tab.key)}
+        activeOpacity={0.8}
       >
         <FontAwesome
           name={tab.icon as any}
           size={16}
-          color={isActive ? '#fff' : Colors[colorScheme].text}
+          color={isActive ? colors.primary.contrastText : colors.text.primary}
         />
         <ThemedText
           style={[
             styles.tabLabel,
-            { color: isActive ? '#fff' : Colors[colorScheme].text },
+            { color: isActive ? colors.primary.contrastText : colors.text.primary },
           ]}
         >
           {tab.label}
@@ -118,13 +128,22 @@ export default function HistorialScreen() {
             {MOCK_GLUCOSE.map((g) => (
               <Card key={g.id} style={styles.recordCard}>
                 <View style={styles.recordHeader}>
-                  <ThemedText type="defaultSemiBold" style={{ fontSize: 24, color: getGlucoseColor(g.nivel) }}>
+                  <ThemedText
+                    type="defaultSemiBold"
+                    style={{ fontSize: 24, color: getGlucoseColor(g.nivel, colors) }}
+                  >
                     {g.nivel}
                   </ThemedText>
-                  <ThemedText style={{ fontSize: 12, opacity: 0.5 }}>mg/dL</ThemedText>
+                  <ThemedText muted style={{ fontSize: 12 }}>
+                    mg/dL
+                  </ThemedText>
                 </View>
-                <ThemedText style={{ fontSize: 13, opacity: 0.7 }}>{g.contexto}</ThemedText>
-                <ThemedText style={{ fontSize: 12, opacity: 0.5 }}>{g.fecha} · {formatHora(g.hora)}</ThemedText>
+                <ThemedText muted style={{ fontSize: 13 }}>
+                  {g.contexto}
+                </ThemedText>
+                <ThemedText muted style={{ fontSize: 12 }}>
+                  {g.fecha} · {formatHora(g.hora)}
+                </ThemedText>
               </Card>
             ))}
           </View>
@@ -134,24 +153,29 @@ export default function HistorialScreen() {
         return (
           <View>
             <View style={styles.filterRow}>
-              {(['todas', 'RAPIDA', 'LENTA'] as const).map((f) => {
-                const isActive = insulinFilter === f;
+              {(['todas', 'RAPIDA', 'LENTA'] as const).map((filter) => {
+                const isActive = insulinFilter === filter;
+
                 return (
                   <TouchableOpacity
-                    key={f}
+                    key={filter}
                     style={[
                       styles.filterChip,
-                      { backgroundColor: isActive ? Colors[colorScheme].tint : 'transparent', borderColor: Colors[colorScheme].tint },
+                      {
+                        backgroundColor: isActive ? colors.primary.main : 'transparent',
+                        borderColor: colors.primary.main,
+                      },
                     ]}
-                    onPress={() => setInsulinFilter(f)}
+                    onPress={() => setInsulinFilter(filter)}
+                    activeOpacity={0.8}
                   >
                     <ThemedText
                       style={{
                         fontSize: 12,
-                        color: isActive ? '#fff' : Colors[colorScheme].tint,
+                        color: isActive ? colors.primary.contrastText : colors.primary.main,
                       }}
                     >
-                      {f === 'todas' ? 'Todas' : f === 'RAPIDA' ? 'Rápida' : 'Lenta'}
+                      {filter === 'todas' ? 'Todas' : filter === 'RAPIDA' ? 'Rápida' : 'Lenta'}
                     </ThemedText>
                   </TouchableOpacity>
                 );
@@ -159,39 +183,54 @@ export default function HistorialScreen() {
             </View>
 
             {loadingInsulin ? (
-              <ThemedText style={{ textAlign: 'center', marginTop: 24, opacity: 0.5 }}>Cargando...</ThemedText>
+              <ThemedText muted style={styles.centerMessage}>
+                Cargando...
+              </ThemedText>
             ) : filteredInsulin.length === 0 ? (
-              <ThemedText style={{ textAlign: 'center', marginTop: 24, opacity: 0.5 }}>Sin registros de insulina</ThemedText>
+              <ThemedText muted style={styles.centerMessage}>
+                Sin registros de insulina
+              </ThemedText>
             ) : (
-              filteredInsulin.map((r) => (
-                <Card key={r.id} style={styles.recordCard}>
-                  <View style={styles.recordRow}>
-                    <View style={{ flex: 1 }}>
-                      <View style={styles.recordHeader}>
-                        <ThemedText type="defaultSemiBold" style={{ fontSize: 20 }}>
-                          {r.dosis} UI
-                        </ThemedText>
-                        <View style={[styles.tipoBadge, { backgroundColor: r.tipo === 'RAPIDA' ? '#4FC3F720' : '#FFA72620' }]}>
-                          <ThemedText style={{ fontSize: 11, color: r.tipo === 'RAPIDA' ? '#4FC3F7' : '#FFA726' }}>
-                            {r.tipo === 'RAPIDA' ? 'Rápida' : 'Lenta'}
+              filteredInsulin.map((record) => {
+                const isRapida = record.tipo === 'RAPIDA';
+                const badgeColor = isRapida ? colors.info.main : colors.warning.main;
+
+                return (
+                  <Card key={record.id} style={styles.recordCard}>
+                    <View style={styles.recordRow}>
+                      <View style={styles.recordContent}>
+                        <View style={styles.recordHeader}>
+                          <ThemedText type="defaultSemiBold" style={{ fontSize: 20 }}>
+                            {record.dosis} UI
                           </ThemedText>
+                          <View
+                            style={[styles.tipoBadge, { backgroundColor: withAlpha(badgeColor, 0.15) }]}
+                          >
+                            <ThemedText style={{ fontSize: 11, color: badgeColor }}>
+                              {isRapida ? 'Rápida' : 'Lenta'}
+                            </ThemedText>
+                          </View>
+                        </View>
+                        <ThemedText muted style={{ fontSize: 12, marginTop: 4 }}>
+                          {record.fecha} · {formatHora(record.hora)}
+                        </ThemedText>
+                        <View style={styles.recordMeta}>
+                          {record.zonaLabel && (
+                            <ThemedText muted style={{ fontSize: 11 }}>
+                              {record.zonaLabel}
+                            </ThemedText>
+                          )}
+                          {record.contextoLabel && (
+                            <ThemedText muted style={{ fontSize: 11 }}>
+                              {' '}· {record.contextoLabel}
+                            </ThemedText>
+                          )}
                         </View>
                       </View>
-                      <ThemedText style={{ fontSize: 12, opacity: 0.6, marginTop: 4 }}>
-                        {r.fecha} · {formatHora(r.hora)}
-                      </ThemedText>
-                      <View style={styles.recordMeta}>
-                        {r.zonaLabel && (
-                          <ThemedText style={{ fontSize: 11, opacity: 0.5 }}>{r.zonaLabel}</ThemedText>
-                        )}
-                        {r.contextoLabel && (
-                          <ThemedText style={{ fontSize: 11, opacity: 0.5 }}> · {r.contextoLabel}</ThemedText>
-                        )}
-                      </View>
                     </View>
-                  </View>
-                </Card>
-              ))
+                  </Card>
+                );
+              })
             )}
           </View>
         );
@@ -199,16 +238,20 @@ export default function HistorialScreen() {
       case 'hba1c':
         return (
           <View>
-            {MOCK_HBA1C.map((h) => (
-              <Card key={h.id} style={styles.recordCard}>
+            {MOCK_HBA1C.map((record) => (
+              <Card key={record.id} style={styles.recordCard}>
                 <View style={styles.recordRow}>
-                  <View style={{ flex: 1 }}>
+                  <View style={styles.recordContent}>
                     <ThemedText type="defaultSemiBold" style={{ fontSize: 22 }}>
-                      {h.resultado}%
+                      {record.resultado}%
                     </ThemedText>
-                    <ThemedText style={{ fontSize: 12, opacity: 0.6 }}>{h.estimado}</ThemedText>
+                    <ThemedText muted style={{ fontSize: 12 }}>
+                      {record.estimado}
+                    </ThemedText>
                   </View>
-                  <ThemedText style={{ fontSize: 12, opacity: 0.5 }}>{h.fecha}</ThemedText>
+                  <ThemedText muted style={{ fontSize: 12 }}>
+                    {record.fecha}
+                  </ThemedText>
                 </View>
               </Card>
             ))}
@@ -218,27 +261,43 @@ export default function HistorialScreen() {
       case 'fisico':
         return (
           <View>
-            {MOCK_FISICO.map((f) => (
-              <Card key={f.id} style={styles.recordCard}>
-                <View style={styles.recordRow}>
-                  <View style={{ flex: 1 }}>
-                    <View style={styles.recordRow}>
-                      <ThemedText type="defaultSemiBold">{f.peso} kg</ThemedText>
-                      <ThemedText style={{ marginHorizontal: 8, opacity: 0.3 }}>|</ThemedText>
-                      <ThemedText type="defaultSemiBold">{f.estatura} cm</ThemedText>
-                      <ThemedText style={{ marginHorizontal: 8, opacity: 0.3 }}>|</ThemedText>
-                      <ThemedText type="defaultSemiBold">IMC {f.imc}</ThemedText>
+            {MOCK_FISICO.map((record) => {
+              const isNormal = record.estado === 'Normal';
+              const statusColor = isNormal ? colors.success.main : colors.warning.main;
+
+              return (
+                <Card key={record.id} style={styles.recordCard}>
+                  <View style={styles.recordRow}>
+                    <View style={styles.recordContent}>
+                      <View style={styles.recordRow}>
+                        <ThemedText type="defaultSemiBold">{record.peso} kg</ThemedText>
+                        <ThemedText muted style={styles.separator}>
+                          |
+                        </ThemedText>
+                        <ThemedText type="defaultSemiBold">{record.estatura} cm</ThemedText>
+                        <ThemedText muted style={styles.separator}>
+                          |
+                        </ThemedText>
+                        <ThemedText type="defaultSemiBold">IMC {record.imc}</ThemedText>
+                      </View>
+                      <View
+                        style={[
+                          styles.estadoBadge,
+                          { backgroundColor: withAlpha(statusColor, 0.15) },
+                        ]}
+                      >
+                        <ThemedText style={{ fontSize: 11, color: statusColor }}>
+                          {record.estado}
+                        </ThemedText>
+                      </View>
                     </View>
-                    <View style={[styles.estadoBadge, { backgroundColor: f.estado === 'Normal' ? '#2e7d3220' : '#f57c0020', alignSelf: 'flex-start', marginTop: 8 }]}>
-                      <ThemedText style={{ fontSize: 11, color: f.estado === 'Normal' ? '#2e7d32' : '#f57c00' }}>
-                        {f.estado}
-                      </ThemedText>
-                    </View>
+                    <ThemedText muted style={{ fontSize: 12 }}>
+                      {record.fecha}
+                    </ThemedText>
                   </View>
-                  <ThemedText style={{ fontSize: 12, opacity: 0.5 }}>{f.fecha}</ThemedText>
-                </View>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </View>
         );
 
@@ -249,12 +308,18 @@ export default function HistorialScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.headerTitle}>
-        <ThemedText type="title" style={{ fontSize: 24 }}>Historial</ThemedText>
+      <View style={[styles.headerTitle, { paddingTop: insets.top + 16 }]}>
+        <ThemedText type="title" style={{ fontSize: 24 }}>
+          Historial
+        </ThemedText>
       </View>
 
       <View style={styles.tabRow}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsContainer}
+        >
           {TABS.map(renderTab)}
         </ScrollView>
       </View>
@@ -273,7 +338,7 @@ export default function HistorialScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  headerTitle: { paddingHorizontal: 16, paddingTop: 60, paddingBottom: 8 },
+  headerTitle: { paddingHorizontal: 16, paddingBottom: 8 },
   tabRow: { paddingHorizontal: 16, marginBottom: 16 },
   tabsContainer: { flexDirection: 'row', gap: 8 },
   tab: {
@@ -284,14 +349,28 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 6,
   },
-  tabLabel: { fontSize: 13 },
+  tabLabel: { fontSize: 13, fontFamily: Fonts.medium },
   scrollContent: { paddingHorizontal: 16, paddingBottom: 100 },
   recordCard: { padding: 16, marginBottom: 8 },
   recordRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  recordContent: { flex: 1 },
   recordHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   recordMeta: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
   filterRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  filterChip: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, borderWidth: 1.5 },
+  filterChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1.5,
+  },
   tipoBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
-  estadoBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  estadoBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginTop: 8,
+  },
+  centerMessage: { textAlign: 'center', marginTop: 24 },
+  separator: { marginHorizontal: 8 },
 });

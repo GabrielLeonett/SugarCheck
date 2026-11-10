@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { Fonts, Shape } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { ZONAS_INYECCION } from '@/src/types';
 
 interface ZoneSelectorProps {
@@ -10,38 +11,43 @@ interface ZoneSelectorProps {
 }
 
 export function ZoneSelector({ selectedZone, onSelectZone }: ZoneSelectorProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const { colors } = useTheme();
   const [vista, setVista] = useState<'FRENTE' | 'ATRAS'>('FRENTE');
   const zonas = ZONAS_INYECCION[vista];
 
   return (
-    <View style={{ marginBottom: 16 }}>
-      <View style={[styles.header, { marginBottom: 10 }]}>
+    <View style={styles.container}>
+      <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text.primary }]}>Zona de inyección</Text>
+
         <View style={[styles.toggleRow, { borderColor: colors.divider }]}>
-          <TouchableOpacity
-            style={[styles.toggleBtn, vista === 'FRENTE' && { backgroundColor: colors.tint }]}
-            onPress={() => setVista('FRENTE')}
-          >
-            <Text style={[styles.toggleText, { color: vista === 'FRENTE' ? '#fff' : colors.text.primary }]}>
-              Frente
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.toggleBtn, vista === 'ATRAS' && { backgroundColor: colors.tint }]}
-            onPress={() => setVista('ATRAS')}
-          >
-            <Text style={[styles.toggleText, { color: vista === 'ATRAS' ? '#fff' : colors.text.primary }]}>
-              Atrás
-            </Text>
-          </TouchableOpacity>
+          {(['FRENTE', 'ATRAS'] as const).map((option) => {
+            const isActive = vista === option;
+            return (
+              <TouchableOpacity
+                key={option}
+                style={[styles.toggleBtn, isActive && { backgroundColor: colors.primary.main }]}
+                onPress={() => setVista(option)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={[
+                    styles.toggleText,
+                    { color: isActive ? colors.primary.contrastText : colors.text.primary },
+                  ]}
+                >
+                  {option === 'FRENTE' ? 'Frente' : 'Atrás'}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
 
       <View style={styles.zoneGrid}>
         {zonas.map((zona) => {
           const isSelected = selectedZone === zona.key;
+
           return (
             <TouchableOpacity
               key={zona.key}
@@ -53,13 +59,11 @@ export function ZoneSelector({ selectedZone, onSelectZone }: ZoneSelectorProps) 
                 },
               ]}
               onPress={() => onSelectZone(zona.key)}
+              activeOpacity={0.8}
             >
               <View style={[styles.zoneDot, { backgroundColor: zona.color }]} />
               <Text
-                style={[
-                  styles.zoneLabel,
-                  { color: isSelected ? '#fff' : colors.text.primary },
-                ]}
+                style={[styles.zoneLabel, { color: isSelected ? colors.onAccent : colors.text.primary }]}
               >
                 {zona.label}
               </Text>
@@ -72,19 +76,22 @@ export function ZoneSelector({ selectedZone, onSelectZone }: ZoneSelectorProps) 
 }
 
 const styles = StyleSheet.create({
+  container: {
+    marginBottom: 16,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 10,
   },
   title: {
     fontSize: 14,
-    fontWeight: '600',
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily: Fonts.semiBold,
   },
   toggleRow: {
     flexDirection: 'row',
-    borderRadius: 8,
+    borderRadius: Shape.borderRadius,
     overflow: 'hidden',
     borderWidth: 1,
   },
@@ -94,7 +101,7 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: 12,
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily: Fonts.semiBold,
   },
   zoneGrid: {
     flexDirection: 'row',
@@ -117,6 +124,6 @@ const styles = StyleSheet.create({
   },
   zoneLabel: {
     fontSize: 12,
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily: Fonts.semiBold,
   },
 });
