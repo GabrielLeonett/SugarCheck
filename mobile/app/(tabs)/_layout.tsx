@@ -1,11 +1,11 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 import { Tabs, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Animated, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { QuickRecordModal } from '@/components/QuickRecordModal';
 import { Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -13,12 +13,10 @@ import { useTheme } from '@/contexts/ThemeContext';
 function TabIcon({
   route,
   focused,
-  color,
   size,
 }: {
   route: { name: string };
   focused: boolean;
-  color: string;
   size?: number;
 }) {
   const scaleAnim = useRef(new Animated.Value(focused ? 1.1 : 1)).current;
@@ -32,15 +30,41 @@ function TabIcon({
   }, [focused, scaleAnim]);
 
   const renderIcon = () => {
+    const iconSize = size ?? 26;
+
     switch (route.name) {
       case 'index':
-        return <IconSymbol name="house.fill" size={size} color={color} />;
+        return (
+          <Image
+            source={require('../../assets/tabbar/home.png')}
+            style={{ width: iconSize, height: iconSize }}
+            resizeMode="contain"
+          />
+        );
       case 'historial':
-        return <FontAwesome name="history" size={size} color={color} />;
+        return (
+          <Image
+            source={require('../../assets/tabbar/libro.png')}
+            style={{ width: iconSize, height: iconSize }}
+            resizeMode="contain"
+          />
+        );
       case 'agent':
-        return <FontAwesome name="android" size={size} color={color} />;
-      case 'perfil':
-        return <FontAwesome name="user-circle" size={size} color={color} />;
+        return (
+          <Image
+            source={require('../../assets/tabbar/robot.png')}
+            style={{ width: iconSize, height: iconSize }}
+            resizeMode="contain"
+          />
+        );
+      case 'camino':
+        return (
+          <Image
+            source={require('../../assets/tabbar/colina.png')}
+            style={{ width: iconSize, height: iconSize }}
+            resizeMode="contain"
+          />
+        );
       default:
         return null;
     }
@@ -59,6 +83,7 @@ function TabIcon({
 }
 
 export default function TabLayout() {
+  const { t } = useTranslation('common');
   const { colors } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -81,6 +106,8 @@ export default function TabLayout() {
       setActiveName('agent');
     } else if (clean === 'perfil') {
       setActiveName('perfil');
+    } else if (clean === 'camino') {
+      setActiveName('camino');
     } else {
       setActiveName('index');
     }
@@ -142,7 +169,6 @@ export default function TabLayout() {
           <TabIcon
             route={{ name: 'index' }}
             focused={activeName === 'index'}
-            color={activeName === 'index' ? colors.tabIconSelected : colors.tabIconDefault}
             size={26}
           />
         </TouchableOpacity>
@@ -159,9 +185,6 @@ export default function TabLayout() {
           <TabIcon
             route={{ name: 'historial' }}
             focused={activeName === 'historial'}
-            color={
-              activeName === 'historial' ? colors.tabIconSelected : colors.tabIconDefault
-            }
             size={26}
           />
         </TouchableOpacity>
@@ -172,7 +195,7 @@ export default function TabLayout() {
           onPress={() => setShowQuickRecord(true)}
           activeOpacity={0.85}
           accessibilityRole="button"
-          accessibilityLabel="Registro rápido"
+          accessibilityLabel={t('quickRecord')}
         >
           <FontAwesome name="plus" size={22} color={colors.primary.contrastText} />
         </TouchableOpacity>
@@ -189,24 +212,24 @@ export default function TabLayout() {
           <TabIcon
             route={{ name: 'agent' }}
             focused={activeName === 'agent'}
-            color={activeName === 'agent' ? colors.tabIconSelected : colors.tabIconDefault}
             size={26}
           />
         </TouchableOpacity>
 
         <TouchableOpacity
-          key="perfil"
+          key="camino"
           style={styles.tabBtn}
           onPress={() => {
-            setActiveName('perfil');
-            goTo('/(tabs)/perfil');
+            setActiveName('camino');
+            goTo('/camino');
           }}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={t('warriorPath')}
         >
           <TabIcon
-            route={{ name: 'perfil' }}
-            focused={activeName === 'perfil'}
-            color={activeName === 'perfil' ? colors.tabIconSelected : colors.tabIconDefault}
+            route={{ name: 'camino' }}
+            focused={activeName === 'camino'}
             size={26}
           />
         </TouchableOpacity>
