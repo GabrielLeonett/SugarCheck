@@ -14,6 +14,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SystemAlertHost } from '@/components/SystemAlertHost';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
+import { useGuestStore } from '@/src/stores/guestStore';
 import { initializeAppLanguage } from '@/src/i18n';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -33,6 +34,7 @@ export default function RootLayout() {
 function RootLayoutContent() {
   const { colors, isDark, isReady } = useTheme();
   const { isAuthLoading, refresh, setLoading } = useAuthStore();
+  const hydrateGuest = useGuestStore((state) => state.hydrate);
   const [languageReady, setLanguageReady] = useState(false);
 
   const [fontsLoaded, fontError] = useFonts({
@@ -47,16 +49,19 @@ function RootLayoutContent() {
   useEffect(() => {
     const init = async () => {
       try {
-        await refresh();
-      } catch {
-        // Sin sesión previa activa.
+        await hydrateGuest();
+        if (!useGuestStore.getState().isGuestMode) {
+          await refresh();
+        }
+      } catch (error) {
+        console.error('No se pudo restaurar el estado local:', error);
       } finally {
         setLoading(false);
       }
     };
 
     init();
-  }, [refresh, setLoading]);
+  }, [hydrateGuest, refresh, setLoading]);
 
   useEffect(() => {
     initializeAppLanguage()

@@ -4,6 +4,7 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -17,6 +18,7 @@ import { Card } from '@/components/card';
 import { Modal } from '@/components/Modal';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { GLUCO_GESTURES } from '@/constants/gestures';
 import { useTheme } from '@/contexts/ThemeContext';
 import { leccionesPorNivel } from '@/src/data/caminoLessons';
 import type { Pregunta } from '@/src/data/caminoLessons';
@@ -284,21 +286,32 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
                   { backgroundColor: answerState === 'correct' ? colors.success.light : colors.error.light },
                 ]}
               >
-                <View style={styles.feedbackHeading}>
-                  <FontAwesome
-                    name={answerState === 'correct' ? 'check-circle' : 'times-circle'}
-                    size={24}
-                    color={answerState === 'correct' ? colors.success.dark : colors.error.dark}
+                <View style={styles.feedbackRow}>
+                  <Image
+                    source={answerState === 'correct'
+                      ? GLUCO_GESTURES.ataqueVictoria
+                      : GLUCO_GESTURES.preguntaConfusa}
+                    style={styles.feedbackMascot}
+                    resizeMode="contain"
                   />
-                  <ThemedText type="defaultSemiBold">
-                    {t(answerState === 'correct' ? 'warriorPath.correctTitle' : 'warriorPath.incorrectTitle')}
-                  </ThemedText>
+                  <View style={styles.feedbackCopy}>
+                    <View style={styles.feedbackHeading}>
+                      <FontAwesome
+                        name={answerState === 'correct' ? 'check-circle' : 'times-circle'}
+                        size={24}
+                        color={answerState === 'correct' ? colors.success.dark : colors.error.dark}
+                      />
+                      <ThemedText type="defaultSemiBold">
+                        {t(answerState === 'correct' ? 'warriorPath.correctTitle' : 'warriorPath.incorrectTitle')}
+                      </ThemedText>
+                    </View>
+                    <ThemedText>
+                      {answerState === 'correct'
+                        ? currentQuestion.retroCorrecta
+                        : currentQuestion.retroIncorrecta}
+                    </ThemedText>
+                  </View>
                 </View>
-                <ThemedText>
-                  {answerState === 'correct'
-                    ? currentQuestion.retroCorrecta
-                    : currentQuestion.retroIncorrecta}
-                </ThemedText>
               </Card>
             )}
 
@@ -369,6 +382,11 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
         onExit();
       }}>
         <View style={styles.dialog}>
+          <Image
+            source={GLUCO_GESTURES.tristeCansado}
+            style={styles.dialogMascot}
+            resizeMode="contain"
+          />
           <ThemedText type="h6" style={styles.dialogTitle}>{t('warriorPath.noLivesTitle')}</ThemedText>
           <ThemedText muted style={styles.dialogDescription}>
             {t('warriorPath.noLivesDescription')}
@@ -417,11 +435,15 @@ const styles = StyleSheet.create({
   option: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, borderWidth: 1.5, borderRadius: 12, padding: 14 },
   optionText: { flex: 1, lineHeight: 22 },
   hintCard: { padding: 14, marginTop: 16 },
-  feedback: { padding: 16, marginTop: 18, gap: 10 },
+  feedback: { padding: 16, marginTop: 18 },
+  feedbackRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  feedbackMascot: { width: 64, height: 72 },
+  feedbackCopy: { flex: 1, gap: 8 },
   feedbackHeading: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   actions: { flexDirection: 'row', gap: 10, marginTop: 18 },
   actionButton: { flex: 1 },
   dialog: { gap: 14, paddingBottom: 18 },
+  dialogMascot: { width: 112, height: 112, alignSelf: 'center' },
   dialogTitle: { textAlign: 'center' },
   dialogDescription: { textAlign: 'center', marginBottom: 8 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16 },

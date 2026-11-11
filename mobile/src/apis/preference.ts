@@ -1,5 +1,6 @@
 import { apiPrivate } from './axios';
 import type { Preference } from '../types';
+import { useGuestStore } from '@/src/stores/guestStore';
 import {
   pullChanges,
   pushChanges,
@@ -14,11 +15,45 @@ const TABLE: SyncTableName = 'preference';
 
 export const preferenceApi = {
   async getPreferences(): Promise<Preference> {
+    const guest = useGuestStore.getState();
+    if (guest.isGuestMode && guest.profile) {
+      return {
+        userId: guest.profile.id,
+        profileImg: guest.profile.avatar,
+        unitMeasure: 'mg/dL',
+        thresholds: {
+          hypo: guest.profile.glucoseRange.hypo,
+          hiper: guest.profile.glucoseRange.hyper,
+        },
+        locale: 'es',
+        theme: 'light',
+      };
+    }
+
     const res = await apiPrivate.get('/preference');
     return res.data?.data as Preference;
   },
 
   async savePreferences(payload: Preference): Promise<Preference> {
+    const guest = useGuestStore.getState();
+    if (guest.isGuestMode && guest.profile) {
+      const profile = {
+        ...guest.profile,
+        avatar: payload.profileImg,
+        glucoseRange: {
+          hypo: payload.thresholds.hypo,
+          hyper: payload.thresholds.hiper,
+        },
+      };
+      await guest.updateProfile(profile);
+      return {
+        ...payload,
+        userId: profile.id,
+        profileImg: profile.avatar,
+        thresholds: { hypo: profile.glucoseRange.hypo, hiper: profile.glucoseRange.hyper },
+      };
+    }
+
     const { userId: _, locale: _l, theme: _t, ...dtoPayload } = payload as any;
     const res = await apiPrivate.post('/preference', dtoPayload);
     return res.data?.data as Preference;

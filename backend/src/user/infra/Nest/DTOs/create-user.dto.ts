@@ -30,10 +30,15 @@ export class CreateUserDTO {
   fechaNacimiento!: Date;
 
   @IsString({ message: 'El sexo debe ser un texto válido' })
-  @IsIn(['masculino', 'femenino'], {
-    message: 'El sexo debe ser masculino o femenino',
+  @IsIn(['masculino', 'femenino', 'otro'], {
+    message: 'El sexo debe ser masculino, femenino u otro',
   })
   sexo!: string;
+
+  @IsOptional()
+  @IsString({ message: 'El objetivo debe ser un texto válido' })
+  @MinLength(1)
+  goal?: string;
 
   @IsString({ message: 'La contraseña debe ser un texto' })
   @IsNotEmpty({ message: 'La contraseña es obligatoria' })

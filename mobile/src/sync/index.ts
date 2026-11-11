@@ -19,6 +19,7 @@ export {
 export {
   TO_SYNC_RECORD,
   FROM_SYNC_RECORD,
+  getFromSyncAdapter,
   type ToSyncRecordFn,
   type FromSyncRecordFn,
   groupPendingChanges,

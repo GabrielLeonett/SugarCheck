@@ -7,7 +7,7 @@ export const userApi = {
     return response.data;
   },
 
-  async update(id: string, data: Partial<{ name: string; email: string; sexo: string; fechaNacimiento: string }>): Promise<User> {
+  async update(id: string, data: Partial<{ name: string; email: string; sexo: string; fechaNacimiento: string; goal: string }>): Promise<User> {
     const response = await apiPrivate.patch(`/user/${id}`, data);
     return response.data;
   },

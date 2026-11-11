@@ -19,6 +19,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
+import { useGuestStore } from '@/src/stores/guestStore';
 import { authApi } from '@/src/apis/auth';
 import { showErrorAlert } from '@/src/stores/systemAlertStore';
 
@@ -72,7 +73,11 @@ export default function RegisterScreen() {
       });
 
       await login(formData.email, formData.password);
-      router.push('/auth/complete-profile');
+      router.replace(
+        useGuestStore.getState().pendingImport
+          ? '/auth/import-guest'
+          : '/auth/complete-profile'
+      );
     } catch (error: any) {
       const message =
         error?.response?.data?.message || error?.message || t('auth:registerError');

@@ -28,6 +28,7 @@ interface UserDB {
   sexo: string;
   createdAt: Date;
   fechaNacimiento: Date;
+  goal: string | null;
 }
 
 @Injectable()
@@ -47,6 +48,7 @@ export class PrismaUserRepository implements UserRepository {
       fechaNacimiento: UserFechaNacimiento.create(
         raw.fechaNacimiento,
       ).getValue(),
+      goal: raw.goal,
     });
   }
 
@@ -61,6 +63,7 @@ export class PrismaUserRepository implements UserRepository {
       createdAt: user.createdAt.value,
       password: user.password.value,
       fechaNacimiento: user.fechaNacimiento.value,
+      goal: user.goal,
     };
   }
 
@@ -200,6 +203,7 @@ async update(id: UserId, update: Partial<User>): Promise<Result<User, ErrorAbstr
         sexo: update.sexo?.value,
         password: update.password?.value,
         fechaNacimiento: update.fechaNacimiento?.value,
+        goal: update.goal,
       },
     });
 

@@ -1,5 +1,6 @@
 import { apiPrivate } from './axios';
 import type { HbA1cRecord } from '../types';
+import { createGuestId, useGuestStore } from '@/src/stores/guestStore';
 import {
   pullChanges,
   pushChanges,
@@ -28,11 +29,36 @@ function mapRecord(record: HbA1cBackendRecord): HbA1cRecord {
 
 export const hba1cApi = {
   async getAll(): Promise<HbA1cRecord[]> {
+    if (useGuestStore.getState().isGuestMode) {
+      return [...useGuestStore.getState().records.hba1c]
+        .sort((a, b) => String(b.examDate).localeCompare(String(a.examDate)))
+        .map((record) => ({
+          id: record.id,
+          resultado: Number(record.valuePercent),
+          fecha: new Date(String(record.examDate)).toLocaleDateString('es-ES'),
+        }));
+    }
+
     const res = await apiPrivate.get('/hba1c');
     return (res.data as HbA1cBackendRecord[]).map(mapRecord);
   },
 
   async create(dto: { resultado: number; fecha: string }): Promise<HbA1cRecord> {
+    if (useGuestStore.getState().isGuestMode) {
+      const record: HbA1cRecord = {
+        id: createGuestId(),
+        resultado: dto.resultado,
+        fecha: new Date(dto.fecha).toLocaleDateString('es-ES'),
+      };
+      await useGuestStore.getState().saveRecord('hba1c', {
+        id: record.id,
+        valuePercent: dto.resultado,
+        examDate: dto.fecha,
+        createdAt: new Date().toISOString(),
+      });
+      return record;
+    }
+
     const res = await apiPrivate.post('/hba1c', {
       valuePercent: dto.resultado,
       examDate: dto.fecha,

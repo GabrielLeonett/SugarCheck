@@ -27,6 +27,10 @@
 
 ## Project setup
 
+When deploying the guest-profile changes, apply Prisma migrations before
+starting the updated API. The migration adds the optional `goal` field to the
+user profile.
+
 ```bash
 $ npm install
 ```

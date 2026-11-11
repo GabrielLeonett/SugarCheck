@@ -1,5 +1,6 @@
 import { apiPrivate } from './axios';
 import type { GlucoseRecord } from '../types';
+import { createGuestId, useGuestStore } from '@/src/stores/guestStore';
 import {
   pullChanges,
   pushChanges,
@@ -60,6 +61,19 @@ function mapRecord(item: GlucoseBackendRecord): GlucoseEntry {
 
 export const glucoseApi = {
   async getAll(): Promise<GlucoseEntry[]> {
+    if (useGuestStore.getState().isGuestMode) {
+      return useGuestStore.getState().records.glucose
+        .map((record) => ({
+          id: record.id,
+          nivel: Number(record.nivel),
+          contexto: String(record.contexto),
+          fecha: String(record.fecha),
+          hora: String(record.hora),
+          timestamp: new Date(String(record.timestamp)),
+        }))
+        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    }
+
     const res = await apiPrivate.get('/glucose');
     const data = res.data as GlucoseBackendRecord[];
     return data
@@ -73,6 +87,28 @@ export const glucoseApi = {
     date: string;
     time: string;
   }): Promise<GlucoseEntry> {
+    if (useGuestStore.getState().isGuestMode) {
+      const timestamp = new Date(`${dto.date.slice(0, 10)}T${dto.time}:00`);
+      const entry: GlucoseEntry = {
+        id: createGuestId(),
+        nivel: dto.valueMgdl,
+        contexto: dto.mealTag,
+        fecha: formatFecha(dto.date),
+        hora: formatHora(dto.time),
+        timestamp,
+      };
+      await useGuestStore.getState().saveRecord('glucose', {
+        id: entry.id,
+        valueMgdl: dto.valueMgdl,
+        mealTag: dto.mealTag,
+        date: dto.date,
+        time: dto.time,
+        timestamp: timestamp.toISOString(),
+        createdAt: new Date().toISOString(),
+      });
+      return entry;
+    }
+
     const res = await apiPrivate.post('/glucose', dto);
     return mapRecord(res.data as GlucoseBackendRecord);
   },

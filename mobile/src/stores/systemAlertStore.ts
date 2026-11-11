@@ -55,12 +55,14 @@ export function showErrorAlert(message: string, title = 'Error') {
 export function showSuccessAlert(
   message: string,
   title = 'Guardado',
-  afterClose?: () => void | Promise<void>
+  afterClose?: () => void | Promise<void>,
+  image?: SystemAlertOptions['image']
 ) {
   return showSystemAlert({
     type: 'success',
     title,
     description: message,
+    image,
     buttons: [{ text: 'Aceptar', color: 'primary', onPress: afterClose }],
   });
 }

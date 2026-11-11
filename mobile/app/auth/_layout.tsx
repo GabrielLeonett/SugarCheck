@@ -12,6 +12,9 @@ export default function AuthLayout() {
         contentStyle: { backgroundColor: colors.background.default },
       }}
     >
+      <Stack.Screen name="start" />
+      <Stack.Screen name="guest-onboarding" />
+      <Stack.Screen name="import-guest" />
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
       <Stack.Screen name="forgot-password" />

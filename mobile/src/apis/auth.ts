@@ -23,7 +23,7 @@ export const authApi = {
   },
 
   async refresh(): Promise<LoginResponse> {
-    const response = await apiPrivate.post('/auth/refresh', {});
+    const response = await apiPrivate.post('/auth/refresh', {}, { timeout: 3000 });
     return response.data;
   },
 

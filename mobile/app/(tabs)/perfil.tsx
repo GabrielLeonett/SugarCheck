@@ -21,8 +21,10 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { DatePickerField } from '@/components/DatePicker';
 import { AVATARS, AVATAR_NAMES } from '@/constants/avatars';
+import { CONTACT_RELATIONSHIPS } from '@/src/constants/contactRelationships';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
+import { useGuestStore } from '@/src/stores/guestStore';
 import { userApi } from '@/src/apis/user';
 import { contactEmergenceApi } from '@/src/apis/contact-emergence';
 import type {
@@ -44,6 +46,11 @@ export default function PerfilScreen() {
   const router = useRouter();
   const authUser = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const guestProfile = useGuestStore((s) => s.profile);
+  const isGuestMode = useGuestStore((s) => s.isGuestMode);
+  const updateGuestProfile = useGuestStore((s) => s.updateProfile);
+  const saveGuestRecord = useGuestStore((s) => s.saveRecord);
+  const setPendingImport = useGuestStore((s) => s.setPendingImport);
   const { preference, load: loadPrefs, save: savePrefs } = usePreferenceConfig();
 
   const [contacts, setContacts] = useState<ContactEmergenceData[]>([]);
@@ -57,10 +64,17 @@ export default function PerfilScreen() {
   const [editingContact, setEditingContact] = useState<ContactEmergenceData | null>(null);
   const [contactForm, setContactForm] = useState({ name: '', parentesco: '', telefono: '' });
   const [personalData, setPersonalData] = useState({
-    name: authUser?.name || '',
+    name: authUser?.name || guestProfile?.name || '',
     email: authUser?.email || '',
-    sexo: authUser?.sexo || '',
-    fechaNacimiento: authUser?.fechaNacimiento ? new Date(authUser.fechaNacimiento) : new Date(2000, 0, 1),
+    sexo: authUser?.sexo || guestProfile?.sex || '',
+    fechaNacimiento: authUser?.fechaNacimiento
+      ? new Date(authUser.fechaNacimiento)
+      : guestProfile?.birthDate
+        ? new Date(guestProfile.birthDate)
+        : new Date(2000, 0, 1),
+    weight: guestProfile?.weight.toString() ?? '',
+    height: guestProfile?.height.toString() ?? '',
+    goal: guestProfile?.goal ?? '',
   });
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -125,6 +139,49 @@ export default function PerfilScreen() {
   };
 
   const handleSavePersonal = async () => {
+    if (isGuestMode && guestProfile) {
+      const weight = Number(personalData.weight);
+      const height = Number(personalData.height);
+      if (personalData.name.trim().length < 3 || personalData.name.trim().length > 50 ||
+        !personalData.sexo || !personalData.goal.trim() || personalData.goal.trim().length > 200 ||
+        !Number.isFinite(weight) || weight <= 0 || weight >= 700 ||
+        !Number.isFinite(height) || height <= 0 || height >= 280 ||
+        personalData.fechaNacimiento.getTime() > Date.now()) {
+        showErrorAlert(t('auth:guestRequired'));
+        return;
+      }
+
+      setSavingPersonal(true);
+      try {
+        await updateGuestProfile({
+          ...guestProfile,
+          name: personalData.name.trim(),
+          sex: personalData.sexo,
+          birthDate: personalData.fechaNacimiento.toISOString(),
+          weight,
+          height,
+          goal: personalData.goal.trim(),
+        });
+        const imc = weight / ((height / 100) ** 2);
+        const createdAt = new Date().toISOString();
+        await saveGuestRecord('physical', {
+          id: guestProfile.id,
+          peso: weight,
+          altura: height,
+          imcValue: Number(imc.toFixed(1)),
+          categoria: imc < 18.5 ? 'Bajo peso' : imc < 25 ? 'Normal' : imc < 30 ? 'Sobrepeso' : 'Obesidad',
+          fecha: createdAt,
+          createdAt,
+        });
+        showSuccessAlert(t('profile:personalUpdated'));
+      } catch {
+        showErrorAlert(t('profile:personalUpdateError'));
+      } finally {
+        setSavingPersonal(false);
+      }
+      return;
+    }
+
     if (!authUser?.id) return;
     if (!personalData.name.trim() || !personalData.email.trim()) {
       showErrorAlert(t('profile:completeNameEmail'));
@@ -134,9 +191,9 @@ export default function PerfilScreen() {
     setSavingPersonal(true);
     try {
       await userApi.update(authUser.id, {
-        ...personalData,
         name: personalData.name.trim(),
         email: personalData.email.trim(),
+        sexo: personalData.sexo,
         fechaNacimiento: personalData.fechaNacimiento.toISOString(),
       });
       await useAuthStore.getState().refresh();
@@ -301,6 +358,15 @@ export default function PerfilScreen() {
   };
 
   const handleSaveContact = async () => {
+    if (contactForm.name.trim().length < 3 || contactForm.name.trim().length > 50 ||
+      !CONTACT_RELATIONSHIPS.includes(contactForm.parentesco as typeof CONTACT_RELATIONSHIPS[number]) ||
+      (contactForm.telefono.trim() &&
+        !/^\+?\d{7,15}$/.test(contactForm.telefono.trim().replace(/[\s()-]/g, ''))) ||
+      (isGuestMode && !contactForm.telefono.trim())) {
+      showErrorAlert(t('profile:contactSaveError'));
+      return;
+    }
+
     try {
       if (editingContact) {
         await contactEmergenceApi.update(editingContact.id, contactForm);
@@ -426,9 +492,9 @@ export default function PerfilScreen() {
             </ThemedText>
           </TouchableOpacity>
           <ThemedText type="h6" style={styles.userName}>
-            {authUser?.name}
+            {authUser?.name || guestProfile?.name}
           </ThemedText>
-          <ThemedText muted>{authUser?.email}</ThemedText>
+          <ThemedText muted>{authUser?.email || (isGuestMode ? t('auth:continueGuest') : '')}</ThemedText>
         </View>
 
         <Card style={styles.card}>
@@ -493,17 +559,40 @@ export default function PerfilScreen() {
             value={personalData.fechaNacimiento}
             onChange={(fechaNacimiento) => setPersonalData((previous) => ({ ...previous, fechaNacimiento }))}
           />
-          <FormInput
-            label={t('common:email')}
-            value={personalData.email}
-            onChangeText={(value) => setPersonalData((previous) => ({ ...previous, email: value }))}
-            keyboardType="email-address"
-          />
+          {isGuestMode ? (
+            <>
+              <FormInput
+                label={t('auth:weight')}
+                value={personalData.weight}
+                onChangeText={(weight) => setPersonalData((previous) => ({ ...previous, weight }))}
+                keyboardType="decimal-pad"
+              />
+              <FormInput
+                label={t('auth:height')}
+                value={personalData.height}
+                onChangeText={(height) => setPersonalData((previous) => ({ ...previous, height }))}
+                keyboardType="decimal-pad"
+              />
+              <FormInput
+                label={t('auth:personalGoal')}
+                value={personalData.goal}
+                onChangeText={(goal) => setPersonalData((previous) => ({ ...previous, goal }))}
+              />
+            </>
+          ) : (
+            <FormInput
+              label={t('common:email')}
+              value={personalData.email}
+              onChangeText={(value) => setPersonalData((previous) => ({ ...previous, email: value }))}
+              keyboardType="email-address"
+            />
+          )}
           <ThemedText muted style={styles.sexLabel}>{t('common:sex')}</ThemedText>
           <View style={styles.sexOptions}>
             {[
               { value: 'masculino', label: t('common:male') },
               { value: 'femenino', label: t('common:female') },
+              ...(isGuestMode ? [{ value: 'otro', label: t('auth:otherSex') }] : []),
             ].map((option) => (
               <TouchableOpacity
                 key={option.value}
@@ -530,7 +619,7 @@ export default function PerfilScreen() {
           />
         </Card>
 
-        <Card style={styles.card}>
+        {!isGuestMode && <Card style={styles.card}>
           <SectionHeader title={t('profile:passwordTitle')} icon="lock" />
           <FormInput
             label={t('profile:currentPassword')}
@@ -556,7 +645,7 @@ export default function PerfilScreen() {
             loading={savingPassword}
             style={styles.inlineButton}
           />
-        </Card>
+        </Card>}
 
         <Card style={styles.card}>
           <View style={styles.contactHeader}>
@@ -611,13 +700,15 @@ export default function PerfilScreen() {
                     style={styles.editIcon}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDeleteContact(contact.id)}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('common:delete')}
-                >
-                  <FontAwesome name="trash" size={18} color={colors.error.main} />
-                </TouchableOpacity>
+                {!isGuestMode && (
+                  <TouchableOpacity
+                    onPress={() => handleDeleteContact(contact.id)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('common:delete')}
+                  >
+                    <FontAwesome name="trash" size={18} color={colors.error.main} />
+                  </TouchableOpacity>
+                )}
               </View>
             ))
           )}
@@ -677,11 +768,41 @@ export default function PerfilScreen() {
           />
         </Card>
 
-        <Card style={styles.card}>
-          <Button title={t('profile:logout')} onPress={handleLogout} variant="outlined" color="secondary" />
-          <View style={styles.buttonGap} />
-          <Button title={t('profile:deleteAccount')} onPress={handleDeleteAccount} variant="outlined" color="danger" />
-        </Card>
+        {isGuestMode ? (
+          <Card style={styles.card}>
+            <ThemedText type="defaultSemiBold">{t('auth:guestAccountTitle')}</ThemedText>
+            <ThemedText muted style={styles.clinicalDescription}>{t('auth:guestAccountDescription')}</ThemedText>
+            <Button title={t('auth:login')} onPress={() => router.push('/auth/login')} />
+            <View style={styles.buttonGap} />
+            <Button title={t('auth:register')} onPress={() => router.push('/auth/register')} variant="outlined" />
+          </Card>
+        ) : (
+          <>
+            {guestProfile && (
+              <Card style={styles.card}>
+                <ThemedText type="defaultSemiBold">{t('auth:guestImportTitle')}</ThemedText>
+                <ThemedText muted style={styles.clinicalDescription}>{t('auth:guestImportLater')}</ThemedText>
+                <Button
+                  title={t('auth:guestImportNow')}
+                  onPress={async () => {
+                    try {
+                      await setPendingImport(true);
+                      router.push('/auth/import-guest');
+                    } catch (error) {
+                      console.error('No se pudo reanudar la importación invitada:', error);
+                      showErrorAlert(t('auth:guestImportError'));
+                    }
+                  }}
+                />
+              </Card>
+            )}
+            <Card style={styles.card}>
+              <Button title={t('profile:logout')} onPress={handleLogout} variant="outlined" color="secondary" />
+              <View style={styles.buttonGap} />
+              <Button title={t('profile:deleteAccount')} onPress={handleDeleteAccount} variant="outlined" color="danger" />
+            </Card>
+          </>
+        )}
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -842,7 +963,8 @@ function ContactModal({
   onSave: () => void;
   editing: boolean;
 }) {
-  const { t } = useTranslation(['profile', 'common']);
+  const { t } = useTranslation(['profile', 'common', 'auth']);
+  const { colors } = useTheme();
   return (
     <Modal visible={visible} onClose={onClose}>
       <ThemedText type="h6" style={{ marginBottom: 20 }}>
@@ -855,12 +977,26 @@ function ContactModal({
         placeholder={t('profile:contactNamePlaceholder')}
         autoCapitalize="words"
       />
-      <FormInput
-        label={t('profile:relationship')}
-        value={form.parentesco}
-        onChangeText={(value) => onChange({ ...form, parentesco: value })}
-        placeholder={t('profile:relationshipPlaceholder')}
-      />
+      <ThemedText muted style={styles.sexLabel}>{t('profile:relationship')}</ThemedText>
+      <View style={styles.sexOptions}>
+        {CONTACT_RELATIONSHIPS.map((value) => (
+          <TouchableOpacity
+            key={value}
+            onPress={() => onChange({ ...form, parentesco: value })}
+            style={[
+              styles.sexOption,
+              {
+                borderColor: form.parentesco === value ? colors.primary.main : colors.border,
+                backgroundColor: form.parentesco === value ? colors.primary[50] : colors.background.paper,
+              },
+            ]}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: form.parentesco === value }}
+          >
+            <ThemedText>{t(`auth:contact${value[0].toUpperCase()}${value.slice(1)}`)}</ThemedText>
+          </TouchableOpacity>
+        ))}
+      </View>
       <FormInput
         label={t('profile:phone')}
         value={form.telefono}

@@ -24,6 +24,7 @@ export class UpdateUser {
         email?: string;
         sexo?: string;
         fechaNacimiento?: Date;
+        goal?: string;
         password?: string;
     }): Promise<Result<User, ErrorAbstract>> {
         // 1. Validar ID del usuario
@@ -84,6 +85,14 @@ export class UpdateUser {
             const fechaNacimientoRes = UserFechaNacimiento.create(update.fechaNacimiento);
             if (!fechaNacimientoRes.isValid) return Result.fail(fechaNacimientoRes.getError());
             validatedUpdate.fechaNacimiento = fechaNacimientoRes.getValue();
+        }
+
+        if (update.goal !== undefined) {
+            const goal = update.goal.trim();
+            if (!goal || goal.length > 200) {
+                return Result.fail(new Error("Goal must contain between 1 and 200 characters") as unknown as ErrorAbstract);
+            }
+            validatedUpdate.goal = goal;
         }
 
         if (update.password !== undefined) {
