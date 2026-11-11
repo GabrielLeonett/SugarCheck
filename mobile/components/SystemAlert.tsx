@@ -4,6 +4,7 @@ import { Image, Modal, Pressable, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { ThemedText } from '@/components/themed-text';
+import { GLUCO_GESTURES } from '@/constants/gestures';
 import { Shape } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import type {
@@ -72,6 +73,7 @@ export function SystemAlert({
 
   const hasButtons = Boolean(buttons && buttons.length > 0);
   const isButtonRow = buttons?.length === 2;
+  const alertImage = image ?? (type === 'success' ? GLUCO_GESTURES.risaTotal : undefined);
 
   return (
     <Modal
@@ -100,8 +102,8 @@ export function SystemAlert({
             },
           ]}
         >
-          {image ? (
-            <Image source={image} style={styles.image} resizeMode="contain" />
+          {alertImage ? (
+            <Image source={alertImage} style={styles.image} resizeMode="contain" />
           ) : (
             <View
               style={[

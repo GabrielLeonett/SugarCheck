@@ -7,10 +7,13 @@ interface PreferenceConfigState {
   save: (currentPrefs: Preference) => Promise<void>;
   load: () => Promise<void>;
   changeAvatar: (img: string) => void;
+  reset: () => void;
 }
 
 export const preferenceStore = create<PreferenceConfigState>((set) => ({
   preference: null,
+
+  reset: () => set({ preference: null }),
 
   changeAvatar: (img: string) =>
     set((state) => ({

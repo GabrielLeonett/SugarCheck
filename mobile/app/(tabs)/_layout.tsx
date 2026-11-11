@@ -1,6 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs, usePathname, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -86,14 +86,13 @@ export default function TabLayout() {
   const { t } = useTranslation('common');
   const { colors } = useTheme();
   const router = useRouter();
+  const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const [showQuickRecord, setShowQuickRecord] = useState(false);
   const [activeName, setActiveName] = useState('index');
 
   // Mantener activeName sincronizado con la ruta actual del router
   const updateActiveName = useCallback(() => {
-    const pathname = router.pathname ?? '/(tabs)';
-
     // Quitar el prefijo del grupo de rutas "(tabs)" y barras sobrantes
     // para que funcione tanto "/(tabs)/historial" como "/historial"
     const clean = pathname.replace(/^\/\(tabs\)\/?/, '').replace(/\/+$/, '') || 'index';
@@ -111,7 +110,7 @@ export default function TabLayout() {
     } else {
       setActiveName('index');
     }
-  }, [router]);
+  }, [pathname]);
 
   useEffect(() => {
     updateActiveName();

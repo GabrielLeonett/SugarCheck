@@ -19,6 +19,7 @@ import { ThemedView } from '@/components/themed-view';
 import { H1, H2, Body1, Caption, H4 } from '@/components/ui';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
+import { useGuestStore } from '@/src/stores/guestStore';
 import { showErrorAlert } from '@/src/stores/systemAlertStore';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
@@ -29,6 +30,7 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const login = useAuthStore((s) => s.login);
   const user = useAuthStore((s) => s.user);
+  const pendingImport = useGuestStore((s) => s.pendingImport);
   const loginWithProvider = useAuthStore((s) => s.loginWithProvider);
 
   const [email, setEmail] = useState('');
@@ -51,6 +53,9 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email, password);
+      if (useGuestStore.getState().pendingImport) {
+        router.replace('/auth/import-guest');
+      }
     } catch (error: any) {
       const message =
         error?.response?.data?.message || error?.message || t('auth:loginError');
@@ -66,7 +71,9 @@ export default function LoginScreen() {
       await loginWithProvider(provider);
       const isNew = useAuthStore.getState().isNewUser;
       useAuthStore.getState().clearNewUserFlag();
-      if (isNew) {
+      if (useGuestStore.getState().pendingImport) {
+        router.replace('/auth/import-guest');
+      } else if (isNew) {
         router.replace('/auth/complete-profile');
       }
     } catch (error: any) {
@@ -77,7 +84,7 @@ export default function LoginScreen() {
   };
 
   if (user) {
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href={pendingImport ? '/auth/import-guest' : '/(tabs)'} />;
   }
 
   return (
