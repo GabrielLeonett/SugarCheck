@@ -5,6 +5,7 @@ export interface User {
   sexo: string;
   roles: string[];
   fechaNacimiento: string;
+  goal?: string | null;
   createdAt: string;
 }
 

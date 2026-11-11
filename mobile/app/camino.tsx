@@ -9,6 +9,7 @@ import { PathMap } from '@/components/camino/PathMap';
 import { PathMission } from '@/components/camino/PathMission';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { GLUCO_GESTURES } from '@/constants/gestures';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
   completarNivelCamino,
@@ -73,12 +74,16 @@ export default function CaminoScreen() {
             ns: 'screens',
             badge: t(`warriorPath.badges.${nextBadgeCount - 1}`, { ns: 'screens' }),
           }),
-          t('warriorPath.badgeUnlocked', { ns: 'screens' })
+          t('warriorPath.badgeUnlocked', { ns: 'screens' }),
+          undefined,
+          GLUCO_GESTURES.sorpresaTotal
         );
       } else {
         showSuccessAlert(
           t('warriorPath.levelCompleted', { ns: 'screens', level }),
-          t('warriorPath.levelCompletedTitle', { ns: 'screens' })
+          t('warriorPath.levelCompletedTitle', { ns: 'screens' }),
+          undefined,
+          GLUCO_GESTURES.ataqueVictoria
         );
       }
       return true;

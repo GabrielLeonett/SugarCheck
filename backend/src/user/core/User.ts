@@ -18,6 +18,7 @@ interface UserProps {
   sexo: UserSexo;
   createdAt: UserCreatedAt;
   fechaNacimiento: UserFechaNacimiento;
+  goal?: string | null;
 }
 
 export interface UserPlain {
@@ -30,6 +31,7 @@ export interface UserPlain {
   sexo: string;
   createdAt: Date;
   fechaNacimiento: Date;
+  goal: string | null;
 }
 
 export class User {
@@ -42,6 +44,7 @@ export class User {
   private readonly _sexo: UserSexo;
   private readonly _createdAt: UserCreatedAt;
   private readonly _fechaNacimiento: UserFechaNacimiento;
+  private readonly _goal: string | null;
 
   constructor(props: UserProps) {
     this._id = props.id;
@@ -52,6 +55,7 @@ export class User {
     this._roles = props.roles;
     this._sexo = props.sexo;
     this._fechaNacimiento = props.fechaNacimiento;
+    this._goal = props.goal ?? null;
     this._createdAt = props.createdAt;
   }
 
@@ -79,6 +83,9 @@ export class User {
   get fechaNacimiento(): UserFechaNacimiento {
     return this._fechaNacimiento;
   }
+  get goal(): string | null {
+    return this._goal;
+  }
   get password(): UserPassword {
     return this._password;
   }
@@ -94,6 +101,7 @@ export class User {
       sexo: this._sexo.value,
       createdAt: this._createdAt.value,
       fechaNacimiento: this._fechaNacimiento.value,
+      goal: this._goal,
     };
   }
 }
