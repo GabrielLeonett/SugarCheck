@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
@@ -12,6 +13,8 @@ import { Modal } from '@/components/Modal';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useTheme } from '@/contexts/ThemeContext';
+import { imcApi } from '@/src/apis/imc';
+import { showErrorAlert, showSuccessAlert } from '@/src/stores/systemAlertStore';
 
 interface PhysicalRecord {
   id: string;
@@ -22,12 +25,6 @@ interface PhysicalRecord {
   estado: string;
 }
 
-const INITIAL_RECORDS: PhysicalRecord[] = [
-  { id: '1', fecha: '25/05/2026', peso: 54.2, estatura: 158, imc: 21.7, estado: 'Normal' },
-  { id: '2', fecha: '12/04/2026', peso: 63.5, estatura: 158, imc: 25.4, estado: 'Sobrepeso' },
-  { id: '3', fecha: '02/03/2026', peso: 65.0, estatura: 157, imc: 26.4, estado: 'Sobrepeso' },
-];
-
 function withAlpha(hex: string, opacity: number) {
   const alpha = Math.round(opacity * 255)
     .toString(16)
@@ -36,46 +33,64 @@ function withAlpha(hex: string, opacity: number) {
 }
 
 export default function MonitoreoFisicoScreen() {
+  const { t } = useTranslation(['screens', 'common']);
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [records, setRecords] = useState<PhysicalRecord[]>(INITIAL_RECORDS);
+  const [records, setRecords] = useState<PhysicalRecord[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [peso, setPeso] = useState('');
   const [estatura, setEstatura] = useState('');
   const [fecha, setFecha] = useState(new Date());
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const loadRecords = useCallback(async () => {
+    setLoading(true);
+    try {
+      setRecords(await imcApi.getAll());
+    } catch (error: any) {
+      showErrorAlert(error?.response?.data?.message || t('screens:physicalForm.loadError'));
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    loadRecords();
+  }, [loadRecords]);
 
   const latest = records[0];
 
-  const handleSave = () => {
-    if (!peso || !estatura) {
-      Alert.alert('Error', 'Ingresa peso y estatura');
+  const handleSave = async () => {
+    const pesoNum = Number(peso);
+    const estaturaNum = Number(estatura);
+    if (!Number.isFinite(pesoNum) || pesoNum <= 0 || pesoNum >= 700) {
+      showErrorAlert(t('screens:physicalForm.invalidWeight'));
+      return;
+    }
+    if (!Number.isFinite(estaturaNum) || estaturaNum <= 0 || estaturaNum >= 280) {
+      showErrorAlert(t('screens:physicalForm.invalidHeight'));
       return;
     }
 
-    const pesoNum = parseFloat(peso);
-    const estaturaNum = parseFloat(estatura);
-    const estaturaMetros = estaturaNum / 100;
-    const imc = pesoNum / (estaturaMetros * estaturaMetros);
-
-    let estado = 'Normal';
-    if (imc < 18.5) estado = 'Bajo peso';
-    else if (imc >= 25) estado = 'Sobrepeso';
-
-    const newRecord: PhysicalRecord = {
-      id: String(records.length + 1),
-      fecha: fecha.toLocaleDateString('es-ES'),
-      peso: pesoNum,
-      estatura: estaturaNum,
-      imc: parseFloat(imc.toFixed(1)),
-      estado,
-    };
-
-    setRecords([newRecord, ...records]);
-    setShowModal(false);
-    setPeso('');
-    setEstatura('');
-    Alert.alert('Guardado', 'Medición registrada');
+    setSaving(true);
+    try {
+      const record = await imcApi.create({
+        peso: pesoNum,
+        estatura: estaturaNum,
+        fecha: fecha.toISOString(),
+      });
+      setRecords((previous) => [record, ...previous]);
+      setShowModal(false);
+      setPeso('');
+      setEstatura('');
+      showSuccessAlert(t('screens:physicalForm.saved'));
+    } catch (error: any) {
+      showErrorAlert(error?.response?.data?.message || t('screens:physicalForm.saveError'));
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getStatusColor = (estado: string) =>
@@ -94,17 +109,17 @@ export default function MonitoreoFisicoScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common:back')}
         >
           <FontAwesome name="arrow-left" size={20} color={colors.text.primary} />
         </TouchableOpacity>
 
         <View style={styles.header}>
           <ThemedText type="h4" style={styles.title}>
-            Monitoreo físico
+            {t('screens:physicalForm.title')}
           </ThemedText>
           <Button
-            title="Nuevo"
+            title={t('screens:physicalForm.new')}
             onPress={() => setShowModal(true)}
             icon={
               <FontAwesome
@@ -119,10 +134,12 @@ export default function MonitoreoFisicoScreen() {
           />
         </View>
 
-        {latest && (
+        {loading ? (
+          <ThemedText muted style={styles.emptyMessage}>{t('screens:physicalForm.loading')}</ThemedText>
+        ) : latest ? (
           <Card style={styles.currentCard}>
             <ThemedText type="defaultSemiBold" style={styles.currentTitle}>
-              Última medición
+              {t('screens:physicalForm.latest')}
             </ThemedText>
             <View style={styles.metricsRow}>
               <View style={styles.metric}>
@@ -161,10 +178,12 @@ export default function MonitoreoFisicoScreen() {
               </ThemedText>
             </View>
           </Card>
+        ) : (
+          <ThemedText muted style={styles.emptyMessage}>{t('screens:physicalForm.noRecords')}</ThemedText>
         )}
 
         <ThemedText type="defaultSemiBold" style={styles.historyTitle}>
-          Historial
+          {t('screens:history.title')}
         </ThemedText>
         {records.map((record) => (
           <Card key={record.id} style={styles.recordCard}>
@@ -185,24 +204,24 @@ export default function MonitoreoFisicoScreen() {
 
       <Modal visible={showModal} onClose={() => setShowModal(false)}>
         <ThemedText type="h6" style={styles.modalTitle}>
-          Registrar medición
+          {t('screens:physicalForm.register')}
         </ThemedText>
         <FormInput
-          label="Peso (kg)"
+          label={t('screens:physicalForm.weight')}
           value={peso}
           onChangeText={setPeso}
           placeholder="Ej: 70"
           keyboardType="numeric"
         />
         <FormInput
-          label="Estatura (cm)"
+          label={t('screens:physicalForm.height')}
           value={estatura}
           onChangeText={setEstatura}
           placeholder="Ej: 170"
           keyboardType="numeric"
         />
-        <DatePickerField label="Fecha" value={fecha} onChange={setFecha} />
-        <Button title="Guardar" onPress={handleSave} style={styles.saveButton} />
+        <DatePickerField label={t('screens:physicalForm.date')} value={fecha} onChange={setFecha} />
+        <Button title={t('screens:physicalForm.save')} onPress={handleSave} loading={saving} style={styles.saveButton} />
       </Modal>
     </ThemedView>
   );
@@ -234,6 +253,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   historyTitle: { marginBottom: 12 },
+  emptyMessage: { textAlign: 'center', marginVertical: 20 },
   recordCard: { padding: 16, marginBottom: 8 },
   recordRow: { flexDirection: 'row', alignItems: 'center' },
   recordContent: { flex: 1 },

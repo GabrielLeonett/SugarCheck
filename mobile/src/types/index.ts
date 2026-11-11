@@ -8,6 +8,17 @@ export interface User {
   createdAt: string;
 }
 
+export interface CorrectionSchemaItem {
+  rangeMin: number;
+  rangeMax: number;
+  dose: number;
+}
+
+export interface BasalSchemaItem {
+  injectionTime: string;
+  dose: number;
+}
+
 export interface BackendErrorResponse {
   message: string;
   statusCode?: number;
@@ -35,8 +46,8 @@ export interface Preference {
   sensitivity?: number;
   locale: string;
   theme: string;
-  correctionSchemas?: any;
-  basalSchemas?: any;
+  correctionSchemas?: CorrectionSchemaItem[];
+  basalSchemas?: BasalSchemaItem[];
 }
 
 export interface ContactEmergenceData {

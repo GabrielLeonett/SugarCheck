@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
@@ -12,8 +13,10 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
 import { preferenceApi } from '@/src/apis/preference';
 import { contactEmergenceApi } from '@/src/apis/contact-emergence';
+import { showErrorAlert } from '@/src/stores/systemAlertStore';
 
 export default function CompleteProfileScreen() {
+  const { t } = useTranslation(['auth', 'common', 'profile']);
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -62,7 +65,7 @@ export default function CompleteProfileScreen() {
 
       router.replace('/(tabs)');
     } catch {
-      Alert.alert('Error', 'Error al guardar los datos');
+      showErrorAlert(t('auth:registerError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -82,40 +85,40 @@ export default function CompleteProfileScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <ThemedText type="h4" style={styles.title}>
-          Completa tu perfil
+          {t('auth:completeProfileTitle')}
         </ThemedText>
         <ThemedText muted style={styles.subtitle}>
-          Prepara tus estadísticas y convoca a tus guardianes
+          {t('auth:completeProfileSubtitle')}
         </ThemedText>
 
         <View style={styles.form}>
           <ThemedText type="defaultSemiBold" style={styles.sectionTitle}>
-            Datos de Salud
+            {t('auth:healthData')}
           </ThemedText>
 
           <FormInput
-            label="Peso (kg)"
+            label={t('auth:weight')}
             value={formData.peso}
             onChangeText={(value) => updateField('peso', value)}
             placeholder="Ej: 70"
             keyboardType="numeric"
           />
           <FormInput
-            label="Talla (cm)"
+            label={t('auth:height')}
             value={formData.talla}
             onChangeText={(value) => updateField('talla', value)}
             placeholder="Ej: 170"
             keyboardType="numeric"
           />
           <FormInput
-            label="Glucosa mínima (hipo)"
+            label={t('auth:minimumGlucose')}
             value={formData.glucosaMin}
             onChangeText={(value) => updateField('glucosaMin', value)}
             placeholder="Ej: 70"
             keyboardType="numeric"
           />
           <FormInput
-            label="Glucosa máxima (hiper)"
+            label={t('auth:maximumGlucose')}
             value={formData.glucosaMax}
             onChangeText={(value) => updateField('glucosaMax', value)}
             placeholder="Ej: 180"
@@ -123,38 +126,38 @@ export default function CompleteProfileScreen() {
           />
 
           <ThemedText type="defaultSemiBold" style={styles.sectionTitle}>
-            Contacto de Emergencia
+            {t('auth:emergencyContact')}
           </ThemedText>
 
           <FormInput
-            label="Nombre del contacto"
+            label={t('auth:contactName')}
             value={formData.nombreGuardian}
             onChangeText={(value) => updateField('nombreGuardian', value)}
-            placeholder="Nombre del familiar/amigo"
+            placeholder={t('auth:contactPlaceholder')}
             autoCapitalize="words"
           />
           <FormInput
-            label="Parentesco"
+            label={t('profile:relationship')}
             value={formData.parentesco}
             onChangeText={(value) => updateField('parentesco', value)}
-            placeholder="madre, padre, tutor, otro"
+            placeholder={t('profile:relationshipPlaceholder')}
           />
           <FormInput
-            label="Teléfono (opcional)"
+            label={t('auth:phoneOptional')}
             value={formData.telefono}
             onChangeText={(value) => updateField('telefono', value)}
-            placeholder="+58 412..."
+            placeholder={t('profile:phonePlaceholder')}
             keyboardType="phone-pad"
           />
         </View>
 
         <View style={styles.buttons}>
-          <Button title="Omitir" onPress={handleSkip} variant="outlined" style={styles.button} />
-          <Button title="Guardar" onPress={handleSubmit} loading={isSubmitting} style={styles.button} />
+          <Button title={t('auth:skip')} onPress={handleSkip} variant="outlined" style={styles.button} />
+          <Button title={t('common:save')} onPress={handleSubmit} loading={isSubmitting} style={styles.button} />
         </View>
 
         <ThemedText muted style={[styles.footer, { color: colors.text.secondary }]}>
-          Podrás cambiar estos datos más tarde desde tu perfil.
+          {t('auth:completeProfileLater')}
         </ThemedText>
       </ScrollView>
     </ThemedView>

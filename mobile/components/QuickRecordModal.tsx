@@ -1,7 +1,8 @@
 import React from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
@@ -15,6 +16,7 @@ interface QuickRecordModalProps {
 }
 
 export function QuickRecordModal({ visible, onClose }: QuickRecordModalProps) {
+  const { t } = useTranslation(['screens', 'common']);
   const { colors } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -32,13 +34,13 @@ export function QuickRecordModal({ visible, onClose }: QuickRecordModalProps) {
 
         <ThemedView variant="paper" style={[styles.container, { paddingBottom: Math.max(insets.bottom, 16) }]}>
           <ThemedText type="h5" style={styles.title}>
-            Registro rápido
+            {t('screens:quickRecord.title')}
           </ThemedText>
 
           <View style={styles.options}>
             <QuickOption
               icon="heartbeat"
-              label="Registrar glucosa"
+              label={t('screens:quickRecord.glucose')}
               color={colors.success.main}
               onPress={() => {
                 onClose();
@@ -47,7 +49,7 @@ export function QuickRecordModal({ visible, onClose }: QuickRecordModalProps) {
             />
             <QuickOption
               icon="clock-o"
-              label="Registrar insulina"
+              label={t('screens:quickRecord.insulin')}
               color={colors.info.main}
               onPress={() => {
                 onClose();
@@ -56,7 +58,7 @@ export function QuickRecordModal({ visible, onClose }: QuickRecordModalProps) {
             />
             <QuickOption
               icon="balance-scale"
-              label="Monitoreo físico"
+              label={t('screens:quickRecord.bmi')}
               color={colors.warning.main}
               onPress={() => {
                 onClose();
@@ -66,7 +68,7 @@ export function QuickRecordModal({ visible, onClose }: QuickRecordModalProps) {
           </View>
 
           <Button
-            title="Cancelar"
+            title={t('common:cancel')}
             onPress={onClose}
             variant="text"
             style={styles.cancelButton}
