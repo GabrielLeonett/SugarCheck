@@ -5,22 +5,53 @@ import {
   pushChanges,
   addPendingChange,
   makeSyncRecord,
-  TO_SYNC_RECORD,
   FROM_SYNC_RECORD,
   type SyncTableName,
 } from '@/src/sync';
 
 const TABLE: SyncTableName = 'imc';
 
+interface ImcBackendRecord {
+  id: string;
+  peso: number;
+  altura: number;
+  imcValue: number;
+  categoria: string;
+  fecha: string;
+}
+
+function formatFecha(fecha: string): string {
+  const date = new Date(fecha);
+  return `${String(date.getUTCDate()).padStart(2, '0')}/${String(date.getUTCMonth() + 1).padStart(2, '0')}/${date.getUTCFullYear()}`;
+}
+
+function mapRecord(record: ImcBackendRecord): PhysicalRecord {
+  return {
+    id: record.id,
+    fecha: formatFecha(record.fecha),
+    peso: record.peso,
+    estatura: record.altura,
+    imc: record.imcValue,
+    estado: record.categoria,
+  };
+}
+
 export const imcApi = {
   async getAll(): Promise<PhysicalRecord[]> {
     const res = await apiPrivate.get('/imc');
-    return res.data as PhysicalRecord[];
+    return (res.data as ImcBackendRecord[]).map(mapRecord);
   },
 
   async create(dto: { peso: number; estatura: number; fecha: string }): Promise<PhysicalRecord> {
-    const res = await apiPrivate.post('/imc', dto);
-    return res.data as PhysicalRecord;
+    const date = new Date(dto.fecha);
+    const res = await apiPrivate.post('/imc', {
+      peso: dto.peso,
+      altura: dto.estatura,
+      dia: date.getDate(),
+      mes: date.getMonth() + 1,
+      anio: date.getFullYear(),
+    });
+    return mapRecord(res.data as ImcBackendRecord);
   },
 };
 

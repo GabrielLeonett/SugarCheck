@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {
   Box, Typography, Grid, LinearProgress, Button, ButtonGroup, Alert, CircularProgress,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
 import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
@@ -25,6 +26,7 @@ interface SeccionGlucemiaProps {
 }
 
 export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProps) {
+  const theme = useTheme();
   const { t } = useLanguage("glucemia");
   const { t: tEdit } = useLanguage('editRecord');
   const [editing, setEditing] = useState<GlucosaRecord | null>(null);
@@ -70,6 +72,12 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
       emptyMessage={t('grafico.sinDatos')}
     />
   );
+  const rangeDominanceColor =
+    dataHook.porcentajeZonaSegura >= 70
+      ? theme.palette.success.main
+      : dataHook.porcentajeZonaSegura >= 50
+        ? theme.palette.warning.main
+        : theme.palette.error.main;
 
   const filterComponent = (
     <ButtonGroup variant="outlined" size="small" aria-label={t('grafico.filtros.ariaLabel')} sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
@@ -135,14 +143,18 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
                 <Typography variant="subtitle1" sx={{ fontWeight: 600, textAlign: "center"}}>
                   {t('zonaSegura.title')}
                 </Typography>
-                <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "error.light", textAlign: "center" }}>
+                <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: rangeDominanceColor, textAlign: "center" }}>
                   {dataHook.porcentajeZonaSegura}%
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", mt: 1 }}>
                   {t('zonaSegura.caption')}
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "error.light" }}>
-                  {dataHook.porcentajeZonaSegura < 50 ? t('zonaSegura.alertaBaja') : t('zonaSegura.alertaNormal')}
+                <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: rangeDominanceColor }}>
+                  {dataHook.porcentajeZonaSegura >= 70
+                    ? t('zonaSegura.alertaNormal')
+                    : dataHook.porcentajeZonaSegura >= 50
+                      ? t('zonaSegura.alertaAdvertencia')
+                      : t('zonaSegura.alertaBaja')}
                 </Typography>
               </CardBase>
             )}
@@ -155,8 +167,8 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, width: "100%" }}>
                 {[
-                  { label: t('frecuenciaAlertas.hiperglucemias'), pct: dataHook.porcentajeHiper, count: dataHook.cantHiperglucemias, barColor: 'warning.light' },
-                  { label: t('frecuenciaAlertas.hipoglucemias'), pct: dataHook.porcentajeHipo, count: dataHook.cantHipoglucemias, barColor: 'info.light' },
+                  { label: t('frecuenciaAlertas.hiperglucemias'), pct: dataHook.porcentajeHiper, count: dataHook.cantHiperglucemias, barColor: 'warning.main' },
+                  { label: t('frecuenciaAlertas.hipoglucemias'), pct: dataHook.porcentajeHipo, count: dataHook.cantHipoglucemias, barColor: 'error.main' },
                   { label: t('frecuenciaAlertas.enRango'), pct: dataHook.porcentajeEnRango, count: dataHook.cantEnRango, barColor: 'success.light' },
                 ].map((item) => (
                   <Box key={item.label} sx={{ display: "flex", alignItems: "center", width: "100%" }}>

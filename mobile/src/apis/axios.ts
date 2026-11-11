@@ -1,4 +1,5 @@
 import { create } from 'axios';
+import i18n from '@/src/i18n';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
@@ -15,6 +16,7 @@ export const apiPublic = create({
 
 apiPrivate.interceptors.request.use(
   async (config) => {
+    config.headers['Accept-Language'] = i18n.resolvedLanguage ?? i18n.language;
     const { useAuthStore } = await import('../stores/authStore');
     const token = useAuthStore.getState().accessToken;
     if (token && !config.headers['Authorization']) {

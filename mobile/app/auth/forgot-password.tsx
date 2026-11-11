@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,6 +8,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
@@ -18,8 +18,10 @@ import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { authApi } from '@/src/apis/auth';
+import { showErrorAlert } from '@/src/stores/systemAlertStore';
 
 export default function ForgotPasswordScreen() {
+  const { t } = useTranslation(['auth', 'common']);
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -29,7 +31,7 @@ export default function ForgotPasswordScreen() {
 
   const handleSubmit = async () => {
     if (!email) {
-      Alert.alert('Error', 'Ingresa tu correo electrónico');
+      showErrorAlert(t('auth:forgotEmailRequired'));
       return;
     }
     setLoading(true);
@@ -38,8 +40,8 @@ export default function ForgotPasswordScreen() {
       setSent(true);
     } catch (error: any) {
       const message =
-        error?.response?.data?.message || error?.message || 'Error al enviar solicitud';
-      Alert.alert('Error', message);
+        error?.response?.data?.message || error?.message || t('auth:forgotRequestError');
+      showErrorAlert(message);
     } finally {
       setLoading(false);
     }
@@ -58,23 +60,23 @@ export default function ForgotPasswordScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common:back')}
         >
           <FontAwesome name="arrow-left" size={20} color={colors.text.primary} />
         </TouchableOpacity>
 
         <ThemedText type="h4" style={styles.title}>
-          Recuperar contraseña
+          {t('auth:forgotTitle')}
         </ThemedText>
 
         {sent ? (
           <View style={styles.sentContainer}>
             <FontAwesome name="check-circle" size={64} color={colors.success.main} />
             <Text style={[styles.sentText, { color: colors.text.primary }]}>
-              Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña.
+              {t('auth:forgotSent')}
             </Text>
             <Button
-              title="Volver al inicio"
+              title={t('auth:backToHome')}
               onPress={() => router.push('/auth/login')}
               style={styles.sentButton}
             />
@@ -82,14 +84,14 @@ export default function ForgotPasswordScreen() {
         ) : (
           <>
             <FormInput
-              label="Correo electrónico"
+              label={t('common:email')}
               value={email}
               onChangeText={setEmail}
-              placeholder="correo@ejemplo.com"
+              placeholder={t('auth:emailPlaceholder')}
               keyboardType="email-address"
             />
             <Button
-              title="Enviar solicitud"
+              title={t('auth:sendRequest')}
               onPress={handleSubmit}
               loading={loading}
               style={styles.submitButton}

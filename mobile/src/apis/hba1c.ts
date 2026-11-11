@@ -5,22 +5,39 @@ import {
   pushChanges,
   addPendingChange,
   makeSyncRecord,
-  TO_SYNC_RECORD,
   FROM_SYNC_RECORD,
   type SyncTableName,
 } from '@/src/sync';
 
 const TABLE: SyncTableName = 'hba1c';
 
+interface HbA1cBackendRecord {
+  id: string;
+  valuePercent: number;
+  examDate: string;
+}
+
+function mapRecord(record: HbA1cBackendRecord): HbA1cRecord {
+  const date = new Date(record.examDate);
+  return {
+    id: record.id,
+    resultado: record.valuePercent,
+    fecha: date.toLocaleDateString('es-ES'),
+  };
+}
+
 export const hba1cApi = {
   async getAll(): Promise<HbA1cRecord[]> {
     const res = await apiPrivate.get('/hba1c');
-    return res.data as HbA1cRecord[];
+    return (res.data as HbA1cBackendRecord[]).map(mapRecord);
   },
 
   async create(dto: { resultado: number; fecha: string }): Promise<HbA1cRecord> {
-    const res = await apiPrivate.post('/hba1c', dto);
-    return res.data as HbA1cRecord;
+    const res = await apiPrivate.post('/hba1c', {
+      valuePercent: dto.resultado,
+      examDate: dto.fecha,
+    });
+    return mapRecord(res.data as HbA1cBackendRecord);
   },
 };
 

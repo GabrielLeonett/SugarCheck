@@ -2,8 +2,8 @@ import React from 'react';
 import {
   Keyboard,
   Modal as RNModal,
+  Pressable,
   StyleSheet,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -29,24 +29,27 @@ export function Modal({ visible, onClose, children }: ModalProps) {
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={[styles.overlay, { backgroundColor: colors.overlay }]}>
-          <TouchableWithoutFeedback>
-            <View
-              style={[
-                styles.content,
-                {
-                  backgroundColor: colors.background.paper,
-                  paddingBottom: Math.max(insets.bottom, 24) + 16,
-                },
-              ]}
-            >
-              <View style={[styles.handle, { backgroundColor: colors.divider }]} />
-              {children}
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
+      <Pressable
+        style={[styles.overlay, { backgroundColor: colors.overlay }]}
+        onPress={() => {
+          Keyboard.dismiss();
+          onClose();
+        }}
+      >
+        <Pressable
+          style={[
+            styles.content,
+            {
+              backgroundColor: colors.background.paper,
+              paddingBottom: Math.max(insets.bottom, 24) + 16,
+            },
+          ]}
+          onPress={(event) => event.stopPropagation()}
+        >
+          <View style={[styles.handle, { backgroundColor: colors.divider }]} />
+          {children}
+        </Pressable>
+      </Pressable>
     </RNModal>
   );
 }

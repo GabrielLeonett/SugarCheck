@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Card } from '@/components/card';
 import { ThemedText } from '@/components/themed-text';
@@ -11,13 +12,14 @@ import { useTheme } from '@/contexts/ThemeContext';
 
 export default function AgentScreen() {
   const { colors } = useTheme();
+  const { t } = useTranslation('screens');
   const insets = useSafeAreaInsets();
 
   return (
     <ThemedView style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <ThemedText type="title" style={{ fontSize: 24 }}>
-          Oráculo Azul
+          {t('agent.title')}
         </ThemedText>
       </View>
 
@@ -25,17 +27,16 @@ export default function AgentScreen() {
         <Card style={styles.card}>
           <FontAwesome name="android" size={48} color={colors.primary.main} />
           <ThemedText type="h6" style={styles.cardTitle}>
-            Tu asistente inteligente
+            {t('agent.cardTitle')}
           </ThemedText>
           <ThemedText muted style={styles.description}>
-            El Oráculo Azul te ayudará a interpretar tus niveles de glucosa, recomendarte comidas y
-            recordarte tus dosis de insulina.
+            {t('agent.description')}
           </ThemedText>
 
           <View style={styles.features}>
-            <Feature icon="comments" text="Consejos personalizados" color={colors.primary.main} />
-            <Feature icon="bell" text="Recordatorios inteligentes" color={colors.primary.main} />
-            <Feature icon="bar-chart" text="Análisis de tendencias" color={colors.primary.main} />
+            <Feature icon="comments" text={t('agent.personalizedAdvice')} color={colors.primary.main} />
+            <Feature icon="bell" text={t('agent.reminders')} color={colors.primary.main} />
+            <Feature icon="bar-chart" text={t('agent.trends')} color={colors.primary.main} />
           </View>
         </Card>
       </View>

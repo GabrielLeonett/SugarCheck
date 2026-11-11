@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,6 +8,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
@@ -20,8 +20,10 @@ import { Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
 import { authApi } from '@/src/apis/auth';
+import { showErrorAlert } from '@/src/stores/systemAlertStore';
 
 export default function RegisterScreen() {
+  const { t } = useTranslation(['auth', 'common']);
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -44,14 +46,14 @@ export default function RegisterScreen() {
 
   const validateStep1 = () => {
     const errs: Record<string, string> = {};
-    if (!formData.nombre) errs.nombre = 'Nombre requerido';
-    if (!formData.sexo) errs.sexo = 'Selecciona un sexo';
-    if (!formData.email) errs.email = 'Correo requerido';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) errs.email = 'Correo inválido';
-    if (!formData.password) errs.password = 'Contraseña requerida';
-    else if (formData.password.length < 6) errs.password = 'Mínimo 6 caracteres';
+    if (!formData.nombre) errs.nombre = t('auth:nameRequired');
+    if (!formData.sexo) errs.sexo = t('auth:selectSex');
+    if (!formData.email) errs.email = t('auth:emailRequired');
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) errs.email = t('auth:emailInvalid');
+    if (!formData.password) errs.password = t('auth:passwordRequired');
+    else if (formData.password.length < 6) errs.password = t('auth:passwordMin');
     if (formData.password !== formData.confirmPassword) {
-      errs.confirmPassword = 'Las contraseñas no coinciden';
+      errs.confirmPassword = t('auth:passwordsMismatch');
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -73,8 +75,8 @@ export default function RegisterScreen() {
       router.push('/auth/complete-profile');
     } catch (error: any) {
       const message =
-        error?.response?.data?.message || error?.message || 'Error al registrarse';
-      Alert.alert('Error', message);
+        error?.response?.data?.message || error?.message || t('auth:registerError');
+      showErrorAlert(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -93,34 +95,34 @@ export default function RegisterScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common:back')}
         >
           <FontAwesome name="arrow-left" size={20} color={colors.text.primary} />
         </TouchableOpacity>
 
         <ThemedText type="h4" style={styles.title}>
-          Crear cuenta
+          {t('auth:registerTitle')}
         </ThemedText>
 
         <View style={styles.form}>
           <FormInput
-            label="Nombre completo"
+            label={t('auth:fullName')}
             value={formData.nombre}
             onChangeText={(value) => updateField('nombre', value)}
-            placeholder="Tu nombre"
+            placeholder={t('auth:yourName')}
             autoCapitalize="words"
             error={errors.nombre}
           />
           <FormInput
-            label="Correo electrónico"
+            label={t('common:email')}
             value={formData.email}
             onChangeText={(value) => updateField('email', value)}
-            placeholder="correo@ejemplo.com"
+            placeholder={t('auth:emailPlaceholder')}
             keyboardType="email-address"
             error={errors.email}
           />
           <FormInput
-            label="Contraseña"
+            label={t('common:password')}
             value={formData.password}
             onChangeText={(value) => updateField('password', value)}
             placeholder="••••••"
@@ -128,7 +130,7 @@ export default function RegisterScreen() {
             error={errors.password}
           />
           <FormInput
-            label="Confirmar contraseña"
+            label={t('auth:confirmPassword')}
             value={formData.confirmPassword}
             onChangeText={(value) => updateField('confirmPassword', value)}
             placeholder="••••••"
@@ -136,30 +138,30 @@ export default function RegisterScreen() {
             error={errors.confirmPassword}
           />
           <FormInput
-            label="Sexo"
+            label={t('common:sex')}
             value={formData.sexo}
             onChangeText={(value) => updateField('sexo', value)}
-            placeholder="masculino / femenino"
+            placeholder={t('auth:sexPlaceholder')}
             error={errors.sexo}
           />
           <DatePickerField
-            label="Fecha de nacimiento"
+            label={t('common:dateOfBirth')}
             value={formData.fechaNacimiento}
             onChange={(date) => updateField('fechaNacimiento', date)}
           />
         </View>
 
         <View style={styles.buttons}>
-          <Button title="Crear cuenta" onPress={handleSubmit} loading={isSubmitting} />
+          <Button title={t('auth:register')} onPress={handleSubmit} loading={isSubmitting} />
         </View>
 
         <View style={styles.footer}>
           <Text style={[styles.footerText, { color: colors.text.secondary }]}>
-            ¿Ya tienes cuenta?
+            {t('auth:alreadyAccount')}
           </Text>
           <TouchableOpacity onPress={() => router.push('/auth/login')} activeOpacity={0.7}>
             <Text style={[styles.link, { color: colors.primary.main, marginLeft: 4 }]}>
-              Inicia sesión
+              {t('auth:login')}
             </Text>
           </TouchableOpacity>
         </View>

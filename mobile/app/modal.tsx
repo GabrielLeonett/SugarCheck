@@ -1,5 +1,5 @@
 import { Link, Stack } from 'expo-router';
-import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -11,8 +11,12 @@ import { useTheme } from '@/contexts/ThemeContext';
 const ACTIONS = [
   { href: '/bitacora/glucosa', icon: 'heartbeat', label: 'Registrar glucosa' },
   { href: '/bitacora/insulina', icon: 'clock-o', label: 'Registrar insulina' },
-  { href: '/bitacora/monitoreo-fisico', icon: 'balance-scale', label: 'Monitoreo físico' },
-  { href: '/camino', icon: 'road', label: 'Camino del Guerrero' },
+  { href: '/bitacora/monitoreo-fisico', icon: 'balance-scale', label: 'Registro de IMC' },
+  {
+    href: '/camino',
+    image: require('../assets/tabbar/colina.png'),
+    label: 'Camino del Guerrero',
+  },
 ] as const;
 
 export default function ModalScreen() {
@@ -39,7 +43,11 @@ export default function ModalScreen() {
               style={[styles.actionItem, { borderColor: colors.primary.main }]}
               activeOpacity={0.8}
             >
-              <FontAwesome name={action.icon as any} size={24} color={colors.primary.main} />
+              {'image' in action ? (
+                <Image source={action.image} style={styles.actionIcon} resizeMode="contain" />
+              ) : (
+                <FontAwesome name={action.icon} size={24} color={colors.primary.main} />
+              )}
               <ThemedText type="defaultSemiBold" style={styles.actionLabel}>
                 {action.label}
               </ThemedText>
@@ -68,6 +76,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1.5,
     borderRadius: 12,
+  },
+  actionIcon: {
+    width: 24,
+    height: 24,
   },
   actionLabel: {
     marginLeft: 16,

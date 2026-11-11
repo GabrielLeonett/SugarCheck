@@ -13,7 +13,7 @@ import type { GlucosaRecord, HbA1cRecord } from '../data/recordsMock';
 export const obtenerColorEstado = (estado: string) => {
   switch (estado) {
     case 'Alto': case 'Elevado': return 'warning.light';
-    case 'Bajo': return 'info.light';
+    case 'Bajo': return 'error.light';
     case 'Normal': case 'En Meta': return 'success.light';
     default: return 'text.primary';
   }

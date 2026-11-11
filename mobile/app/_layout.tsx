@@ -6,13 +6,15 @@ import {
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { SystemAlertHost } from '@/components/SystemAlertHost';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
+import { initializeAppLanguage } from '@/src/i18n';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   // La pantalla de splash puede no estar disponible en web.
@@ -31,6 +33,7 @@ export default function RootLayout() {
 function RootLayoutContent() {
   const { colors, isDark, isReady } = useTheme();
   const { isAuthLoading, refresh, setLoading } = useAuthStore();
+  const [languageReady, setLanguageReady] = useState(false);
 
   const [fontsLoaded, fontError] = useFonts({
     'Poppins-Light': require('../assets/fonts/Poppins_300Light.ttf'),
@@ -55,7 +58,15 @@ function RootLayoutContent() {
     init();
   }, [refresh, setLoading]);
 
-  const appReady = (fontsLoaded || Boolean(fontError)) && isReady && !isAuthLoading;
+  useEffect(() => {
+    initializeAppLanguage()
+      .catch((error) => {
+        console.error('No se pudo cargar el idioma guardado:', error);
+      })
+      .finally(() => setLanguageReady(true));
+  }, []);
+
+  const appReady = (fontsLoaded || Boolean(fontError)) && isReady && !isAuthLoading && languageReady;
 
   useEffect(() => {
     if (appReady) {
@@ -97,6 +108,7 @@ function RootLayoutContent() {
         <Stack.Screen name="bitacora/monitoreo-fisico" options={{ presentation: 'modal' }} />
       </Stack>
       <StatusBar style={isDark ? 'light' : 'dark'} />
+      <SystemAlertHost />
     </NavigationThemeProvider>
   );
 }

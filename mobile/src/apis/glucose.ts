@@ -66,6 +66,16 @@ export const glucoseApi = {
       .map(mapRecord)
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   },
+
+  async create(dto: {
+    valueMgdl: number;
+    mealTag: string;
+    date: string;
+    time: string;
+  }): Promise<GlucoseEntry> {
+    const res = await apiPrivate.post('/glucose', dto);
+    return mapRecord(res.data as GlucoseBackendRecord);
+  },
 };
 
 /*─────────────────────────────────────────────────────────────────────────────*/

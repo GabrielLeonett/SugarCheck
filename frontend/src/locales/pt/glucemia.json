@@ -18,6 +18,7 @@
     "title": "Tempo no Alvo (Zona Segura)",
     "caption": "Tempo no intervalo",
     "alertaBaja": "Níveis baixos. Revise seus registros e aja",
+    "alertaAdvertencia": "O tempo na faixa pode melhorar. Continue monitorando seus níveis",
     "alertaNormal": "Níveis estáveis dentro da faixa segura",
     "alertaAlta": "Níveis altos. Monitore sua situação e aja"
   },

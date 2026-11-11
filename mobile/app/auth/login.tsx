@@ -1,15 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Alert,
   Image,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Redirect, useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
@@ -20,12 +19,11 @@ import { ThemedView } from '@/components/themed-view';
 import { H1, H2, Body1, Caption, H4 } from '@/components/ui';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
-
-const LANGUAGE_STORAGE_KEY = 'app_language';
-
-type AppLanguage = 'es' | 'en';
+import { showErrorAlert } from '@/src/stores/systemAlertStore';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 export default function LoginScreen() {
+  const { t } = useTranslation(['auth', 'common']);
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -38,66 +36,12 @@ export default function LoginScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | 'facebook' | null>(null);
-  const [language, setLanguage] = useState<AppLanguage>('es');
-
-  // Cargar idioma guardado
-  useEffect(() => {
-    AsyncStorage.getItem(LANGUAGE_STORAGE_KEY)
-      .then((saved) => {
-        if (saved === 'es' || saved === 'en') {
-          setLanguage(saved as AppLanguage);
-        }
-      })
-      .catch(() => {
-        // Idioma por defecto: español
-      });
-  }, []);
-
-  const changeLanguage = useCallback((next: AppLanguage) => {
-    setLanguage(next);
-    AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, next).catch(() => { });
-  }, []);
-
-  // Textos según idioma
-  const t = {
-    es: {
-      title: 'SugarCheck',
-      subtitle: 'Inicia sesión para continuar',
-      emailLabel: 'Correo electrónico',
-      emailPlaceholder: 'correo@ejemplo.com',
-      passwordLabel: 'Contraseña',
-      passwordPlaceholder: '••••••',
-      loginButton: 'Iniciar sesión',
-      forgotPassword: '¿Olvidaste tu contraseña?',
-      or: 'O',
-      googleButton: 'Continuar con Google',
-      facebookButton: 'Continuar con Facebook',
-      noAccount: '¿No tienes cuenta?',
-      register: 'Regístrate',
-    },
-    en: {
-      title: 'Blue Warriors',
-      subtitle: 'Log in to continue',
-      emailLabel: 'Email',
-      emailPlaceholder: 'email@example.com',
-      passwordLabel: 'Password',
-      passwordPlaceholder: '••••••',
-      loginButton: 'Log in',
-      forgotPassword: 'Forgot your password?',
-      or: 'Or',
-      googleButton: 'Continue with Google',
-      facebookButton: 'Continue with Facebook',
-      noAccount: "Don't have an account?",
-      register: 'Sign up',
-    },
-  }[language];
-
   const validate = () => {
     const errs: Record<string, string> = {};
-    if (!email) errs.email = t.emailLabel + ' es requerido';
-    else if (!/\S+@\S+\.\S+/.test(email)) errs.email = 'Correo inválido';
-    if (!password) errs.password = t.passwordLabel + ' es requerida';
-    else if (password.length < 6) errs.password = 'Mínimo 6 caracteres';
+    if (!email) errs.email = t('auth:emailRequired');
+    else if (!/\S+@\S+\.\S+/.test(email)) errs.email = t('auth:emailInvalid');
+    if (!password) errs.password = t('auth:passwordRequired');
+    else if (password.length < 6) errs.password = t('auth:passwordMin');
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -109,8 +53,8 @@ export default function LoginScreen() {
       await login(email, password);
     } catch (error: any) {
       const message =
-        error?.response?.data?.message || error?.message || 'Error al iniciar sesión';
-      Alert.alert('Error', message);
+        error?.response?.data?.message || error?.message || t('auth:loginError');
+      showErrorAlert(message);
     } finally {
       setLoading(false);
     }
@@ -126,7 +70,7 @@ export default function LoginScreen() {
         router.replace('/auth/complete-profile');
       }
     } catch (error: any) {
-      Alert.alert('Error', error?.message || `Error al iniciar sesión con ${provider}`);
+      showErrorAlert(error?.message || t('auth:socialLoginError', { provider }));
     } finally {
       setSocialLoading(null);
     }
@@ -147,15 +91,16 @@ export default function LoginScreen() {
       >
         {/* Encabezado */}
         <View style={styles.header}>
+          <LanguageSelector />
           <Image
             source={require('../../assets/icons/SugarCheck.svg')}
             style={styles.logo}
             resizeMode="contain"
           />
           <H2 style={[styles.appTitle, { color: colors.primary.main }]}>
-            {t.title}
+            SugarCheck
           </H2>
-          <ThemedText muted style={styles.subtitle}>{t.subtitle}</ThemedText>
+          <ThemedText muted style={styles.subtitle}>{t('auth:loginSubtitle')}</ThemedText>
         </View>
 
         {/* Tarjeta: bienvenida */}
@@ -166,10 +111,10 @@ export default function LoginScreen() {
             resizeMode="contain"
           />
           <H1 style={[styles.welcomeTitle, { color: colors.primary.main }]}>
-            ¡Bienvenido, Guerrero!
+            {t('auth:welcome')}
           </H1>
           <Body1 style={styles.welcomeBody}>
-            Prepárate para la batalla de hoy. Entra a tu panel, asegura tu bienestar y mantente firme en la zona segura.
+            {t('auth:welcomeBody')}
           </Body1>
           <TouchableOpacity
             onPress={() => router.push('/auth/register')}
@@ -177,7 +122,7 @@ export default function LoginScreen() {
             activeOpacity={0.7}
           >
             <ThemedText type="link" style={styles.linkText}>
-              {t.noAccount} {t.register}
+              {t('auth:noAccount')} {t('auth:signUp')}
             </ThemedText>
           </TouchableOpacity>
         </Card>
@@ -185,32 +130,32 @@ export default function LoginScreen() {
         {/* Tarjeta: formulario de acceso (fondo primary del sistema) */}
         <Card style={[styles.card, { backgroundColor: colors.primary.dark }]}>
           <H4 style={[styles.formTitle, { color: colors.text.inverse }]}>
-            {t.loginButton}
+            {t('auth:login')}
           </H4>
           <ThemedText style={[styles.formSubtitle, { color: colors.text.inverse }]}>
-            Ingresa tus credenciales para acceder
+            {t('auth:loginInstructions')}
           </ThemedText>
           <FormInput
-            label={t.emailLabel}
+            label={t('common:email')}
             value={email}
             onChangeText={setEmail}
-            placeholder={t.emailPlaceholder}
+            placeholder={t('auth:emailPlaceholder')}
             keyboardType="email-address"
             autoCapitalize="none"
             error={errors.email}
           />
           <FormInput
-            label={t.passwordLabel}
+            label={t('common:password')}
             value={password}
             onChangeText={setPassword}
-            placeholder={t.passwordPlaceholder}
+            placeholder="••••••"
             secureTextEntry
             autoCapitalize="none"
             error={errors.password}
           />
 
           <Button
-            title={t.loginButton}
+            title={t('auth:login')}
             onPress={handleLogin}
             loading={loading}
             style={styles.primaryButton}
@@ -220,11 +165,11 @@ export default function LoginScreen() {
             type="defaultSemiBold"
             style={[styles.dividerTitle, { color: colors.text.inverse }]}
           >
-            {t.or}
+            {t('auth:or')}
           </ThemedText>
           <View style={styles.socialRow}>
             <Button
-              title={t.googleButton}
+              title={t('auth:continueGoogle')}
               onPress={() => handleSocialLogin('google')}
               variant="outlined"
               loading={socialLoading === 'google'}
@@ -232,7 +177,7 @@ export default function LoginScreen() {
               style={styles.socialButton}
             />
             <Button
-              title={t.facebookButton}
+              title={t('auth:continueFacebook')}
               onPress={() => handleSocialLogin('facebook')}
               variant="outlined"
               color="secondary"
@@ -248,14 +193,14 @@ export default function LoginScreen() {
             activeOpacity={0.7}
           >
             <ThemedText type="link" style={[styles.linkText, { color: colors.text.inverse }]}>
-              {t.forgotPassword}
+              {t('auth:forgotPassword')}
             </ThemedText>
           </TouchableOpacity>
         </Card>
 
         {/* Pie: patrocinador */}
         <View style={styles.footer}>
-          <Caption style={styles.footerText}>Patrocinado por</Caption>
+          <Caption style={styles.footerText}>{t('auth:sponsoredBy')}</Caption>
           <Image
             source={require('../../assets/escudo.png')}
             style={styles.sponsorLogo}
@@ -277,6 +222,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 32,
+    width: '100%',
   },
   logo: {
     width: 80,

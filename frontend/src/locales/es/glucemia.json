@@ -18,6 +18,7 @@
     "title": "Dominio de la Zona Segura",
     "caption": "Tiempo en rango",
     "alertaBaja": "Niveles bajos. Revisa tus registros y actúa",
+    "alertaAdvertencia": "El tiempo en rango puede mejorar. Sigue monitoreando tus niveles",
     "alertaNormal": "Niveles estables dentro del rango seguro",
     "alertaAlta": "Niveles altos. Monitorea tu situación y actúa"
   },

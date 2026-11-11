@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 
 import { Fonts, Shape } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -15,6 +16,7 @@ interface DatePickerProps {
 }
 
 export function DatePickerField({ label, value, onChange, mode = 'date', error }: DatePickerProps) {
+  const { i18n } = useTranslation();
   const { colors, isDark } = useTheme();
   const [show, setShow] = useState(false);
 
@@ -26,10 +28,17 @@ export function DatePickerField({ label, value, onChange, mode = 'date', error }
   };
 
   const formatDate = (date: Date) => {
+    const locale = i18n.resolvedLanguage === 'ja'
+      ? 'ja-JP'
+      : i18n.resolvedLanguage === 'pt'
+        ? 'pt-BR'
+        : i18n.resolvedLanguage === 'en'
+          ? 'en-US'
+          : 'es-ES';
     if (mode === 'time') {
-      return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
     }
-    return date.toLocaleDateString('es-ES', {
+    return date.toLocaleDateString(locale, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

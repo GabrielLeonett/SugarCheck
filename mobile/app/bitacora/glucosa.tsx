@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
@@ -12,20 +13,18 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { glucoseApi } from '@/src/apis/glucose';
+import { hba1cApi } from '@/src/apis/hba1c';
+import { showErrorAlert, showSuccessAlert } from '@/src/stores/systemAlertStore';
 
 const CONTEXTOS = [
-  'Antes del desayuno',
-  'Después del desayuno',
-  'Antes del almuerzo',
-  'Después del almuerzo',
-  'Antes de la cena',
-  'Después de la cena',
-  'Antes de dormir',
-  'Ejercicio',
-  'Otro',
+  { value: 'En Ayunas', key: 'fasting' },
+  { value: 'Despues de comer', key: 'afterMeal' },
+  { value: 'Control general', key: 'general' },
 ];
 
 export default function GlucosaScreen() {
+  const { t } = useTranslation(['screens', 'common']);
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -35,23 +34,53 @@ export default function GlucosaScreen() {
   const [hora, setHora] = useState(new Date());
   const [resultadoHb, setResultadoHb] = useState('');
   const [fechaHb, setFechaHb] = useState(new Date());
+  const [savingGlucose, setSavingGlucose] = useState(false);
+  const [savingHbA1c, setSavingHbA1c] = useState(false);
 
-  const handleSaveGlucosa = () => {
-    if (!nivel) {
-      Alert.alert('Error', 'Ingresa el nivel de glucosa');
+  const handleSaveGlucosa = async () => {
+    const valueMgdl = Number(nivel);
+    if (!Number.isFinite(valueMgdl) || valueMgdl < 1 || valueMgdl > 999) {
+      showErrorAlert(t('screens:glucoseForm.invalidGlucose'));
       return;
     }
-    Alert.alert('Guardado', 'Lectura de glucosa registrada');
-    router.back();
+    if (!contexto) {
+      showErrorAlert(t('screens:glucoseForm.contextRequired'));
+      return;
+    }
+    setSavingGlucose(true);
+    try {
+      const time = `${String(hora.getHours()).padStart(2, '0')}:${String(
+        hora.getMinutes()
+      ).padStart(2, '0')}`;
+      await glucoseApi.create({
+        valueMgdl,
+        mealTag: contexto,
+        date: fecha.toISOString(),
+        time,
+      });
+      showSuccessAlert(t('screens:glucoseForm.glucoseSaved'), t('common:success'), () => router.back());
+    } catch (error: any) {
+      showErrorAlert(error?.response?.data?.message || t('screens:glucoseForm.glucoseSaveError'));
+    } finally {
+      setSavingGlucose(false);
+    }
   };
 
-  const handleSaveHbA1c = () => {
-    if (!resultadoHb) {
-      Alert.alert('Error', 'Ingresa el resultado de HbA1c');
+  const handleSaveHbA1c = async () => {
+    const value = Number(resultadoHb);
+    if (!Number.isFinite(value) || value < 0.1 || value > 20) {
+      showErrorAlert(t('screens:glucoseForm.invalidHba1c'));
       return;
     }
-    Alert.alert('Guardado', 'HbA1c registrada');
-    router.back();
+    setSavingHbA1c(true);
+    try {
+      await hba1cApi.create({ resultado: value, fecha: fechaHb.toISOString() });
+      showSuccessAlert(t('screens:glucoseForm.hba1cSaved'), t('common:success'), () => router.back());
+    } catch (error: any) {
+      showErrorAlert(error?.response?.data?.message || t('screens:glucoseForm.hba1cSaveError'));
+    } finally {
+      setSavingHbA1c(false);
+    }
   };
 
   return (
@@ -67,18 +96,18 @@ export default function GlucosaScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel={t('common:back')}
         >
           <FontAwesome name="arrow-left" size={20} color={colors.text.primary} />
         </TouchableOpacity>
 
         <ThemedText type="h4" style={styles.title}>
-          Registro de glucosa
+          {t('screens:glucoseForm.title')}
         </ThemedText>
 
         <Card style={styles.card}>
           <FormInput
-            label="Nivel de glucosa (mg/dL)"
+            label={t('screens:glucoseForm.level')}
             value={nivel}
             onChangeText={setNivel}
             placeholder="Ej: 120"
@@ -86,15 +115,15 @@ export default function GlucosaScreen() {
           />
 
           <ThemedText type="defaultSemiBold" style={styles.contextLabel}>
-            Contexto
+            {t('screens:glucoseForm.context')}
           </ThemedText>
           <View style={styles.contextGrid}>
             {CONTEXTOS.map((context) => {
-              const isSelected = contexto === context;
+              const isSelected = contexto === context.value;
 
               return (
                 <TouchableOpacity
-                  key={context}
+                  key={context.value}
                   style={[
                     styles.contextChip,
                     {
@@ -102,7 +131,7 @@ export default function GlucosaScreen() {
                       borderColor: colors.primary.main,
                     },
                   ]}
-                  onPress={() => setContexto(context)}
+                  onPress={() => setContexto(context.value)}
                   activeOpacity={0.8}
                 >
                   <ThemedText
@@ -112,39 +141,49 @@ export default function GlucosaScreen() {
                       fontFamily: Fonts.semiBold,
                     }}
                   >
-                    {context}
+                    {t(`screens:glucoseForm.${context.key}`)}
                   </ThemedText>
                 </TouchableOpacity>
               );
             })}
           </View>
 
-          <DatePickerField label="Fecha" value={fecha} onChange={setFecha} />
-          <DatePickerField label="Hora" value={hora} onChange={setHora} mode="time" />
-          <Button title="Guardar glucosa" onPress={handleSaveGlucosa} style={styles.saveButton} />
+          <DatePickerField label={t('screens:glucoseForm.date')} value={fecha} onChange={setFecha} />
+          <DatePickerField label={t('screens:glucoseForm.time')} value={hora} onChange={setHora} mode="time" />
+          <Button
+            title={t('screens:glucoseForm.saveGlucose')}
+            onPress={handleSaveGlucosa}
+            loading={savingGlucose}
+            style={styles.saveButton}
+          />
         </Card>
 
         <View style={styles.divider}>
           <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
           <ThemedText muted style={styles.dividerText}>
-            O
+            {t('screens:glucoseForm.or')}
           </ThemedText>
           <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
         </View>
 
         <ThemedText type="h6" style={styles.hba1cTitle}>
-          Registrar HbA1c
+          {t('screens:glucoseForm.recordHba1c')}
         </ThemedText>
         <Card style={styles.card}>
           <FormInput
-            label="Resultado HbA1c (%)"
+            label={t('screens:glucoseForm.hba1cResult')}
             value={resultadoHb}
             onChangeText={setResultadoHb}
             placeholder="Ej: 6.5"
             keyboardType="numeric"
           />
-          <DatePickerField label="Fecha" value={fechaHb} onChange={setFechaHb} />
-          <Button title="Guardar HbA1c" onPress={handleSaveHbA1c} style={styles.saveButton} />
+          <DatePickerField label={t('screens:glucoseForm.date')} value={fechaHb} onChange={setFechaHb} />
+          <Button
+            title={t('screens:glucoseForm.saveHba1c')}
+            onPress={handleSaveHbA1c}
+            loading={savingHbA1c}
+            style={styles.saveButton}
+          />
         </Card>
       </ScrollView>
     </ThemedView>
