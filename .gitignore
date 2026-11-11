@@ -4,3 +4,7 @@
 /.opencode
 .env*
 !.env.example
+
+# dependencias (cada proyecto instala las suyas)
+
+.pnpm-store/
