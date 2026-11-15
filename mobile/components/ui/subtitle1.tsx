@@ -1,19 +1,8 @@
-import { ThemedText, ThemedTextProps } from "../themed-text";
+import { ThemedText, type ThemedTextProps } from '../themed-text';
 
 export function Subtitle({ children, style, ...props }: ThemedTextProps) {
-
   return (
-    <ThemedText
-      type="title"
-      style={[
-        {
-          fontWeight: 600,
-          fontSize: 15,
-        },
-        style, // Permitimos que estilos externos también apliquen
-      ]}
-      {...props}
-    >
+    <ThemedText type="subtitle1" style={style} {...props}>
       {children}
     </ThemedText>
   );

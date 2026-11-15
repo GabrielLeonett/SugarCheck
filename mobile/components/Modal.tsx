@@ -1,7 +1,15 @@
 import React from 'react';
-import { Modal as RNModal, View, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import {
+  Keyboard,
+  Modal as RNModal,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { Shape } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ModalProps {
   visible: boolean;
@@ -10,7 +18,8 @@ interface ModalProps {
 }
 
 export function Modal({ visible, onClose, children }: ModalProps) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <RNModal
@@ -18,16 +27,29 @@ export function Modal({ visible, onClose, children }: ModalProps) {
       transparent
       animationType="slide"
       onRequestClose={onClose}
+      statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }}>
-        <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <View style={[styles.content, { backgroundColor: Colors[colorScheme].background }]}>
-              {children}
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
+      <Pressable
+        style={[styles.overlay, { backgroundColor: colors.overlay }]}
+        onPress={() => {
+          Keyboard.dismiss();
+          onClose();
+        }}
+      >
+        <Pressable
+          style={[
+            styles.content,
+            {
+              backgroundColor: colors.background.paper,
+              paddingBottom: Math.max(insets.bottom, 24) + 16,
+            },
+          ]}
+          onPress={(event) => event.stopPropagation()}
+        >
+          <View style={[styles.handle, { backgroundColor: colors.divider }]} />
+          {children}
+        </Pressable>
+      </Pressable>
     </RNModal>
   );
 }
@@ -35,15 +57,20 @@ export function Modal({ visible, onClose, children }: ModalProps) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   content: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: Shape.modalRadius,
+    borderTopRightRadius: Shape.modalRadius,
     paddingHorizontal: 20,
-    paddingVertical: 24,
-    paddingBottom: 40,
-    maxHeight: '80%',
+    paddingTop: 12,
+    maxHeight: '85%',
+  },
+  handle: {
+    alignSelf: 'center',
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    marginBottom: 16,
   },
 });

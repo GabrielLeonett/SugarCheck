@@ -1,6 +1,5 @@
-import type { AxiosError } from 'axios';
 import { apiPrivate } from './axios';
-import type { User, BackendErrorResponse } from '../types';
+import type { User } from '../types';
 
 export const userApi = {
   async getById(id: string): Promise<User> {
@@ -8,9 +7,13 @@ export const userApi = {
     return response.data;
   },
 
-  async update(id: string, data: Partial<{ name: string; email: string; sexo: string; fechaNacimiento: string; password: string }>): Promise<User> {
+  async update(id: string, data: Partial<{ name: string; email: string; sexo: string; fechaNacimiento: string; goal: string }>): Promise<User> {
     const response = await apiPrivate.patch(`/user/${id}`, data);
     return response.data;
+  },
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await apiPrivate.patch('/user/password', { currentPassword, newPassword });
   },
 
   async delete(id: string): Promise<void> {

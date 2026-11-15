@@ -1,19 +1,8 @@
-import { ThemedText, ThemedTextProps } from "../themed-text";
+import { ThemedText, type ThemedTextProps } from '../themed-text';
 
 export function H3({ children, style, ...props }: ThemedTextProps) {
-
   return (
-    <ThemedText
-      type="title"
-      style={[
-        {
-          fontWeight: 700,
-          fontSize: 48,
-        },
-        style, // Permitimos que estilos externos también apliquen
-      ]}
-      {...props}
-    >
+    <ThemedText type="h3" style={style} {...props}>
       {children}
     </ThemedText>
   );
