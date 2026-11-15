@@ -1,26 +1,29 @@
 {
   "expo": {
-    "name": "MiSuperApp",
+    "name": "SugarCheck",
     "slug": "MiSuperApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "misuperapp",
+    "scheme": "sugarcheck",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gabrielleonett.sugarcheck",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.gabrielleonett.MiSuperApp"
+      "package": "com.gabrielleonett.sugarcheck"
     },
     "web": {
       "output": "static",
@@ -51,6 +54,7 @@
       "eas": {
         "projectId": "917cfcb2-9639-47f5-b4a2-f77870958329"
       }
-    }
+    },
+    "owner": "gabrielleonett"
   }
 }

@@ -1,19 +1,8 @@
-import { ThemedText, ThemedTextProps } from "../themed-text";
+import { ThemedText, type ThemedTextProps } from '../themed-text';
 
 export function Caption({ children, style, ...props }: ThemedTextProps) {
-
   return (
-    <ThemedText
-      type="title"
-      style={[
-        {
-          fontWeight: 300,
-          fontSize: 12,
-        },
-        style, // Permitimos que estilos externos también apliquen
-      ]}
-      {...props}
-    >
+    <ThemedText type="caption" style={style} {...props}>
       {children}
     </ThemedText>
   );

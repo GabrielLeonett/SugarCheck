@@ -1,5 +1,18 @@
 # Welcome to your Expo app 👋
 
+## Modo invitado
+
+El acceso de invitado conserva el perfil, las preferencias y los registros de
+glucosa, HbA1c, insulina, medidas físicas y progreso del Camino en el
+almacenamiento local del dispositivo. Estos datos no se envían al servidor
+hasta que la persona inicia sesión y confirma la importación. Si la importación
+falla, se conservan localmente para poder reintentarla desde el perfil.
+
+El registro y el historial de salud, junto con el progreso del Camino, funcionan
+sin conexión. Los videos, el chat y la asociación con una cuenta requieren
+internet. El rango de glucosa se ingresa según la indicación de la persona o su
+equipo de salud; la app no lo recomienda.
+
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
 ## Get started

@@ -1,22 +1,36 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Redirect, useRouter } from 'expo-router';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import { FormInput } from '@/components/FormInput';
-import { Button } from '@/components/Button';
-import { useAuthStore } from '@/src/stores/authStore';
-import { ThemedView } from '@/components/themed-view';
-import { H2 } from '@/components/ui/h2';
-import { Body1 } from '@/components/ui/body1';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { Button } from '@/components/Button';
+import { Card } from '@/components/card';
+import { FormInput } from '@/components/FormInput';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { H1, H2, Body1, Caption, H4 } from '@/components/ui';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useAuthStore } from '@/src/stores/authStore';
+import { useGuestStore } from '@/src/stores/guestStore';
+import { showErrorAlert } from '@/src/stores/systemAlertStore';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 export default function LoginScreen() {
+  const { t } = useTranslation(['auth', 'common']);
   const router = useRouter();
-  const colorScheme = useColorScheme() ?? 'light';
-  const isDark = colorScheme === 'dark';
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const login = useAuthStore((s) => s.login);
   const user = useAuthStore((s) => s.user);
+  const pendingImport = useGuestStore((s) => s.pendingImport);
   const loginWithProvider = useAuthStore((s) => s.loginWithProvider);
 
   const [email, setEmail] = useState('');
@@ -24,13 +38,12 @@ export default function LoginScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | 'facebook' | null>(null);
-
   const validate = () => {
     const errs: Record<string, string> = {};
-    if (!email) errs.email = 'Correo electrónico es requerido';
-    else if (!/\S+@\S+\.\S+/.test(email)) errs.email = 'Correo inválido';
-    if (!password) errs.password = 'Contraseña es requerida';
-    else if (password.length < 6) errs.password = 'Mínimo 6 caracteres';
+    if (!email) errs.email = t('auth:emailRequired');
+    else if (!/\S+@\S+\.\S+/.test(email)) errs.email = t('auth:emailInvalid');
+    if (!password) errs.password = t('auth:passwordRequired');
+    else if (password.length < 6) errs.password = t('auth:passwordMin');
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -40,9 +53,13 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email, password);
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || 'Error al iniciar sesión';
-      Alert.alert('Error', msg);
+      if (useGuestStore.getState().pendingImport) {
+        router.replace('/auth/import-guest');
+      }
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message || error?.message || t('auth:loginError');
+      showErrorAlert(message);
     } finally {
       setLoading(false);
     }
@@ -54,96 +71,148 @@ export default function LoginScreen() {
       await loginWithProvider(provider);
       const isNew = useAuthStore.getState().isNewUser;
       useAuthStore.getState().clearNewUserFlag();
-      if (isNew) {
+      if (useGuestStore.getState().pendingImport) {
+        router.replace('/auth/import-guest');
+      } else if (isNew) {
         router.replace('/auth/complete-profile');
       }
-    } catch (err: any) {
-      Alert.alert('Error', err?.message || `Error al iniciar sesión con ${provider}`);
+    } catch (error: any) {
+      showErrorAlert(error?.message || t('auth:socialLoginError', { provider }));
     } finally {
       setSocialLoading(null);
     }
   };
 
   if (user) {
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href={pendingImport ? '/auth/import-guest' : '/(tabs)'} />;
   }
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Encabezado */}
         <View style={styles.header}>
-          <H2 style={{ color: Colors[colorScheme].tint, textAlign: 'center' }}>
-            Guerreros Azules
+          <LanguageSelector />
+          <Image
+            source={require('../../assets/icons/SugarCheck.svg')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <H2 style={[styles.appTitle, { color: colors.primary.main }]}>
+            SugarCheck
           </H2>
-          <Body1 style={{ textAlign: 'center', marginTop: 8, color: isDark ? '#aaa' : '#666' }}>
-            Inicia sesión para continuar
-          </Body1>
+          <ThemedText muted style={styles.subtitle}>{t('auth:loginSubtitle')}</ThemedText>
         </View>
 
-        <View style={styles.form}>
+        {/* Tarjeta: bienvenida */}
+        <Card style={styles.card}>
+          <Image
+            source={require('../../assets/gluco-saludo.png')}
+            style={styles.welcomeImage}
+            resizeMode="contain"
+          />
+          <H1 style={[styles.welcomeTitle, { color: colors.primary.main }]}>
+            {t('auth:welcome')}
+          </H1>
+          <Body1 style={styles.welcomeBody}>
+            {t('auth:welcomeBody')}
+          </Body1>
+          <TouchableOpacity
+            onPress={() => router.push('/auth/register')}
+            style={styles.linkRow}
+            activeOpacity={0.7}
+          >
+            <ThemedText type="link" style={styles.linkText}>
+              {t('auth:noAccount')} {t('auth:signUp')}
+            </ThemedText>
+          </TouchableOpacity>
+        </Card>
+
+        {/* Tarjeta: formulario de acceso (fondo primary del sistema) */}
+        <Card style={[styles.card, { backgroundColor: colors.primary.dark }]}>
+          <H4 style={[styles.formTitle, { color: colors.text.inverse }]}>
+            {t('auth:login')}
+          </H4>
+          <ThemedText style={[styles.formSubtitle, { color: colors.text.inverse }]}>
+            {t('auth:loginInstructions')}
+          </ThemedText>
           <FormInput
-            label="Correo electrónico"
+            label={t('common:email')}
             value={email}
             onChangeText={setEmail}
-            placeholder="correo@ejemplo.com"
+            placeholder={t('auth:emailPlaceholder')}
             keyboardType="email-address"
+            autoCapitalize="none"
             error={errors.email}
           />
           <FormInput
-            label="Contraseña"
+            label={t('common:password')}
             value={password}
             onChangeText={setPassword}
             placeholder="••••••"
             secureTextEntry
+            autoCapitalize="none"
             error={errors.password}
           />
 
           <Button
-            title="Iniciar sesión"
+            title={t('auth:login')}
             onPress={handleLogin}
             loading={loading}
-            style={{ marginTop: 8 }}
+            style={styles.primaryButton}
           />
 
-          <TouchableOpacity onPress={() => router.push('/auth/forgot-password' as any)} style={styles.linkContainer}>
-            <Text style={[styles.link, { color: Colors[colorScheme].tint }]}>
-              ¿Olvidaste tu contraseña?
-            </Text>
+          <ThemedText
+            type="defaultSemiBold"
+            style={[styles.dividerTitle, { color: colors.text.inverse }]}
+          >
+            {t('auth:or')}
+          </ThemedText>
+          <View style={styles.socialRow}>
+            <Button
+              title={t('auth:continueGoogle')}
+              onPress={() => handleSocialLogin('google')}
+              variant="outlined"
+              loading={socialLoading === 'google'}
+              icon={<FontAwesome name="google" size={20} color={colors.primary.main} />}
+              style={styles.socialButton}
+            />
+            <Button
+              title={t('auth:continueFacebook')}
+              onPress={() => handleSocialLogin('facebook')}
+              variant="outlined"
+              color="secondary"
+              loading={socialLoading === 'facebook'}
+              icon={<FontAwesome name="facebook" size={20} color={colors.info.main} />}
+              style={styles.socialButton}
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={() => router.push('/auth/forgot-password')}
+            style={styles.linkRow}
+            activeOpacity={0.7}
+          >
+            <ThemedText type="link" style={[styles.linkText, { color: colors.text.inverse }]}>
+              {t('auth:forgotPassword')}
+            </ThemedText>
           </TouchableOpacity>
+        </Card>
 
-          <View style={styles.divider}>
-            <View style={[styles.dividerLine, { backgroundColor: isDark ? '#333' : '#e0e0e0' }]} />
-            <Text style={[styles.dividerText, { color: isDark ? '#888' : '#999' }]}>O</Text>
-            <View style={[styles.dividerLine, { backgroundColor: isDark ? '#333' : '#e0e0e0' }]} />
-          </View>
-
-          <Button
-            title="Continuar con Google"
-            onPress={() => handleSocialLogin('google')}
-            variant="outlined"
-            loading={socialLoading === 'google'}
-            icon={<FontAwesome name="google" size={20} color={isDark ? '#fff' : '#000'} />}
+        {/* Pie: patrocinador */}
+        <View style={styles.footer}>
+          <Caption style={styles.footerText}>{t('auth:sponsoredBy')}</Caption>
+          <Image
+            source={require('../../assets/escudo.png')}
+            style={styles.sponsorLogo}
+            resizeMode="contain"
           />
-          <View style={{ height: 12 }} />
-          <Button
-            title="Continuar con Facebook"
-            onPress={() => handleSocialLogin('facebook')}
-            variant="outlined"
-            color="secondary"
-            loading={socialLoading === 'facebook'}
-            icon={<FontAwesome name="facebook" size={20} color="#1877F2" />}
-          />
-
-          <View style={styles.footer}>
-            <Text style={{ color: isDark ? '#aaa' : '#666', fontFamily: 'Montserrat-Regular' }}>
-              ¿No tienes cuenta?
-            </Text>
-            <TouchableOpacity onPress={() => router.push('/auth/register' as any)}>
-              <Text style={[styles.link, { color: Colors[colorScheme].tint, marginLeft: 4 }]}>
-                Regístrate
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </ScrollView>
     </ThemedView>
@@ -151,47 +220,95 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 80,
-    paddingBottom: 40,
+    alignItems: 'center',
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 32,
+    width: '100%',
   },
-  form: {
-    gap: 4,
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 12,
   },
-  linkContainer: {
-    alignItems: 'center',
-    paddingVertical: 12,
+  appTitle: {
+    fontSize: 24,
+    textAlign: 'center',
   },
-  link: {
-    fontFamily: 'Montserrat-SemiBold',
+  subtitle: {
+    textAlign: 'center',
     fontSize: 14,
   },
-  divider: {
+  card: {
+    width: '100%',
+    marginBottom: 16,
+  },
+  welcomeImage: {
+    width: 170,
+    height: 170,
+    marginBottom: 16,
+    alignSelf: 'center',
+  },
+  welcomeTitle: {
+    fontSize: 22,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  welcomeBody: {
+    textAlign: 'center',
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  primaryButton: {
+    marginTop: 8,
+    alignSelf: 'stretch',
+  },
+  linkRow: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  linkText: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  formTitle: {
+    textAlign: 'center',
+    fontSize: 20,
+    marginBottom: 4,
+  },
+  formSubtitle: {
+    textAlign: 'center',
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  dividerTitle: {
+    textAlign: 'center',
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  socialRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 24,
+    gap: 10,
+    width: '100%',
   },
-  dividerLine: {
+  socialButton: {
     flex: 1,
-    height: 1,
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    fontFamily: 'Montserrat-Regular',
-    fontSize: 14,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 32,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  footerText: {
+    fontSize: 12,
+    marginBottom: 6,
+  },
+  sponsorLogo: {
+    width: 120,
+    height: 40,
   },
 });

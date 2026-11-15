@@ -1,5 +1,6 @@
 import { Box, Grid, Slider, Typography } from '@mui/material';
 import { useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 import Footer from '../components/layout/Footer/Footer.tsx';
 import Navbar from '../components/layout/Header/Navbar.tsx';
 import { useAuthStore } from '../stores/authStore.tsx';
@@ -23,9 +24,11 @@ const MAX = 100;
 const MIN = 0;
 
 export default function Home() {
+  const theme = useTheme();
   const user = useAuthStore((state) => state.user);
 
   const { t } = useLanguage("home");
+  const { t: tGlucemia } = useLanguage('glucemia');
   const showToast = useUiStore((s) => s.showToast);
 
   const [openGlucosaModal, setOpenGlucosaModal] = useState(false);
@@ -69,6 +72,38 @@ export default function Home() {
     ultimaCategoria === 'Bajo peso' ? t('cards.physicalBalance.statusUnderweight') :
     ultimaCategoria === 'Sobrepeso' ? t('cards.physicalBalance.statusOverweight') :
     t('cards.physicalBalance.statusNormal');
+  const glucoseStatusColor =
+    ultimoRegistro?.estado === 'Bajo'
+      ? theme.palette.error.main
+      : ultimoRegistro?.estado === 'Alto'
+        ? theme.palette.warning.main
+        : ultimoRegistro
+          ? theme.palette.success.main
+          : theme.palette.text.disabled;
+  const rangeDominanceColor =
+    dataGlucosa.glucosaFiltrada.length === 0
+      ? theme.palette.text.disabled
+      : porcentajeZonaSegura >= 70
+        ? theme.palette.success.main
+        : porcentajeZonaSegura >= 50
+          ? theme.palette.warning.main
+          : theme.palette.error.main;
+  const imcStatusColor =
+    ultimaCategoria === 'Normal'
+      ? theme.palette.success.main
+      : ultimaCategoria === 'Bajo peso'
+        ? theme.palette.error.main
+        : ultimaCategoria === 'Sobrepeso'
+          ? theme.palette.warning.main
+        : theme.palette.text.disabled;
+  const safeZoneMessage =
+    dataGlucosa.glucosaFiltrada.length === 0
+      ? tGlucemia('tabla.sinDatos')
+      : porcentajeZonaSegura >= 70
+        ? tGlucemia('zonaSegura.alertaNormal')
+        : porcentajeZonaSegura >= 50
+        ? tGlucemia('zonaSegura.alertaAdvertencia')
+        : tGlucemia('zonaSegura.alertaBaja');
 
   return (
     <>
@@ -126,17 +161,17 @@ export default function Home() {
                 {t("cards.lastBattle.title")}
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-                <Typography variant='h1' component='h1' sx={{ color: '#4CAF50', fontWeight: 'bold', fontSize: { xs: '3.5rem', sm: '5rem' } }}>
+                <Typography variant='h1' component='h1' sx={{ color: glucoseStatusColor, fontWeight: 'bold', fontSize: { xs: '3.5rem', sm: '5rem' } }}>
                   {ultimaLectura ?? '--'}
                 </Typography>
                 <Box sx={{ ml: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <ArrowDropUpIcon sx={{ color: '#4CAF50', fontSize: { xs: '2rem', sm: '3rem' }, mb: -1 }} />
-                  <Typography variant='subtitle1' component='span' sx={{ color: '#4CAF50', fontWeight: 'bold' }}>
+                  <ArrowDropUpIcon sx={{ color: glucoseStatusColor, fontSize: { xs: '2rem', sm: '3rem' }, mb: -1 }} />
+                  <Typography variant='subtitle1' component='span' sx={{ color: glucoseStatusColor, fontWeight: 'bold' }}>
                     {t("cards.lastBattle.unit")}
                   </Typography>
                 </Box>
               </Box>
-              <Typography variant='subtitle2' component='aside' sx={{ color: '#4CAF50', fontWeight: 'medium' }}>
+              <Typography variant='subtitle2' component='aside' sx={{ color: glucoseStatusColor, fontWeight: 'medium' }}>
                 {ultimoRegistro?.hora ?? t('cards.lastBattle.noReadings')}
               </Typography>
             </CardBase>
@@ -156,11 +191,11 @@ export default function Home() {
               <Typography variant='h5' component='h5' sx={{ color: '#7692A8', fontWeight: 'bold', mb: 2, fontSize: { xs: '1.1rem', sm: '1.5rem' } }}>
                 {t("cards.safeZone.title")}
               </Typography>
-              <Typography variant='h1' component='h1' sx={{ color: '#FF5252', fontWeight: 'bold', fontSize: { xs: '3.5rem', sm: '5rem' }, mb: 2 }}>
+              <Typography variant='h1' component='h1' sx={{ color: rangeDominanceColor, fontWeight: 'bold', fontSize: { xs: '3.5rem', sm: '5rem' }, mb: 2 }}>
                 {porcentajeZonaSegura}%
               </Typography>
-              <Typography variant='subtitle2' component='aside' sx={{ color: '#FF5252', fontWeight: 'medium' }}>
-                {t("cards.safeZone.alertMessage")}
+              <Typography variant='subtitle2' component='aside' sx={{ color: rangeDominanceColor, fontWeight: 'medium' }}>
+                {safeZoneMessage}
               </Typography>
             </CardBase>
           </Grid>
@@ -184,7 +219,7 @@ export default function Home() {
                 {ultimoImc !== null ? ultimoImc.toFixed(1) : '--'}
               </Typography>
 
-              <Typography variant='subtitle2' component='aside' sx={{ color: ultimaCategoria === 'Normal' ? '#4CAF50' : '#FF5252', fontWeight: 'medium', mb: 3 }}>
+              <Typography variant='subtitle2' component='aside' sx={{ color: imcStatusColor, fontWeight: 'medium', mb: 3 }}>
                 {ultimaCategoria ? categoriaImcLabel : t('cards.physicalBalance.noReadings')}
               </Typography>
 
@@ -205,7 +240,7 @@ export default function Home() {
                     opacity: 1,
                     height: 8,
                     borderRadius: 4,
-                    backgroundImage: 'linear-gradient(90deg, #0088FF 0%, #4CAF50 50%, #FB8C00 100%)'
+                    backgroundImage: `linear-gradient(90deg, ${theme.palette.error.main} 0%, ${theme.palette.success.main} 50%, ${theme.palette.warning.main} 100%)`
                   },
                   '& .MuiSlider-track': {
                     display: 'none'
