@@ -4,7 +4,7 @@ import {
   ThemeProvider as NavigationThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { SplashScreen, Stack } from 'expo-router';
+import { router, SplashScreen, Stack, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -13,9 +13,16 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SystemAlertHost } from '@/components/SystemAlertHost';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import {
+  attachNotificationResponseHandler,
+  configureNotifications,
+} from '@/src/notifications/reminders';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useGuestStore } from '@/src/stores/guestStore';
+import { useReminderStore } from '@/src/stores/reminderStore';
 import { initializeAppLanguage } from '@/src/i18n';
+
+configureNotifications();
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   // La pantalla de splash puede no estar disponible en web.
@@ -35,6 +42,7 @@ function RootLayoutContent() {
   const { colors, isDark, isReady } = useTheme();
   const { isAuthLoading, refresh, setLoading } = useAuthStore();
   const hydrateGuest = useGuestStore((state) => state.hydrate);
+  const hydrateReminders = useReminderStore((state) => state.hydrate);
   const [languageReady, setLanguageReady] = useState(false);
 
   const [fontsLoaded, fontError] = useFonts({
@@ -72,6 +80,24 @@ function RootLayoutContent() {
   }, []);
 
   const appReady = (fontsLoaded || Boolean(fontError)) && isReady && !isAuthLoading && languageReady;
+
+  useEffect(() => {
+    if (!appReady) {
+      return;
+    }
+    hydrateReminders().catch((error) => {
+      console.error('No se pudieron cargar los recordatorios:', error);
+    });
+  }, [appReady, hydrateReminders]);
+
+  useEffect(() => {
+    if (!appReady) {
+      return;
+    }
+    return attachNotificationResponseHandler((url) => {
+      router.push(url as Href);
+    });
+  }, [appReady]);
 
   useEffect(() => {
     if (appReady) {
