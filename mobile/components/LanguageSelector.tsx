@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { APP_LANGUAGES, changeAppLanguage, type AppLanguage } from '@/src/i18n';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useReminderStore } from '@/src/stores/reminderStore';
 import { showErrorAlert } from '@/src/stores/systemAlertStore';
 
 const LANGUAGE_FLAGS: Record<AppLanguage, number> = {
@@ -27,6 +28,7 @@ export function LanguageSelector() {
     try {
       await changeAppLanguage(language);
       setIsExpanded(false);
+      void useReminderStore.getState().sync();
     } catch (error) {
       console.error('No se pudo guardar el idioma seleccionado:', error);
       showErrorAlert(t('languageSaveError'));
