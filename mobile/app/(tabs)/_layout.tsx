@@ -136,7 +136,9 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarButton: HapticTab,
+          // expo-router 58 trae su propia copia de los tipos de react-navigation,
+          // por eso BottomTabBarButtonProps no coincide entre ambos paquetes.
+          tabBarButton: HapticTab as any,
           tabBarStyle: {
             display: 'none',
             height: 0,
