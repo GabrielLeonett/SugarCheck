@@ -1,4 +1,4 @@
-import { ChevronUp } from 'lucide-react-native';
+import { ChevronRight, ChevronUp } from 'lucide-react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BarChartMini } from '@/components/BarChartMini';
 import { Card } from '@/components/card';
+import { BattleRow } from '@/components/dashboard/BattleRow';
+import { DistributionBar } from '@/components/dashboard/DistributionBar';
+import { StatPill } from '@/components/dashboard/StatPill';
+import { TrendBadge } from '@/components/dashboard/TrendBadge';
 import { ImcGauge } from '@/components/ImcGauge';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -16,7 +20,11 @@ import { AVATARS } from '@/constants/avatars';
 import { useDashboardData } from '@/src/hooks/useDashboardData';
 import { useAuthStore } from '@/src/stores/authStore';
 import { usePreferenceConfig } from '@/src/stores/preferenceStore';
-import { getGlucoseStatusColor, getRangeDominanceColor } from '@/src/utils/glucoseRange';
+import {
+  getGlucoseStatusColor,
+  getRangeDominanceColor,
+  type GlucoseRangeStatus,
+} from '@/src/utils/glucoseRange';
 
 function CardTitle({ children, color }: { children: React.ReactNode; color: string }) {
   return (
@@ -37,8 +45,19 @@ export default function HomeScreen() {
 
   const {
     ultimaLectura,
+    lecturaAnterior,
+    deltaLectura,
     porcentajeZonaSegura,
     totalLecturas,
+    distribucion,
+    rachaDias,
+    deltaZonaSegura,
+    peso,
+    estatura,
+    imcAnterior,
+    imcFechaLabel,
+    resumen,
+    batallasRecientes,
     chartData,
     ultimoImc,
     imcCategoria,
@@ -105,6 +124,33 @@ export default function HomeScreen() {
         ? t('screens:home.overweight')
         : null;
 
+  const rangeStatusLabel = (status: GlucoseRangeStatus) =>
+    status === 'low'
+      ? t('screens:history.low')
+      : status === 'high'
+        ? t('screens:history.high')
+        : t('screens:history.inRange');
+
+  const deltaImc =
+    ultimoImc !== null && imcAnterior !== null
+      ? Math.round((ultimoImc - imcAnterior) * 10) / 10
+      : null;
+
+  const formatDelta = (delta: number | null, suffix?: string) => {
+    if (delta === null) return '--';
+    if (delta === 0) return t('screens:home.noChange');
+    return `${delta > 0 ? '+' : ''}${delta}${suffix ? ` ${suffix}` : ''}`;
+  };
+
+  const safeZoneDeltaColor =
+    deltaZonaSegura === null
+      ? colors.text.disabled
+      : deltaZonaSegura > 0
+        ? colors.success.main
+        : deltaZonaSegura < 0
+          ? colors.error.main
+          : colors.text.disabled;
+
   const bigValueStyle = [styles.bigValue, { fontSize: isWide ? 64 : 52, lineHeight: isWide ? 72 : 60 }];
 
   return (
@@ -165,12 +211,39 @@ export default function HomeScreen() {
               </View>
 
               <ThemedText style={[styles.cardHint, { color: glucoseColor }]}>
-                {ultimaLectura
-                  ? `${ultimaLectura.timeLabel}${
-                      ultimaLectura.contexto ? ` (${ultimaLectura.contexto})` : ''
-                    }`
-                  : t('screens:home.noRecords')}
+                {ultimaLectura ? ultimaLectura.timeLabel : t('screens:home.noRecords')}
               </ThemedText>
+
+              {ultimaLectura ? (
+                <View style={[styles.statusChip, { borderColor: glucoseColor }]}>
+                  <ThemedText type="caption" style={[styles.statusChipText, { color: glucoseColor }]}>
+                    {rangeStatusLabel(ultimaLectura.rangeStatus)}
+                  </ThemedText>
+                </View>
+              ) : null}
+
+              <View style={styles.trendRow}>
+                {deltaLectura !== null ? (
+                  <TrendBadge
+                    delta={deltaLectura}
+                    suffix=" mg/dL"
+                    flatLabel={t('screens:home.noChange')}
+                  />
+                ) : null}
+                <ThemedText type="caption" muted numberOfLines={1}>
+                  {lecturaAnterior !== null
+                    ? t('screens:home.vsPreviousReading', { value: lecturaAnterior })
+                    : t('screens:home.noPreviousReading')}
+                </ThemedText>
+              </View>
+
+              {ultimaLectura?.contexto ? (
+                <View style={[styles.contextChip, { backgroundColor: colors.background.default }]}>
+                  <ThemedText type="caption" muted numberOfLines={1}>
+                    {ultimaLectura.contexto}
+                  </ThemedText>
+                </View>
+              ) : null}
             </Card>
           </View>
 
@@ -186,6 +259,33 @@ export default function HomeScreen() {
               <ThemedText style={[styles.cardHint, { color: safeZoneColor }]}>
                 {safeZoneMessage}
               </ThemedText>
+
+              <View style={styles.blockStretch}>
+                <ThemedText type="caption" muted style={styles.blockLabel}>
+                  {t('screens:home.periodDistribution')}
+                </ThemedText>
+                <DistributionBar
+                  distribution={distribucion}
+                  labels={{
+                    low: t('screens:history.low'),
+                    inRange: t('screens:history.inRange'),
+                    high: t('screens:history.high'),
+                  }}
+                />
+              </View>
+
+              <View style={styles.statRow}>
+                <StatPill
+                  label={t('screens:home.streakLabel')}
+                  value={t('screens:home.streak', { count: rachaDias })}
+                  color={rachaDias > 0 ? colors.success.main : colors.text.disabled}
+                />
+                <StatPill
+                  label={t('screens:home.periodChange')}
+                  value={formatDelta(deltaZonaSegura, 'pts')}
+                  color={safeZoneDeltaColor}
+                />
+              </View>
 
               <ThemedText type="caption" muted style={styles.cardFootnote}>
                 {totalLecturas > 0
@@ -209,6 +309,36 @@ export default function HomeScreen() {
               </ThemedText>
 
               <ImcGauge imc={ultimoImc} />
+
+              <View style={styles.statRow}>
+                <StatPill
+                  label={t('screens:home.weightLabel')}
+                  value={
+                    peso !== null
+                      ? t('screens:home.weightValue', { value: peso.toFixed(1) })
+                      : '--'
+                  }
+                />
+                <StatPill
+                  label={t('screens:home.heightLabel')}
+                  value={
+                    estatura !== null
+                      ? t('screens:home.heightValue', { value: estatura })
+                      : '--'
+                  }
+                />
+                <StatPill
+                  label={t('screens:home.imcChangeLabel')}
+                  value={formatDelta(deltaImc)}
+                  color={colors.text.primary}
+                />
+              </View>
+
+              <ThemedText type="caption" muted style={styles.cardFootnote}>
+                {imcFechaLabel
+                  ? t('screens:home.lastMeasurement', { time: imcFechaLabel.toLowerCase() })
+                  : t('screens:home.noMeasurement')}
+              </ThemedText>
             </Card>
           </View>
 
@@ -258,6 +388,52 @@ export default function HomeScreen() {
                 height={isWide ? 200 : 180}
                 emptyMessage={t('screens:home.chartEmpty')}
               />
+
+              <View style={styles.statRow}>
+                <StatPill
+                  label={t('screens:home.average')}
+                  value={resumen.average !== null ? `${resumen.average}` : '--'}
+                  color={colors.accent.blue}
+                />
+                <StatPill
+                  label={t('screens:home.minimum')}
+                  value={resumen.min !== null ? `${resumen.min}` : '--'}
+                  color={colors.error.main}
+                />
+                <StatPill
+                  label={t('screens:home.maximum')}
+                  value={resumen.max !== null ? `${resumen.max}` : '--'}
+                  color={colors.warning.main}
+                />
+              </View>
+
+              {batallasRecientes.length > 0 ? (
+                <View style={styles.battleList}>
+                  <ThemedText type="caption" muted style={styles.battleListTitle}>
+                    {t('screens:home.recentBattles')}
+                  </ThemedText>
+                  {batallasRecientes.map((battle) => (
+                    <BattleRow
+                      key={battle.id}
+                      battle={battle}
+                      statusLabel={rangeStatusLabel(battle.rangeStatus)}
+                    />
+                  ))}
+                </View>
+              ) : null}
+
+              <TouchableOpacity
+                style={[styles.viewAllButton, { borderColor: colors.border }]}
+                onPress={() => router.push('/(tabs)/historial')}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={t('screens:home.viewAll')}
+              >
+                <ThemedText style={[styles.viewAllText, { color: colors.primary.main }]}>
+                  {t('screens:home.viewAll')}
+                </ThemedText>
+                <ChevronRight size={16} color={colors.primary.main} />
+              </TouchableOpacity>
             </Card>
           </View>
         </View>
@@ -394,5 +570,71 @@ const styles = StyleSheet.create({
   chartSubtitle: {
     textAlign: 'center',
     marginBottom: 4,
+  },
+  blockStretch: {
+    alignSelf: 'stretch',
+    marginTop: 12,
+  },
+  blockLabel: {
+    textAlign: 'center',
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  statusChip: {
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  statusChipText: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontFamily: Fonts.semiBold,
+  },
+  trendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 8,
+  },
+  contextChip: {
+    marginTop: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  statRow: {
+    flexDirection: 'row',
+    alignSelf: 'stretch',
+    gap: 8,
+    marginTop: 12,
+  },
+  battleList: {
+    alignSelf: 'stretch',
+    marginTop: 14,
+  },
+  battleListTitle: {
+    fontSize: 11,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    alignSelf: 'stretch',
+    marginTop: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  viewAllText: {
+    fontSize: 13,
+    fontFamily: Fonts.semiBold,
   },
 });
