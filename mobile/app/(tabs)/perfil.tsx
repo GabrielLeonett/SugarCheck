@@ -17,6 +17,7 @@ import { Card } from '@/components/card';
 import { FormInput } from '@/components/FormInput';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { Modal } from '@/components/Modal';
+import { ReminderSettingsCard } from '@/components/ReminderSettingsCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { DatePickerField } from '@/components/DatePicker';
@@ -767,6 +768,8 @@ export default function PerfilScreen() {
             style={styles.inlineButton}
           />
         </Card>
+
+        <ReminderSettingsCard basalSchemas={preference?.basalSchemas} />
 
         {isGuestMode ? (
           <Card style={styles.card}>
