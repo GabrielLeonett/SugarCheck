@@ -52,9 +52,14 @@ pnpm start
 
 ### 🐳 Despliegue
 
-El despliegue con Docker sigue funcionando igual desde la raíz
-(`docker-compose.yml` + `deploy/`), porque cada Dockerfile construye su propia
-carpeta (`backend/` o `frontend/`).
+El frontend y el backend se construyen en **GitHub Actions** y se publican en
+**Docker Hub**. El servidor solo descarga las imágenes con
+`docker compose pull`; no compila nada.
+
+- Workflow: `.github/workflows/docker-publish.yml`
+- Guía completa: [`deploy/README.md`](deploy/README.md)
+- Variables: `backend/.env.example`, `frontend/.env.example` y `.env.example`
+- Mobile: se despliega aparte con Expo/EAS (`mobile/.env.example`)
 
 ## 🎨 Diseño y UI/UX
 Toda la interfaz fue diseñada pensando en la accesibilidad y la psicología infantil:

@@ -1,0 +1,77 @@
+name: Docker publish
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/docker-publish.yml"
+      - "docker-compose.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-publish-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            context: ./backend
+            dockerfile: ./backend/Dockerfile
+            tag: api
+          - name: web
+            context: ./frontend
+            dockerfile: ./frontend/Dockerfile
+            tag: web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Compute image name
+        id: image
+        run: |
+          NAMESPACE="${{ vars.DOCKERHUB_NAMESPACE || secrets.DOCKERHUB_USERNAME }}"
+          REPO="${{ vars.DOCKERHUB_REPO || 'sugarcheck' }}"
+          echo "base=${NAMESPACE,,}/${REPO,,}" >> "$GITHUB_OUTPUT"
+          echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Set frontend build args
+        if: matrix.name == 'web'
+        env:
+          BACKEND_URL: ${{ vars.VITE_BACKEND_URL || 'https://sugarcheck.duckdns.org' }}
+        run: echo "BUILD_ARGS=VITE_BACKEND_URL=${BACKEND_URL}" >> "$GITHUB_ENV"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ${{ steps.image.outputs.base }}:${{ matrix.tag }}
+            ${{ steps.image.outputs.base }}:${{ matrix.tag }}-${{ steps.image.outputs.sha }}
+          build-args: ${{ env.BUILD_ARGS }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}

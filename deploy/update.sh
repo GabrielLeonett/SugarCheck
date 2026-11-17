@@ -16,9 +16,11 @@ log() { echo -e "\n\033[1;34m==>\033[0m $*"; }
 # build/push funcione en tu PC.
 if [[ ! -f backend/.env ]]; then
   echo "[x] Falta backend/.env"
-  echo "    cp deploy/backend.env.example backend/.env  y rellénalo"
+  echo "    cp backend/.env.example backend/.env  y rellénalo"
   exit 1
 fi
+
+# Si el repo de Docker Hub es privado, ejecuta `docker login` antes.
 
 log "Git pull"
 git pull --ff-only || true
