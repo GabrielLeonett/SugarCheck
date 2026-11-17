@@ -50,15 +50,15 @@ pnpm start
 > Importante: **no** ejecutes `pnpm install` en la raíz del repositorio. Cada
 > carpeta gestiona sus dependencias de forma aislada.
 
-### 🐳 Despliegue
+### 🚢 Despliegue
 
-El frontend y el backend se construyen en **GitHub Actions** y se publican en
-**Docker Hub**. El servidor solo descarga las imágenes con
-`docker compose pull`; no compila nada.
+- **Frontend:** Vercel (configurado con `frontend/vercel.json`).
+- **Backend:** Railway.
 
-- Workflow: `.github/workflows/docker-publish.yml`
-- Guía completa: [`deploy/README.md`](deploy/README.md)
-- Variables: `backend/.env.example`, `frontend/.env.example` y `.env.example`
+No se usa Docker ni GitHub Actions: cada plataforma construye y despliega
+directamente desde su carpeta (`frontend/` o `backend/`).
+
+- Variables: `backend/.env.example` y `frontend/.env.example`
 - Mobile: se despliega aparte con Expo/EAS (`mobile/.env.example`)
 
 ## 🎨 Diseño y UI/UX
