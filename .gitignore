@@ -4,6 +4,7 @@
 /.opencode
 .env*
 !.env.example
+!**/.env.example
 
 # dependencias (cada proyecto instala las suyas)
 

@@ -2,11 +2,14 @@
 # ============================================================
 # SugarCheck - Construir y subir las imágenes a Docker Hub
 #
+# Flujo normal: GitHub Actions (.github/workflows/docker-publish.yml).
+# Este script queda como respaldo para construir desde tu PC.
+#
 # Uso (en tu PC):
 #   docker login
 #   ./deploy/push.sh
 #
-# Sube dos tags al repo gayer12/sugarcheck:
+# Sube dos tags al repo configurado en docker-compose.yml:
 #   :api   → backend NestJS
 #   :web   → frontend Vite + Caddy
 # ============================================================
