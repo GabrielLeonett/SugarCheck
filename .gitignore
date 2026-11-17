@@ -1,7 +1,8 @@
 /.agents
+/.opencode
+/.vscode
 
 # dotenv environment files (nunca commitear secretos)
-/.opencode
 .env*
 !.env.example
 !**/.env.example
