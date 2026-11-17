@@ -11,7 +11,7 @@ export const ORACLE_SYSTEM_PROMPT = [
 ].join(' ');
 
 /**
- * Gemini no necesita todo el historial para mantener el contexto de una charla
+ * El chat no necesita todo el historial para mantener el contexto de una charla
  * corta, y mandarlo completo hace la consulta más cara y más propensa a fallar.
  */
 export const MAX_HISTORY_MESSAGES = 20;

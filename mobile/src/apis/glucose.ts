@@ -47,7 +47,7 @@ function mapRecord(item: GlucoseBackendRecord): GlucoseEntry {
   const datePart = item.date.slice(0, 10);
   return {
     id: item.id,
-    nivel: item.valueMgdl,
+    nivel: Number(item.valueMgdl),
     contexto: item.mealTag,
     fecha: formatFecha(item.date),
     hora: formatHora(item.time),
@@ -65,10 +65,10 @@ export const glucoseApi = {
       return useGuestStore.getState().records.glucose
         .map((record) => ({
           id: record.id,
-          nivel: Number(record.nivel),
-          contexto: String(record.contexto),
-          fecha: String(record.fecha),
-          hora: String(record.hora),
+          nivel: Number(record.valueMgdl),
+          contexto: String(record.mealTag),
+          fecha: formatFecha(String(record.date)),
+          hora: formatHora(String(record.time)),
           timestamp: new Date(String(record.timestamp)),
         }))
         .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());

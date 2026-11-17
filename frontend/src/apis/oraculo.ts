@@ -100,7 +100,7 @@ export const oraculoApi = {
    *
    * No se puede usar axios aquí porque su interceptor espera la respuesta
    * completa: hace falta `fetch` con `ReadableStream` para ir mostrando los
-   * trozos a medida que Gemini los emite.
+   * trozos a medida que el proveedor de IA los emite.
    */
   async streamMessage(
     id: string,

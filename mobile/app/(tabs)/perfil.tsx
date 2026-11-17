@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/card';
+import { ExportDataCard } from '@/components/ExportDataCard';
 import { FormInput } from '@/components/FormInput';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { Modal } from '@/components/Modal';
@@ -770,6 +771,8 @@ export default function PerfilScreen() {
         </Card>
 
         <ReminderSettingsCard basalSchemas={preference?.basalSchemas} />
+
+        {!isGuestMode && <ExportDataCard />}
 
         {isGuestMode ? (
           <Card style={styles.card}>

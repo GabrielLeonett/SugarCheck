@@ -101,5 +101,15 @@
   "deleteAccount": "Excluir conta",
   "deleteAccountWarning": "Esta ação não pode ser desfeita. Todos os seus dados serão excluídos permanentemente.",
   "deleteAccountError": "Não foi possível excluir a conta",
-  "logoutError": "Não foi possível sair"
+  "logoutError": "Não foi possível sair",
+  "exportTitle": "Exportar dados médicos",
+  "exportDescription": "Baixe seus registros clínicos de glicose, HbA1c, insulina e IMC.",
+  "exportFrom": "Desde",
+  "exportTo": "Até",
+  "exportRangeHint": "Deixe as datas vazias para exportar todo o histórico.",
+  "exportPdf": "Baixar PDF",
+  "exportCsv": "Baixar CSV",
+  "exportSuccess": "Arquivo baixado",
+  "exportError": "Não foi possível gerar o arquivo",
+  "exportInvalidRange": "A data inicial deve ser anterior ou igual à final"
 }

@@ -6,7 +6,7 @@
     "deleteOutDir": true,
     "assets": [
       {
-        "include": "export/infra/exporters/fonts/*",
+        "include": "export/infra/exporters/fonts/NotoSansJP-Regular.woff",
         "outDir": "dist"
       }
     ],
