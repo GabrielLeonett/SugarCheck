@@ -30,6 +30,9 @@ Mobile **no** entra en este flujo: se despliega con Expo/EAS.
 
 ## 1. Configurar GitHub Actions
 
+> Asegúrate de que Actions esté habilitado en **Settings → Actions → General →
+> Allow all actions and reusable workflows**.
+
 En GitHub: **Settings → Secrets and variables → Actions**.
 
 ### Secrets obligatorios
