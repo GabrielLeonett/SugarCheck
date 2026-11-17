@@ -16,7 +16,7 @@ import { Card } from '@/components/card';
 import { FormInput } from '@/components/FormInput';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { H1, H2, Body1, Caption, H4 } from '@/components/ui';
+import { H1, H2, Body1, H4 } from '@/components/ui';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useGuestStore } from '@/src/stores/guestStore';
@@ -205,15 +205,6 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </Card>
 
-        {/* Pie: patrocinador */}
-        <View style={styles.footer}>
-          <Caption style={styles.footerText}>{t('auth:sponsoredBy')}</Caption>
-          <Image
-            source={require('../../assets/escudo.png')}
-            style={styles.sponsorLogo}
-            resizeMode="contain"
-          />
-        </View>
       </ScrollView>
     </ThemedView>
   );
@@ -298,17 +289,5 @@ const styles = StyleSheet.create({
   },
   socialButton: {
     flex: 1,
-  },
-  footer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  footerText: {
-    fontSize: 12,
-    marginBottom: 6,
-  },
-  sponsorLogo: {
-    width: 120,
-    height: 40,
   },
 });

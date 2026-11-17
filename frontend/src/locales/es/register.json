@@ -15,7 +15,6 @@
     "hasAccount": "¿Ya tienes cuenta?",
     "loginLink": "Iniciar sesión",
     "finishButton": "Crear cuenta",
-    "sponsoredBy": "Patrocinado por",
     "errorRegister": "Error al registrar usuario",
     "errorEmailExists": "Este correo electrónico ya está registrado"
 }

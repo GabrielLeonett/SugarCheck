@@ -15,7 +15,6 @@
     "hasAccount": "Already have an account?",
     "loginLink": "Sign In",
     "finishButton": "Create Account",
-    "sponsoredBy": "Sponsored by",
     "errorRegister": "Error registering user",
     "errorEmailExists": "This email is already registered"
 }

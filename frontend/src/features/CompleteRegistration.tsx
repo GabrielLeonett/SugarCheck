@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Box, useTheme, Typography, TextField, Button, Link, Grid, MenuItem, Alert } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LogoGA } from "../components/ui/LogoGA";
+import { LogoSugarCheck } from "../components/ui/LogoSugarCheck";
 import LoginIcon from '@mui/icons-material/Login';
 import { CardBase } from '../components/ui/Cards/CardBase';
 import { apiPrivate } from '../apis/axios';
@@ -340,10 +340,7 @@ export default function CompleteRegistration() {
         mb: { xs: 2, md: 0 },
         pt: 2
       }}>
-        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-          {t("sponsoredBy")}
-        </Typography>
-        <LogoGA />
+        <LogoSugarCheck />
       </Box>
     </Box>
   );

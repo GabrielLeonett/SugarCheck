@@ -12,7 +12,6 @@
   "submittingButton": "Loading...",
   "oauthDivider": "Or continue with",
   "forgotPassword": "Forgot your password?",
-  "sponsoredBy": "Sponsored by",
   "errors": {
     "defaultBackendError": "Error signing in. Please try again.",
     "unknownError": "Unknown error"

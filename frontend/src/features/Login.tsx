@@ -1,5 +1,5 @@
 import { Box, useTheme, Typography, TextField, Link, Alert, Button } from "@mui/material";
-import { LogoGA } from "../components/ui/LogoGA";
+import { LogoSugarCheck } from "../components/ui/LogoSugarCheck";
 import LoginIcon from '@mui/icons-material/Login';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -333,7 +333,7 @@ export default function Login() {
                 </Box>
             </Box>
 
-            {/* Footer - Patrocinado por */}
+            {/* Footer - Marca SugarCheck */}
             <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -343,16 +343,7 @@ export default function Login() {
                 gap: 2
             }}>
                 <ConfigRow />
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-                        {t("sponsoredBy")}
-                    </Typography>
-                    <LogoGA />
-                </Box>
+                <LogoSugarCheck />
             </Box>
         </Box>
     );
