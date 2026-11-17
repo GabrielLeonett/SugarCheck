@@ -26,7 +26,7 @@ export class PdfMedicalExporter {
   private readonly japaneseFontPath = path.join(
     __dirname,
     'fonts',
-    'NotoSansJP-Regular.ttf',
+    'NotoSansJP-Regular.woff',
   );
 
   constructor(private readonly translationService: TranslationService) {}

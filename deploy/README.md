@@ -89,7 +89,7 @@ Mínimo obligatorio:
 - `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`
 - `CORS_ORIGIN` y `FRONTEND_URL` → `https://sugarcheck.duckdns.org`
 
-Opcionales: email (Gmail) y `GEMINI_API_KEY`.
+Opcionales: email (Gmail) y `DEEPSEEK_API_KEY` (o `GEMINI_API_KEY` como alternativa).
 
 > `backend/.env` no se versiona ni se copia a la imagen. Compose lo inyecta en
 > tiempo de ejecución con `env_file`.
@@ -190,7 +190,7 @@ docker compose down             # parar todo
 ## Seguridad
 
 `backend/.env.development` está trackeado en git con credenciales reales
-(Supabase, Firebase, Gmail, Gemini, JWT). Rótalas y sácalo del repo:
+(Supabase, Firebase, Gmail, DeepSeek/Gemini, JWT). Rótalas y sácalo del repo:
 
 ```bash
 git rm --cached backend/.env.development

@@ -1,7 +1,7 @@
 import { create } from 'axios';
 import i18n from '@/src/i18n';
 
-const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+export const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
 export const apiPrivate = create({
   baseURL: BASE_URL,

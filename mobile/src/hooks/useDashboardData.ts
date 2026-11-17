@@ -251,9 +251,13 @@ export function useDashboardData(): DashboardData {
   const hypo = currentPreference?.thresholds?.hypo ?? 70;
   const hiper = currentPreference?.thresholds?.hiper ?? 180;
 
-  const sortedGlucose = [...glucose].sort(
-    (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
-  );
+  const sortedGlucose = [...glucose]
+    .filter(
+      (entry) =>
+        Number.isFinite(entry.nivel) &&
+        Number.isFinite(entry.timestamp.getTime())
+    )
+    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   const lastReading = sortedGlucose[0] ?? null;
 
   const cutoff = now - RANGE_DAYS * 24 * 60 * 60 * 1000;

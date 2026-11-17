@@ -101,5 +101,15 @@
   "deleteAccount": "Delete account",
   "deleteAccountWarning": "This action cannot be undone. All your data will be permanently deleted.",
   "deleteAccountError": "Could not delete the account",
-  "logoutError": "Could not log out"
+  "logoutError": "Could not log out",
+  "exportTitle": "Export medical data",
+  "exportDescription": "Download your clinical records for glucose, HbA1c, insulin and BMI.",
+  "exportFrom": "From",
+  "exportTo": "To",
+  "exportRangeHint": "Leave the dates empty to export the full history.",
+  "exportPdf": "Download PDF",
+  "exportCsv": "Download CSV",
+  "exportSuccess": "File downloaded",
+  "exportError": "The file could not be generated",
+  "exportInvalidRange": "The start date must be before or equal to the end date"
 }

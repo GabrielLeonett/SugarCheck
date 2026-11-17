@@ -7,6 +7,7 @@ import { ConversationController } from './conversation.controller';
 import { PrismaConversationRepository } from '../persistence/PrismaConversationRepository';
 import { PrismaGlucoseDataProvider } from '../glucose/PrismaGlucoseDataProvider';
 import { FallbackLanguageModel } from '../language-model/FallbackLanguageModel';
+import { DeepSeekLanguageModel } from '../language-model/DeepSeekLanguageModel';
 import { GeminiLanguageModel } from '../language-model/GeminiLanguageModel';
 import { LocalLanguageModel } from '../language-model/LocalLanguageModel';
 import { ConversationRepository } from '../../core/conversation/ConversationRepository';
@@ -42,11 +43,21 @@ import { GlucoseDataProvider } from '../../app/ports/GlucoseDataProvider';
       inject: [ConfigService],
       useFactory: (config: ConfigService): LanguageModel => {
         const local = new LocalLanguageModel();
-        const apiKey = config.get<string>('GEMINI_API_KEY');
-        if (apiKey) {
-          const model = config.get<string>('GEMINI_MODEL') ?? 'gemini-3.1-flash-lite';
-          return new FallbackLanguageModel(new GeminiLanguageModel(apiKey, model), local);
+
+        const deepSeekKey = config.get<string>('DEEPSEEK_API_KEY')?.trim();
+        if (deepSeekKey) {
+          const model = config.get<string>('DEEPSEEK_MODEL')?.trim() || 'deepseek-flash';
+          return new FallbackLanguageModel(new DeepSeekLanguageModel(deepSeekKey, model), local);
         }
+
+        // Gemini se conserva como alternativa para despliegues que aún no
+        // migraron sus credenciales a DeepSeek.
+        const geminiKey = config.get<string>('GEMINI_API_KEY')?.trim();
+        if (geminiKey) {
+          const model = config.get<string>('GEMINI_MODEL')?.trim() || 'gemini-3.1-flash-lite';
+          return new FallbackLanguageModel(new GeminiLanguageModel(geminiKey, model), local);
+        }
+
         return local;
       },
     },

@@ -13,6 +13,11 @@ sin conexión. Los videos, el chat y la asociación con una cuenta requieren
 internet. El rango de glucosa se ingresa según la indicación de la persona o su
 equipo de salud; la app no lo recomienda.
 
+El chat del Oráculo Azul usa el backend (`/oraculo/*`), que a su vez se conecta
+con el proveedor de IA. La app móvil nunca guarda la API key de DeepSeek. Para
+usar el chat hay que iniciar sesión; el modo invitado conserva sus registros
+locales y puede importarlos después.
+
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
 ## Get started
