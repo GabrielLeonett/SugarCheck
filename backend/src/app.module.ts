@@ -21,7 +21,14 @@ import { ExportModule } from './export/infra/Nest/export.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV || 'production'}`,
+      // Los archivos .local permiten credenciales locales sin tocar los .env
+      // versionados. El primero que define una variable tiene prioridad.
+      envFilePath: [
+        `.env.${process.env.NODE_ENV || 'production'}.local`,
+        `.env.${process.env.NODE_ENV || 'production'}`,
+        '.env.local',
+        '.env',
+      ],
     }),
     I18nModule,
     UserModule,

@@ -101,5 +101,15 @@
   "deleteAccount": "アカウントを削除",
   "deleteAccountWarning": "この操作は元に戻せません。すべてのデータが完全に削除されます。",
   "deleteAccountError": "アカウントを削除できませんでした",
-  "logoutError": "ログアウトできませんでした"
+  "logoutError": "ログアウトできませんでした",
+  "exportTitle": "医療データをエクスポート",
+  "exportDescription": "血糖値、HbA1c、インスリン、BMIの臨床記録をダウンロードします。",
+  "exportFrom": "開始日",
+  "exportTo": "終了日",
+  "exportRangeHint": "日付を空欄にすると全履歴をエクスポートします。",
+  "exportPdf": "PDFをダウンロード",
+  "exportCsv": "CSVをダウンロード",
+  "exportSuccess": "ファイルをダウンロードしました",
+  "exportError": "ファイルを生成できませんでした",
+  "exportInvalidRange": "開始日は終了日以前である必要があります"
 }

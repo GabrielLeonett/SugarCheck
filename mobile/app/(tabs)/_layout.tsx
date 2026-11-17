@@ -2,13 +2,20 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { QuickRecordModal } from '@/components/QuickRecordModal';
 import { Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+
+const TAB_ICONS: Record<string, 'home' | 'book' | 'android' | 'flag'> = {
+  index: 'home',
+  historial: 'book',
+  agent: 'android',
+  camino: 'flag',
+};
 
 function TabIcon({
   route,
@@ -19,6 +26,7 @@ function TabIcon({
   focused: boolean;
   size?: number;
 }) {
+  const { colors } = useTheme();
   const scaleAnim = useRef(new Animated.Value(focused ? 1.1 : 1)).current;
 
   useEffect(() => {
@@ -29,46 +37,8 @@ function TabIcon({
     }).start();
   }, [focused, scaleAnim]);
 
-  const renderIcon = () => {
-    const iconSize = size ?? 26;
-
-    switch (route.name) {
-      case 'index':
-        return (
-          <Image
-            source={require('../../assets/tabbar/home.png')}
-            style={{ width: iconSize, height: iconSize }}
-            resizeMode="contain"
-          />
-        );
-      case 'historial':
-        return (
-          <Image
-            source={require('../../assets/tabbar/libro.png')}
-            style={{ width: iconSize, height: iconSize }}
-            resizeMode="contain"
-          />
-        );
-      case 'agent':
-        return (
-          <Image
-            source={require('../../assets/tabbar/robot.png')}
-            style={{ width: iconSize, height: iconSize }}
-            resizeMode="contain"
-          />
-        );
-      case 'camino':
-        return (
-          <Image
-            source={require('../../assets/tabbar/colina.png')}
-            style={{ width: iconSize, height: iconSize }}
-            resizeMode="contain"
-          />
-        );
-      default:
-        return null;
-    }
-  };
+  const iconName = TAB_ICONS[route.name];
+  if (!iconName) return null;
 
   return (
     <Animated.View
@@ -77,7 +47,11 @@ function TabIcon({
         { transform: [{ scale: scaleAnim }] },
       ]}
     >
-      {renderIcon()}
+      <FontAwesome
+        name={iconName}
+        size={size ?? 26}
+        color={focused ? colors.tabIconSelected : colors.tabIconDefault}
+      />
     </Animated.View>
   );
 }
