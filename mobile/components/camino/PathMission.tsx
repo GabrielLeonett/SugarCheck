@@ -180,7 +180,6 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
                 style={styles.video}
                 nativeControls
                 contentFit="contain"
-                fullscreenOptions={{ enable: true }}
                 requiresLinearPlayback
                 playsInline
               />
@@ -418,7 +417,11 @@ const styles = StyleSheet.create({
   videoContainer: { width: '100%', aspectRatio: 16 / 9, borderRadius: 14, overflow: 'hidden' },
   video: { width: '100%', height: '100%' },
   videoOverlay: {
-    ...StyleSheet.absoluteFill,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: 'rgba(0,0,0,0.72)',
     alignItems: 'center',
     justifyContent: 'center',
