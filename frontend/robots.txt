@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /admin/
 Disallow: /config/
 
-Sitemap: https://guerreros-azules-5dpg32qqa-gabrielleonetts-projects.vercel.app/sitemap.xml
+Sitemap: https://sugarcheck.duckdns.org/sitemap.xml

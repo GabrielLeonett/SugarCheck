@@ -12,7 +12,6 @@
   "submittingButton": "Carregando...",
   "oauthDivider": "Ou continuar com",
   "forgotPassword": "Esqueceu sua senha?",
-  "sponsoredBy": "Patrocinado por",
   "errors": {
     "defaultBackendError": "Erro ao iniciar sessão. Tente novamente.",
     "unknownError": "Erro desconhecido"

@@ -1,5 +1,5 @@
 import { Box, useTheme, Typography, TextField, Alert } from "@mui/material";
-import { LogoGA } from "../components/ui/LogoGA";
+import { LogoSugarCheck } from "../components/ui/LogoSugarCheck";
 import LockResetIcon from '@mui/icons-material/LockReset';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -236,10 +236,7 @@ export default function ResetPassword() {
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: { xs: 3, md: 5 }, mb: { xs: 2, md: 0 }, pt: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                    {t("sponsoredBy")}
-                </Typography>
-                <LogoGA />
+                <LogoSugarCheck />
             </Box>
         </Box>
     );

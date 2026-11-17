@@ -1,5 +1,5 @@
 import { Box, useTheme, Typography, TextField, Button, Link } from "@mui/material";
-import { LogoGA } from "../components/ui/LogoGA";
+import { LogoSugarCheck } from "../components/ui/LogoSugarCheck";
 
 export default function Login() {
     const theme = useTheme();
@@ -110,10 +110,7 @@ export default function Login() {
                 </Box>
             </Box>
             <Box sx={{ display: 'flex', margin: 3, flexDirection: 'column', alignItems: 'center' }}>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 1 }}>
-                    Patrocinado por
-                </Typography>
-                <LogoGA />
+                <LogoSugarCheck />
             </Box>
         </>
     );
