@@ -47,6 +47,8 @@
   "TOKEN_REFRESHED": "Token renovado com sucesso",
   "LOGOUT_SUCCESS": "Sessão encerrada com sucesso",
   "FIREBASE_LOGIN_SUCCESS": "Login com {provider} realizado com sucesso",
+  "OAUTH_LOGIN_SUCCESS": "Login com Google ou Facebook realizado com sucesso",
+  "OAUTH_CODE_INVALID": "O código de login é inválido ou expirou",
   "EMAIL_UPDATED": "E-mail atualizado com sucesso",
   "PREFERENCES_FETCHED": "Preferências obtidas com sucesso",
   "PREFERENCES_SAVED": "Preferências salvas com sucesso",

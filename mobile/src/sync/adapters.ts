@@ -2,9 +2,9 @@
  * Adaptadores entre los tipos del móvil y el formato de sincronización del backend.
  *
  * El backend espera en /sync/push:
- *   { id, data: { <campos de negocio> }, createdAt, updatedAt }
+ *   { id, <campos de negocio en la raíz>, createdAt, updatedAt }
  * y devuelve en /sync/pull:
- *   { id, data: { <campos de negocio> }, createdAt (epoch ms), updatedAt (epoch ms), ...otros campos }
+ *   { id, <campos de negocio en la raíz>, createdAt (epoch ms), updatedAt (epoch ms), ...otros campos }
  */
 
 import type {
@@ -29,12 +29,10 @@ const now = () => Date.now();
 export function glucoseToSyncRecord(entry: GlucoseEntry): SyncRecord {
   return {
     id: entry.id,
-    data: {
-      valueMgdl: entry.nivel,
-      mealTag: entry.contexto,
-      date: entry.fecha,
-      time: entry.hora,
-    },
+    valueMgdl: entry.nivel,
+    mealTag: entry.contexto,
+    date: entry.fecha,
+    time: entry.hora,
     createdAt: entry.timestamp.getTime(),
     updatedAt: entry.timestamp.getTime(),
   };
@@ -64,15 +62,13 @@ export function syncRecordToGlucose(rec: Record<string, unknown>): GlucoseEntry 
 export function insulinaToSyncRecord(rec: InsulinRecord): SyncRecord {
   return {
     id: rec.id,
-    data: {
-      tipo: rec.tipo,
-      dosis: rec.dosis,
-      unidades: rec.unidades ?? rec.dosis,
-      fecha: rec.fecha,
-      hora: rec.hora,
-      zona: rec.zona,
-      contexto: rec.contexto ?? null,
-    },
+    tipo: rec.tipo,
+    dosis: rec.dosis,
+    unidades: rec.unidades ?? rec.dosis,
+    fecha: rec.fecha,
+    hora: rec.hora,
+    zona: rec.zona,
+    contexto: rec.contexto ?? null,
     createdAt: new Date(rec.createdAt).getTime(),
     updatedAt: new Date(rec.createdAt).getTime(),
   };
@@ -113,12 +109,10 @@ export function imcToSyncRecord(rec: PhysicalRecord): SyncRecord {
   const imcValue = rec.peso / (alturaM * alturaM);
   return {
     id: rec.id,
-    data: {
-      peso: rec.peso,
-      altura: rec.estatura,
-      fecha: rec.fecha,
-      imcValue: Number(imcValue.toFixed(1)),
-    },
+    peso: rec.peso,
+    altura: rec.estatura,
+    fecha: rec.fecha,
+    imcValue: Number(imcValue.toFixed(1)),
     createdAt: now(),
     updatedAt: now(),
   };
@@ -148,11 +142,9 @@ export function syncRecordToImc(rec: Record<string, unknown>): PhysicalRecord {
 export function contactToSyncRecord(rec: ContactEmergenceData): SyncRecord {
   return {
     id: rec.id,
-    data: {
-      name: rec.name,
-      parentesco: rec.parentesco,
-      telefono: rec.telefono ?? null,
-    },
+    name: rec.name,
+    parentesco: rec.parentesco,
+    telefono: rec.telefono ?? null,
     createdAt: now(),
     updatedAt: now(),
   };
@@ -175,15 +167,13 @@ export function syncRecordToContact(rec: Record<string, unknown>): ContactEmerge
 export function preferenceToSyncRecord(pref: Preference): SyncRecord {
   return {
     id: pref.userId, // preference usa userId como clave
-    data: {
-      profileImg: pref.profileImg,
-      unitMeasure: pref.unitMeasure,
-      thresholds: pref.thresholds,
-      insulinRatios: pref.insulinRatios,
-      sensitivity: pref.sensitivity,
-      correctionSchemas: pref.correctionSchemas ?? null,
-      basalSchemas: pref.basalSchemas ?? null,
-    },
+    profileImg: pref.profileImg,
+    unitMeasure: pref.unitMeasure,
+    thresholds: pref.thresholds,
+    insulinRatios: pref.insulinRatios,
+    sensitivity: pref.sensitivity,
+    correctionSchemas: pref.correctionSchemas ?? null,
+    basalSchemas: pref.basalSchemas ?? null,
     createdAt: now(),
     updatedAt: now(),
   };
@@ -218,10 +208,8 @@ export function syncRecordToPreference(rec: Record<string, unknown>): Preference
 export function hba1cToSyncRecord(rec: HbA1cRecord): SyncRecord {
   return {
     id: rec.id,
-    data: {
-      valuePercent: rec.resultado,
-      examDate: rec.fecha,
-    },
+    valuePercent: rec.resultado,
+    examDate: rec.fecha,
     createdAt: now(),
     updatedAt: now(),
   };

@@ -47,6 +47,8 @@
   "TOKEN_REFRESHED": "トークンが正常に更新されました",
   "LOGOUT_SUCCESS": "セッションが正常に終了しました",
   "FIREBASE_LOGIN_SUCCESS": "{provider}でのログインに成功しました",
+  "OAUTH_LOGIN_SUCCESS": "GoogleまたはFacebookでのログインに成功しました",
+  "OAUTH_CODE_INVALID": "ログインコードが無効または期限切れです",
   "EMAIL_UPDATED": "メールアドレスが正常に更新されました",
   "PREFERENCES_FETCHED": "設定が正常に取得されました",
   "PREFERENCES_SAVED": "設定が正常に保存されました",

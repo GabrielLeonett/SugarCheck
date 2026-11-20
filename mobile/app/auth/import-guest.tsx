@@ -20,7 +20,7 @@ import { showErrorAlert } from '@/src/stores/systemAlertStore';
 function toSyncRecord(record: GuestRecord, data: Record<string, unknown>): SyncRecord {
   return {
     id: record.id,
-    data,
+    ...data,
     createdAt: record.createdAt,
     updatedAt: record.createdAt,
   };
@@ -95,16 +95,13 @@ export default function ImportGuestScreen() {
           }, {
             name: profile.emergencyContact.name,
             parentesco: profile.emergencyContact.relationship,
-            telefono: profile.emergencyContact.phone,
+            telefono: profile.emergencyContact.phone || null,
           })],
         },
         preference: {
           created: [{
             id: user.id,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            data: {
-            profileImg: profile.avatar,
+            profileImg: profile.avatar || 'default',
             unitMeasure: 'mg/dL',
             thresholds: {
               hypo: profile.glucoseRange.hypo,
@@ -112,7 +109,8 @@ export default function ImportGuestScreen() {
             },
             insulinRatios: { breakfast: 100, lunch: 100, dinner: 100 },
             sensitivity: 1,
-            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           }],
         },
       };

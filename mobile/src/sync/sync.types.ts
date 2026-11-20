@@ -5,6 +5,10 @@
  * Endpoints del backend:
  *   POST /sync/push   { changes: { [table]: { created, updated, deleted } }, lastPulledAt? }
  *   GET  /sync/pull?lastPulledAt=number  -> { changes: { [table]: { created, updated, deleted } }, timestamp }
+ *
+ * IMPORTANTE: el backend lee los campos de negocio en la RAÍZ del registro,
+ * no dentro de una propiedad `data`. Es decir:
+ *   { id, valueMgdl, mealTag, date, time, createdAt, updatedAt }
  */
 
 export type SyncTableName =
@@ -17,9 +21,10 @@ export type SyncTableName =
 
 export interface SyncRecord {
   id: string;
-  data: Record<string, unknown>;
   createdAt: string | number;
   updatedAt: string | number;
+  /** Campos de negocio aplanados, tal como los espera el backend. */
+  [field: string]: unknown;
 }
 
 export interface TableChanges {

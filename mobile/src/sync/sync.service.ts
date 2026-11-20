@@ -116,6 +116,7 @@ export function addPendingChange(
 
 /**
  * Crea un SyncRecord genérico para usar en created/updated.
+ * Los campos de negocio se aplanan en la raíz porque así los valida el backend.
  */
 export function makeSyncRecord(
   id: string,
@@ -126,7 +127,7 @@ export function makeSyncRecord(
   const now = Date.now();
   return {
     id,
-    data,
+    ...data,
     createdAt: createdAt ?? now,
     updatedAt: updatedAt ?? now,
   };

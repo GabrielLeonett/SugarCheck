@@ -5,6 +5,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BcryptHasher } from '../../shared/infrastructure/security/bcrypt-hasher';
 import { AuthController } from './auth.controller';
+import { OAuthController } from './oauth.controller';
+import { OAuthService } from './oauth/oauth.service';
 import { RefreshAccessToken } from '../app/RefreshAccessToken';
 import { LoginUser } from '../app/LoginUser';
 import { Logout } from '../app/LogoutUser';
@@ -37,7 +39,7 @@ import {
       },
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, OAuthController],
   providers: [
     AuthGuard,
     OptionalAuthGuard,
@@ -64,6 +66,7 @@ import {
     ResetPassword,
     AuthService,
     FirebaseAdminService,
+    OAuthService,
   ],
   exports: [JwtModule, AuthGuard, OptionalAuthGuard, RolesGuard, FirebaseAdminService],
 })

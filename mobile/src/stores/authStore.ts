@@ -1,7 +1,10 @@
 import { create } from 'zustand';
+import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
 import { authApi } from '../apis/auth';
 import { signOut } from 'firebase/auth';
 import { authFirebase } from '../config/firebase';
+import i18n from '../i18n';
 import type { User } from '../types';
 import { useGuestStore } from './guestStore';
 import { preferenceStore } from './preferenceStore';
@@ -12,15 +15,16 @@ interface AuthState {
   isAuthLoading: boolean;
   isNewUser: boolean;
   refresh: () => Promise<string | null>;
-  login: (email: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setAuth: (user: User, accessToken: string) => void;
   setLoading: (loading: boolean) => void;
   loginWithProvider: (providerName: 'google' | 'facebook') => Promise<void>;
+  exchangeOAuthCode: (code: string) => Promise<void>;
   clearNewUserFlag: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
   isAuthLoading: true,
@@ -31,8 +35,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   clearNewUserFlag: () => set({ isNewUser: false }),
 
-  login: async (email, password) => {
-    const response = await authApi.login(email, password);
+  login: async (username, password) => {
+    const response = await authApi.login(username, password);
     await useGuestStore.getState().beginAccountSession();
     set({ user: response.user, accessToken: response.accessToken, isNewUser: false });
     preferenceStore.getState().reset();
@@ -74,28 +78,39 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  loginWithProvider: async (providerName: 'google' | 'facebook') => {
-    try {
-      const { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } = await import('firebase/auth');
-      const provider = providerName === 'google'
-        ? new GoogleAuthProvider()
-        : new FacebookAuthProvider();
+  exchangeOAuthCode: async (code) => {
+    const response = await authApi.exchangeOAuthCode(code);
+    await useGuestStore.getState().beginAccountSession();
+    set({ user: response.user, accessToken: response.accessToken, isNewUser: response.isNewUser ?? false });
+    preferenceStore.getState().reset();
+    await preferenceStore.getState().load().catch((error) => {
+      console.error('No se pudieron cargar las preferencias de la cuenta:', error);
+    });
+  },
 
-      const userCredential = await signInWithPopup(authFirebase, provider);
-      const firebaseToken = await userCredential.user.getIdToken();
-      const response = await authApi.firebaseLogin(firebaseToken);
-      await useGuestStore.getState().beginAccountSession();
-      set({ user: response.user, accessToken: response.accessToken, isNewUser: response.isNewUser ?? false });
-      preferenceStore.getState().reset();
-      await preferenceStore.getState().load().catch((error) => {
-        console.error('No se pudieron cargar las preferencias de la cuenta:', error);
-      });
-    } catch (error: unknown) {
-      const errorMessage =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        (error as Error)?.message ||
-        'Error de autenticación';
-      throw new Error(errorMessage);
+  loginWithProvider: async (providerName: 'google' | 'facebook') => {
+    const redirectUri = Linking.createURL('auth/callback');
+
+    const result = await WebBrowser.openAuthSessionAsync(
+      authApi.oauthStartUrl(providerName, redirectUri),
+      redirectUri,
+    );
+
+    if (result.type !== 'success' || !result.url) {
+      throw new Error(i18n.t('auth:socialLoginCancelled'));
     }
+
+    const { queryParams } = Linking.parse(result.url);
+
+    if (typeof queryParams?.error === 'string') {
+      throw new Error(i18n.t('auth:socialLoginError', { provider: providerName }));
+    }
+
+    const code = queryParams?.code;
+    if (typeof code !== 'string' || code.length === 0) {
+      throw new Error(i18n.t('auth:socialLoginError', { provider: providerName }));
+    }
+
+    await get().exchangeOAuthCode(code);
   },
 }));
