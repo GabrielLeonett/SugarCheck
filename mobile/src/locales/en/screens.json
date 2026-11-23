@@ -19,6 +19,7 @@
     "safetyTimer": "Safety timer",
     "lastRapidInsulin": "Last rapid-acting insulin",
     "hoursRemaining": "Hours remaining",
+    "hoursShort": "h",
     "safe": "Safe zone",
     "expiresSoon": "Expiring soon",
     "shieldActive": "Shield active",

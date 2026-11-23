@@ -10,6 +10,7 @@ export default function Footer() {
     const links = [
         { label: t('privacidad'), path: '/privacidad' },
         { label: t('terminos'), path: '/terminos' },
+        { label: t('cookies'), path: '/cookies' },
         { label: t('soporte'), path: '/soporte' },
         { label: t('version'), path: '#' }
     ];

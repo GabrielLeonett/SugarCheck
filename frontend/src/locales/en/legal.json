@@ -1,0 +1,278 @@
+{
+  "back": "Back",
+  "managePreferences": "Manage cookie preferences",
+  "privacy": {
+    "title": "Privacy Policy",
+    "updated": "Last updated: November 2026",
+    "intro": "At SugarCheck, developed by the SugarCheck Civil Association, we are committed to protecting your privacy and your personal data, including sensitive health information. This policy explains what information we collect, how we use it, and what rights you have.",
+    "sections": [
+      {
+        "title": "Data controller",
+        "paragraphs": [
+          "The controller of your data is the SugarCheck Civil Association. For any privacy-related question, you can write to us at soporte@sugarcheck.org."
+        ]
+      },
+      {
+        "title": "Data we collect",
+        "paragraphs": [
+          "Registration data: username, email address, date of birth, and login credentials.",
+          "Health data you enter: glucose levels, insulin doses, glycated hemoglobin (HbA1c), weight, height, and emergency contacts.",
+          "Usage data and preferences: language, visual theme, avatar, and activity logs within the application.",
+          "Technical data: IP address, device type, and browser, which are necessary for the security and proper operation of the service."
+        ]
+      },
+      {
+        "title": "How we use your data",
+        "paragraphs": [
+          "To provide the service: allow you to record and review your health information, view history and charts, and sync your data across devices.",
+          "To personalize your experience: remember your language, visual theme, and preferences.",
+          "Security: authenticate your account, prevent unauthorized access, and detect misuse.",
+          "Service improvement: analyze aggregated usage to fix bugs and develop new features.",
+          "Communications: send you important notices about your account, policy changes, or service updates."
+        ]
+      },
+      {
+        "title": "Legal basis for processing",
+        "paragraphs": [
+          "We process your data based on your explicit consent for health data, on the performance of the contractual relationship when you use the service, on our legitimate interest in maintaining security and improving the application, and on compliance with legal obligations where applicable."
+        ]
+      },
+      {
+        "title": "Sensitive health data",
+        "paragraphs": [
+          "Health data are special categories of personal data. We only process them with your explicit consent, given when you create your account and when you record each measurement. We apply enhanced security measures and limit access to the personnel and systems strictly necessary to provide the service.",
+          "By registering, you agree that the health data you enter may be stored and processed in order to show your history and statistics within SugarCheck. You can withdraw your consent at any time by deleting your account."
+        ]
+      },
+      {
+        "title": "Data retention",
+        "paragraphs": [
+          "We retain your data for as long as your account remains active. If you delete your account, we will erase or anonymize your personal data within a reasonable period, except where we must retain it due to legal obligations or to resolve claims.",
+          "You can export a copy of your medical information from the profile section before deleting your account."
+        ]
+      },
+      {
+        "title": "Who we share your data with",
+        "paragraphs": [
+          "We do not sell or rent your personal data. We only share it with technology providers that help us operate the service (for example, hosting, authentication through Firebase/Google, and notifications), under contracts that require confidentiality and appropriate security measures.",
+          "We may also disclose information when required by law or when necessary to protect the safety of individuals and the platform."
+        ]
+      },
+      {
+        "title": "Information security",
+        "paragraphs": [
+          "We use encrypted HTTPS connections, store passwords using hash functions, manage sessions with HttpOnly cookies, and apply access controls to data. No system is completely infallible, so we recommend using a unique password and keeping it secret."
+        ]
+      },
+      {
+        "title": "Your rights",
+        "paragraphs": [
+          "You have the right to access, rectify, erase, or object to the processing of your data, to request its portability, and to withdraw your consent at any time.",
+          "You can exercise these rights from your account settings or by writing to soporte@sugarcheck.org. You may also file a complaint with the competent data protection authority in your country."
+        ]
+      },
+      {
+        "title": "Minors",
+        "paragraphs": [
+          "SugarCheck is intended for people with diabetes and their caregivers. Minors must use the application under the supervision and consent of their parent or legal guardian. We do not knowingly collect data from minors without such authorization."
+        ]
+      },
+      {
+        "title": "Changes to this policy",
+        "paragraphs": [
+          "We may update this policy to reflect legal or functional changes. We will publish the current version on this page and indicate the date of the last update. If the changes are significant, we will notify you through the contact channels on record."
+        ]
+      },
+      {
+        "title": "Contact",
+        "paragraphs": [
+          "If you have questions about this Privacy Policy or about how your data is processed, write to us at soporte@sugarcheck.org."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "updated": "Last updated: November 2026",
+    "intro": "These Terms and Conditions govern access to and use of the SugarCheck application. By creating an account or using the service, you accept these terms in full. If you do not agree, please do not use the application.",
+    "sections": [
+      {
+        "title": "Acceptance of the terms",
+        "paragraphs": [
+          "By registering, accessing, or using SugarCheck, you confirm that you have read and accepted these Terms and Conditions and our Privacy Policy. If you use the application on behalf of another person, you represent that you are authorized to do so."
+        ]
+      },
+      {
+        "title": "Description of the service",
+        "paragraphs": [
+          "SugarCheck is a support tool for diabetes management that allows you to record glucose, insulin, HbA1c, and physical measurements, view trends, and access educational content.",
+          "SugarCheck is not a medical device, does not perform diagnoses or prescribe treatments, and does not replace the assessment of a healthcare professional. Decisions about doses, medication, or diet should always be discussed with your doctor or care team.",
+          "The application is not an emergency service. In a risky situation, contact your local emergency services immediately."
+        ]
+      },
+      {
+        "title": "Registration and account security",
+        "paragraphs": [
+          "You must provide truthful and up-to-date information and keep your credentials confidential. You are responsible for all activity carried out from your account.",
+          "You must be of legal age or have the consent and supervision of your parent or legal guardian. Notify us immediately of any unauthorized use of your account."
+        ]
+      },
+      {
+        "title": "Acceptable use",
+        "paragraphs": [
+          "You agree to use the application for personal and lawful purposes. You may not impersonate other people, attempt to access other users' accounts, enter third-party data without their consent, distribute illegal content, reverse engineer the application, overload the infrastructure, or use the service for commercial purposes without written authorization."
+        ]
+      },
+      {
+        "title": "User content",
+        "paragraphs": [
+          "You retain ownership of the information you record. You grant us a limited, non-exclusive, revocable license to store, process, and display it to you for the sole purpose of providing the service.",
+          "You are responsible for the accuracy of the data you enter. Verify your measurements before making decisions based on them."
+        ]
+      },
+      {
+        "title": "Intellectual property",
+        "paragraphs": [
+          "The SugarCheck brand, design, software, texts, illustrations, and educational content are the property of the SugarCheck Civil Association or its licensors. No rights are granted over them other than the personal use permitted by these terms."
+        ]
+      },
+      {
+        "title": "Accuracy and limitation of liability",
+        "paragraphs": [
+          "The information and charts shown by the application depend on the data you record and may contain errors or delays. We do not guarantee that the service will be available uninterrupted or error-free.",
+          "To the extent permitted by law, SugarCheck will not be liable for indirect, incidental, or consequential damages arising from the use or inability to use the application, nor for medical decisions made without the guidance of a healthcare professional."
+        ]
+      },
+      {
+        "title": "Third-party services",
+        "paragraphs": [
+          "The application may rely on third-party services, such as Firebase or Google for authentication. Use of those services is also subject to their own terms and privacy policies."
+        ]
+      },
+      {
+        "title": "Suspension and termination",
+        "paragraphs": [
+          "We may suspend or cancel your access if you breach these terms, if we detect fraudulent use, or if necessary for security reasons. You can delete your account at any time from your profile settings.",
+          "When the relationship ends, your right to use the application ceases, without prejudice to obligations that by their nature must survive."
+        ]
+      },
+      {
+        "title": "Changes",
+        "paragraphs": [
+          "We may modify these terms to adapt them to legal or functional changes. We will publish the updated version on this page and, if the changes are substantial, we will notify you within a reasonable period. Continued use of the service implies acceptance of the new version."
+        ]
+      },
+      {
+        "title": "Governing law and dispute resolution",
+        "paragraphs": [
+          "These terms are governed by the laws of the country where the SugarCheck Civil Association is established. Any dispute shall be submitted to the competent courts of that jurisdiction, without prejudice to the rights granted to you by the consumer regulations of your country."
+        ]
+      },
+      {
+        "title": "Contact",
+        "paragraphs": [
+          "For questions about these Terms and Conditions, write to us at soporte@sugarcheck.org."
+        ]
+      }
+    ]
+  },
+  "cookies": {
+    "title": "Cookies and Local Storage Policy",
+    "updated": "Last updated: November 2026",
+    "intro": "This policy explains how SugarCheck uses cookies and browser local storage. We want you to know what we store, what it is for, and how you can control it. We do not use advertising or cross-site tracking cookies.",
+    "tableTitle": "Storage used by SugarCheck",
+    "storageTable": {
+      "headers": ["Name", "Purpose", "Duration", "Type"],
+      "rows": [
+        {
+          "name": "access_token",
+          "purpose": "Keep the session authenticated and protect access to your account.",
+          "duration": "15 minutes",
+          "type": "Necessary cookie (HttpOnly)"
+        },
+        {
+          "name": "refresh_token",
+          "purpose": "Renew the session without requiring you to log in again.",
+          "duration": "7 days",
+          "type": "Necessary cookie (HttpOnly)"
+        },
+        {
+          "name": "theme",
+          "purpose": "Remember whether you prefer the light or dark theme.",
+          "duration": "Until you clear your browser data",
+          "type": "Local storage (preferences)"
+        },
+        {
+          "name": "i18nextLng",
+          "purpose": "Remember the language you selected.",
+          "duration": "Until you clear your browser data",
+          "type": "Local storage (preferences)"
+        },
+        {
+          "name": "sugarcheck_cookie_consent_v1",
+          "purpose": "Store your decision about cookies and preferences.",
+          "duration": "Until you clear your browser data",
+          "type": "Local storage (necessary)"
+        }
+      ]
+    },
+    "sections": [
+      {
+        "title": "What are cookies and local storage?",
+        "paragraphs": [
+          "Cookies are small files that a website stores in your browser to remember information. Local storage (localStorage) is a similar mechanism that lets data be stored on your device without an automatic expiration date.",
+          "SugarCheck uses them only to keep your session active and remember your preferences. We do not use them for advertising or to build behavioral profiles."
+        ]
+      },
+      {
+        "title": "Strictly necessary cookies",
+        "paragraphs": [
+          "These are essential for the application to work. They keep you logged in, allow secure session renewal, and protect your account. Because they are necessary for the service, they cannot be disabled from the preferences panel; you can delete them from your browser settings, although you will lose your session."
+        ]
+      },
+      {
+        "title": "Preferences stored in your browser",
+        "paragraphs": [
+          "We store your language, visual theme, and consent decision in local storage. This information remains on your device and is not sent to our servers. If you disable it, the application will still work but will return to default values on each visit."
+        ]
+      },
+      {
+        "title": "Third-party cookies",
+        "paragraphs": [
+          "If you choose to sign in with your Google account or use Firebase-based features, Google may set its own technical cookies to complete authentication. Those cookies are governed by Google's privacy policy and are not controlled by SugarCheck.",
+          "We do not include advertising networks, tracking pixels, or third-party analytics tools."
+        ]
+      },
+      {
+        "title": "How to manage your cookies",
+        "paragraphs": [
+          "You can accept all cookies, limit yourself to necessary ones, or configure your preferences from the banner shown on your first visit. You can also change your decision at any time using the \"Manage cookie preferences\" button on this page.",
+          "In addition, all browsers allow you to block or delete cookies and local data from their privacy settings. Note that blocking necessary cookies will prevent you from logging in."
+        ]
+      },
+      {
+        "title": "Updates and contact",
+        "paragraphs": [
+          "If we change the cookies or storage we use, we will update this policy and indicate the date of the change. For any questions, write to us at soporte@sugarcheck.org."
+        ]
+      }
+    ]
+  },
+  "consent": {
+    "title": "Your privacy matters to us",
+    "message": "We use strictly necessary cookies and local storage to keep your session active and remember your preferences. We do not use advertising or tracking cookies.",
+    "acceptAll": "Accept all",
+    "necessaryOnly": "Necessary only",
+    "customize": "Customize",
+    "policyLink": "Cookie policy",
+    "preferencesTitle": "Cookie preferences",
+    "preferencesIntro": "Choose which categories you allow. Necessary cookies cannot be disabled because they are essential for SugarCheck to work.",
+    "necessaryTitle": "Strictly necessary",
+    "necessaryDesc": "Keep your session active and protect your account.",
+    "alwaysActive": "Always active",
+    "preferencesCatTitle": "Preferences",
+    "preferencesCatDesc": "Store your language, visual theme, and this decision in your browser.",
+    "save": "Save preferences",
+    "cancel": "Cancel"
+  }
+}

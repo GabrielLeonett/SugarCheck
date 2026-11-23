@@ -19,6 +19,7 @@
     "safetyTimer": "安全タイマー",
     "lastRapidInsulin": "最後の速効型インスリン",
     "hoursRemaining": "残り時間",
+    "hoursShort": "h",
     "safe": "安全範囲",
     "expiresSoon": "まもなく終了",
     "shieldActive": "シールド有効",
