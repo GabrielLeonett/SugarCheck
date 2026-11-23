@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/Button';
 import { DatePickerField } from '@/components/DatePicker';
 import { FormInput } from '@/components/FormInput';
+import { LegalLinks } from '@/components/legal/LegalLinks';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
@@ -183,6 +184,8 @@ export default function RegisterScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        <LegalLinks />
       </ScrollView>
     </ThemedView>
   );

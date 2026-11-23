@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/card';
 import { FormInput } from '@/components/FormInput';
+import { LegalLinks } from '@/components/legal/LegalLinks';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { H1, H2, Body1, H4 } from '@/components/ui';
@@ -205,6 +206,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </Card>
 
+        <LegalLinks />
       </ScrollView>
     </ThemedView>
   );

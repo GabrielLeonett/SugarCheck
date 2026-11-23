@@ -10,6 +10,7 @@ import React, {
 import { useColorScheme as useNativeColorScheme } from 'react-native';
 
 import { Colors, type ThemeColors, type ThemeMode } from '@/constants/theme';
+import { arePreferenceStorageAllowed } from '@/src/utils/cookieConsent';
 
 const THEME_STORAGE_KEY = 'theme';
 
@@ -61,6 +62,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setMode = useCallback((nextMode: ThemePreference) => {
     setModeState(nextMode);
+
+    if (!arePreferenceStorageAllowed()) {
+      return;
+    }
 
     const persistence =
       nextMode === 'system'

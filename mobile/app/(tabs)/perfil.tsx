@@ -774,6 +774,35 @@ export default function PerfilScreen() {
 
         {!isGuestMode && <ExportDataCard />}
 
+        <Card style={styles.card}>
+          <SectionHeader title={t('profile:legal')} icon="balance-scale" />
+          {[
+            { label: t('profile:privacyPolicy'), icon: 'shield', href: '/legal/privacy' },
+            { label: t('profile:termsConditions'), icon: 'file-text', href: '/legal/terms' },
+            { label: t('profile:cookiePolicy'), icon: 'cookie', href: '/legal/cookies' },
+          ].map((item, index, items) => (
+            <TouchableOpacity
+              key={item.href}
+              style={[
+                styles.legalRow,
+                index < items.length - 1 && {
+                  borderBottomWidth: StyleSheet.hairlineWidth,
+                  borderBottomColor: colors.divider,
+                },
+              ]}
+              onPress={() => router.push(item.href as never)}
+              activeOpacity={0.7}
+              accessibilityRole="link"
+            >
+              <View style={[styles.legalIcon, { backgroundColor: colors.primary[50] }]}>
+                <FontAwesome name={item.icon as any} size={16} color={colors.primary.main} />
+              </View>
+              <ThemedText style={styles.legalLabel}>{item.label}</ThemedText>
+              <FontAwesome name="chevron-right" size={14} color={colors.text.disabled} />
+            </TouchableOpacity>
+          ))}
+        </Card>
+
         {isGuestMode ? (
           <Card style={styles.card}>
             <ThemedText type="defaultSemiBold">{t('auth:guestAccountTitle')}</ThemedText>
@@ -1108,6 +1137,20 @@ const styles = StyleSheet.create({
   schemaSaveButton: { marginTop: 12 },
   inlineButton: { marginTop: 8 },
   buttonGap: { height: 12 },
+  legalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    gap: 12,
+  },
+  legalIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  legalLabel: { flex: 1, fontSize: 14 },
 });
 
 function getTimeDate(time: string): Date {

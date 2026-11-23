@@ -111,5 +111,9 @@
   "exportCsv": "Baixar CSV",
   "exportSuccess": "Arquivo baixado",
   "exportError": "Não foi possível gerar o arquivo",
-  "exportInvalidRange": "A data inicial deve ser anterior ou igual à final"
+  "exportInvalidRange": "A data inicial deve ser anterior ou igual à final",
+  "legal": "Legal",
+  "privacyPolicy": "Política de privacidade",
+  "termsConditions": "Termos e condições",
+  "cookiePolicy": "Cookies e armazenamento"
 }
