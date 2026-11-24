@@ -22,6 +22,8 @@ import { useUiStore } from '../stores/uiStore';
 
 const MAX = 100;
 const MIN = 0;
+/** Máximo de registros visibles en la card de Historial de Batallas. */
+const MAX_BATTLE_HISTORY = 10;
 
 export default function Home() {
   const theme = useTheme();
@@ -63,6 +65,10 @@ export default function Home() {
   const ultimoRegistro = dataGlucosa.glucosaFiltrada[dataGlucosa.glucosaFiltrada.length - 1];
   const ultimaLectura = ultimoRegistro?.nivel ?? null;
   const porcentajeZonaSegura = dataGlucosa.porcentajeZonaSegura;
+
+  // El historial solo muestra las últimas batallas registradas.
+  const nivelesHistorial = dataGlucosa.nivelesGlucosa.slice(0, MAX_BATTLE_HISTORY);
+  const horasHistorial = dataGlucosa.horasGlucosa.slice(0, MAX_BATTLE_HISTORY);
 
   const ultimoImc = dataImc.ultimoImc;
   const ultimaCategoria = dataImc.ultimaCategoria;
@@ -282,8 +288,8 @@ export default function Home() {
 
               <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', flexGrow: 1 }}>
                 <GraficoBarra
-                  data={dataGlucosa.nivelesGlucosa}
-                  labels={dataGlucosa.horasGlucosa}
+                  data={nivelesHistorial}
+                  labels={horasHistorial}
                   color="#94c2e6"
                   label={t("cards.battleHistory.serieLabel")}
                   emptyMessage={t("cards.battleHistory.empty")}

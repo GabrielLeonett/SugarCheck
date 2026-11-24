@@ -20,6 +20,10 @@ import { Profile } from "./features/Profile/Profile";
 import { LoadingScreen } from "./components/ui/LoadingScreen";
 import { useTranslation } from "react-i18next";
 import ToastProvider from "./components/shared/ToastProvider";
+import CookieConsent from "./components/shared/CookieConsent";
+import PrivacyPolicy from "./features/Legal/PrivacyPolicy";
+import TermsConditions from "./features/Legal/TermsConditions";
+import CookiePolicy from "./features/Legal/CookiePolicy";
 
 function App() {
   const { t } = useTranslation("common");
@@ -72,8 +76,13 @@ function App() {
                <Route path="/register" element={<Register />} />
              </Route>
 
+             <Route path="/privacidad" element={<PrivacyPolicy />} />
+             <Route path="/terminos" element={<TermsConditions />} />
+             <Route path="/cookies" element={<CookiePolicy />} />
+
              <Route path="*" element={<Navigate to="/" replace />} />
            </Routes>
+           <CookieConsent />
           </Router>
         </Suspense>
         <ToastProvider />

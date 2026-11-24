@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/card';
 import { FormInput } from '@/components/FormInput';
+import { LegalLinks } from '@/components/legal/LegalLinks';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { H1, H2, Body1, H4 } from '@/components/ui';
@@ -33,17 +34,18 @@ export default function LoginScreen() {
   const pendingImport = useGuestStore((s) => s.pendingImport);
   const loginWithProvider = useAuthStore((s) => s.loginWithProvider);
 
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | 'facebook' | null>(null);
   const validate = () => {
     const errs: Record<string, string> = {};
-    if (!email) errs.email = t('auth:emailRequired');
-    else if (!/\S+@\S+\.\S+/.test(email)) errs.email = t('auth:emailInvalid');
+    if (!username) errs.username = t('auth:usernameRequired');
+    else if (username.length < 3) errs.username = t('auth:usernameMin');
+    else if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(username)) errs.username = t('auth:usernameInvalid');
     if (!password) errs.password = t('auth:passwordRequired');
-    else if (password.length < 6) errs.password = t('auth:passwordMin');
+    else if (password.length < 8) errs.password = t('auth:passwordMin');
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -52,7 +54,7 @@ export default function LoginScreen() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await login(email, password);
+      await login(username, password);
       if (useGuestStore.getState().pendingImport) {
         router.replace('/auth/import-guest');
       }
@@ -143,13 +145,12 @@ export default function LoginScreen() {
             {t('auth:loginInstructions')}
           </ThemedText>
           <FormInput
-            label={t('common:email')}
-            value={email}
-            onChangeText={setEmail}
-            placeholder={t('auth:emailPlaceholder')}
-            keyboardType="email-address"
+            label={t('auth:username')}
+            value={username}
+            onChangeText={setUsername}
+            placeholder={t('auth:usernamePlaceholder')}
             autoCapitalize="none"
-            error={errors.email}
+            error={errors.username}
           />
           <FormInput
             label={t('common:password')}
@@ -205,6 +206,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </Card>
 
+        <LegalLinks />
       </ScrollView>
     </ThemedView>
   );

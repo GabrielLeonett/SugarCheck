@@ -12,6 +12,7 @@ import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SystemAlertHost } from '@/components/SystemAlertHost';
+import { CookieConsent } from '@/components/CookieConsent';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import {
   attachNotificationResponseHandler,
@@ -20,6 +21,7 @@ import {
 import { useAuthStore } from '@/src/stores/authStore';
 import { useGuestStore } from '@/src/stores/guestStore';
 import { useReminderStore } from '@/src/stores/reminderStore';
+import { useCookieConsentStore } from '@/src/utils/cookieConsent';
 import { initializeAppLanguage } from '@/src/i18n';
 
 configureNotifications();
@@ -57,6 +59,7 @@ function RootLayoutContent() {
   useEffect(() => {
     const init = async () => {
       try {
+        await useCookieConsentStore.getState().hydrate();
         await hydrateGuest();
         if (!useGuestStore.getState().isGuestMode) {
           await refresh();
@@ -132,12 +135,14 @@ function RootLayoutContent() {
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="auth" />
+        <Stack.Screen name="legal" />
         <Stack.Screen name="camino" options={{ presentation: 'modal' }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen name="bitacora/glucosa" options={{ presentation: 'modal' }} />
         <Stack.Screen name="bitacora/insulina" options={{ presentation: 'modal' }} />
         <Stack.Screen name="bitacora/monitoreo-fisico" options={{ presentation: 'modal' }} />
       </Stack>
+      <CookieConsent />
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <SystemAlertHost />
     </NavigationThemeProvider>

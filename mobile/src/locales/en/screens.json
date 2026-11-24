@@ -19,6 +19,7 @@
     "safetyTimer": "Safety timer",
     "lastRapidInsulin": "Last rapid-acting insulin",
     "hoursRemaining": "Hours remaining",
+    "hoursShort": "h",
     "safe": "Safe zone",
     "expiresSoon": "Expiring soon",
     "shieldActive": "Shield active",
@@ -153,11 +154,18 @@
       "Golden Graduate"
     ],
     "worlds": {
-      "energy": "Path of Energy",
-      "safety": "Path of Safety",
-      "carbohydrates": "Path of Carbohydrates",
-      "insulin": "Path of Insulin",
-      "explorer": "Path of the Explorer"
+      "energy": "Kingdom of Self-Knowledge",
+      "safety": "Valley of Alerts (Hypo and Hyper)",
+      "carbohydrates": "Island of Nutri-Knowledge",
+      "insulin": "Temple of Insulin",
+      "explorer": "Peak of Active Living"
+    },
+    "worldTags": {
+      "energy": "Castle of knowledge",
+      "safety": "Land of alerts",
+      "carbohydrates": "Island of nutrients",
+      "insulin": "Temple of insulin",
+      "explorer": "Peak of adventure"
     },
     "lessonTitles": {
       "1": "The Pancreas's Lost Key",
@@ -181,6 +189,9 @@
     "available": "Available",
     "locked": "Locked",
     "completedLevel": "Completed",
+    "currentMission": "Current mission",
+    "keepGoing": "Keep walking your path!",
+    "levelShort": "Level",
     "loading": "Loading your progress...",
     "loadError": "Could not load your Path progress.",
     "saveError": "Could not save this level. Check your connection and try again.",

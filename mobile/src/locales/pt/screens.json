@@ -19,6 +19,7 @@
     "safetyTimer": "Cronômetro de segurança",
     "lastRapidInsulin": "Última insulina rápida",
     "hoursRemaining": "Horas restantes",
+    "hoursShort": "h",
     "safe": "Zona segura",
     "expiresSoon": "Perto de vencer",
     "shieldActive": "Escudo ativo",
@@ -153,11 +154,18 @@
       "Graduado de ouro"
     ],
     "worlds": {
-      "energy": "Caminho da energia",
-      "safety": "Caminho da segurança",
-      "carbohydrates": "Caminho dos carboidratos",
-      "insulin": "Caminho da insulina",
-      "explorer": "Caminho do explorador"
+      "energy": "Reino do Autoconhecimento",
+      "safety": "Vale dos Alertas (Hipo e Hiper)",
+      "carbohydrates": "Ilha do Nutri-Saber",
+      "insulin": "Templo da Insulina",
+      "explorer": "Cume da Vida Ativa"
+    },
+    "worldTags": {
+      "energy": "Castelo do saber",
+      "safety": "Terra de alertas",
+      "carbohydrates": "Ilha dos nutrientes",
+      "insulin": "Templo da insulina",
+      "explorer": "Cume da aventura"
     },
     "lessonTitles": {
       "1": "A chave perdida do pâncreas",
@@ -181,6 +189,9 @@
     "available": "Disponível",
     "locked": "Bloqueado",
     "completedLevel": "Concluído",
+    "currentMission": "Missão atual",
+    "keepGoing": "Segue o teu caminho!",
+    "levelShort": "Nível",
     "loading": "Carregando seu progresso...",
     "loadError": "Não foi possível carregar o progresso do Caminho.",
     "saveError": "Não foi possível salvar o nível. Verifique sua conexão e tente novamente.",

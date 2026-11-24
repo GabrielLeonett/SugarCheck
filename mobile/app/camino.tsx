@@ -125,7 +125,7 @@ export default function CaminoScreen() {
         >
           <FontAwesome name="arrow-left" size={20} color={colors.text.primary} />
         </TouchableOpacity>
-        <ThemedText type="defaultSemiBold" style={styles.topTitle}>
+        <ThemedText type="h6" style={styles.topTitle}>
           {t('warriorPath.title', { ns: 'screens' })}
         </ThemedText>
         <View style={styles.backButton} />

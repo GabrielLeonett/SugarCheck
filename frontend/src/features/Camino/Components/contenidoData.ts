@@ -156,4 +156,5 @@ export const leccionesPorNivelKeys: Record<number, { tituloKey: string; pregunta
   }
 };
 
-export const leccionesPorNivel: Record<number, { titulo: string; preguntas: Pregunta[] }> = leccionesPorNivelKeys as any;
+export const leccionesPorNivel: Record<number, { titulo: string; preguntas: Pregunta[] }> =
+  leccionesPorNivelKeys as unknown as Record<number, { titulo: string; preguntas: Pregunta[] }>;

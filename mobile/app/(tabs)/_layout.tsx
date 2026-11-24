@@ -2,7 +2,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useTranslation } from 'react-i18next';
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Animated, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/haptic-tab';
@@ -10,10 +10,11 @@ import { QuickRecordModal } from '@/components/QuickRecordModal';
 import { Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 
-const TAB_ICONS: Record<string, 'home' | 'book' | 'android' | 'flag'> = {
+const GLUCO_SILHOUETTE = require('../../assets/gluco-saludo.png');
+
+const TAB_ICONS: Record<string, 'home' | 'book' | 'flag'> = {
   index: 'home',
   historial: 'book',
-  agent: 'android',
   camino: 'flag',
 };
 
@@ -38,7 +39,10 @@ function TabIcon({
   }, [focused, scaleAnim]);
 
   const iconName = TAB_ICONS[route.name];
-  if (!iconName) return null;
+  const isAgent = route.name === 'agent';
+  if (!iconName && !isAgent) return null;
+
+  const iconColor = focused ? colors.tabIconSelected : colors.tabIconDefault;
 
   return (
     <Animated.View
@@ -47,11 +51,24 @@ function TabIcon({
         { transform: [{ scale: scaleAnim }] },
       ]}
     >
-      <FontAwesome
-        name={iconName}
-        size={size ?? 26}
-        color={focused ? colors.tabIconSelected : colors.tabIconDefault}
-      />
+      {isAgent ? (
+        <Image
+          source={GLUCO_SILHOUETTE}
+          style={{
+            width: (size ?? 26) + 6,
+            height: (size ?? 26) + 6,
+            tintColor: iconColor,
+          }}
+          resizeMode="contain"
+          accessibilityIgnoresInvertColors
+        />
+      ) : iconName ? (
+        <FontAwesome
+          name={iconName}
+          size={size ?? 26}
+          color={iconColor}
+        />
+      ) : null}
     </Animated.View>
   );
 }

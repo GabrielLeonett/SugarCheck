@@ -1,0 +1,279 @@
+{
+  "back": "Voltar",
+  "managePreferences": "Gerenciar preferências",
+  "privacy": {
+    "title": "Política de Privacidade",
+    "updated": "Última atualização: novembro de 2026",
+    "intro": "No SugarCheck, desenvolvido pela Associação Civil SugarCheck, comprometemo-nos a proteger a sua privacidade e os seus dados pessoais, incluindo os dados sensíveis relacionados com a sua saúde. Esta política explica que informações recolhemos, para que as utilizamos e que direitos tem.",
+    "sections": [
+      {
+        "title": "Responsável pelo tratamento",
+        "paragraphs": [
+          "O responsável pelo tratamento dos seus dados é a Associação Civil SugarCheck. Para qualquer questão relacionada com privacidade, pode escrever-nos para soporte@sugarcheck.org."
+        ]
+      },
+      {
+        "title": "Dados que recolhemos",
+        "paragraphs": [
+          "Dados de registo: nome de utilizador, endereço de e-mail, data de nascimento e credenciais de acesso.",
+          "Dados de saúde que introduz: níveis de glicose, doses de insulina, hemoglobina glicada (HbA1c), peso, altura e contactos de emergência.",
+          "Dados de utilização e preferências: idioma, tema visual, avatar e registos de atividade na aplicação.",
+          "Dados técnicos: endereço IP, tipo de dispositivo e sistema operativo, necessários para a segurança e o funcionamento do serviço."
+        ]
+      },
+      {
+        "title": "Para que utilizamos os seus dados",
+        "paragraphs": [
+          "Prestar o serviço: permitir-lhe registar e consultar as suas informações de saúde, visualizar históricos e gráficos e sincronizar os seus dados entre dispositivos.",
+          "Personalizar a experiência: memorizar o seu idioma, tema visual e preferências.",
+          "Segurança: autenticar a sua conta, prevenir acessos não autorizados e detetar utilizações indevidas.",
+          "Melhoria do serviço: analisar de forma agregada a utilização da aplicação para corrigir erros e desenvolver novas funcionalidades.",
+          "Comunicações: enviar-lhe avisos importantes sobre a sua conta, alterações nas políticas ou atualizações do serviço."
+        ]
+      },
+      {
+        "title": "Base legal do tratamento",
+        "paragraphs": [
+          "Tratamos os seus dados com base no seu consentimento explícito para os dados de saúde, na execução da relação contratual quando utiliza o serviço, no nosso interesse legítimo em manter a segurança e melhorar a aplicação, e no cumprimento de obrigações legais quando aplicável."
+        ]
+      },
+      {
+        "title": "Dados sensíveis de saúde",
+        "paragraphs": [
+          "Os dados de saúde são categorias especiais de dados pessoais. Só os tratamos com o seu consentimento explícito, concedido ao criar a conta e ao registar cada medição. Aplicamos medidas de segurança reforçadas e limitamos o acesso aos dados ao pessoal e aos sistemas estritamente necessários para lhe prestar o serviço.",
+          "Ao registar-se, aceita que os dados de saúde que introduz sejam armazenados e processados com a finalidade de mostrar o seu histórico e as suas estatísticas no SugarCheck. Pode retirar o seu consentimento em qualquer momento eliminando a sua conta."
+        ]
+      },
+      {
+        "title": "Conservação dos dados",
+        "paragraphs": [
+          "Conservamos os seus dados enquanto a sua conta estiver ativa. Se decidir eliminar a sua conta, apagamos ou anonimizamos os seus dados pessoais num prazo razoável, exceto os que devamos conservar por obrigações legais ou para a resolução de reclamações.",
+          "Pode exportar uma cópia das suas informações médicas a partir da secção de perfil antes de eliminar a sua conta."
+        ]
+      },
+      {
+        "title": "Com quem partilhamos os seus dados",
+        "paragraphs": [
+          "Não vendemos nem alugamos os seus dados pessoais. Partilhamo-los apenas com fornecedores tecnológicos que nos ajudam a operar o serviço (por exemplo, alojamento, autenticação com Firebase/Google e notificações), ao abrigo de contratos que exigem confidencialidade e medidas de segurança adequadas.",
+          "Também podemos divulgar informações quando a lei o exigir ou quando for necessário para proteger a segurança das pessoas e da plataforma."
+        ]
+      },
+      {
+        "title": "Segurança da informação",
+        "paragraphs": [
+          "Utilizamos ligações encriptadas através de HTTPS, armazenamos as palavras-passe com funções de hash, gerimos a sessão com cookies HttpOnly e aplicamos controlos de acesso aos dados. Nenhum sistema é completamente infalível, pelo que recomendamos a utilização de uma palavra-passe única e mantida em segredo."
+        ]
+      },
+      {
+        "title": "Os seus direitos",
+        "paragraphs": [
+          "Tem o direito de aceder aos seus dados, retificá-los, apagá-los, opor-se ao seu tratamento, solicitar a sua portabilidade e retirar o seu consentimento em qualquer momento.",
+          "Pode exercer estes direitos a partir das configurações da sua conta ou escrevendo-nos para soporte@sugarcheck.org. Também pode apresentar uma reclamação junto da autoridade de proteção de dados competente do seu país."
+        ]
+      },
+      {
+        "title": "Menores de idade",
+        "paragraphs": [
+          "O SugarCheck destina-se a pessoas com diabetes e aos seus cuidadores. Os menores de idade devem utilizar a aplicação sob a supervisão e o consentimento dos pais ou do tutor legal. Não recolhemos conscientemente dados de menores sem essa autorização."
+        ]
+      },
+      {
+        "title": "Alterações a esta política",
+        "paragraphs": [
+          "Podemos atualizar esta política para refletir alterações legais ou funcionais. Publicaremos a versão em vigor nesta página e indicaremos a data da última atualização. Se as alterações forem relevantes, avisá-lo-emos pelos canais de contacto registados."
+        ]
+      },
+      {
+        "title": "Contacto",
+        "paragraphs": [
+          "Se tiver dúvidas sobre esta Política de Privacidade ou sobre o tratamento dos seus dados, escreva-nos para soporte@sugarcheck.org."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Termos e Condições",
+    "updated": "Última atualização: novembro de 2026",
+    "intro": "Estes Termos e Condições regulam o acesso e a utilização da aplicação SugarCheck. Ao criar uma conta ou utilizar o serviço, aceita integralmente estas condições. Se não concordar, não utilize a aplicação.",
+    "sections": [
+      {
+        "title": "Aceitação dos termos",
+        "paragraphs": [
+          "Ao registar-se, aceder ou utilizar o SugarCheck, confirma que leu e aceitou estes Termos e Condições e a nossa Política de Privacidade. Se utilizar a aplicação em nome de outra pessoa, declara ter autorização para o fazer."
+        ]
+      },
+      {
+        "title": "Descrição do serviço",
+        "paragraphs": [
+          "O SugarCheck é uma ferramenta de apoio ao acompanhamento da diabetes que permite registar glicose, insulina, HbA1c e medidas físicas, visualizar tendências e aceder a conteúdos educativos.",
+          "O SugarCheck não é um dispositivo médico, não realiza diagnósticos nem prescreve tratamentos e não substitui a avaliação de um profissional de saúde. As decisões sobre doses, medicação ou alimentação devem ser sempre discutidas com o seu médico ou equipa de cuidados.",
+          "A aplicação não é um serviço de emergência. Perante uma situação de risco, contacte imediatamente os serviços de emergência da sua localidade."
+        ]
+      },
+      {
+        "title": "Registo e segurança da conta",
+        "paragraphs": [
+          "Deve fornecer informações verdadeiras e atualizadas e manter a confidencialidade das suas credenciais. É responsável por toda a atividade realizada a partir da sua conta.",
+          "Deve ser maior de idade ou contar com o consentimento e a supervisão dos pais ou do tutor legal. Notifique-nos imediatamente de qualquer utilização não autorizada da sua conta."
+        ]
+      },
+      {
+        "title": "Utilização aceitável",
+        "paragraphs": [
+          "Compromete-se a utilizar a aplicação de forma pessoal e lícita. Não é permitido assumir a identidade de outras pessoas, tentar aceder a contas alheias, introduzir dados de terceiros sem o seu consentimento, divulgar conteúdos ilegais, fazer engenharia inversa, sobrecarregar a infraestrutura nem utilizar o serviço para fins comerciais sem autorização escrita."
+        ]
+      },
+      {
+        "title": "Conteúdo do utilizador",
+        "paragraphs": [
+          "Mantém a titularidade das informações que regista. Concede-nos uma licença limitada, não exclusiva e revogável para as armazenar, processar e mostrar-lhe com o único objetivo de prestar o serviço.",
+          "É responsável pela exatidão dos dados que introduz. Verifique as medições antes de tomar decisões com base nelas."
+        ]
+      },
+      {
+        "title": "Propriedade intelectual",
+        "paragraphs": [
+          "A marca SugarCheck, o design, o software, os textos, as ilustrações e o conteúdo educativo são propriedade da Associação Civil SugarCheck ou dos seus licenciantes. Não é concedido qualquer direito sobre eles além da utilização pessoal permitida por estes termos."
+        ]
+      },
+      {
+        "title": "Exatidão e limitação de responsabilidade",
+        "paragraphs": [
+          "As informações e os gráficos apresentados pela aplicação dependem dos dados que regista e podem conter erros ou atrasos. Não garantimos que o serviço esteja disponível de forma ininterrupta ou livre de erros.",
+          "Na medida permitida por lei, o SugarCheck não será responsável por danos indiretos, incidentais ou consequentes decorrentes da utilização ou da impossibilidade de utilização da aplicação, nem por decisões médicas tomadas sem a orientação de um profissional de saúde."
+        ]
+      },
+      {
+        "title": "Serviços de terceiros",
+        "paragraphs": [
+          "A aplicação pode recorrer a serviços de terceiros, como o Firebase ou o Google para autenticação. A utilização desses serviços está também sujeita aos seus próprios termos e políticas de privacidade."
+        ]
+      },
+      {
+        "title": "Suspensão e cessação",
+        "paragraphs": [
+          "Podemos suspender ou cancelar o seu acesso se incumprir estes termos, se detetarmos uma utilização fraudulenta ou se for necessário por razões de segurança. Pode eliminar a sua conta em qualquer momento a partir das configurações do seu perfil.",
+          "Ao terminar a relação, o seu direito de utilizar a aplicação cessa, sem prejuízo das obrigações que, pela sua natureza, devam subsistir."
+        ]
+      },
+      {
+        "title": "Alterações",
+        "paragraphs": [
+          "Podemos modificar estes termos para os adaptar a alterações legais ou funcionais. Publicaremos a versão atualizada nesta página e, se as alterações forem substanciais, notificá-lo-emos com antecedência razoável. A utilização continuada do serviço implica a aceitação da nova versão."
+        ]
+      },
+      {
+        "title": "Lei aplicável e resolução de conflitos",
+        "paragraphs": [
+          "Estes termos regem-se pelas leis do país onde está constituída a Associação Civil SugarCheck. Qualquer controvérsia será submetida aos tribunais competentes dessa jurisdição, sem prejuízo dos direitos que a legislação de consumo do seu país lhe reconheça."
+        ]
+      },
+      {
+        "title": "Contacto",
+        "paragraphs": [
+          "Para questões sobre estes Termos e Condições, escreva-nos para soporte@sugarcheck.org."
+        ]
+      }
+    ]
+  },
+  "cookies": {
+    "title": "Política de Cookies e Armazenamento Local",
+    "updated": "Última atualização: novembro de 2026",
+    "intro": "Esta política explica como o SugarCheck utiliza o armazenamento local do seu dispositivo. A aplicação não utiliza cookies publicitários nem tecnologias de rastreamento. Guardamos apenas as informações necessárias para manter a sua sessão e recordar as suas preferências.",
+    "tableTitle": "Armazenamento utilizado pelo SugarCheck",
+    "storageTable": {
+      "headers": [
+        "Nome",
+        "Finalidade",
+        "Duração",
+        "Tipo"
+      ],
+      "rows": [
+        {
+          "name": "Sessão de autenticação",
+          "purpose": "Manter a sua conta autenticada e renovar o acesso de forma segura.",
+          "duration": "Até terminar a sessão ou a sessão expirar",
+          "type": "Armazenamento seguro (necessário)"
+        },
+        {
+          "name": "sugarcheck_cookie_consent_v1",
+          "purpose": "Guardar a sua decisão sobre o armazenamento local e as preferências.",
+          "duration": "Até limpar os dados da aplicação",
+          "type": "Armazenamento local (necessário)"
+        },
+        {
+          "name": "theme",
+          "purpose": "Memorizar se prefere o tema claro ou escuro.",
+          "duration": "Até limpar os dados da aplicação",
+          "type": "Armazenamento local (preferências)"
+        },
+        {
+          "name": "app_language",
+          "purpose": "Memorizar o idioma que escolheu.",
+          "duration": "Até limpar os dados da aplicação",
+          "type": "Armazenamento local (preferências)"
+        }
+      ]
+    },
+    "sections": [
+      {
+        "title": "O que é o armazenamento local?",
+        "paragraphs": [
+          "O SugarCheck não utiliza cookies publicitários nem de rastreamento. Para recordar a sua sessão e as suas preferências, a aplicação guarda dados no armazenamento local do dispositivo (AsyncStorage).",
+          "Na versão web, o navegador pode utilizar cookies técnicos e armazenamento local com a mesma finalidade."
+        ]
+      },
+      {
+        "title": "Dados estritamente necessários",
+        "paragraphs": [
+          "Mantêm a sua sessão e guardam a sua decisão de consentimento. Sem eles não é possível iniciar sessão nem recordar a sua escolha, pelo que não podem ser desativados na aplicação.",
+          "Pode eliminar estes dados nas configurações do sistema operativo; ao fazê-lo, a sessão será encerrada."
+        ]
+      },
+      {
+        "title": "Preferências",
+        "paragraphs": [
+          "Guardamos o seu idioma e tema visual para que a aplicação fique como prefere. Se desativar esta categoria, a aplicação continuará a funcionar, mas voltará aos valores predefinidos em cada arranque.",
+          "Pode alterar a sua decisão em qualquer momento em Perfil > Legal > Cookies."
+        ]
+      },
+      {
+        "title": "Serviços de terceiros",
+        "paragraphs": [
+          "Se iniciar sessão com o Google ou utilizar funcionalidades baseadas no Firebase, o Google pode gerir os seus próprios dados técnicos de autenticação de acordo com a sua política de privacidade.",
+          "Não incluímos redes publicitárias, píxeis de rastreamento nem ferramentas de análise de terceiros."
+        ]
+      },
+      {
+        "title": "Como gerenciar as suas preferências",
+        "paragraphs": [
+          "No aviso apresentado ao abrir a aplicação, pode aceitar todas as preferências, limitar-se às necessárias ou configurá-las. Também pode usar o botão «Gerenciar preferências» desta tela.",
+          "Para eliminar todos os dados locais, limpe os dados do SugarCheck nas configurações do seu dispositivo."
+        ]
+      },
+      {
+        "title": "Atualizações e contacto",
+        "paragraphs": [
+          "Se alterarmos o armazenamento que utilizamos, atualizaremos esta política e indicaremos a data da alteração. Para qualquer dúvida, escreva-nos para soporte@sugarcheck.org."
+        ]
+      }
+    ]
+  },
+  "consent": {
+    "title": "A sua privacidade é importante para nós",
+    "message": "Utilizamos armazenamento local estritamente necessário para manter a sua sessão e recordar as suas preferências. Não utilizamos cookies publicitários nem de rastreamento.",
+    "acceptAll": "Aceitar todas",
+    "necessaryOnly": "Apenas necessários",
+    "customize": "Configurar",
+    "policyLink": "Política de armazenamento",
+    "preferencesTitle": "Preferências de armazenamento",
+    "preferencesIntro": "Escolha as categorias que permite. Os dados necessários não podem ser desativados porque são essenciais para o funcionamento do SugarCheck.",
+    "necessaryTitle": "Estritamente necessários",
+    "necessaryDesc": "Mantêm a sua sessão e guardam esta decisão.",
+    "alwaysActive": "Sempre ativos",
+    "preferencesCatTitle": "Preferências",
+    "preferencesCatDesc": "Guardam o seu idioma e tema visual no dispositivo.",
+    "save": "Guardar preferências",
+    "cancel": "Cancelar"
+  }
+}

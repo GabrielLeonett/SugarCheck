@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '@/components/Button';
 import { DatePickerField } from '@/components/DatePicker';
 import { FormInput } from '@/components/FormInput';
+import { LegalLinks } from '@/components/legal/LegalLinks';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Fonts } from '@/constants/theme';
@@ -34,6 +35,7 @@ export default function RegisterScreen() {
 
   const [formData, setFormData] = useState({
     nombre: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -48,11 +50,14 @@ export default function RegisterScreen() {
   const validateStep1 = () => {
     const errs: Record<string, string> = {};
     if (!formData.nombre) errs.nombre = t('auth:nameRequired');
+    if (!formData.username) errs.username = t('auth:usernameRequired');
+    else if (formData.username.length < 3) errs.username = t('auth:usernameMin');
+    else if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(formData.username)) errs.username = t('auth:usernameInvalid');
     if (!formData.sexo) errs.sexo = t('auth:selectSex');
     if (!formData.email) errs.email = t('auth:emailRequired');
     else if (!/\S+@\S+\.\S+/.test(formData.email)) errs.email = t('auth:emailInvalid');
     if (!formData.password) errs.password = t('auth:passwordRequired');
-    else if (formData.password.length < 6) errs.password = t('auth:passwordMin');
+    else if (formData.password.length < 8) errs.password = t('auth:passwordMin');
     if (formData.password !== formData.confirmPassword) {
       errs.confirmPassword = t('auth:passwordsMismatch');
     }
@@ -66,13 +71,14 @@ export default function RegisterScreen() {
     try {
       await authApi.register({
         nombre: formData.nombre,
+        username: formData.username,
         email: formData.email,
         password: formData.password,
         sexo: formData.sexo,
         fechaNacimiento: formData.fechaNacimiento.toISOString(),
       });
 
-      await login(formData.email, formData.password);
+      await login(formData.username, formData.password);
       router.replace(
         useGuestStore.getState().pendingImport
           ? '/auth/import-guest'
@@ -117,6 +123,14 @@ export default function RegisterScreen() {
             placeholder={t('auth:yourName')}
             autoCapitalize="words"
             error={errors.nombre}
+          />
+          <FormInput
+            label={t('auth:username')}
+            value={formData.username}
+            onChangeText={(value) => updateField('username', value)}
+            placeholder={t('auth:usernamePlaceholder')}
+            autoCapitalize="none"
+            error={errors.username}
           />
           <FormInput
             label={t('common:email')}
@@ -170,6 +184,8 @@ export default function RegisterScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        <LegalLinks />
       </ScrollView>
     </ThemedView>
   );

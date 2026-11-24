@@ -111,5 +111,9 @@
   "exportCsv": "CSVをダウンロード",
   "exportSuccess": "ファイルをダウンロードしました",
   "exportError": "ファイルを生成できませんでした",
-  "exportInvalidRange": "開始日は終了日以前である必要があります"
+  "exportInvalidRange": "開始日は終了日以前である必要があります",
+  "legal": "法的情報",
+  "privacyPolicy": "プライバシーポリシー",
+  "termsConditions": "利用規約",
+  "cookiePolicy": "Cookieとストレージ"
 }

@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
 import { Card } from '@/components/card';
+import { LegalLinks } from '@/components/legal/LegalLinks';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { GLUCO_GESTURES } from '@/constants/gestures';
@@ -76,6 +77,8 @@ export default function StartScreen() {
         <ThemedText muted style={styles.notice}>
           {t('auth:guestPrivacy')}
         </ThemedText>
+
+        <LegalLinks />
       </ScrollView>
     </ThemedView>
   );

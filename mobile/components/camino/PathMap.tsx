@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Svg, { Polygon } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 
 import { Card } from '@/components/card';
@@ -16,13 +15,8 @@ import { ThemedText } from '@/components/themed-text';
 import { useTheme } from '@/contexts/ThemeContext';
 import { leccionesPorNivel } from '@/src/data/caminoLessons';
 
-const WORLDS = [
-  { number: 1, title: 'energy' },
-  { number: 2, title: 'safety' },
-  { number: 3, title: 'carbohydrates' },
-  { number: 4, title: 'insulin' },
-  { number: 5, title: 'explorer' },
-] as const;
+import { CaminoMap } from './CaminoMap';
+import { MUNDOS } from './caminoTheme';
 
 const BADGES = [
   require('../../assets/insigniasCamino/escudo_de_fribra.png'),
@@ -51,6 +45,16 @@ export function PathMap({
   const { t } = useTranslation('screens');
   const progressPercent = Math.round((lastCompletedLevel / 15) * 100);
   const unlockedBadges = Math.floor(lastCompletedLevel / 3);
+  const currentLevel = Math.min(lastCompletedLevel + 1, 15);
+  const currentWorld =
+    MUNDOS.find(
+      (mundo) => currentLevel >= mundo.levelRange[0] && currentLevel <= mundo.levelRange[1]
+    ) ?? MUNDOS[0];
+
+  const currentTitle = t(`warriorPath.lessonTitles.${currentLevel}`, {
+    defaultValue:
+      leccionesPorNivel[currentLevel]?.titulo ?? t('warriorPath.level', { number: currentLevel }),
+  });
 
   if (loading) {
     return (
@@ -116,112 +120,42 @@ export function PathMap({
         </ThemedText>
       </Card>
 
-      <View style={styles.mapSection}>
-        {WORLDS.map((world) => {
-          const firstLevel = (world.number - 1) * 3 + 1;
-          const worldUnlocked = firstLevel <= lastCompletedLevel + 1;
-          return (
-            <View key={world.number} style={styles.world}>
-              <View
-                style={[
-                  styles.worldHeader,
-                  {
-                    backgroundColor: worldUnlocked ? colors.primary.dark : colors.divider,
-                    borderColor: worldUnlocked ? colors.primary.dark : colors.border,
-                  },
-                ]}
-              >
-                <View style={[styles.headerLine, { backgroundColor: colors.text.disabled }]} />
-                <View style={styles.worldTitleWrap}>
-                  <ThemedText
-                    type="defaultSemiBold"
-                    style={{ color: worldUnlocked ? colors.text.inverse : colors.text.disabled }}
-                  >
-                    {t('warriorPath.world', { number: world.number })}
-                  </ThemedText>
-                  <ThemedText
-                    style={[
-                      styles.worldSubtitle,
-                      { color: worldUnlocked ? colors.text.inverse : colors.text.disabled },
-                    ]}
-                  >
-                    {t(`warriorPath.worlds.${world.title}`)}
-                  </ThemedText>
-                </View>
-                <View style={[styles.headerLine, { backgroundColor: colors.text.disabled }]} />
-              </View>
+      {/* Misión actual con Gluco */}
+      <Card
+        style={[
+          styles.missionCard,
+          {
+            borderColor: `${currentWorld.accent}66`,
+            backgroundColor: `${currentWorld.accent}14`,
+          },
+        ]}
+      >
+        <Image
+          source={require('../../assets/gluco-saludo.png')}
+          style={styles.missionGluco}
+          resizeMode="contain"
+        />
+        <View style={styles.missionInfo}>
+          <ThemedText style={[styles.missionLabel, { color: currentWorld.accent }]}>
+            {t('warriorPath.currentMission')}
+          </ThemedText>
+          <ThemedText
+            numberOfLines={1}
+            style={[styles.missionWorld, { color: currentWorld.accent }]}
+          >
+            {t('warriorPath.world', { number: currentWorld.numero })} ·{' '}
+            {t(`warriorPath.worlds.${currentWorld.key}`)}
+          </ThemedText>
+          <ThemedText type="defaultSemiBold" numberOfLines={2} style={styles.missionTitle}>
+            {currentTitle}
+          </ThemedText>
+          <ThemedText muted style={styles.missionHint}>
+            {t('warriorPath.keepGoing')}
+          </ThemedText>
+        </View>
+      </Card>
 
-              {Array.from({ length: 3 }, (_, index) => {
-                const level = firstLevel + index;
-                const completed = level <= lastCompletedLevel;
-                const available = level <= lastCompletedLevel + 1;
-                const color = completed
-                  ? colors.success.main
-                  : available
-                    ? colors.primary.main
-                    : colors.text.disabled;
-
-                return (
-                  <View key={level} style={styles.levelRow}>
-                    <TouchableOpacity
-                      onPress={() => onSelectLevel(level)}
-                      disabled={!available}
-                      activeOpacity={0.75}
-                      accessibilityRole="button"
-                      accessibilityState={{ disabled: !available }}
-                      accessibilityLabel={`${t('warriorPath.level', { number: level })}: ${t(completed ? 'warriorPath.completedLevel' : available ? 'warriorPath.available' : 'warriorPath.locked')}`}
-                      style={[
-                        styles.levelButton,
-                        index % 2 === 0 ? styles.levelLeft : styles.levelRight,
-                        !available && styles.lockedLevel,
-                      ]}
-                    >
-                      <Svg width={76} height={72} viewBox="0 0 76 72">
-                        <Polygon
-                          points="38,2 72,19 72,53 38,70 4,53 4,19"
-                          fill={color}
-                          stroke={completed ? colors.success.dark : available ? colors.primary.dark : colors.border}
-                          strokeWidth={3}
-                        />
-                      </Svg>
-                      <ThemedText
-                        type="h6"
-                        style={[
-                          styles.levelNumber,
-                          { color: available ? colors.text.inverse : colors.text.disabled },
-                        ]}
-                      >
-                        {level}
-                      </ThemedText>
-                      {completed && (
-                        <View style={[styles.completedMark, { backgroundColor: colors.success.dark }]}>
-                          <FontAwesome name="check" size={11} color={colors.success.contrastText} />
-                        </View>
-                      )}
-                      {!available && (
-                        <View style={styles.lockMark}>
-                          <FontAwesome name="lock" size={12} color={colors.text.disabled} />
-                        </View>
-                      )}
-                      <ThemedText
-                        numberOfLines={2}
-                        style={[
-                          styles.levelTitle,
-                          { color: available ? colors.text.primary : colors.text.disabled },
-                        ]}
-                      >
-                        {t(`warriorPath.lessonTitles.${level}`, {
-                          defaultValue: leccionesPorNivel[level]?.titulo ?? t('warriorPath.level', { number: level }),
-                        })}
-                      </ThemedText>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
-            </View>
-          );
-        })}
-      </View>
+      <CaminoMap lastCompletedLevel={lastCompletedLevel} onSelectLevel={onSelectLevel} />
 
       <ThemedText type="defaultSemiBold" style={styles.collectionTitle}>
         {t('warriorPath.collection')}
@@ -229,27 +163,55 @@ export function PathMap({
       <View style={styles.badges}>
         {BADGES.map((image, index) => {
           const unlocked = index < unlockedBadges;
+          const mundo = MUNDOS[index] ?? MUNDOS[0];
           return (
-            <Card key={index} style={[styles.badgeCard, !unlocked && styles.lockedBadge]}>
-              <Image
-                source={image}
-                style={[styles.badgeImage, !unlocked && styles.badgeImageLocked]}
-                resizeMode="contain"
-              />
+            <Card
+              key={index}
+              style={[
+                styles.badgeCard,
+                {
+                  borderColor: unlocked ? `${mundo.accent}66` : colors.divider,
+                  backgroundColor: unlocked ? colors.background.paper : colors.background.elevated,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.badgeImageWrap,
+                  {
+                    backgroundColor: unlocked ? `${mundo.accent}1f` : colors.action.disabledBackground,
+                    borderColor: unlocked ? `${mundo.accent}55` : 'transparent',
+                  },
+                ]}
+              >
+                <Image
+                  source={image}
+                  style={[styles.badgeImage, !unlocked && styles.badgeImageLocked]}
+                  resizeMode="contain"
+                />
+              </View>
+              <View style={styles.badgeInfo}>
+                <ThemedText
+                  type="defaultSemiBold"
+                  style={[styles.badgeName, !unlocked && { color: colors.text.disabled }]}
+                  numberOfLines={2}
+                >
+                  {t(`warriorPath.badges.${index}`)}
+                </ThemedText>
+                <ThemedText
+                  style={[
+                    styles.badgeWorld,
+                    { color: unlocked ? mundo.accent : colors.text.disabled },
+                  ]}
+                >
+                  {t('warriorPath.world', { number: index + 1 })}
+                </ThemedText>
+              </View>
               {!unlocked && (
-                <View style={[styles.badgeLock, { backgroundColor: colors.background.paper }]}>
+                <View style={[styles.badgeLock, { backgroundColor: colors.action.selected }]}>
                   <FontAwesome name="lock" size={13} color={colors.text.disabled} />
                 </View>
               )}
-              <ThemedText
-                type="defaultSemiBold"
-                style={[styles.badgeName, !unlocked && { color: colors.text.disabled }]}
-              >
-                {t(`warriorPath.badges.${index}`)}
-              </ThemedText>
-              <ThemedText muted style={styles.badgeWorld}>
-                {t('warriorPath.world', { number: index + 1 })}
-              </ThemedText>
             </Card>
           );
         })}
@@ -269,67 +231,59 @@ const styles = StyleSheet.create({
   pathIcon: { width: 48, height: 48 },
   title: { marginTop: 8, textAlign: 'center' },
   subtitle: { marginTop: 4, textAlign: 'center' },
-  progressCard: { padding: 18, marginBottom: 24 },
+  progressCard: { padding: 18, marginBottom: 12 },
   progressHeading: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
   progressTrack: { height: 12, borderRadius: 8, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 8 },
   progressCaption: { marginTop: 8, fontSize: 13 },
-  mapSection: { marginBottom: 28 },
-  world: { marginBottom: 20 },
-  worldHeader: {
-    minHeight: 62,
+  missionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    gap: 12,
+    padding: 14,
+    marginBottom: 8,
     borderWidth: 1,
   },
-  headerLine: { flex: 1, height: 1 },
-  worldTitleWrap: { alignItems: 'center' },
-  worldSubtitle: { fontSize: 12, textAlign: 'center' },
-  levelRow: { minHeight: 116, justifyContent: 'center' },
-  levelButton: { width: 104, minHeight: 108, alignItems: 'center', justifyContent: 'center' },
-  levelLeft: { alignSelf: 'flex-start', marginLeft: 36 },
-  levelRight: { alignSelf: 'flex-end', marginRight: 36 },
-  lockedLevel: { opacity: 0.75 },
-  levelNumber: { position: 'absolute', top: 20 },
-  completedMark: {
-    position: 'absolute',
-    right: 12,
-    top: 12,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+  missionGluco: { width: 52, height: 52 },
+  missionInfo: { flex: 1, minWidth: 0 },
+  missionLabel: {
+    fontSize: 10,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  missionTitle: { fontSize: 15 },
+  missionWorld: { fontSize: 10.5, fontWeight: '600', marginBottom: 2 },
+  missionHint: { fontSize: 12, marginTop: 2 },
+  collectionTitle: { fontSize: 18, marginTop: 24, marginBottom: 8 },
+  badges: { gap: 4 },
+  badgeCard: {
+    minHeight: 92,
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 1,
+  },
+  badgeImageWrap: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
   },
-  lockMark: { position: 'absolute', right: 12, top: 12 },
-  levelTitle: {
-    position: 'absolute',
-    bottom: 0,
-    width: 104,
-    fontSize: 11,
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-  collectionTitle: { fontSize: 18, marginBottom: 14 },
-  badges: { gap: 12 },
-  badgeCard: { minHeight: 108, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  lockedBadge: { opacity: 0.75 },
-  badgeImage: { width: 64, height: 64 },
+  badgeImage: { width: 42, height: 42 },
   badgeImageLocked: { opacity: 0.35 },
+  badgeInfo: { flex: 1, minWidth: 0 },
+  badgeName: { fontSize: 14 },
+  badgeWorld: { fontSize: 11, fontWeight: '700', marginTop: 3, textTransform: 'uppercase' },
   badgeLock: {
-    position: 'absolute',
-    left: 56,
-    top: 54,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeName: { flex: 1, fontSize: 14 },
-  badgeWorld: { fontSize: 12 },
 });

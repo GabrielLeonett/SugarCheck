@@ -1,90 +1,109 @@
 import { Box, Typography } from "@mui/material";
+import LockRoundedIcon from "@mui/icons-material/LockRounded";
 import useLanguage from "../../../hooks/useLanguage";
 
-
-// 1. Definimos el "contrato" de qué datos puede recibir esta tarjeta
 interface InsigniaCardProps {
-  img: string;     
-  name: string;   
-  mundo: string; 
-  bloqueado: boolean 
+  img: string;
+  name: string;
+  mundo: string;
+  bloqueado: boolean;
+  acento?: string;
 }
 
-// 2. Le asignamos la interfaz a los parámetros usando la desestructuración de React
-function InsigniaCard({ 
-  img , 
-  name , 
-  mundo, 
-  bloqueado = false
-}: InsigniaCardProps) {
+function InsigniaCard({ img, name, mundo, bloqueado = false, acento = "#95BFDF" }: InsigniaCardProps) {
   const { t } = useLanguage("camino");
-  
+
   return (
-    <Box 
-    component="section"
-  sx={{
-    p: 2,                         
-    position: "relative",        
-    display: "flex",
-    flexDirection: "column",  
-    alignItems: "center",
-    justifyContent: "center",         
-    borderRadius: 3,         
-    width: "100%",
-    maxWidth: 260,     
-    mx: "auto",     
-    // CAMBIO DINÁMICO: Si está bloqueado se vuelve gris opaco; si no, fondo blanco
-    bgcolor: bloqueado ? "rgba(40, 40, 40, 0.6)" : "white",
-    color: bloqueado ? "#8e8e8e" : "black",
-    
-    // Sombras: La tarjeta activa tiene una sombra suave para que parezca que flota
-    boxShadow: bloqueado ? "none" : "0px 4px 10px rgba(0,0,0,0.15)",
-    transition: "all 0.3s ease",      // Hace que los cambios visuales se sientan suaves
-  }}>
-      {/* Contenedor de la Imagen */}
-      <Box
-      sx={{ 
-    width: 90,                        // Tamaño fijo controlado para el escudo/yelmo
-    height: 90, 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "center",
-    mb: 1.5,                          // Separación con el texto de abajo
-    // CAMBIO DINÁMICO: Si está bloqueado, pone la imagen en blanco y negro (grayscale) y opaca
-    filter: bloqueado ? "grayscale(100%) opacity(40%)" : "none"}}
+    <Box
+      component="section"
+      sx={{
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        gap: 1.5,
+        p: 1.25,
+        width: "100%",
+        borderRadius: 2.5,
+        bgcolor: bloqueado ? "action.hover" : "background.paper",
+        border: "1px solid",
+        borderColor: bloqueado ? "divider" : `${acento}66`,
+        boxShadow: bloqueado ? "none" : `0 6px 14px ${acento}22`,
+        overflow: "hidden",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        "&:hover": {
+          transform: bloqueado ? "none" : "translateY(-2px)",
+          boxShadow: bloqueado ? "none" : `0 10px 20px ${acento}33`,
+        },
+      }}
     >
-        <img 
-          src={img} 
-          alt={name}  
-        style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", maxWidth: "100%", maxHeight: "100%" }} />
+      <Box
+        sx={{
+          flex: "0 0 auto",
+          width: 56,
+          height: 56,
+          borderRadius: "50%",
+          display: "grid",
+          placeItems: "center",
+          background: bloqueado
+            ? "rgba(148,163,184,0.18)"
+            : `radial-gradient(circle at 30% 25%, ${acento}33, ${acento}0d)`,
+          border: `2px solid ${bloqueado ? "transparent" : `${acento}55`}`,
+        }}
+      >
+        <img
+          src={img}
+          alt={name}
+          style={{
+            width: 44,
+            height: 44,
+            objectFit: "contain",
+            display: "block",
+            filter: bloqueado ? "grayscale(100%) opacity(40%)" : "none",
+          }}
+        />
       </Box>
 
-      {/* Textos de la tarjeta */}
-      <Box>
+      <Box sx={{ minWidth: 0, flex: 1 }}>
         <Typography
-        variant="body1" 
-        sx={{ 
-          fontWeight: "bold", 
-          textAlign: "center",
-          fontSize: "0.95rem",              // Tamaño de letra estilizado y legible
-          lineHeight: 1.2
-        }}>
+          sx={{
+            fontWeight: 700,
+            fontSize: 14,
+            lineHeight: 1.2,
+            color: bloqueado ? "text.disabled" : "text.primary",
+          }}
+        >
           {t(name) !== name ? t(name) : name}
         </Typography>
         <Typography
-        variant="caption"                   // Letra más pequeña para etiquetas secundarias
-        sx={{ 
-          fontWeight: "bold",
-          letterSpacing: 0.5,               
-          mt: 0.5,                          
-          color: bloqueado ? "inherit" : "#4caf50", 
-          textTransform: "uppercase"}}>
+          variant="caption"
+          sx={{
+            display: "block",
+            mt: 0.4,
+            fontWeight: 700,
+            letterSpacing: 0.4,
+            textTransform: "uppercase",
+            color: bloqueado ? "text.disabled" : acento,
+          }}
+        >
           {t(mundo) !== mundo ? t(mundo) : mundo}
         </Typography>
-        
-        
       </Box>
 
+      {bloqueado && (
+        <Box
+          sx={{
+            width: 26,
+            height: 26,
+            borderRadius: "50%",
+            display: "grid",
+            placeItems: "center",
+            bgcolor: "action.selected",
+            color: "text.disabled",
+          }}
+        >
+          <LockRoundedIcon sx={{ fontSize: 15 }} />
+        </Box>
+      )}
     </Box>
   );
 }
