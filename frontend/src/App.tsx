@@ -4,6 +4,8 @@ import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import Home from "./features/Home";
+import Welcome from "./features/Welcome/Welcome";
+import RouteSeo from "./seo/RouteSeo";
 import Login from "./features/Login";
 import { PublicRoute } from "./components/shared/PublicRoute";
 import Register from "./features/Register";
@@ -25,17 +27,37 @@ import PrivacyPolicy from "./features/Legal/PrivacyPolicy";
 import TermsConditions from "./features/Legal/TermsConditions";
 import CookiePolicy from "./features/Legal/CookiePolicy";
 
+function RootRoute() {
+  const accessToken = useAuthStore((state) => state.accessToken);
+  return accessToken ? <Home /> : <Welcome />;
+}
+
 function App() {
   const { t } = useTranslation("common");
   const refresh = useAuthStore((state) => state.refresh);
   const setLoading = useAuthStore((state) => state.setLoading);
   const isAuthLoading = useAuthStore((state) => state.isAuthLoading);
+  // Las páginas públicas deben renderizarse de inmediato para visitantes y
+  // rastreadores, sin esperar a que el backend responda a la verificación de sesión.
+  const publicPathsWhileLoading = [
+    "/",
+    "/login",
+    "/register",
+    "/privacidad",
+    "/terminos",
+    "/cookies",
+    "/olvidoContrasena",
+    "/restablecer-contrasena",
+  ];
+  const currentPath =
+    window.location.pathname.replace(/\/+$/, "") || "/";
+  const canRenderWhileLoading = publicPathsWhileLoading.includes(currentPath);
 
   useEffect(() => {
     const verifySession = async () => {
       try {
         await refresh();
-      } catch (err) {
+      } catch {
         console.log("Sin sesión previa activa.");
       } finally {
         setLoading(false);
@@ -47,15 +69,17 @@ function App() {
 
   return (
     <ThemeWrapperContext>
-{isAuthLoading ? (
+{isAuthLoading && !canRenderWhileLoading ? (
         <LoadingScreen message={t("verificandoSesion")} />
       ) : (
         <>
         <Suspense fallback={<LoadingScreen />}>
           <Router>
+            <RouteSeo />
             <Routes>
+              <Route path="/" element={<RootRoute />} />
+
               <Route element={<ProtectedRoute />}>
-                <Route index element={<Home />} />
                 <Route path="completar-registro" element={<CompleteRegistration />} />
                 <Route path="perfil" element={<Profile />} />
                 <Route path="bitacora">

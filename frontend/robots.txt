@@ -1,5 +1,0 @@
-User-agent: *
-Disallow: /admin/
-Disallow: /config/
-
-Sitemap: https://sugarcheck.duckdns.org/sitemap.xml

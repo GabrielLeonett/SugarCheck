@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Áreas privadas o de uso interno
+Disallow: /perfil
+Disallow: /completar-registro
+Disallow: /bitacora/
+Disallow: /agente/
+Disallow: /olvidoContrasena
+Disallow: /restablecer-contrasena
+
+Sitemap: https://sugarcheck.duckdns.org/sitemap.xml

@@ -1,0 +1,139 @@
+{
+  "brand": {
+    "tagline": "Seu Controle de Diabetes",
+    "logoAlt": "Logotipo do SugarCheck",
+    "homeLabel": "SugarCheck, ir para o início"
+  },
+  "nav": {
+    "benefits": "Benefícios",
+    "how": "Como funciona",
+    "path": "O Caminho",
+    "faq": "Perguntas",
+    "login": "Entrar",
+    "register": "Criar conta"
+  },
+  "hero": {
+    "badge": "A aventura de cuidar da sua diabetes",
+    "title": "Transforme o controle da diabetes em uma",
+    "titleAccent": "aventura épica",
+    "description": "O SugarCheck ajuda crianças e famílias a registrar a glicose, a insulina e o bem-estar físico com a diversão de um videogame. Porque cuidar de si também pode ser heroico.",
+    "primaryCta": "Começar minha aventura",
+    "secondaryCta": "Já tenho conta",
+    "trust1": "Grátis para começar",
+    "trust2": "Para crianças, famílias e cuidadores",
+    "trust3": "Disponível em 4 idiomas",
+    "mascotAlt": "Gluco, o mascote do SugarCheck",
+    "visual": {
+      "safeZone": "Zona Segura",
+      "safeZoneValue": "92%",
+      "safeZoneCaption": "Ótima batalha hoje!",
+      "experience": "Experiência",
+      "experienceValue": "+50 XP",
+      "experienceCaption": "Nível 12 · Guardião"
+    }
+  },
+  "features": {
+    "eyebrow": "Seu equipamento de herói",
+    "title": "Tudo o que você precisa para a batalha de cada dia",
+    "subtitle": "Ferramentas simples, com olhar de herói. Registre, aprenda e celebre cada avanço.",
+    "glucose": {
+      "title": "Registro de glicose",
+      "description": "Anote sua energia e veja seu histórico em gráficos claros, com a Zona Segura sempre à vista."
+    },
+    "insulin": {
+      "title": "Doses de insulina",
+      "description": "Controle suas poções e receba lembretes para não perder o ritmo da batalha."
+    },
+    "physical": {
+      "title": "Monitoramento físico",
+      "description": "Peso, altura e IMC com um medidor amigável que celebra cada avanço."
+    },
+    "oracle": {
+      "title": "O Grande Oráculo",
+      "description": "Um assistente com IA que responde às suas dúvidas e incentiva você a seguir em frente."
+    },
+    "path": {
+      "title": "Caminho do Guerreiro",
+      "description": "Suba de nível, ganhe insígnias e mantenha suas sequências de vitórias."
+    },
+    "guardians": {
+      "title": "Guardiões e alertas",
+      "description": "Contatos de emergência e lembretes que os pais podem configurar."
+    }
+  },
+  "path": {
+    "eyebrow": "Gamificação",
+    "title": "O Caminho do Guerreiro",
+    "subtitle": "Cada medição soma experiência. Cada dia na Zona Segura é uma vitória.",
+    "level": "Nível {{number}}",
+    "apprentice": {
+      "name": "Aprendiz",
+      "description": "Dê seus primeiros passos e aprenda a ouvir sua energia.",
+      "xp": "Nível 1 · Ponto de partida"
+    },
+    "guardian": {
+      "name": "Guardião",
+      "description": "Mantenha suas sequências e desbloqueie novas insígnias.",
+      "xp": "Nível 10 · Protetor"
+    },
+    "legend": {
+      "name": "Lenda",
+      "description": "Torne-se um exemplo para outros Guerreiros Azuis.",
+      "xp": "Nível 30 · Herói"
+    },
+    "cta": "Começar meu caminho"
+  },
+  "preview": {
+    "eyebrow": "Seu Quartel-General",
+    "title": "É assim que é o seu dia a dia",
+    "description": "Um painel claro com sua última batalha, o cronômetro de insulina, seu histórico e seu equilíbrio físico. Pensado para que crianças e pais entendam tudo de relance.",
+    "cta": "Criar minha conta grátis",
+    "caption": "Visão do painel do SugarCheck"
+  },
+  "how": {
+    "eyebrow": "Como funciona",
+    "title": "Três passos para começar",
+    "subtitle": "Do cadastro à sua primeira vitória em poucos minutos.",
+    "step1": {
+      "title": "Crie sua conta",
+      "description": "Cadastre-se em minutos e personalize seu guerreiro."
+    },
+    "step2": {
+      "title": "Registre sua energia",
+      "description": "Anote glicose, insulina e peso de qualquer dispositivo."
+    },
+    "step3": {
+      "title": "Fique na Zona Segura",
+      "description": "Acompanhe seus gráficos, ganhe insígnias e compartilhe o progresso com sua família."
+    }
+  },
+  "guardians": {
+    "eyebrow": "Para os guardiões",
+    "title": "Os pais também têm seu escudo",
+    "subtitle": "O SugarCheck foi pensado para que crianças e cuidadores trabalhem em equipe.",
+    "point1": "Contatos de emergência sempre à mão.",
+    "point2": "Lembretes de medição e de insulina.",
+    "point3": "Preferências e avatares adaptados a cada guerreiro.",
+    "point4": "Dados protegidos e políticas de privacidade claras.",
+    "cta": "Ler a política de privacidade"
+  },
+  "faq": {
+    "eyebrow": "Perguntas frequentes",
+    "title": "Tudo o que você quer saber",
+    "subtitle": "Se sua dúvida não estiver aqui, escreva para soporte@sugarcheck.org.",
+    "q1": "O SugarCheck é grátis?",
+    "a1": "Sim. Você pode criar sua conta e começar a registrar suas informações sem custo.",
+    "q2": "Serve para crianças e adultos?",
+    "a2": "Sim. O app foi pensado para crianças com diabetes e suas famílias, mas qualquer pessoa que precise acompanhar glicose e insulina pode usá-lo.",
+    "q3": "Preciso de um sensor de glicose?",
+    "a3": "Não. Você pode registrar suas medições manualmente. Se usar um glicosímetro ou sensor, também pode anotar os valores no SugarCheck.",
+    "q4": "O que acontece com meus dados?",
+    "a4": "Seus dados de saúde são tratados com medidas de segurança reforçadas e apenas com o seu consentimento. Você pode consultar todos os detalhes na nossa política de privacidade."
+  },
+  "cta": {
+    "title": "O escudo se ativa quando você começa",
+    "subtitle": "Junte-se aos Guerreiros Azuis e transforme o cuidado com a diabetes em uma aventura que você vai querer viver.",
+    "primary": "Criar minha conta grátis",
+    "secondary": "Entrar"
+  }
+}

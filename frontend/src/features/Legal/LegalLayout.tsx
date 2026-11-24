@@ -2,7 +2,7 @@ import { Box, Button, Container, Divider, Paper, Stack, Typography } from "@mui/
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import Navbar from "../../components/layout/Header/Navbar";
 import Footer from "../../components/layout/Footer/Footer";
 import type { LegalPageContent, LegalSectionContent } from "./types";
@@ -15,14 +15,6 @@ interface LegalLayoutProps {
 export function LegalLayout({ content, children }: LegalLayoutProps) {
   const { t } = useTranslation("legal");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const previousTitle = document.title;
-    document.title = `${content.title} | SugarCheck`;
-    return () => {
-      document.title = previousTitle;
-    };
-  }, [content.title]);
 
   return (
     <>
