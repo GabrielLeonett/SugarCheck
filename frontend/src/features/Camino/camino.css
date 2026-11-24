@@ -1,0 +1,107 @@
+@keyframes caminoFlotar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes caminoPulso {
+  0% {
+    transform: scale(0.82);
+    opacity: 0.75;
+  }
+  70% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes caminoHumo {
+  0% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-26px);
+    opacity: 0;
+  }
+}
+
+@keyframes caminoOlas {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-40px);
+  }
+}
+
+@keyframes caminoBrillo {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes caminoDibujar {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.camino-gluco {
+  animation: caminoFlotar 3.2s ease-in-out infinite;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.camino-pulso {
+  animation: caminoPulso 2.2s ease-out infinite;
+}
+
+.camino-humo {
+  animation: caminoHumo 3.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.camino-olas {
+  animation: caminoOlas 6s ease-in-out infinite alternate;
+}
+
+.camino-olas-lento {
+  animation: caminoOlas 9s ease-in-out infinite alternate-reverse;
+}
+
+.camino-brillo {
+  animation: caminoBrillo 2.8s ease-in-out infinite;
+}
+
+.camino-trazo {
+  animation: caminoDibujar 1.6s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camino-gluco,
+  .camino-pulso,
+  .camino-humo,
+  .camino-olas,
+  .camino-olas-lento,
+  .camino-brillo,
+  .camino-trazo {
+    animation: none !important;
+  }
+}

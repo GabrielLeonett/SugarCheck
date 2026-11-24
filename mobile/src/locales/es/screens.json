@@ -153,11 +153,18 @@
       "Graduado de oro"
     ],
     "worlds": {
-      "energy": "Camino de la energía",
-      "safety": "Camino de la seguridad",
-      "carbohydrates": "Camino de los carbohidratos",
-      "insulin": "Camino de la insulina",
-      "explorer": "Camino del explorador"
+      "energy": "El Reino del Autoconocimiento",
+      "safety": "El Valle de las Alertas (Hipo e Hiper)",
+      "carbohydrates": "La Isla del Nutri-Saber",
+      "insulin": "El Templo de la Insulina",
+      "explorer": "La Cumbre de la Vida Activa"
+    },
+    "worldTags": {
+      "energy": "Castillo del saber",
+      "safety": "Tierra de alertas",
+      "carbohydrates": "Isla de los nutrientes",
+      "insulin": "Templo de la insulina",
+      "explorer": "Cumbre de la aventura"
     },
     "lessonTitles": {
       "1": "La llave perdida del páncreas",
@@ -181,6 +188,9 @@
     "available": "Disponible",
     "locked": "Bloqueado",
     "completedLevel": "Completado",
+    "currentMission": "Misión actual",
+    "keepGoing": "¡Sigue tu camino!",
+    "levelShort": "Nivel",
     "loading": "Cargando tu progreso...",
     "loadError": "No se pudo cargar el progreso del Camino.",
     "saveError": "No se pudo guardar el nivel. Revisa tu conexión e inténtalo de nuevo.",

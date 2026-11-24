@@ -153,11 +153,18 @@
       "ゴールド卒業生"
     ],
     "worlds": {
-      "energy": "エネルギーの道",
-      "safety": "安全の道",
-      "carbohydrates": "炭水化物の道",
-      "insulin": "インスリンの道",
-      "explorer": "探検家の道"
+      "energy": "自己認識の王国",
+      "safety": "アラートの谷（低血糖・高血糖）",
+      "carbohydrates": "栄養知識の島",
+      "insulin": "インスリンの神殿",
+      "explorer": "アクティブライフの頂点"
+    },
+    "worldTags": {
+      "energy": "知識の城",
+      "safety": "警告の谷",
+      "carbohydrates": "栄養の島",
+      "insulin": "インスリンの神殿",
+      "explorer": "冒険の頂"
     },
     "lessonTitles": {
       "1": "すい臓の失われた鍵",
@@ -181,6 +188,9 @@
     "available": "プレイ可能",
     "locked": "ロック中",
     "completedLevel": "完了",
+    "currentMission": "現在のミッション",
+    "keepGoing": "自分の道を進もう！",
+    "levelShort": "レベル",
     "loading": "進捗を読み込み中...",
     "loadError": "進捗を読み込めませんでした。",
     "saveError": "レベルを保存できませんでした。接続を確認して再試行してください。",
