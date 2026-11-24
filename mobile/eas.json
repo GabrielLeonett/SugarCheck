@@ -14,11 +14,17 @@
       "android": {
         "buildType": "apk"
       },
-      "node": "22.13.0"
+      "node": "22.13.0",
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL": "https://sugarcheck-production.up.railway.app"
+      }
     },
     "production": {
       "autoIncrement": true,
-      "node": "22.13.0"
+      "node": "22.13.0",
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL": "https://sugarcheck-production.up.railway.app"
+      }
     }
   },
   "submit": {
