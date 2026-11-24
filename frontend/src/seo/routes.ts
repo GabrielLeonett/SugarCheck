@@ -1,4 +1,4 @@
-export const SITE_URL = "https://sugarcheck.duckdns.org";
+export const SITE_URL = "https://sugarcheck.app";
 
 const INDEXABLE =
   "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
