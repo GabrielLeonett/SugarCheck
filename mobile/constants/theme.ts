@@ -79,6 +79,14 @@ export interface ThemeColors {
   };
   /** Superficies tintadas para tarjetas destacadas (equivalente a primary.200). */
   surface: string;
+  /** Acentos de los cinco mundos del Camino del Guerrero. */
+  world: {
+    kingdom: string;
+    alerts: string;
+    nutrition: string;
+    insulin: string;
+    summit: string;
+  };
   accent: AccentColors;
   /** Texto/icono sobre colores saturados (zonas, badges de estado, etc.). */
   onAccent: string;
@@ -159,6 +167,13 @@ const lightColors: ThemeColors = {
     focus: 'rgba(85, 142, 185, 0.18)',
   },
   surface: '#d7e7f3',
+  world: {
+    kingdom: '#3f729b',
+    alerts: '#c2842f',
+    nutrition: '#3f8f68',
+    insulin: '#7561a8',
+    summit: '#2b8fa3',
+  },
   accent: {
     blue: '#7692A8',
     softBlue: '#94c2e6',
@@ -208,6 +223,13 @@ const darkColors: ThemeColors = {
     focus: 'rgba(149, 191, 223, 0.18)',
   },
   surface: '#202e3a',
+  world: {
+    kingdom: '#8fc0e4',
+    alerts: '#e8bb7a',
+    nutrition: '#8ad2ae',
+    insulin: '#b7a7e2',
+    summit: '#79cbd9',
+  },
   accent: {
     blue: '#afcfe7',
     softBlue: '#95bfdf',

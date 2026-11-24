@@ -1002,44 +1002,63 @@ function ContactModal({
   const { colors } = useTheme();
   return (
     <Modal visible={visible} onClose={onClose}>
-      <ThemedText type="h6" style={{ marginBottom: 20 }}>
-        {editing ? t('profile:editContact') : t('profile:newContact')}
-      </ThemedText>
-      <FormInput
-        label={t('profile:contactName')}
-        value={form.name}
-        onChangeText={(value) => onChange({ ...form, name: value })}
-        placeholder={t('profile:contactNamePlaceholder')}
-        autoCapitalize="words"
-      />
-      <ThemedText muted style={styles.sexLabel}>{t('profile:relationship')}</ThemedText>
-      <View style={styles.sexOptions}>
-        {CONTACT_RELATIONSHIPS.map((value) => (
-          <TouchableOpacity
-            key={value}
-            onPress={() => onChange({ ...form, parentesco: value })}
-            style={[
-              styles.sexOption,
-              {
-                borderColor: form.parentesco === value ? colors.primary.main : colors.border,
-                backgroundColor: form.parentesco === value ? colors.primary[50] : colors.background.paper,
-              },
-            ]}
-            accessibilityRole="radio"
-            accessibilityState={{ selected: form.parentesco === value }}
-          >
-            <ThemedText>{t(`auth:contact${value[0].toUpperCase()}${value.slice(1)}`)}</ThemedText>
-          </TouchableOpacity>
-        ))}
-      </View>
-      <FormInput
-        label={t('profile:phone')}
-        value={form.telefono}
-        onChangeText={(value) => onChange({ ...form, telefono: value })}
-        placeholder={t('profile:phonePlaceholder')}
-        keyboardType="phone-pad"
-      />
-      <Button title={editing ? t('common:update') : t('common:save')} onPress={onSave} style={styles.inlineButton} />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.contactModalContent}
+      >
+        <ThemedText type="h6" style={{ marginBottom: 20 }}>
+          {editing ? t('profile:editContact') : t('profile:newContact')}
+        </ThemedText>
+        <FormInput
+          label={t('profile:contactName')}
+          value={form.name}
+          onChangeText={(value) => onChange({ ...form, name: value })}
+          placeholder={t('profile:contactNamePlaceholder')}
+          autoCapitalize="words"
+        />
+        <ThemedText muted style={styles.sexLabel}>{t('profile:relationship')}</ThemedText>
+        <View style={styles.relationshipOptions}>
+          {CONTACT_RELATIONSHIPS.map((value) => {
+            const selected = form.parentesco === value;
+            return (
+              <TouchableOpacity
+                key={value}
+                onPress={() => onChange({ ...form, parentesco: value })}
+                style={[
+                  styles.relationshipOption,
+                  {
+                    borderColor: selected ? colors.primary.main : colors.border,
+                    backgroundColor: selected ? colors.primary[100] : colors.background.paper,
+                  },
+                ]}
+                accessibilityRole="radio"
+                accessibilityState={{ selected }}
+              >
+                {selected && (
+                  <FontAwesome name="check" size={11} color={colors.primary[700]} />
+                )}
+                <ThemedText
+                  style={[
+                    styles.relationshipLabel,
+                    selected && { color: colors.primary[700], fontWeight: '700' },
+                  ]}
+                >
+                  {t(`auth:contact${value[0].toUpperCase()}${value.slice(1)}`)}
+                </ThemedText>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+        <FormInput
+          label={t('profile:phone')}
+          value={form.telefono}
+          onChangeText={(value) => onChange({ ...form, telefono: value })}
+          placeholder={t('profile:phonePlaceholder')}
+          keyboardType="phone-pad"
+        />
+        <Button title={editing ? t('common:update') : t('common:save')} onPress={onSave} style={styles.inlineButton} />
+      </ScrollView>
     </Modal>
   );
 }
@@ -1124,6 +1143,23 @@ const styles = StyleSheet.create({
   sexLabel: { fontSize: 14, marginBottom: 8 },
   sexOptions: { flexDirection: 'row', gap: 12, marginBottom: 16 },
   sexOption: { flex: 1, alignItems: 'center', paddingVertical: 12, borderWidth: 1.5, borderRadius: 10 },
+  relationshipOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  relationshipOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1.5,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+  },
+  relationshipLabel: { fontSize: 12, lineHeight: 17 },
+  contactModalContent: { paddingBottom: 8 },
   clinicalSubheading: { marginTop: 16, marginBottom: 4 },
   clinicalDescription: { fontSize: 13, marginBottom: 8 },
   schemaModalTitle: { textAlign: 'center', marginBottom: 16 },
