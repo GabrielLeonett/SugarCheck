@@ -7,6 +7,7 @@
     "formSubtitle": "Ingresa tus credenciales para acceder",
     "usernameLabel": "Nombre de usuario",
     "emailLabel": "Correo electrónico",
+    "usernameLabel": "Nombre de Usuario",
     "passwordLabel": "Contraseña",
     "submitButton": "Ingresar",
     "submittingButton": "Cargando...",
