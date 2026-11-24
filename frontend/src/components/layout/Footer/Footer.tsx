@@ -7,12 +7,12 @@ export default function Footer() {
     const navigate = useNavigate();
     const currentYear = new Date().getFullYear();
 
-    const links = [
+    const links: Array<{ label: string; path?: string; href?: string }> = [
         { label: t('privacidad'), path: '/privacidad' },
         { label: t('terminos'), path: '/terminos' },
         { label: t('cookies'), path: '/cookies' },
-        { label: t('soporte'), path: '/soporte' },
-        { label: t('version'), path: '#' }
+        { label: t('soporte'), href: 'mailto:soporte@sugarcheck.org' },
+        { label: t('version'), href: '#' }
     ];
     return (
         <Box
@@ -39,9 +39,22 @@ export default function Footer() {
                 {links.map((link) => (
                     <Typography
                         key={link.label}
+                        component="a"
+                        href={link.href ?? link.path}
                         variant="body2"
-                        onClick={() => navigate(link.path)}
-                        sx={{ cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}
+                        onClick={(event) => {
+                            if (link.path) {
+                                event.preventDefault();
+                                navigate(link.path);
+                            }
+                        }}
+                        sx={{
+                            cursor: 'pointer',
+                            opacity: 0.7,
+                            color: 'inherit',
+                            textDecoration: 'none',
+                            '&:hover': { opacity: 1 },
+                        }}
                     >
                         {link.label}
                     </Typography>

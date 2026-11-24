@@ -1,16 +1,120 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/src/assets/icons/SugarCheck.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO básico -->
+  <title>SugarCheck | Control de glucosa e insulina para niños</title>
+  <meta name="description"
+    content="SugarCheck convierte el control de la diabetes en una aventura épica. Registra glucosa, insulina y bienestar físico con una app pensada para niños, familias y cuidadores." />
+  <meta name="keywords"
+    content="diabetes infantil, control de glucosa, insulina, diabetes tipo 1, app para niños con diabetes, monitoreo de glucosa, SugarCheck, Guerreros Azules, HbA1c, IMC" />
+  <meta name="author" content="Asociación Civil SugarCheck" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="theme-color" content="#5866AD" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="canonical" href="https://sugarcheck.duckdns.org/" />
+
+  <!-- Iconos y PWA -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="application-name" content="SugarCheck" />
+  <meta name="apple-mobile-web-app-title" content="SugarCheck" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="msapplication-config" content="/browserconfig.xml" />
+  <meta name="msapplication-TileColor" content="#5866AD" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="SugarCheck" />
+  <meta property="og:title" content="SugarCheck | El control de la diabetes puede ser una aventura épica" />
+  <meta property="og:description"
+    content="Registra glucosa, insulina y bienestar físico con la diversión de un videojuego. Para niños, familias y cuidadores." />
+  <meta property="og:url" content="https://sugarcheck.duckdns.org/" />
+  <meta property="og:image" content="https://sugarcheck.duckdns.org/og-image.png" />
+  <meta property="og:image:secure_url" content="https://sugarcheck.duckdns.org/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="SugarCheck: el control de la diabetes puede ser una aventura épica" />
+  <meta property="og:locale" content="es_ES" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:locale:alternate" content="pt_PT" />
+  <meta property="og:locale:alternate" content="ja_JP" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SugarCheck | El control de la diabetes puede ser una aventura épica" />
+  <meta name="twitter:description"
+    content="Registra glucosa, insulina y bienestar físico con la diversión de un videojuego. Para niños, familias y cuidadores." />
+  <meta name="twitter:image" content="https://sugarcheck.duckdns.org/og-image.png" />
+  <meta name="twitter:image:alt" content="SugarCheck: el control de la diabetes puede ser una aventura épica" />
+
+  <!-- Google Search Console: pega aquí la etiqueta de verificación cuando la tengas -->
+  <!-- <meta name="google-site-verification" content="TU_CODIGO_DE_VERIFICACION" /> -->
+
+  <!-- Datos estructurados -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://sugarcheck.duckdns.org/#organization",
+        "name": "SugarCheck",
+        "alternateName": "Guerreros Azules",
+        "url": "https://sugarcheck.duckdns.org/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://sugarcheck.duckdns.org/icon-512.png",
+          "width": 512,
+          "height": 512
+        },
+        "email": "soporte@sugarcheck.org",
+        "description": "Asociación Civil SugarCheck, creadora de la app que convierte el control de la diabetes infantil en una aventura."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://sugarcheck.duckdns.org/#website",
+        "url": "https://sugarcheck.duckdns.org/",
+        "name": "SugarCheck",
+        "description": "Control de glucosa, insulina y bienestar físico para niños y familias.",
+        "inLanguage": ["es", "en", "pt", "ja"],
+        "publisher": { "@id": "https://sugarcheck.duckdns.org/#organization" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://sugarcheck.duckdns.org/#app",
+        "name": "SugarCheck",
+        "applicationCategory": "HealthApplication",
+        "applicationSubCategory": "Diabetes management",
+        "operatingSystem": "Web, Android, iOS",
+        "url": "https://sugarcheck.duckdns.org/",
+        "description": "App de control de diabetes para niños, familias y cuidadores: registro de glucosa, insulina, peso, IMC, recordatorios y un asistente con IA.",
+        "image": "https://sugarcheck.duckdns.org/og-image.png",
+        "inLanguage": ["es", "en", "pt", "ja"],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "publisher": { "@id": "https://sugarcheck.duckdns.org/#organization" }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Tipografía -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
     rel="stylesheet">
-  <title>SugarCheck</title>
 </head>
 
 <body>

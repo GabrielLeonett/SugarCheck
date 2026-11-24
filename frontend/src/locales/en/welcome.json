@@ -1,0 +1,139 @@
+{
+  "brand": {
+    "tagline": "Your Diabetes Control",
+    "logoAlt": "SugarCheck logo",
+    "homeLabel": "SugarCheck, go to the top"
+  },
+  "nav": {
+    "benefits": "Benefits",
+    "how": "How it works",
+    "path": "The Path",
+    "faq": "FAQ",
+    "login": "Log in",
+    "register": "Sign up"
+  },
+  "hero": {
+    "badge": "The adventure of caring for your diabetes",
+    "title": "Turn diabetes care into an",
+    "titleAccent": "epic adventure",
+    "description": "SugarCheck helps children and families log glucose, insulin and physical wellbeing with the fun of a video game. Because taking care of yourself can be heroic too.",
+    "primaryCta": "Start my adventure",
+    "secondaryCta": "I already have an account",
+    "trust1": "Free to start",
+    "trust2": "For kids, families and caregivers",
+    "trust3": "Available in 4 languages",
+    "mascotAlt": "Gluco, the SugarCheck mascot",
+    "visual": {
+      "safeZone": "Safe Zone",
+      "safeZoneValue": "92%",
+      "safeZoneCaption": "Great battle today!",
+      "experience": "Experience",
+      "experienceValue": "+50 XP",
+      "experienceCaption": "Level 12 · Guardian"
+    }
+  },
+  "features": {
+    "eyebrow": "Your hero gear",
+    "title": "Everything you need for every day's battle",
+    "subtitle": "Simple tools with a hero's touch. Log, learn and celebrate every step forward.",
+    "glucose": {
+      "title": "Glucose log",
+      "description": "Log your energy and see your history in clear charts, with the Safe Zone always in sight."
+    },
+    "insulin": {
+      "title": "Insulin doses",
+      "description": "Track your potions and get reminders so you never lose the rhythm of the battle."
+    },
+    "physical": {
+      "title": "Physical monitoring",
+      "description": "Weight, height and BMI with a friendly meter that celebrates every step forward."
+    },
+    "oracle": {
+      "title": "The Great Oracle",
+      "description": "An AI assistant that answers your questions and cheers you on."
+    },
+    "path": {
+      "title": "Warrior's Path",
+      "description": "Level up, earn badges and keep your winning streaks."
+    },
+    "guardians": {
+      "title": "Guardians and alerts",
+      "description": "Emergency contacts and reminders that parents can set up."
+    }
+  },
+  "path": {
+    "eyebrow": "Gamification",
+    "title": "The Warrior's Path",
+    "subtitle": "Every reading earns experience. Every day in the Safe Zone is a victory.",
+    "level": "Level {{number}}",
+    "apprentice": {
+      "name": "Apprentice",
+      "description": "Take your first steps and learn to listen to your energy.",
+      "xp": "Level 1 · Starting point"
+    },
+    "guardian": {
+      "name": "Guardian",
+      "description": "Keep your streaks and unlock new badges.",
+      "xp": "Level 10 · Protector"
+    },
+    "legend": {
+      "name": "Legend",
+      "description": "Become an example for other Blue Warriors.",
+      "xp": "Level 30 · Hero"
+    },
+    "cta": "Start my path"
+  },
+  "preview": {
+    "eyebrow": "Your Headquarters",
+    "title": "This is your day-to-day",
+    "description": "A clear dashboard with your last battle, the insulin timer, your history and your physical balance. Designed so kids and parents understand everything at a glance.",
+    "cta": "Create my free account",
+    "caption": "SugarCheck dashboard preview"
+  },
+  "how": {
+    "eyebrow": "How it works",
+    "title": "Three steps to get started",
+    "subtitle": "From sign-up to your first victory in just a few minutes.",
+    "step1": {
+      "title": "Create your account",
+      "description": "Sign up in minutes and customize your warrior."
+    },
+    "step2": {
+      "title": "Log your energy",
+      "description": "Record glucose, insulin and weight from any device."
+    },
+    "step3": {
+      "title": "Stay in the Safe Zone",
+      "description": "Follow your charts, earn badges and share progress with your family."
+    }
+  },
+  "guardians": {
+    "eyebrow": "For guardians",
+    "title": "Parents have a shield too",
+    "subtitle": "SugarCheck is designed so kids and caregivers work as a team.",
+    "point1": "Emergency contacts always at hand.",
+    "point2": "Measurement and insulin reminders.",
+    "point3": "Preferences and avatars tailored to each warrior.",
+    "point4": "Protected data and clear privacy policies.",
+    "cta": "Read the privacy policy"
+  },
+  "faq": {
+    "eyebrow": "Frequently asked questions",
+    "title": "Everything you want to know",
+    "subtitle": "If your question isn't here, email us at soporte@sugarcheck.org.",
+    "q1": "Is SugarCheck free?",
+    "a1": "Yes. You can create your account and start logging your information at no cost.",
+    "q2": "Is it for kids and adults?",
+    "a2": "Yes. The app is designed with children with diabetes and their families in mind, but anyone who needs to track glucose and insulin can use it.",
+    "q3": "Do I need a glucose sensor?",
+    "a3": "No. You can log your readings manually. If you use a glucose meter or sensor, you can also enter the values in SugarCheck.",
+    "q4": "What happens to my data?",
+    "a4": "Your health data is handled with reinforced security measures and only with your consent. You can read all the details in our privacy policy."
+  },
+  "cta": {
+    "title": "Your shield activates when you start",
+    "subtitle": "Join the Blue Warriors and turn diabetes care into an adventure you'll want to live.",
+    "primary": "Create my free account",
+    "secondary": "Log in"
+  }
+}
