@@ -91,7 +91,7 @@ export class ImcController {
     if (!result.isValid) {
       const error = result.getError();
       if (error instanceof ImcNotFoundError) throw new NotFoundException(error.message);
-      if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
+      // El resto de errores de dominio los resuelve el filtro global (403 incluido).
       throw error;
     }
     return result.getValue().toPlain();
@@ -104,7 +104,6 @@ export class ImcController {
     if (!result.isValid) {
       const error = result.getError();
       if (error instanceof ImcNotFoundError) throw new NotFoundException(error.message);
-      if (error instanceof ErrorAbstract) throw new BadRequestException(error.message);
       throw error;
     }
     return;

@@ -7,6 +7,7 @@ import { UserName } from "../core/value-objects/UserName";
 import { UserFechaNacimiento } from "../core/value-objects/UserFechaNacimiento";
 import { UserPassword } from "../core/value-objects/UserPassword";
 import { UserSexo } from "../core/value-objects/UserSexo";
+import { UserUsername } from "../core/value-objects/UserUsername";
 import { PasswordHasher } from "../../shared/application/ports/password-hasher.interface";
 import { User } from "../core/User";
 
@@ -19,9 +20,11 @@ export class UpdateUser {
 
     async run(id: string, update: {
         name?: string;
+        username?: string;
         email?: string;
         sexo?: string;
         fechaNacimiento?: Date;
+        goal?: string;
         password?: string;
     }): Promise<Result<User, ErrorAbstract>> {
         // 1. Validar ID del usuario
@@ -57,6 +60,21 @@ export class UpdateUser {
             validatedUpdate.email = emailRes.getValue();
         }
 
+        if (update.username !== undefined) {
+            const usernameRes = UserUsername.create(update.username);
+            if (!usernameRes.isValid) return Result.fail(usernameRes.getError());
+
+            // Validar unicidad del username si cambió
+            const existingByUsername = await this.userRepository.getOneByUsername(usernameRes.getValue());
+            if (existingByUsername.isValid) {
+                const existingUser = existingByUsername.getValue();
+                if (existingUser.id.value !== userId.value) {
+                    return Result.fail(new Error("Username is already in use by another user") as unknown as ErrorAbstract);
+                }
+            }
+            validatedUpdate.username = usernameRes.getValue();
+        }
+
         if (update.sexo !== undefined) {
             const sexoRes = UserSexo.create(update.sexo);
             if (!sexoRes.isValid) return Result.fail(sexoRes.getError());
@@ -67,6 +85,14 @@ export class UpdateUser {
             const fechaNacimientoRes = UserFechaNacimiento.create(update.fechaNacimiento);
             if (!fechaNacimientoRes.isValid) return Result.fail(fechaNacimientoRes.getError());
             validatedUpdate.fechaNacimiento = fechaNacimientoRes.getValue();
+        }
+
+        if (update.goal !== undefined) {
+            const goal = update.goal.trim();
+            if (!goal || goal.length > 200) {
+                return Result.fail(new Error("Goal must contain between 1 and 200 characters") as unknown as ErrorAbstract);
+            }
+            validatedUpdate.goal = goal;
         }
 
         if (update.password !== undefined) {

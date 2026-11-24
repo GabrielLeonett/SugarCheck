@@ -1,0 +1,2 @@
+# Scripts: forzar LF (fallan con CRLF en Linux)
+*.sh text eol=lf

@@ -12,6 +12,7 @@ interface ImcOverrides {
   peso?: number;
   altura?: number;
   fecha?: Date;
+  createdAt?: Date;
 }
 
 export class ImcFactory {
@@ -23,6 +24,7 @@ export class ImcFactory {
       peso: Peso.create(overrides.peso ?? 80).getValue(),
       altura: Altura.create(overrides.altura ?? 170).getValue(),
       fecha: Fecha.fromDate(fecha).getValue(),
+      createdAt: overrides.createdAt ?? new Date(),
     });
   }
 }

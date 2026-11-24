@@ -13,7 +13,6 @@
     "submittingButton": "Cargando...",
     "oauthDivider": "O continuar con",
     "forgotPassword": "¿Olvidaste tu contraseña?",
-    "sponsoredBy": "Patrocinado por",
     "errors": {
       "defaultBackendError": "Error al iniciar sesión. Inténtalo de nuevo.",
       "unknownError": "Error desconocido"

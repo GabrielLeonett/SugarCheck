@@ -11,6 +11,7 @@
     "uiBolus": "UI Bolus",
     "modalRapidaTitle": "Register Rapid Dose Application",
     "modalLentaTitle": "Register Slow Dose Application",
+    "dosis": "Dose (UI)",
     "glucoseLevel": "Glucose Level (mg/dL)",
     "measurementContext": "Measurement Context",
     "applicationContext": "Application Context",
@@ -26,6 +27,9 @@
     "front": "FRONT",
     "back": "BACK",
     "saveMeasurement": "Save Measurement",
+    "saving": "Saving...",
+    "errorGuardarRegistro": "Error saving the record",
+    "pleaseSelectZone": "Please select an application zone",
     "pleaseEnterUnits": "Please enter the units",
     "pleaseSelectContext": "Please select a context",
     "zoneAbdomenRight": "Right Abdomen",
@@ -35,5 +39,9 @@
     "zoneArmRight": "Right Arm",
     "zoneArmLeft": "Left Arm",
     "zoneGluteRight": "Right Glute",
-    "zoneGluteLeft": "Left Glute"
+    "zoneGluteLeft": "Left Glute",
+    "sinRangosDefinidos": "No ranges defined",
+    "editarEsquema": "Edit scheme",
+    "saveSuccess": "Insulin dose saved successfully",
+    "saveSuccessTitle": "Insulin saved"
 }

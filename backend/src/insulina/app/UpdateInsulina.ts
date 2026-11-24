@@ -7,12 +7,16 @@ import { ContextoAplicacion } from '../core/value-objects/ContextoAplicacion';
 import { FechaInsulina } from '../core/value-objects/FechaInsulina';
 import { HoraInsulina } from '../core/value-objects/HoraInsulina';
 import { InsulinaNotFoundError } from '../core/errors/InsulinaNotFoundError';
-import { InsulinaNoModificableError } from '../core/errors/InsulinaNoModificableError';
 import { ContextoAplicacionInvalidoError } from '../core/errors/ContextoAplicacionInvalidoError';
+import { InsulinaOverlapError } from '../core/errors/InsulinaOverlapError';
+import { findOverlappingInsulin } from '../core/InsulinaOverlap';
+import {
+  daysSinceMedicalRecordCreation,
+  isWithinMedicalRecordEditWindow,
+} from '../../shared/core/MedicalRecordEditWindow';
+import { MedicalRecordNotEditableError } from '../../shared/core/errors/MedicalRecordNotEditableError';
 import { Result } from '../../shared/result';
 import { ErrorAbstract } from '../../shared/error-abstract';
-
-const DIAS_MODIFICACION = 15;
 
 export class UpdateInsulina {
   constructor(
@@ -40,12 +44,13 @@ export class UpdateInsulina {
       return Result.fail(new InsulinaNotFoundError(params.id));
     }
 
-    const ahora = new Date();
-    const diasTranscurridos = Math.floor(
-      (ahora.getTime() - existing.createdAt.getTime()) / (1000 * 60 * 60 * 24),
-    );
-    if (diasTranscurridos > DIAS_MODIFICACION) {
-      return Result.fail(new InsulinaNoModificableError(diasTranscurridos));
+    if (!isWithinMedicalRecordEditWindow(existing.createdAt)) {
+      const diasTranscurridos = daysSinceMedicalRecordCreation(existing.createdAt);
+      return Result.fail(
+        new MedicalRecordNotEditableError(
+          `No se puede modificar un registro de insulina después de 15 días. Han transcurrido ${diasTranscurridos} días desde su creación.`,
+        ),
+      );
     }
 
     if (params.dosis !== undefined) {
@@ -83,6 +88,27 @@ export class UpdateInsulina {
         if (!ctxRes.isValid) return Result.fail(ctxRes.getError());
         existing.actualizarContexto(ctxRes.getValue());
       }
+    }
+
+    const recordsRes = await this.repository.getAllByUserId(existing.userId);
+    if (!recordsRes.isValid) return Result.fail(recordsRes.getError());
+
+    const overlap = findOverlappingInsulin(
+      recordsRes.getValue(),
+      {
+        fecha: existing.fecha,
+        hora: existing.hora,
+        tipo: existing.tipo,
+      },
+      existing.id.value,
+    );
+
+    if (overlap) {
+      return Result.fail(
+        new InsulinaOverlapError(
+          'Ya existe un registro de insulina en ese horario o dentro del margen de seguridad de 3 horas.',
+        ).withCode('INSULIN_OVERLAP', 'hora'),
+      );
     }
 
     return this.repository.update(idRes.getValue(), existing);

@@ -5,6 +5,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BcryptHasher } from '../../shared/infrastructure/security/bcrypt-hasher';
 import { AuthController } from './auth.controller';
+import { OAuthController } from './oauth.controller';
+import { OAuthService } from './oauth/oauth.service';
 import { RefreshAccessToken } from '../app/RefreshAccessToken';
 import { LoginUser } from '../app/LoginUser';
 import { Logout } from '../app/LogoutUser';
@@ -17,6 +19,10 @@ import { ForgotPassword } from '../app/ForgotPassword';
 import { ResetPassword } from '../app/ResetPassword';
 import { NodemailerService } from './email/nodemailer.service';
 import { ResetCodeStore } from './ResetCodeStore';
+import {
+  ForgotPasswordRateLimitGuard,
+  ResetPasswordRateLimitGuard,
+} from './auth-rate-limit.guard';
 
 @Module({
   imports: [
@@ -33,7 +39,7 @@ import { ResetCodeStore } from './ResetCodeStore';
       },
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, OAuthController],
   providers: [
     AuthGuard,
     OptionalAuthGuard,
@@ -50,6 +56,8 @@ import { ResetCodeStore } from './ResetCodeStore';
       provide: 'ResetCodeStore',
       useClass: ResetCodeStore,
     },
+    ForgotPasswordRateLimitGuard,
+    ResetPasswordRateLimitGuard,
     LoginUser,
     RefreshAccessToken,
     Logout,
@@ -58,6 +66,7 @@ import { ResetCodeStore } from './ResetCodeStore';
     ResetPassword,
     AuthService,
     FirebaseAdminService,
+    OAuthService,
   ],
   exports: [JwtModule, AuthGuard, OptionalAuthGuard, RolesGuard, FirebaseAdminService],
 })

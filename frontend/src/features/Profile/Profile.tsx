@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Box,
     LinearProgress,
@@ -14,7 +14,6 @@ import {
     Switch,
     Paper,
     Modal,
-    Alert,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +24,6 @@ import { CardBase } from "../../components/ui/Cards/CardBase";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { AvatarProfile } from "./components/AvatarProfile";
-import Medal from '../../assets/icons/medal.svg';
 import { useAuthStore } from "../../stores/authStore";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -33,31 +31,47 @@ import { DateField } from '@mui/x-date-pickers/DateField';
 import dayjs from 'dayjs';
 import { ButtonBase } from "../../components/ui/Buttons/ButtonBase";
 import NumberSpinner from "../../components/ui/NumberSpinner";
-import { apiPrivate } from "../../apis/axios";
 import { userApi } from "../../apis/user_config";
+import { preferenceApi } from "../../apis/preference_config";
 import { contactEmergenceApi, type ContactEmergenceData } from "../../apis/contact_emergence";
 import { profilePersonalSchema, type ProfilePersonalData } from "../../schemas/profile";
+import { changePasswordSchema, type ChangePasswordData } from "../../schemas/change_password";
 import { contactEmergenceSchema, type ContactEmergenceData as ContactEmergenceFormData } from "../../schemas/contact_emergence";
+import { preferenceStore } from "../../hooks/usePreferenceConfig";
 import ModalBasalSchema from "./components/ModalBasalSchema";
 import ModalDynamicCorrection from "./components/ModalDynamicCorrection";
+import { ExportMedicalDataSection } from "./components/ExportMedicalDataSection";
 import useLanguage from "../../hooks/useLanguage";
+import { useUiStore } from "../../stores/uiStore";
+import { getCaminoProgreso } from "../../apis/camino";
+import yelmo_de_sabiduria from "../../assets/insigniasCamino/yelmo_de_sabiduria.png";
+import escudo_de_fibra from "../../assets/insigniasCamino/escudo_de_fribra.png";
+import lanzas from "../../assets/insigniasCamino/lanzas.png";
+import imagen_8 from "../../assets/insigniasCamino/image 8.svg";
+import imagen_9 from "../../assets/insigniasCamino/image 9.svg";
+
+const insigniasCaminoPerfil = [
+    { img: escudo_de_fibra, mundo: "Mundo 1", name: "Escudo de fibra" },
+    { img: yelmo_de_sabiduria, mundo: "Mundo 2", name: "Yelmo de la sabiduría" },
+    { img: imagen_8, mundo: "Mundo 3", name: "Peto de Precisión" },
+    { img: imagen_9, mundo: "Mundo 4", name: "Gradas de equilibrio" },
+    { img: lanzas, mundo: "Mundo 5", name: "Lanceta del Elegido" },
+];
 
 export function Profile() {
     const { t: tp } = useLanguage("profile");
     const authUser = useAuthStore((state) => state.user);
     const authLogout = useAuthStore((state) => state.logout);
+    const authRefresh = useAuthStore((state) => state.refresh);
+    const showToast = useUiStore((s) => s.showToast);
 
-    const [progress] = React.useState(25);
+    const [totalNivelesCompletados, setTotalNivelesCompletados] = useState(0);
+    const [insigniasDesbloqueadas, setInsigniasDesbloqueadas] = useState(0);
     const [openConfirm, setOpenConfirm] = React.useState(false);
     const [prefForm, setPrefForm] = React.useState({
         hypo: 90,
         hiper: 160,
-        breakfast: 100,
-        lunch: 100,
-        dinner: 100,
-        sensitivity: 1,
     });
-    const [msg, setMsg] = React.useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [contacts, setContacts] = React.useState<ContactEmergenceData[]>([]);
     const [openContactModal, setOpenContactModal] = React.useState(false);
     const [editingContact, setEditingContact] = React.useState<ContactEmergenceData | null>(null);
@@ -83,6 +97,17 @@ export function Profile() {
     });
 
     const {
+        register: registerPassword,
+        handleSubmit: handleSubmitPassword,
+        reset: resetPassword,
+        formState: { errors: errorsPassword, isSubmitting: isSubmittingPassword },
+    } = useForm<ChangePasswordData>({
+        resolver: zodResolver(changePasswordSchema),
+        mode: "onChange",
+        defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
+    });
+
+    const {
         register: registerContact,
         handleSubmit: handleSubmitContact,
         reset: resetContact,
@@ -101,79 +126,102 @@ export function Profile() {
     };
 
     useEffect(() => {
-        apiPrivate.get('/preference').then((res) => {
-            const prefs = res.data?.data;
+        preferenceApi.getPreferences().then((prefs) => {
             if (prefs) {
                 setPrefForm({
                     hypo: prefs.thresholds?.hypo ?? 90,
                     hiper: prefs.thresholds?.hiper ?? 160,
-                    breakfast: prefs.insulinRatios?.breakfast ?? 100,
-                    lunch: prefs.insulinRatios?.lunch ?? 100,
-                    dinner: prefs.insulinRatios?.dinner ?? 100,
-                    sensitivity: prefs.sensitivity ?? 1,
                 });
             }
         }).catch(() => { });
         loadContacts();
+        getCaminoProgreso().then((progreso) => {
+            const completados = progreso.ultimoNivelCompletado || 0;
+            setTotalNivelesCompletados(completados);
+            setInsigniasDesbloqueadas(Math.floor(completados / 3));
+        }).catch(() => { });
     }, []);
 
     const onPersonalSave = async (data: ProfilePersonalData) => {
         try {
             const userId = authUser?.id;
             if (!userId) {
-                setMsg({ type: 'error', text: tp("usuarioNoAutenticado") });
+                showToast('error', tp("usuarioNoAutenticado"));
                 return;
             }
             await userApi.update(userId, {
-                name: data.username || undefined,
+                username: data.username || undefined,
                 email: data.email || undefined,
                 sexo: data.sexo || undefined,
                 fechaNacimiento: data.fechaNacimiento ? new Date(data.fechaNacimiento) : undefined,
             });
-            setMsg({ type: 'success', text: tp("guardadoExitoPersonal") });
+            // Sincroniza el store con los datos frescos del servidor
+            await authRefresh();
+            showToast('success', tp("guardadoExitoPersonal"));
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorGuardar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorGuardar"));
+        }
+    };
+
+    const onChangePassword = async (data: ChangePasswordData) => {
+        try {
+            await userApi.changePassword(data.currentPassword, data.newPassword);
+            resetPassword({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            showToast('success', tp("passwordUpdated"));
+        } catch (error) {
+            showToast('error', error instanceof Error ? error.message : tp("passwordUpdateError"));
         }
     };
 
     const handlePrefSave = async () => {
         try {
-            await apiPrivate.get('/preference').then(async (res) => {
-                const current = res.data?.data;
-                if (!current?.userId) {
-                    setMsg({ type: 'error', text: tp("errorCarga") });
-                    return;
-                }
-                await apiPrivate.post('/preference', {
-                    profileImg: current.profileImg,
-                    unitMeasure: current.unitMeasure,
-                    thresholds: { hypo: prefForm.hypo, hiper: prefForm.hiper },
-                    insulinRatios: { breakfast: prefForm.breakfast, lunch: prefForm.lunch, dinner: prefForm.dinner },
-                    sensitivity: prefForm.sensitivity,
-                    correctionSchemas: current.correctionSchemas ?? [],
-                    basalSchemas: current.basalSchemas ?? [],
-                });
-                setMsg({ type: 'success', text: tp("guardadoExitoClinico") });
+            const thresholds = {
+                hypo: Number(prefForm.hypo),
+                hiper: Number(prefForm.hiper),
+            };
+            // Validacion cruzada: hipo debe ser menor a hiper
+            if (!(thresholds.hypo > 0 && thresholds.hiper > 0 && thresholds.hypo < thresholds.hiper)) {
+                showToast('error', tp("errorRangosInvalidos"));
+                return;
+            }
+
+            const current = await preferenceApi.getPreferences();
+            if (!current?.userId) {
+                showToast('error', tp("errorCarga"));
+                return;
+            }
+
+            await preferenceApi.savePreferences({
+                ...current,
+                thresholds,
             });
+            await preferenceStore.getState().load();
+            showToast('success', tp("guardadoExitoClinico"));
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorGuardar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorGuardar"));
         }
     };
 
     const onContactSave = async (data: ContactEmergenceFormData) => {
         try {
+            const isEditing = Boolean(editingContact);
+            const payload = {
+                ...data,
+                name: data.name.trim(),
+                telefono: data.telefono?.trim() || undefined,
+            };
             if (editingContact) {
-                await contactEmergenceApi.update(editingContact.id, data);
+                await contactEmergenceApi.update(editingContact.id, payload);
             } else {
-                await contactEmergenceApi.create(data);
+                await contactEmergenceApi.create(payload);
             }
             setOpenContactModal(false);
             setEditingContact(null);
             resetContact({ name: '', parentesco: '', telefono: '' });
             await loadContacts();
-            setMsg({ type: 'success', text: editingContact ? tp("contactoActualizado") : tp("contactoAgregado") });
+            showToast('success', isEditing ? tp("contactoActualizado") : tp("contactoAgregado"));
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorGuardar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorGuardar"));
         }
     };
 
@@ -197,9 +245,9 @@ export function Profile() {
         try {
             await contactEmergenceApi.delete(id);
             await loadContacts();
-            setMsg({ type: 'success', text: tp("contactoEliminado") });
+            showToast('success', tp("contactoEliminado"));
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorEliminar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorEliminar"));
         }
     };
 
@@ -210,7 +258,7 @@ export function Profile() {
             await userApi.delete(userId);
             await authLogout();
         } catch (error) {
-            setMsg({ type: 'error', text: error instanceof Error ? error.message : tp("errorEliminar") });
+            showToast('error', error instanceof Error ? error.message : tp("errorEliminar"));
         }
     };
 
@@ -218,11 +266,6 @@ export function Profile() {
         <>
             <Navbar />
             <Box sx={{ minHeight: "100vh", py: 4, px: 2 }}>
-                {msg && (
-                    <Alert severity={msg.type} onClose={() => setMsg(null)} sx={{ maxWidth: 'lg', mx: 'auto', mb: 2 }}>
-                        {msg.text}
-                    </Alert>
-                )}
                 <Grid container spacing={4} sx={{ mx: "auto", maxWidth: 'lg' }}>
                     <Grid size={{ xs: 12, md: 4 }}>
                         <CardBase elevation={4} sx={{ p: 3, borderRadius: 3, textAlign: "center" }}>
@@ -232,28 +275,40 @@ export function Profile() {
                                     {authUser?.username || 'Guerrero'}
                                 </Typography>
                             </Box>
-                            <Box sx={{ mb: 4, p: 2, borderRadius: 2 }}>
-                                <Typography variant="subtitle2" color="#4A5568">{tp("streaks")}</Typography>
-                                <Typography variant="h3" sx={{ my: 1, color: "success.light" }}>7</Typography>
-                                <Typography variant="caption" color="#718096">{tp("daysInSafeZone")}</Typography>
-                            </Box>
                             <Box sx={{ mb: 4 }}>
                                 <Typography variant="subtitle1" align="center">{tp("warriorPath")}</Typography>
                                 <Box sx={{ display: "flex", alignItems: "center", mt: 1, mb: 0.5 }}>
-                                    <LinearProgress variant="determinate" value={progress} sx={{ flexGrow: 1, height: 20, borderRadius: 5, bgcolor: 'primary.dark' }} />
-                                    <Typography variant="body2" sx={{ ml: 1, fontWeight: "bold" }}>{progress}%</Typography>
+                                    <LinearProgress variant="determinate" value={Math.round((totalNivelesCompletados / 15) * 100)} sx={{ flexGrow: 1, height: 20, borderRadius: 5, bgcolor: 'primary.dark' }} />
+                                    <Typography variant="body2" sx={{ ml: 1, fontWeight: "bold" }}>{Math.round((totalNivelesCompletados / 15) * 100)}%</Typography>
                                 </Box>
-                                <Typography variant="body2" sx={{ mt: 2 }}>{tp("currentLevel")}</Typography>
-                                <Typography variant="caption" sx={{ mt: 4 }}>{tp("badMission")}</Typography>
+                                <Typography variant="caption" sx={{ mt: 1, display: "block" }}>
+                                    {totalNivelesCompletados} / 15 niveles completados
+                                </Typography>
                             </Box>
                             <Box sx={{ textAlign: "left" }}>
                                 <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>{tp("badges")}</Typography>
-                                <Box sx={{ bgcolor: 'primary.500', display: "flex", alignItems: "center", justifyContent: 'center', p: 1.5, borderRadius: 2, gap: 2 }}>
-                                    <Box component="img" src={Medal} alt="Medalla" sx={{ width: 50, height: 50 }} />
-                                    <Box>
-                                        <Typography variant="body2">{tp("badgeShield")}</Typography>
-                                        <Typography variant="caption">{tp("badgeWorld")}</Typography>
-                                    </Box>
+                                <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                                    {insigniasCaminoPerfil.map((insignia, index) => (
+                                        <Box
+                                            key={`${insignia.name}-${index}`}
+                                            sx={{
+                                                bgcolor: index < insigniasDesbloqueadas ? 'primary.500' : 'rgba(255,255,255,0.3)',
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: 'flex-start',
+                                                p: 1.5,
+                                                borderRadius: 2,
+                                                gap: 2,
+                                                filter: index < insigniasDesbloqueadas ? 'none' : 'grayscale(100%) opacity(40%)',
+                                            }}
+                                        >
+                                            <Box component="img" src={insignia.img} alt={insignia.name} sx={{ width: 50, height: 50, objectFit: "contain" }} />
+                                            <Box>
+                                                <Typography variant="body2" sx={{ color: index < insigniasDesbloqueadas ? 'inherit' : '#8e8e8e' }}>{insignia.name}</Typography>
+                                                <Typography variant="caption" sx={{ color: index < insigniasDesbloqueadas ? '#4caf50' : '#8e8e8e', textTransform: 'uppercase' }}>{insignia.mundo}</Typography>
+                                            </Box>
+                                        </Box>
+                                    ))}
                                 </Box>
                             </Box>
                         </CardBase>
@@ -336,16 +391,60 @@ export function Profile() {
                                             helperText={errorsPersonal.email?.message}
                                         />
                                     </Grid>
+                                    <Grid size={12} sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                                        <ButtonBase variant="contained" onClick={handleSubmitPersonal(onPersonalSave)}>{tp("saveChanges")}</ButtonBase>
+                                    </Grid>
+                                </Grid>
+                            </AccordionDetails>
+                        </Accordion>
+
+                        <Accordion sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "2px solid #3182CE", mb: 3 }}>
+                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>{tp("changePasswordTitle")}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails sx={{ p: 0, mb: 4 }}>
+                                <Grid container spacing={3}>
                                     <Grid size={12}>
                                         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("currentPasswordLabel")}</Typography>
-                                        <TextField fullWidth type="password" />
+                                        <TextField
+                                            {...registerPassword('currentPassword')}
+                                            fullWidth
+                                            type="password"
+                                            autoComplete="current-password"
+                                            error={!!errorsPassword.currentPassword}
+                                            helperText={errorsPassword.currentPassword?.message}
+                                        />
                                     </Grid>
                                     <Grid size={12}>
                                         <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("newPasswordLabel")}</Typography>
-                                        <TextField fullWidth type="password" />
+                                        <TextField
+                                            {...registerPassword('newPassword')}
+                                            fullWidth
+                                            type="password"
+                                            autoComplete="new-password"
+                                            error={!!errorsPassword.newPassword}
+                                            helperText={errorsPassword.newPassword?.message}
+                                        />
+                                    </Grid>
+                                    <Grid size={12}>
+                                        <Typography variant="body2" sx={{ mb: 1, fontWeight: "bold" }}>{tp("confirmPasswordLabel")}</Typography>
+                                        <TextField
+                                            {...registerPassword('confirmPassword')}
+                                            fullWidth
+                                            type="password"
+                                            autoComplete="new-password"
+                                            error={!!errorsPassword.confirmPassword}
+                                            helperText={errorsPassword.confirmPassword?.message}
+                                        />
                                     </Grid>
                                     <Grid size={12} sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                                        <ButtonBase variant="contained" onClick={handleSubmitPersonal(onPersonalSave)}>{tp("saveChanges")}</ButtonBase>
+                                        <ButtonBase
+                                            variant="contained"
+                                            disabled={isSubmittingPassword}
+                                            onClick={handleSubmitPassword(onChangePassword)}
+                                        >
+                                            {tp("changePasswordButton")}
+                                        </ButtonBase>
                                     </Grid>
                                 </Grid>
                             </AccordionDetails>
@@ -388,14 +487,14 @@ export function Profile() {
                                     <AccordionDetails sx={{ p: 0, mb: 3 }}>
                                         <Grid container spacing={2} sx={{ maxWidth: 500, mx: "auto" }}>
                                             <Grid size={{ sm: 12, md: 6 }}>
-                                                <NumberSpinner label={tp("severeHypoLimit")} min={10} max={40} value={prefForm.hypo} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hypo: _v }); }} />
+                                                <NumberSpinner label={tp("severeHypoLimit")} min={0} max={400} value={prefForm.hypo} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hypo: _v }); }} />
                                             </Grid>
                                             <Grid size={{ sm: 12, md: 6 }}>
-                                                <NumberSpinner label={tp("severeHyperLimit")} min={10} max={40} value={prefForm.hiper} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hiper: _v }); }} />
+                                                <NumberSpinner label={tp("severeHyperLimit")} min={0} max={500} value={prefForm.hiper} onValueChange={(_v: number | null, _e: unknown) => { if (_v !== null) setPrefForm({ ...prefForm, hiper: _v }); }} />
                                             </Grid>
                                             <Grid size={12} sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
                                                 <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={handlePrefSave}>
-                                                    Guardar Cambios
+                                                    {tp("saveChanges")}
                                                 </ButtonBase>
                                             </Grid>
                                         </Grid>
@@ -408,7 +507,7 @@ export function Profile() {
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ p: 0, mb: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>
                                         <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
-                                            Administre los rangos de glucemia y las dosis de corrección correspondientes.
+                                            {tp("correctionDesc")}
                                         </Typography>
                                         <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={() => setOpenCorrectionModal(true)}>
                                             {tp("addRange")}
@@ -422,13 +521,22 @@ export function Profile() {
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ p: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
                                         <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
-                                            Configure las dosis de insulina basal según la hora del día.
+                                            {tp("basalDesc")}
                                         </Typography>
                                         <ButtonBase variant="contained" sx={{ bgcolor: "#63B3ED", "&:hover": { bgcolor: "#4299E1" }, fontWeight: "bold" }} onClick={() => setOpenBasalModal(true)}>
                                             {tp("addSchema")}
                                         </ButtonBase>
                                     </AccordionDetails>
                                 </Accordion>
+                            </AccordionDetails>
+                        </Accordion>
+
+                        <Accordion sx={{ background: "none", boxShadow: "none", "&:before": { display: "none" } }}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: 0, borderBottom: "2px solid #3182CE", mb: 3 }}>
+                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>{tp("exportTitle")}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails sx={{ p: 0, mb: 4 }}>
+                                <ExportMedicalDataSection />
                             </AccordionDetails>
                         </Accordion>
 
@@ -474,10 +582,6 @@ export function Profile() {
                                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>{tp("emergencyMode")}</Typography>
                                 <Grid container spacing={2} sx={{ maxWidth: 400, mx: "auto" }}>
                                     <Grid size={12} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>{tp("doseOverlapBlock")}</Typography>
-                                        <Switch defaultChecked />
-                                    </Grid>
-                                    <Grid size={12} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                         <Typography variant="body2" sx={{ fontWeight: "bold" }}>{tp("sosChannel")}</Typography>
                                         <Switch defaultChecked />
                                     </Grid>
@@ -491,7 +595,7 @@ export function Profile() {
                                 <TextField
                                     {...registerContact('name')}
                                     fullWidth
-                                    label="Nombre"
+                                    label={tp("contactName")}
                                     variant="outlined"
                                     size="small"
                                     sx={{ mb: 2 }}
@@ -501,7 +605,7 @@ export function Profile() {
                                 <TextField
                                     {...registerContact('parentesco')}
                                     fullWidth
-                                    label="Parentesco"
+                                    label={tp("contactRelationship")}
                                     variant="outlined"
                                     size="small"
                                     select
@@ -523,9 +627,12 @@ export function Profile() {
                                 <TextField
                                     {...registerContact('telefono')}
                                     fullWidth
-                                    label="Teléfono"
+                                    label={tp("contactPhone")}
                                     variant="outlined"
                                     size="small"
+                                    type="tel"
+                                    error={!!errorsContact.telefono}
+                                    helperText={errorsContact.telefono?.message}
                                     sx={{ mb: 2 }}
                                 />
                                 <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>

@@ -1,5 +1,5 @@
-import { Box, useTheme, Typography, TextField, Button, Link } from "@mui/material";
-import { LogoGA } from "../components/ui/LogoGA";
+import { Box, useTheme, Typography, TextField, Button } from "@mui/material";
+import { LogoSugarCheck } from "../components/ui/LogoSugarCheck";
 import LockIcon from '@mui/icons-material/Lock';
 
 export default function RecoveryPassword() {
@@ -99,7 +99,7 @@ export default function RecoveryPassword() {
                 </Box>
             </Box>
 
-            {/* Footer - Patrocinado por */}
+            {/* Footer - Marca SugarCheck */}
             <Box sx={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
@@ -107,10 +107,7 @@ export default function RecoveryPassword() {
                 mt: 5,
                 pt: 2
             }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-                    Patrocinado por
-                </Typography>
-                <LogoGA />
+                <LogoSugarCheck />
             </Box>
         </Box>
     );

@@ -12,12 +12,14 @@ import NavBarItem from "../../ui/NavBarItem";
 import ProfileNavBar from "../../ui/Cards/ProfileNavBar";
 import { useNavbar } from "../../../hooks/useNavbar";
 import { usePreferenceConfig } from "../../../hooks/usePreferenceConfig";
+import { useAuthStore } from "../../../stores/authStore";
 import { AVATAR_MAP } from "../../../constants/avatars";
 import NotificationsDropdown from "../../shared/NotificationsDropdown";
 
 
 function Navbar() {
   const {preference} = usePreferenceConfig();
+  const accessToken = useAuthStore((state) => state.accessToken);
   const avatarSrc = preference?.profileImg && AVATAR_MAP[preference.profileImg]
     ? AVATAR_MAP[preference.profileImg]
     : undefined;
@@ -94,15 +96,19 @@ function Navbar() {
               p: 1,
             }}
           >
-            <NotificationsDropdown />
-            <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => setProfileMenuOpen(!profileMenuOpen)}>
-              <Avatar alt="User" src={avatarSrc} children={userInitials} sx={{
-                "&:hover": {
-                  backgroundColor: "action.hover",
-                  borderRadius: 1,
-                },
-              }} />
-            </Box>
+            {accessToken && (
+              <>
+                <NotificationsDropdown />
+                <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => setProfileMenuOpen(!profileMenuOpen)}>
+                  <Avatar alt="User" src={avatarSrc} children={userInitials} sx={{
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                      borderRadius: 1,
+                    },
+                  }} />
+                </Box>
+              </>
+            )}
           </Box>
 
           {/* Menú hamburguesa */}

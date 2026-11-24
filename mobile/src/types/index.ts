@@ -5,7 +5,19 @@ export interface User {
   sexo: string;
   roles: string[];
   fechaNacimiento: string;
+  goal?: string | null;
   createdAt: string;
+}
+
+export interface CorrectionSchemaItem {
+  rangeMin: number;
+  rangeMax: number;
+  dose: number;
+}
+
+export interface BasalSchemaItem {
+  injectionTime: string;
+  dose: number;
 }
 
 export interface BackendErrorResponse {
@@ -27,14 +39,16 @@ export interface Preference {
     hypo: number;
     hiper: number;
   };
-  insulinRatios: {
+  insulinRatios?: {
     breakfast: number;
     lunch: number;
     dinner: number;
   };
-  sensitivity: number;
+  sensitivity?: number;
   locale: string;
   theme: string;
+  correctionSchemas?: CorrectionSchemaItem[];
+  basalSchemas?: BasalSchemaItem[];
 }
 
 export interface ContactEmergenceData {

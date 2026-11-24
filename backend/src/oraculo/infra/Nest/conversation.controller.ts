@@ -176,6 +176,7 @@ export class ConversationController {
     } catch (error) {
       if (clientGone) return;
 
+      console.error('[Oráculo] Error generando la respuesta:', error);
       send({ type: 'error', message: this.toStreamErrorMessage(error) });
       res.end();
     } finally {

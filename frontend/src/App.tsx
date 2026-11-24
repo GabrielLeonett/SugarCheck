@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, useEffect } from 'react';
 import ThemeWrapperContext from "./contexts/ThemeContext";
 import { useAuthStore } from './stores/authStore';
@@ -19,6 +19,11 @@ import "./App.css";
 import { Profile } from "./features/Profile/Profile";
 import { LoadingScreen } from "./components/ui/LoadingScreen";
 import { useTranslation } from "react-i18next";
+import ToastProvider from "./components/shared/ToastProvider";
+import CookieConsent from "./components/shared/CookieConsent";
+import PrivacyPolicy from "./features/Legal/PrivacyPolicy";
+import TermsConditions from "./features/Legal/TermsConditions";
+import CookiePolicy from "./features/Legal/CookiePolicy";
 
 function App() {
   const { t } = useTranslation("common");
@@ -42,9 +47,10 @@ function App() {
 
   return (
     <ThemeWrapperContext>
-      {isAuthLoading ? (
+{isAuthLoading ? (
         <LoadingScreen message={t("verificandoSesion")} />
       ) : (
+        <>
         <Suspense fallback={<LoadingScreen />}>
           <Router>
             <Routes>
@@ -69,10 +75,19 @@ function App() {
                <Route path="/restablecer-contrasena" element={<ResetPassword />} />
                <Route path="/register" element={<Register />} />
              </Route>
+
+             <Route path="/privacidad" element={<PrivacyPolicy />} />
+             <Route path="/terminos" element={<TermsConditions />} />
+             <Route path="/cookies" element={<CookiePolicy />} />
+
+             <Route path="*" element={<Navigate to="/" replace />} />
            </Routes>
-         </Router>
-       </Suspense>
-     )}
+           <CookieConsent />
+          </Router>
+        </Suspense>
+        <ToastProvider />
+        </>
+      )}
    </ThemeWrapperContext>
    );
 }

@@ -21,5 +21,6 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/features/.tsx"]
+  "include": ["src", "src/features/.tsx"],
+  "exclude": ["**/*copia*"]
 }

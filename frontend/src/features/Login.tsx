@@ -1,5 +1,5 @@
 import { Box, useTheme, Typography, TextField, Link, Alert, Button } from "@mui/material";
-import { LogoGA } from "../components/ui/LogoGA";
+import { LogoSugarCheck } from "../components/ui/LogoSugarCheck";
 import LoginIcon from '@mui/icons-material/Login';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,7 @@ import type { AxiosError } from "axios";
 import type { BackendErrorResponse } from "../types/types";
 import axios from "axios";
 import GlucoSaludando from '../assets/gluco-saludo.png';
+import Icon from '../assets/icons/SugarCheck.svg';
 import { ConfigRow } from "../components/ui/ConfigRow";
 import useLanguage from "../hooks/useLanguage";
 import { CardBase } from "../components/ui/Cards/CardBase";
@@ -24,7 +25,6 @@ export default function Login() {
     const theme = useTheme();
     const login = useAuthStore((state) => state.login);
     const loginWithProvider = useAuthStore((state) => state.loginWithProvider);
-    const isNewUser = useAuthStore((state) => state.isNewUser);
     const clearNewUserFlag = useAuthStore((state) => state.clearNewUserFlag);
 
     // Cambiado al namespace 'login' para cargar las llaves correctas
@@ -80,7 +80,14 @@ export default function Login() {
             justifyContent: 'center',
             alignItems: 'center',
             bgcolor: 'background.default',
+            py: { xs: 4, md: 6 },
         }}>
+            <Box sx={{ mb: { xs: 3, md: 5 }, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+                <Typography variant="h2" color="primary" sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: { xs: '2.5rem', sm: '3.125rem' }  }}>
+                    SugarCheck
+                </Typography>
+                <Box component="img" src={Icon} alt="Ilustración de Bienvenida" sx={{ width: { xs: '50px', sm: '70px' }, height: 'auto', mb: 1 }} />
+            </Box>
             {/* Contenedor de las dos tarjetas */}
             <Box sx={{
                 display: 'flex',
@@ -326,7 +333,7 @@ export default function Login() {
                 </Box>
             </Box>
 
-            {/* Footer - Patrocinado por */}
+            {/* Footer - Marca SugarCheck */}
             <Box sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -336,16 +343,7 @@ export default function Login() {
                 gap: 2
             }}>
                 <ConfigRow />
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-                        {t("sponsoredBy")}
-                    </Typography>
-                    <LogoGA />
-                </Box>
+                <LogoSugarCheck />
             </Box>
         </Box>
     );

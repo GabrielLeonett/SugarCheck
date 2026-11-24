@@ -15,7 +15,6 @@
     "hasAccount": "すでにアカウントをお持ちですか？",
     "loginLink": "ログイン",
     "finishButton": "アカウント作成",
-    "sponsoredBy": "提供：",
     "errorRegister": "ユーザー登録エラー",
     "errorEmailExists": "このメールアドレスは既に登録されています"
 }

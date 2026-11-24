@@ -3,7 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import useLanguage from '../../hooks/useLanguage';
-import { useEffect } from 'react';
+import type { ImcRecord } from '../../data/recordsMock';
+import { useEffect, useState } from 'react';
 
 const imcSchema = z.object({
   peso: z.string()
@@ -20,7 +21,10 @@ type ImcFormData = z.infer<typeof imcSchema>;
 interface ModalImcFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: { peso: number; altura: number; fecha: string }) => void;
+  onSave: (data: { peso: number; altura: number; fecha: string }) => void | Promise<boolean>;
+  record?: ImcRecord | null;
+  title?: string;
+  submitLabel?: string;
 }
 
 const obtenerFechaActual = () => {
@@ -30,8 +34,16 @@ const obtenerFechaActual = () => {
   return fechaLocal.toISOString().split('T')[0];
 };
 
-export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProps) {
+export default function ModalImcForm({
+  open,
+  onClose,
+  onSave,
+  record,
+  title,
+  submitLabel,
+}: ModalImcFormProps) {
   const { t } = useLanguage('monitoreoFisico');
+  const [saving, setSaving] = useState(false);
 
   const {
     register,
@@ -46,13 +58,26 @@ export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProp
 
   useEffect(() => {
     if (open) {
-      reset({ peso: '', altura: '', fecha: obtenerFechaActual() });
+      reset(
+        record
+          ? {
+              peso: String(record.peso),
+              altura: String(record.estatura),
+              fecha: record.fechaISO.split('T')[0],
+            }
+          : { peso: '', altura: '', fecha: obtenerFechaActual() }
+      );
     }
-  }, [open, reset]);
+  }, [open, reset, record]);
 
-  const onSubmit = (data: ImcFormData) => {
-    onSave({ peso: Number(data.peso), altura: Number(data.altura), fecha: data.fecha });
-    onClose();
+  const onSubmit = async (data: ImcFormData) => {
+    setSaving(true);
+    try {
+      const result = await onSave({ peso: Number(data.peso), altura: Number(data.altura), fecha: data.fecha });
+      if (result !== false) onClose();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -82,7 +107,7 @@ export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProp
           color="primary.dark"
           sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}
         >
-          {t('modalTitle')}
+          {title ?? t('modalTitle')}
         </Typography>
 
         <TextField
@@ -124,8 +149,9 @@ export default function ModalImcForm({ open, onClose, onSave }: ModalImcFormProp
           variant="contained"
           color="primary"
           fullWidth
+          disabled={saving}
         >
-          {t('saveButton')}
+          {submitLabel ?? t('saveButton')}
         </Button>
       </Box>
     </Modal>

@@ -1,14 +1,20 @@
 import AddIcon from '@mui/icons-material/Add';
 import {
-  Box, Typography, Grid, LinearProgress, Button, ButtonGroup, Alert, CircularProgress,
+  Box, Typography, Grid, LinearProgress, Alert, CircularProgress,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { useState } from 'react';
 import { ButtonBase } from '../../../components/ui/Buttons/ButtonBase.tsx';
 import { CardBase } from '../../../components/ui/Cards/CardBase.tsx';
 import ModalGlucosaForm from '../../../components/shared/ModalGlucosaForm.tsx';
 import HistorialTable from '../../../components/shared/HistorialTable';
 import { PanelGraficoHistorial } from '../../../components/shared/PanelGraficoHistorial';
 import { GraficoBarra } from '../../../components/shared/GraficoBarra';
+import { TimeRangeFilter } from '../../../components/shared/TimeRangeFilter';
+import { EditActionButton } from '../../../components/shared/EditActionButton';
 import { obtenerColorEstado, type UseGlucosaDataReturn } from '../../../hooks/useGlucosaData.tsx';
+import { canEditRecord } from '../../../utils/editWindow';
+import { formToCreateGlucoseDto } from '../../../schemas/glucosa';
 import useLanguage from '../../../hooks/useLanguage.tsx';
 
 import type { GlucosaData } from '../../../schemas/glucosa';
@@ -17,11 +23,14 @@ import type { Column } from '../../../components/shared/HistorialTable';
 
 interface SeccionGlucemiaProps {
   dataHook: UseGlucosaDataReturn;
-  onSaveGlucosa: (data: GlucosaData) => void;
+  onSaveGlucosa: (data: GlucosaData) => void | Promise<boolean>;
 }
 
 export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProps) {
+  const theme = useTheme();
   const { t } = useLanguage("glucemia");
+  const { t: tEdit } = useLanguage('editRecord');
+  const [editing, setEditing] = useState<GlucosaRecord | null>(null);
 
   const formatDate = (iso: string) => {
     const [aaaa, mm, dd] = iso.split('T')[0].split('-');
@@ -41,6 +50,18 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
         </Box>
       ),
     },
+    {
+      key: 'acciones',
+      label: tEdit('actions'),
+      render: (row) => (
+        <EditActionButton
+          canEdit={canEditRecord(row.createdAt)}
+          onClick={() => setEditing(row)}
+          editLabel={tEdit('edit')}
+          expiredLabel={tEdit('editExpired')}
+        />
+      ),
+    },
   ];
 
   const chartComponent = (
@@ -52,19 +73,26 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
       emptyMessage={t('grafico.sinDatos')}
     />
   );
+  const rangeDominanceColor =
+    dataHook.porcentajeZonaSegura >= 70
+      ? theme.palette.success.main
+      : dataHook.porcentajeZonaSegura >= 50
+        ? theme.palette.warning.main
+        : theme.palette.error.main;
 
   const filterComponent = (
-    <ButtonGroup variant="outlined" size="small" aria-label={t('grafico.filtros.ariaLabel')} sx={{ alignSelf: { xs: 'center', sm: 'auto' } }}>
-      {(['hoy', 'semana', 'mes'] as const).map((filtro) => (
-        <Button
-          key={filtro}
-          onClick={() => { dataHook.setFiltroGlucosa(filtro); dataHook.setPageGlucosa(0); }}
-          variant={dataHook.filtroGlucosa === filtro ? 'contained' : 'outlined'}
-        >
-          {t(`grafico.filtros.${filtro}`)}
-        </Button>
-      ))}
-    </ButtonGroup>
+    <TimeRangeFilter
+      value={dataHook.filtroGlucosa}
+      onChange={dataHook.setFiltroGlucosa}
+      presets={['hoy', 'semana', 'mes']}
+      customRange={dataHook.customRangeGlucosa}
+      onCustomRangeChange={dataHook.setCustomRangeGlucosa}
+      getPresetLabel={(filtro) => t(`grafico.filtros.${filtro}`)}
+      personalizadoLabel={t('grafico.filtros.personalizado')}
+      startLabel={t('grafico.filtros.fechaInicio')}
+      endLabel={t('grafico.filtros.fechaFin')}
+      ariaLabel={t('grafico.filtros.ariaLabel')}
+    />
   );
 
   if (dataHook.error && dataHook.glucosaFiltrada.length === 0) {
@@ -99,20 +127,36 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
               onSave={onSaveGlucosa}
             />
 
+            <ModalGlucosaForm
+              open={!!editing}
+              onClose={() => setEditing(null)}
+              onSave={async (data) => {
+                if (!editing) return false;
+                return dataHook.handleUpdateGlucosa(editing.id, formToCreateGlucoseDto(data));
+              }}
+              record={editing}
+              title={tEdit('editGlucoseTitle')}
+              submitLabel={tEdit('saveChanges')}
+            />
+
             {/* Dominio de la Zona Segura (oculta hasta tener >= 2 registros) */}
             {dataHook.hasGlucosaData && (
               <CardBase sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%" }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600, textAlign: "center"}}>
                   {t('zonaSegura.title')}
                 </Typography>
-                <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: "error.light", textAlign: "center" }}>
+                <Typography variant="h2" sx={{ fontWeight: 700, mt: 2, color: rangeDominanceColor, textAlign: "center" }}>
                   {dataHook.porcentajeZonaSegura}%
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center", mt: 1 }}>
                   {t('zonaSegura.caption')}
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: "error.light" }}>
-                  {dataHook.porcentajeZonaSegura < 50 ? t('zonaSegura.alertaBaja') : t('zonaSegura.alertaNormal')}
+                <Typography variant="body2" sx={{ fontWeight: 700, mt: 2, color: rangeDominanceColor }}>
+                  {dataHook.porcentajeZonaSegura >= 70
+                    ? t('zonaSegura.alertaNormal')
+                    : dataHook.porcentajeZonaSegura >= 50
+                      ? t('zonaSegura.alertaAdvertencia')
+                      : t('zonaSegura.alertaBaja')}
                 </Typography>
               </CardBase>
             )}
@@ -125,8 +169,8 @@ export function SeccionGlucemia({ dataHook, onSaveGlucosa }: SeccionGlucemiaProp
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, width: "100%" }}>
                 {[
-                  { label: t('frecuenciaAlertas.hiperglucemias'), pct: dataHook.porcentajeHiper, count: dataHook.cantHiperglucemias, barColor: 'warning.light' },
-                  { label: t('frecuenciaAlertas.hipoglucemias'), pct: dataHook.porcentajeHipo, count: dataHook.cantHipoglucemias, barColor: 'info.light' },
+                  { label: t('frecuenciaAlertas.hiperglucemias'), pct: dataHook.porcentajeHiper, count: dataHook.cantHiperglucemias, barColor: 'warning.main' },
+                  { label: t('frecuenciaAlertas.hipoglucemias'), pct: dataHook.porcentajeHipo, count: dataHook.cantHipoglucemias, barColor: 'error.main' },
                   { label: t('frecuenciaAlertas.enRango'), pct: dataHook.porcentajeEnRango, count: dataHook.cantEnRango, barColor: 'success.light' },
                 ].map((item) => (
                   <Box key={item.label} sx={{ display: "flex", alignItems: "center", width: "100%" }}>

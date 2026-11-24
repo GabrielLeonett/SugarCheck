@@ -1,20 +1,22 @@
-import axios from 'axios';
+import { create } from 'axios';
+import i18n from '@/src/i18n';
 
-const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+export const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
-export const apiPrivate = axios.create({
+export const apiPrivate = create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
 });
 
-export const apiPublic = axios.create({
+export const apiPublic = create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
 apiPrivate.interceptors.request.use(
   async (config) => {
+    config.headers['Accept-Language'] = i18n.resolvedLanguage ?? i18n.language;
     const { useAuthStore } = await import('../stores/authStore');
     const token = useAuthStore.getState().accessToken;
     if (token && !config.headers['Authorization']) {

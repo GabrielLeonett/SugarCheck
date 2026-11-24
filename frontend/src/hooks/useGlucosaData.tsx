@@ -5,14 +5,15 @@ import { hba1cApi } from '../apis/hba1c';
 import type { CreateHbA1cPayload } from '../apis/hba1c';
 import { preferenceStore } from './usePreferenceConfig';
 import { useNotificationStore } from '../stores/notificationStore';
+import { useUiStore } from '../stores/uiStore';
 import useMetricData from './useMetricData';
-import type { TimeRange } from './useMetricData';
+import type { CustomDateRange, TimeRange } from './useMetricData';
 import type { GlucosaRecord, HbA1cRecord } from '../data/recordsMock';
 
 export const obtenerColorEstado = (estado: string) => {
   switch (estado) {
     case 'Alto': case 'Elevado': return 'warning.light';
-    case 'Bajo': return 'info.light';
+    case 'Bajo': return 'error.light';
     case 'Normal': case 'En Meta': return 'success.light';
     default: return 'text.primary';
   }
@@ -23,8 +24,15 @@ export interface UseGlucosaDataReturn {
   openHbA1c: boolean;
   filtroGlucosa: TimeRange;
   setFiltroGlucosa: (range: TimeRange) => void;
+  customRangeGlucosa: CustomDateRange | null;
+  setCustomRangeGlucosa: (range: CustomDateRange | null) => void;
   filtroHbA1c: TimeRange;
   setFiltroHbA1c: (range: TimeRange) => void;
+  customRangeHbA1c: CustomDateRange | null;
+  setCustomRangeHbA1c: (range: CustomDateRange | null) => void;
+  yearFilterHbA1c: number | null;
+  setYearFilterHbA1c: (year: number | null) => void;
+  hbA1cYears: number[];
   pageGlucosa: number;
   setPageGlucosa: (page: number) => void;
   rowsPerPageGlucosa: number;
@@ -37,8 +45,10 @@ export interface UseGlucosaDataReturn {
   handleCloseGlucosa: () => void;
   handleOpenHbA1c: () => void;
   handleCloseHbA1c: () => void;
-  handleSaveGlucosa: (data: CreateGlucosePayload) => Promise<void>;
-  handleSaveHbA1c: (data: CreateHbA1cPayload) => Promise<void>;
+  handleSaveGlucosa: (data: CreateGlucosePayload) => Promise<boolean>;
+  handleSaveHbA1c: (data: CreateHbA1cPayload) => Promise<boolean>;
+  handleUpdateGlucosa: (id: string, data: Partial<CreateGlucosePayload>) => Promise<boolean>;
+  handleUpdateHbA1c: (id: string, data: Partial<CreateHbA1cPayload>) => Promise<boolean>;
   glucosaFiltrada: GlucosaRecord[];
   hbA1cFiltrada: HbA1cRecord[];
   horasGlucosa: string[];
@@ -74,6 +84,7 @@ export function useGlucosaData(): UseGlucosaDataReturn {
   const [crisisValue, setCrisisValue] = useState<number | null>(null);
 
   const addNotification = useNotificationStore((s) => s.addNotification);
+  const showToast = useUiStore((s) => s.showToast);
 
   const thresholds = preferenceStore((s) => s.preference?.thresholds);
 
@@ -106,10 +117,11 @@ export function useGlucosaData(): UseGlucosaDataReturn {
   const handleOpenHbA1c = () => setOpenHbA1c(true);
   const handleCloseHbA1c = () => setOpenHbA1c(false);
 
-  const handleSaveGlucosa = async (data: Parameters<typeof glucoseApi.create>[0]) => {
+  const handleSaveGlucosa = async (data: Parameters<typeof glucoseApi.create>[0]): Promise<boolean> => {
     try {
       const { record, alert } = await glucoseApi.create(data, thresholds);
-      setGlucosaRaw((prev) => [...prev, record]);
+      await loadData();
+      showToast('success', 'Registro de glucosa guardado correctamente.', 'Glucosa');
       addNotification({
         id: `glucose-${Date.now()}`,
         type: 'info',
@@ -124,8 +136,10 @@ export function useGlucosaData(): UseGlucosaDataReturn {
         setCrisisValue(record.nivel);
       }
       handleCloseGlucosa();
+      return true;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al guardar glucosa';
+      showToast('error', message, 'Error');
       addNotification({
         id: `glucose-err-${Date.now()}`,
         type: 'warning',
@@ -135,6 +149,7 @@ export function useGlucosaData(): UseGlucosaDataReturn {
         createdAt: new Date().toISOString(),
         link: '/bitacora/control-glucosa',
       });
+      return false;
     }
   };
 
@@ -152,6 +167,7 @@ export function useGlucosaData(): UseGlucosaDataReturn {
         link: '/bitacora/control-glucosa',
       });
       handleCloseHbA1c();
+      return true;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al guardar HbA1c';
       addNotification({
@@ -163,6 +179,39 @@ export function useGlucosaData(): UseGlucosaDataReturn {
         createdAt: new Date().toISOString(),
         link: '/bitacora/control-glucosa',
       });
+      return false;
+    }
+  };
+
+  const handleUpdateGlucosa = async (
+    id: string,
+    data: Partial<CreateGlucosePayload>
+  ): Promise<boolean> => {
+    try {
+      await glucoseApi.update(id, data, thresholds);
+      await loadData();
+      showToast('success', 'Registro de glucosa actualizado correctamente.', 'Glucosa');
+      return true;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error al actualizar glucosa';
+      showToast('error', message, 'Error');
+      return false;
+    }
+  };
+
+  const handleUpdateHbA1c = async (
+    id: string,
+    data: Partial<CreateHbA1cPayload>
+  ): Promise<boolean> => {
+    try {
+      await hba1cApi.update(id, data);
+      await loadData();
+      showToast('success', 'Resultado de HbA1c actualizado correctamente.', 'HbA1c');
+      return true;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error al actualizar HbA1c';
+      showToast('error', message, 'Error');
+      return false;
     }
   };
 
@@ -188,12 +237,23 @@ export function useGlucosaData(): UseGlucosaDataReturn {
 
   const ultimoHbA1c = hbA1cRaw.length > 0 ? hbA1cRaw[hbA1cRaw.length - 1] : null;
 
+  const hbA1cYears = Array.from(
+    new Set(hbA1cRaw.map((item) => parseInt(item.fechaISO.slice(0, 4), 10)))
+  ).sort((a, b) => b - a);
+
   return {
     openGlucosa, openHbA1c,
     filtroGlucosa: glucosa.timeRange,
     setFiltroGlucosa: glucosa.setTimeRange,
+    customRangeGlucosa: glucosa.customRange,
+    setCustomRangeGlucosa: glucosa.setCustomRange,
     filtroHbA1c: hbA1c.timeRange,
     setFiltroHbA1c: hbA1c.setTimeRange,
+    customRangeHbA1c: hbA1c.customRange,
+    setCustomRangeHbA1c: hbA1c.setCustomRange,
+    yearFilterHbA1c: hbA1c.yearFilter,
+    setYearFilterHbA1c: hbA1c.setYearFilter,
+    hbA1cYears,
     pageGlucosa: glucosa.page,
     setPageGlucosa: glucosa.setPage,
     rowsPerPageGlucosa: glucosa.rowsPerPage,
@@ -205,6 +265,7 @@ export function useGlucosaData(): UseGlucosaDataReturn {
     handleOpenGlucosa, handleCloseGlucosa,
     handleOpenHbA1c, handleCloseHbA1c,
     handleSaveGlucosa, handleSaveHbA1c,
+    handleUpdateGlucosa, handleUpdateHbA1c,
     glucosaFiltrada: [...glucosa.filteredData].reverse(),
     hbA1cFiltrada: [...hbA1c.filteredData].reverse(),
     horasGlucosa, nivelesGlucosa,

@@ -1,35 +1,49 @@
 import { Box, Grid, Slider, Typography } from '@mui/material';
 import { useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 import Footer from '../components/layout/Footer/Footer.tsx';
 import Navbar from '../components/layout/Header/Navbar.tsx';
 import { useAuthStore } from '../stores/authStore.tsx';
 import { ButtonBase } from '../components/ui/Buttons/ButtonBase.tsx';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import { LineChart } from '@mui/x-charts/LineChart';
+import { GraficoBarra } from '../components/shared/GraficoBarra.tsx';
 import { CardBase } from '../components/ui/Cards/CardBase.tsx';
 import useLanguage from '../hooks/useLanguage.tsx';
+import { useGlucosaData } from '../hooks/useGlucosaData.tsx';
+import { useImcData } from '../hooks/useImcData.ts';
 import ModalGlucosaForm from '../components/shared/ModalGlucosaForm.tsx';
 import ModalImcForm from '../components/shared/ModalImcForm.tsx';
 import ModalInsulinaRapida from './Insulina/components/ModalInsulinaRapida.tsx';
 import { insulinaApi } from '../apis/insulina';
-import { imcApi } from '../apis/imc';
+import { formToCreateGlucoseDto } from '../schemas/glucosa';
+import type { GlucosaData } from '../schemas/glucosa';
+import { useUiStore } from '../stores/uiStore';
 
 const MAX = 100;
 const MIN = 0;
+/** Máximo de registros visibles en la card de Historial de Batallas. */
+const MAX_BATTLE_HISTORY = 10;
 
 export default function Home() {
+  const theme = useTheme();
   const user = useAuthStore((state) => state.user);
 
   const { t } = useLanguage("home");
+  const { t: tGlucemia } = useLanguage('glucemia');
+  const showToast = useUiStore((s) => s.showToast);
 
   const [openGlucosaModal, setOpenGlucosaModal] = useState(false);
   const [openInsulinaModal, setOpenInsulinaModal] = useState(false);
   const [openImcModal, setOpenImcModal] = useState(false);
 
+  const dataGlucosa = useGlucosaData();
+  const dataImc = useImcData();
+
   const handleOpenGlucosaModal = () => setOpenGlucosaModal(true);
   const handleCloseGlucosaModal = () => setOpenGlucosaModal(false);
-  const handleSaveGlucosaModal = () => setOpenGlucosaModal(false);
+  const handleSaveGlucosaModal = (data: GlucosaData) =>
+    dataGlucosa.handleSaveGlucosa(formToCreateGlucoseDto(data));
 
   const handleOpenInsulinaModal = () => setOpenInsulinaModal(true);
   const handleCloseInsulinaModal = () => setOpenInsulinaModal(false);
@@ -39,34 +53,63 @@ export default function Home() {
   }) => {
     await insulinaApi.create({ tipo: 'RAPIDA', ...data });
     setOpenInsulinaModal(false);
+    showToast('success', t('insulinSaved'), t('insulinSavedTitle'));
   };
 
   const handleOpenImcModal = () => setOpenImcModal(true);
   const handleCloseImcModal = () => setOpenImcModal(false);
 
-  const handleSaveImc = async (data: { peso: number; altura: number; fecha: string }) => {
-    const parts = data.fecha.split('-');
-    await imcApi.create({ peso: data.peso, altura: data.altura, dia: parseInt(parts[2]), mes: parseInt(parts[1]), anio: parseInt(parts[0]) });
-    setOpenImcModal(false);
-  };
+  const handleSaveImc = (data: { peso: number; altura: number; fecha: string }) =>
+    dataImc.handleSave(data);
 
-  // Reconstruimos el array de días usando las llaves del JSON
-  const Dias = [
-    t("days.monday"),
-    t("days.tuesday"),
-    t("days.wednesday"),
-    t("days.thursday"),
-    t("days.friday"),
-    t("days.saturday"),
-    t("days.sunday")
-  ];
+  const ultimoRegistro = dataGlucosa.glucosaFiltrada[dataGlucosa.glucosaFiltrada.length - 1];
+  const ultimaLectura = ultimoRegistro?.nivel ?? null;
+  const porcentajeZonaSegura = dataGlucosa.porcentajeZonaSegura;
 
-  const ObtenerDiasOrdenados = () => {
-    const hoy = new Date().getDay();
-    // Ajuste por si el domingo en JS es 0 para acoplarlo al array que empieza en Lunes (1)
-    const indiceActual = hoy === 0 ? 6 : hoy - 1;
-    return [...Dias.slice(indiceActual), ...Dias.slice(0, indiceActual)];
-  };
+  // El historial solo muestra las últimas batallas registradas.
+  const nivelesHistorial = dataGlucosa.nivelesGlucosa.slice(0, MAX_BATTLE_HISTORY);
+  const horasHistorial = dataGlucosa.horasGlucosa.slice(0, MAX_BATTLE_HISTORY);
+
+  const ultimoImc = dataImc.ultimoImc;
+  const ultimaCategoria = dataImc.ultimaCategoria;
+
+  const categoriaImcLabel =
+    ultimaCategoria === 'Normal' ? t('cards.physicalBalance.statusNormal') :
+    ultimaCategoria === 'Bajo peso' ? t('cards.physicalBalance.statusUnderweight') :
+    ultimaCategoria === 'Sobrepeso' ? t('cards.physicalBalance.statusOverweight') :
+    t('cards.physicalBalance.statusNormal');
+  const glucoseStatusColor =
+    ultimoRegistro?.estado === 'Bajo'
+      ? theme.palette.error.main
+      : ultimoRegistro?.estado === 'Alto'
+        ? theme.palette.warning.main
+        : ultimoRegistro
+          ? theme.palette.success.main
+          : theme.palette.text.disabled;
+  const rangeDominanceColor =
+    dataGlucosa.glucosaFiltrada.length === 0
+      ? theme.palette.text.disabled
+      : porcentajeZonaSegura >= 70
+        ? theme.palette.success.main
+        : porcentajeZonaSegura >= 50
+          ? theme.palette.warning.main
+          : theme.palette.error.main;
+  const imcStatusColor =
+    ultimaCategoria === 'Normal'
+      ? theme.palette.success.main
+      : ultimaCategoria === 'Bajo peso'
+        ? theme.palette.error.main
+        : ultimaCategoria === 'Sobrepeso'
+          ? theme.palette.warning.main
+        : theme.palette.text.disabled;
+  const safeZoneMessage =
+    dataGlucosa.glucosaFiltrada.length === 0
+      ? tGlucemia('tabla.sinDatos')
+      : porcentajeZonaSegura >= 70
+        ? tGlucemia('zonaSegura.alertaNormal')
+        : porcentajeZonaSegura >= 50
+        ? tGlucemia('zonaSegura.alertaAdvertencia')
+        : tGlucemia('zonaSegura.alertaBaja');
 
   return (
     <>
@@ -124,46 +167,18 @@ export default function Home() {
                 {t("cards.lastBattle.title")}
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-                <Typography variant='h1' component='h1' sx={{ color: '#4CAF50', fontWeight: 'bold', fontSize: { xs: '3.5rem', sm: '5rem' } }}>
-                  120
+                <Typography variant='h1' component='h1' sx={{ color: glucoseStatusColor, fontWeight: 'bold', fontSize: { xs: '3.5rem', sm: '5rem' } }}>
+                  {ultimaLectura ?? '--'}
                 </Typography>
                 <Box sx={{ ml: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <ArrowDropUpIcon sx={{ color: '#4CAF50', fontSize: { xs: '2rem', sm: '3rem' }, mb: -1 }} />
-                  <Typography variant='subtitle1' component='span' sx={{ color: '#4CAF50', fontWeight: 'bold' }}>
+                  <ArrowDropUpIcon sx={{ color: glucoseStatusColor, fontSize: { xs: '2rem', sm: '3rem' }, mb: -1 }} />
+                  <Typography variant='subtitle1' component='span' sx={{ color: glucoseStatusColor, fontWeight: 'bold' }}>
                     {t("cards.lastBattle.unit")}
                   </Typography>
                 </Box>
               </Box>
-              <Typography variant='subtitle2' component='aside' sx={{ color: '#4CAF50', fontWeight: 'medium' }}>
-                {t("cards.lastBattle.timeLabel").replace("{time}", "25 min")}
-              </Typography>
-            </CardBase>
-          </Grid>
-
-          {/* Tarjeta: Cronómetro de Seguridad */}
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-            <CardBase sx={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              p: { xs: 2, sm: 3 },
-              textAlign: 'center'
-            }}>
-              <Typography variant='h5' component='h5' sx={{ color: '#7692A8', fontWeight: 'bold', mb: 2, fontSize: { xs: '1.1rem', sm: '1.5rem' } }}>
-                {t("cards.securityTimer.title")}
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 3, mb: 2 }}>
-                <Typography variant='subtitle1' component='p' sx={{ width: '5rem', textAlign: 'center', color: '#666', fontSize: '0.85rem', lineHeight: 2 }}>
-                  {t("cards.securityTimer.description")}
-                </Typography>
-                <Typography variant='h3' component='h3' sx={{ color: '#FF9800', fontWeight: 'bold', fontSize: { xs: '2rem', sm: '3rem' } }}>
-                  3h : 45m
-                </Typography>
-              </Box>
-              <Typography variant='subtitle2' component='aside' sx={{ color: '#FF9800', fontWeight: 'medium' }}>
-                {t("cards.securityTimer.alertMessage")}
+              <Typography variant='subtitle2' component='aside' sx={{ color: glucoseStatusColor, fontWeight: 'medium' }}>
+                {ultimoRegistro?.hora ?? t('cards.lastBattle.noReadings')}
               </Typography>
             </CardBase>
           </Grid>
@@ -182,52 +197,16 @@ export default function Home() {
               <Typography variant='h5' component='h5' sx={{ color: '#7692A8', fontWeight: 'bold', mb: 2, fontSize: { xs: '1.1rem', sm: '1.5rem' } }}>
                 {t("cards.safeZone.title")}
               </Typography>
-              <Typography variant='h1' component='h1' sx={{ color: '#FF5252', fontWeight: 'bold', fontSize: { xs: '3.5rem', sm: '5rem' }, mb: 2 }}>
-                45%
+              <Typography variant='h1' component='h1' sx={{ color: rangeDominanceColor, fontWeight: 'bold', fontSize: { xs: '3.5rem', sm: '5rem' }, mb: 2 }}>
+                {porcentajeZonaSegura}%
               </Typography>
-              <Typography variant='subtitle2' component='aside' sx={{ color: '#FF5252', fontWeight: 'medium' }}>
-                {t("cards.safeZone.alertMessage")}
+              <Typography variant='subtitle2' component='aside' sx={{ color: rangeDominanceColor, fontWeight: 'medium' }}>
+                {safeZoneMessage}
               </Typography>
             </CardBase>
           </Grid>
 
-          {/* Historial de Batallas (Gráfico) */}
-          <Grid size={{ xs: 12, md: 8 }}>
-            <CardBase sx={{
-              height: '100%',
-              p: 3,
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
-              <Typography variant='h5' component='h5' sx={{ color: '#7692A8', fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
-                {t("cards.battleHistory.title")}
-              </Typography>
-
-              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                <LineChart
-                  xAxis={[{
-                    data: ObtenerDiasOrdenados(),
-                    scaleType: 'band'
-                  }]}
-                  yAxis={[{
-                    min: 50,
-                    max: 500,
-                  }]}
-                  series={[
-                    {
-                      data: [110, 135, 210, 230, 115, 100, 240],
-                      color: '#5B9BD5',
-                      showMark: true,
-                    },
-                  ]}
-                  height={500}
-                  margin={{ left: 50, right: 20, top: 20, bottom: 30 }}
-                />
-              </Box>
-            </CardBase>
-          </Grid>
-
-          {/* Tarjeta: Balance de Fortaleza Física */}
+          {/* Balance de Fortaleza Física */}
           <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <CardBase sx={{
               height: '100%',
@@ -243,15 +222,15 @@ export default function Home() {
               </Typography>
 
               <Typography variant='h1' component='h1' sx={{ color: '#5A5A5A', fontWeight: 'bold', fontSize: { xs: '3.5rem', sm: '5rem' }, my: 1 }}>
-                21.1
+                {ultimoImc !== null ? ultimoImc.toFixed(1) : '--'}
               </Typography>
 
-              <Typography variant='subtitle2' component='aside' sx={{ color: '#4CAF50', fontWeight: 'medium', mb: 3 }}>
-                {t("cards.physicalBalance.statusHealthy")}
+              <Typography variant='subtitle2' component='aside' sx={{ color: imcStatusColor, fontWeight: 'medium', mb: 3 }}>
+                {ultimaCategoria ? categoriaImcLabel : t('cards.physicalBalance.noReadings')}
               </Typography>
 
               <Slider
-                value={21.1}
+                value={Math.min(ultimoImc ?? 0, MAX)}
                 min={MIN}
                 max={MAX}
                 disabled
@@ -267,7 +246,7 @@ export default function Home() {
                     opacity: 1,
                     height: 8,
                     borderRadius: 4,
-                    backgroundImage: 'linear-gradient(90deg, #0088FF 0%, #4CAF50 50%, #FB8C00 100%)'
+                    backgroundImage: `linear-gradient(90deg, ${theme.palette.error.main} 0%, ${theme.palette.success.main} 50%, ${theme.palette.warning.main} 100%)`
                   },
                   '& .MuiSlider-track': {
                     display: 'none'
@@ -292,6 +271,30 @@ export default function Home() {
                   </Typography>
                 </Grid>
               </Grid>
+            </CardBase>
+          </Grid>
+
+          {/* Historial de Batallas (Gráfico) */}
+          <Grid size={{ xs: 12, md: 8 }}>
+            <CardBase sx={{
+              height: '100%',
+              p: 3,
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <Typography variant='h5' component='h5' sx={{ color: '#7692A8', fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
+                {t("cards.battleHistory.title")}
+              </Typography>
+
+              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', flexGrow: 1 }}>
+                <GraficoBarra
+                  data={nivelesHistorial}
+                  labels={horasHistorial}
+                  color="#94c2e6"
+                  label={t("cards.battleHistory.serieLabel")}
+                  emptyMessage={t("cards.battleHistory.empty")}
+                />
+              </Box>
             </CardBase>
           </Grid>
         </Grid>

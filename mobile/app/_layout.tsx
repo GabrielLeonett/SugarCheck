@@ -1,58 +1,150 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { SplashScreen, Stack } from 'expo-router';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider as NavigationThemeProvider,
+} from 'expo-router/react-navigation';
+import { useFonts } from 'expo-font';
+import { router, SplashScreen, Stack, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import 'react-native-reanimated';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useEffect } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { SystemAlertHost } from '@/components/SystemAlertHost';
+import { CookieConsent } from '@/components/CookieConsent';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import {
+  attachNotificationResponseHandler,
+  configureNotifications,
+} from '@/src/notifications/reminders';
 import { useAuthStore } from '@/src/stores/authStore';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/theme';
+import { useGuestStore } from '@/src/stores/guestStore';
+import { useReminderStore } from '@/src/stores/reminderStore';
+import { useCookieConsentStore } from '@/src/utils/cookieConsent';
+import { initializeAppLanguage } from '@/src/i18n';
+
+configureNotifications();
+
+SplashScreen.preventAutoHideAsync().catch(() => {
+  // La pantalla de splash puede no estar disponible en web.
+});
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <RootLayoutContent />
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function RootLayoutContent() {
+  const { colors, isDark, isReady } = useTheme();
   const { isAuthLoading, refresh, setLoading } = useAuthStore();
+  const hydrateGuest = useGuestStore((state) => state.hydrate);
+  const hydrateReminders = useReminderStore((state) => state.hydrate);
+  const [languageReady, setLanguageReady] = useState(false);
+
+  const [fontsLoaded, fontError] = useFonts({
+    'Poppins-Light': require('../assets/fonts/Poppins_300Light.ttf'),
+    'Poppins-Regular': require('../assets/fonts/Poppins_400Regular.ttf'),
+    'Poppins-Medium': require('../assets/fonts/Poppins_500Medium.ttf'),
+    'Poppins-SemiBold': require('../assets/fonts/Poppins_600SemiBold.ttf'),
+    'Poppins-Bold': require('../assets/fonts/Poppins_700Bold.ttf'),
+    'Poppins-ExtraBold': require('../assets/fonts/Poppins_800ExtraBold.ttf'),
+  });
 
   useEffect(() => {
     const init = async () => {
       try {
-        await refresh();
-      } catch {
+        await useCookieConsentStore.getState().hydrate();
+        await hydrateGuest();
+        if (!useGuestStore.getState().isGuestMode) {
+          await refresh();
+        }
+      } catch (error) {
+        console.error('No se pudo restaurar el estado local:', error);
       } finally {
         setLoading(false);
-        await SplashScreen.hideAsync();
       }
     };
+
     init();
+  }, [hydrateGuest, refresh, setLoading]);
+
+  useEffect(() => {
+    initializeAppLanguage()
+      .catch((error) => {
+        console.error('No se pudo cargar el idioma guardado:', error);
+      })
+      .finally(() => setLanguageReady(true));
   }, []);
 
-  if (isAuthLoading) {
-    return (
-      <View style={[styles.loading, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}>
-        <ActivityIndicator size="large" color={Colors[colorScheme ?? 'light'].tint} />
-      </View>
-    );
+  const appReady = (fontsLoaded || Boolean(fontError)) && isReady && !isAuthLoading && languageReady;
+
+  useEffect(() => {
+    if (!appReady) {
+      return;
+    }
+    hydrateReminders().catch((error) => {
+      console.error('No se pudieron cargar los recordatorios:', error);
+    });
+  }, [appReady, hydrateReminders]);
+
+  useEffect(() => {
+    if (!appReady) {
+      return;
+    }
+    return attachNotificationResponseHandler((url) => {
+      router.push(url as Href);
+    });
+  }, [appReady]);
+
+  useEffect(() => {
+    if (appReady) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [appReady]);
+
+  if (!appReady) {
+    return <View style={{ flex: 1, backgroundColor: colors.background.default }} />;
   }
 
+  const navigationTheme = {
+    ...(isDark ? DarkTheme : DefaultTheme),
+    colors: {
+      primary: colors.primary.main,
+      background: colors.background.default,
+      card: colors.background.paper,
+      text: colors.text.primary,
+      border: colors.divider,
+      notification: colors.error.main,
+    },
+  };
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+    <NavigationThemeProvider value={navigationTheme}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background.default },
+        }}
+      >
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="auth" />
+        <Stack.Screen name="legal" />
         <Stack.Screen name="camino" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         <Stack.Screen name="bitacora/glucosa" options={{ presentation: 'modal' }} />
         <Stack.Screen name="bitacora/insulina" options={{ presentation: 'modal' }} />
         <Stack.Screen name="bitacora/monitoreo-fisico" options={{ presentation: 'modal' }} />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+      <CookieConsent />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <SystemAlertHost />
+    </NavigationThemeProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

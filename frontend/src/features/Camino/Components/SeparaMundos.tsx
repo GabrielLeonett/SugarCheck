@@ -1,63 +1,126 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, alpha, useTheme } from "@mui/material";
+import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
+import type { SvgIconComponent } from "@mui/icons-material";
+import useLanguage from "../../../hooks/useLanguage";
 
 interface SeparadorMundoProps {
-    texto: string; 
-    numero:string | number
-    bool: boolean
+    texto: string;
+    numero: string | number;
+    /** Mantiene la compatibilidad con la versión anterior del componente. */
+    bool?: boolean;
+    /** Color de acento del mundo. */
+    accent?: string;
+    /** Icono representativo del mundo. */
+    Icon?: SvgIconComponent;
+    /** Niveles completados dentro del mundo. */
+    completados?: number;
+    /** Total de niveles del mundo. */
+    total?: number;
 }
 
-function SeparadorMundo({ 
-    texto = "Tierras de la Energía", 
-    numero = "1", 
-    bool = true
+function SeparadorMundo({
+    texto = "Tierras de la Energía",
+    numero = "1",
+    bool = true,
+    accent,
+    Icon,
+    completados = 0,
+    total = 3,
 }: SeparadorMundoProps) {
-return (
-    <Box
-    sx={{
-        width: "100%",
-        backgroundColor: bool ? "#2c3e50" : "rgba(114, 113, 113, 0.77)" , // El color azul oscuro/grisáceo de la barra en tu Figma
-        borderRadius: 2,             // Esquinas un poco redondeadas
-        py: 1.5,                    // Padding arriba y abajo para darle grosor
-        px: 3,                      // Padding a los lados
-        display: "flex",
-        alignItems: "center",       // Centra todo verticalmente
-        justifyContent: "center",   // Centra el contenido horizontalmente
-        gap: 2,                     // Separación entre las líneas y el texto
-        my: 3,                      // Margen externo arriba y abajo para separarlo de los hexágonos
-    }}
-    >
-      {/* Línea Izquierda */}
-    <Box 
-        sx={{ 
-          flexGrow: 1,              // Hace que la línea se estire todo lo posible hacia la izquierda
-          height: "2px",            // Grosor de la línea
-          backgroundColor: bool ? "rgba(255, 255, 255, 0.6)" : "black"   // Color blanco con un toque de transparencia
-        }} 
-    />
+    const { t } = useLanguage("camino");
+    const theme = useTheme();
+    const color = accent ?? theme.palette.primary.main;
+    const mundoCompletado = total > 0 && completados >= total;
 
-      {/* Texto Central */}
-    <Typography
-        variant="body1"
-        sx={{
-            color: bool ? "white" : "black",
-            fontWeight: "bold",
-            fontSize: "1.1rem",
-            whiteSpace: "nowrap",     // Evita que el texto se rompa en dos renglones si la pantalla se achica
-        }}
-    >
-        Mundo {numero} : {texto}
-    </Typography>
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: { xs: 1.5, sm: 2 },
+                px: { xs: 2, sm: 3 },
+                py: { xs: 2, sm: 2.5 },
+                position: "relative",
+                zIndex: 2,
+                opacity: bool ? 1 : 0.65,
+            }}
+        >
+            <Box
+                sx={{
+                    width: { xs: 42, sm: 48 },
+                    height: { xs: 42, sm: 48 },
+                    borderRadius: 2.5,
+                    flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color,
+                    bgcolor: alpha(color, theme.palette.mode === "dark" ? 0.18 : 0.1),
+                    border: "1px solid",
+                    borderColor: alpha(color, 0.28),
+                }}
+            >
+                {Icon ? <Icon sx={{ fontSize: { xs: 23, sm: 26 } }} /> : String(numero)}
+            </Box>
 
-      {/* Línea Derecha */}
-    <Box 
-        sx={{ 
-            flexGrow: 1,              // Hace que la línea se estire todo lo posible hacia la derecha
-            height: "2px", 
-            backgroundColor: bool ? "rgba(255, 255, 255, 0.6)" : "black" 
-        }} 
-    />
-    </Box>
-);
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Typography
+                    variant="overline"
+                    sx={{ color, fontWeight: 700, letterSpacing: 2, lineHeight: 1.4, display: "block" }}
+                >
+                    {t("world")} {numero}
+                </Typography>
+                <Typography
+                    variant="h6"
+                    component="h3"
+                    sx={{
+                        color: "text.primary",
+                        fontWeight: 700,
+                        fontSize: { xs: "1rem", sm: "1.15rem" },
+                        lineHeight: 1.25,
+                    }}
+                >
+                    {texto}
+                </Typography>
+            </Box>
+
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.75,
+                    flexShrink: 0,
+                }}
+            >
+                <Box sx={{ display: "flex", gap: 0.5 }}>
+                    {Array.from({ length: total }).map((_, idx) => (
+                        <Box
+                            key={idx}
+                            sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: "50%",
+                                bgcolor: idx < completados ? color : alpha(color, 0.22),
+                                transition: "background-color 0.3s ease",
+                            }}
+                        />
+                    ))}
+                </Box>
+                <Typography
+                    variant="caption"
+                    sx={{ color: "text.secondary", fontWeight: 600, minWidth: 28, textAlign: "right" }}
+                >
+                    {completados}/{total}
+                </Typography>
+                {mundoCompletado && (
+                    <CheckCircleRounded
+                        sx={{ fontSize: 16, color }}
+                        titleAccess={t("levelsCompleted")}
+                    />
+                )}
+            </Box>
+        </Box>
+    );
 }
 
 export default SeparadorMundo;

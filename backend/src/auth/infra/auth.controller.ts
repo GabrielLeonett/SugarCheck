@@ -7,6 +7,7 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDTO } from './DTOs/login.dto';
@@ -16,6 +17,11 @@ import type { Response, Request } from 'express';
 import { FirebaseAdminService } from './firebase-admin.service';
 import { LoginFirebaseDTO } from './DTOs/login-firebase.dto';
 import { TranslationService } from '../../shared/infrastructure/i18n/translation.service';
+import {
+  ForgotPasswordRateLimitGuard,
+  ResetPasswordRateLimitGuard,
+} from './auth-rate-limit.guard';
+import { cookieOptionsAccessToken, cookieOptionsRefreshToken } from './cookie-options';
 
 @Controller('auth')
 export class AuthController {
@@ -26,28 +32,6 @@ export class AuthController {
   ) { }
 
   private readonly isProduction = process.env.NODE_ENV === 'production';
-
-  // Configuración centralizada de cookies
-  private getCookieOptions(maxAge: number) {
-    return {
-      httpOnly: true,
-      // En producción requiere HTTPS (true), en desarrollo puede ser false
-      secure: this.isProduction,
-      // 'none' es obligatorio en producción para permitir cookies cross-site (con secure: true)
-      // 'lax' es ideal para desarrollo local
-      sameSite: this.isProduction ? 'none' as const : 'lax' as const,
-      maxAge,
-      path: '/',
-      // Si estás en producción, es buena práctica añadir 'domain' si es necesario
-      // domain: this.isProduction ? '.tu-dominio.com' : undefined,
-    };
-  }
-
-  // Access Token: 15 minutos
-  private readonly cookieOptionsAccessToken = this.getCookieOptions(15 * 60 * 1000);
-
-  // Refresh Token: 7 días
-  private readonly cookieOptionsRefreshToken = this.getCookieOptions(7 * 24 * 60 * 60 * 1000);
 
   @Post('login')
   async login(
@@ -61,8 +45,8 @@ export class AuthController {
     
     const { at, rt, user } = result.getValue();
     
-    res.cookie('access_token', at, this.cookieOptionsAccessToken);
-    res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
+    res.cookie('access_token', at, cookieOptionsAccessToken);
+    res.cookie('refresh_token', rt, cookieOptionsRefreshToken);
     
     const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     return {
@@ -97,8 +81,8 @@ export class AuthController {
     
     const { at, rt, user } = result.getValue();
 
-    res.cookie('access_token', at, this.cookieOptionsAccessToken);
-    res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
+    res.cookie('access_token', at, cookieOptionsAccessToken);
+    res.cookie('refresh_token', rt, cookieOptionsRefreshToken);
     
     return {
       message: this.translationService.translate('TOKEN_REFRESHED', lang),
@@ -159,8 +143,8 @@ export class AuthController {
     
     const { at, rt, user, isNewUser } = result.getValue();
     
-    res.cookie('access_token', at, this.cookieOptionsAccessToken);
-    res.cookie('refresh_token', rt, this.cookieOptionsRefreshToken);
+    res.cookie('access_token', at, cookieOptionsAccessToken);
+    res.cookie('refresh_token', rt, cookieOptionsRefreshToken);
     
     return {
       message: this.translationService.translate('FIREBASE_LOGIN_SUCCESS', lang, { provider: 'Firebase' }),
@@ -171,6 +155,7 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @UseGuards(ForgotPasswordRateLimitGuard)
   async forgotPassword(
     @Body() body: ForgotPasswordDTO,
     @Req() req: Request,
@@ -184,6 +169,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @UseGuards(ResetPasswordRateLimitGuard)
   async resetPassword(
     @Body() body: ResetPasswordDTO,
     @Req() req: Request,

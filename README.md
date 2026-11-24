@@ -15,6 +15,52 @@ El control de la glucosa y la administración de insulina puede ser un proceso e
 * 👤 **Perfil del Guerrero (Gamificación):** Sistema de niveles, rachas de victorias y personalización de avatares y armaduras.
 * ⚙️ **Configuración de la Orden (Control Parental):** Área protegida para que los padres configuren "Guardianes" (contactos de emergencia), ajusten dosis médicas, vinculen sensores y programen "Recordatorios de Batalla" (alarmas).
 
+## 📁 Estructura del proyecto
+
+El repositorio contiene tres proyectos **independientes**. Cada uno tiene su
+propio `package.json`, lockfile y `node_modules`; no hay workspace ni monorepo.
+
+| Carpeta | Proyecto | Stack |
+| --- | --- | --- |
+| `backend/` | API | NestJS + Prisma |
+| `frontend/` | Web | React + Vite |
+| `mobile/` | App móvil | React Native + Expo |
+
+### 🚀 Desarrollo
+
+Instala y ejecuta cada proyecto por separado, desde su propia carpeta:
+
+```bash
+# Backend
+cd backend
+pnpm install
+pnpm start:dev
+
+# Frontend
+cd frontend
+pnpm install
+pnpm dev
+
+# Mobile
+cd mobile
+pnpm install
+pnpm start
+```
+
+> Importante: **no** ejecutes `pnpm install` en la raíz del repositorio. Cada
+> carpeta gestiona sus dependencias de forma aislada.
+
+### 🚢 Despliegue
+
+- **Frontend:** Vercel (configurado con `frontend/vercel.json`).
+- **Backend:** Railway.
+
+No se usa Docker ni GitHub Actions: cada plataforma construye y despliega
+directamente desde su carpeta (`frontend/` o `backend/`).
+
+- Variables: `backend/.env.example` y `frontend/.env.example`
+- Mobile: se despliega aparte con Expo/EAS (`mobile/.env.example`)
+
 ## 🎨 Diseño y UI/UX
 Toda la interfaz fue diseñada pensando en la accesibilidad y la psicología infantil:
 * **Paleta de colores:** Tonos azules y verdes que transmiten calma y salud, con alertas claras en colores cálidos.
