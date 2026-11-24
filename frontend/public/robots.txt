@@ -9,4 +9,4 @@ Disallow: /agente/
 Disallow: /olvidoContrasena
 Disallow: /restablecer-contrasena
 
-Sitemap: https://sugarcheck.duckdns.org/sitemap.xml
+Sitemap: https://sugarcheck.app/sitemap.xml
