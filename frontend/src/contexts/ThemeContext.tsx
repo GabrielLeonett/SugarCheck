@@ -3,6 +3,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { lightTheme, darkTheme } from "../stores/themesStore.js";
 import type { ThemeContextType } from "../types/types.js";
+import { arePreferenceCookiesAllowed } from "../utils/cookieConsent.js";
 
 // Create context for theme state
 export const ThemeContext = React.createContext<ThemeContextType>({
@@ -46,11 +47,15 @@ export default function ThemeWrapperContext({
     if (isDarkMode) {
       root.classList.add("dark");
       root.classList.remove("light");
-      localStorage.setItem("theme", "dark");
+      if (arePreferenceCookiesAllowed()) {
+        localStorage.setItem("theme", "dark");
+      }
     } else {
       root.classList.add("light");
       root.classList.remove("dark");
-      localStorage.setItem("theme", "light");
+      if (arePreferenceCookiesAllowed()) {
+        localStorage.setItem("theme", "light");
+      }
     }
   }, [isDarkMode]);
 

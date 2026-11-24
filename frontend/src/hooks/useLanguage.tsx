@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { arePreferenceCookiesAllowed } from "../utils/cookieConsent";
 
 // Banderas importación (si las usas)
 import ES from "../assets/icons/ES.svg";
@@ -15,7 +16,9 @@ const useLanguage = (ns?: string) => {
   const changeLanguage = useCallback(
     (lng: string) => {
       i18n.changeLanguage(lng);
-      localStorage.setItem("i18nextLng", lng);
+      if (arePreferenceCookiesAllowed()) {
+        localStorage.setItem("i18nextLng", lng);
+      }
       document.documentElement.lang = lng;
     },
     [i18n]

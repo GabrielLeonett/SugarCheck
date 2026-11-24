@@ -261,15 +261,13 @@ function HomeScreen() {
               accessibilityLabel={t('screens:home.safetyTimer')}
               style={styles.card}
             >
-              <View style={styles.timerRow}>
+              <View style={styles.glucoseRow}>
                 <ThemedText style={[bigValueStyle, { color: safetyColor }]}>
                   {safety.remainingLabel}
                 </ThemedText>
-                {safety.status !== 'none' ? (
-                  <ThemedText style={[styles.timerUnit, { color: safetyColor }]}>
-                    {t('screens:home.hoursRemaining')}
-                  </ThemedText>
-                ) : null}
+                <ThemedText style={[styles.unit, { color: safetyColor }]}>
+                  {t('screens:home.hoursShort')}
+                </ThemedText>
               </View>
               <ThemedText style={[styles.cardHint, { color: safetyColor }]}>
                 {safetyLabel}
@@ -414,17 +412,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.semiBold,
     textAlign: 'center',
-  },
-  timerRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
-  timerUnit: {
-    marginLeft: 8,
-    fontSize: 14,
-    fontFamily: Fonts.semiBold,
   },
   blockStretch: {
     alignSelf: 'stretch',

@@ -23,6 +23,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { leccionesPorNivel } from '@/src/data/caminoLessons';
 import type { Pregunta } from '@/src/data/caminoLessons';
 import { getCaminoVideoUrl } from '@/src/data/caminoVideoUrls';
+import { CaminoWorldDecor } from './CaminoWorldDecor';
+import { getCaminoWorld, withAlpha } from './caminoWorlds';
 
 interface PathMissionProps {
   level: number;
@@ -55,6 +57,10 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
 
+  const worldNumber = Math.ceil(level / 3);
+  const world = getCaminoWorld(worldNumber);
+  const accent = colors.world[world.accentKey];
+
   useEventListener(player, 'statusChange', ({ status }) => {
     setVideoLoading(status === 'loading' || status === 'idle');
     setVideoError(status === 'error');
@@ -76,6 +82,8 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
   const progress = questionIndex < 0
     ? 0
     : ((questionIndex + (answerState === 'idle' ? 0 : 1)) / lesson.preguntas.length) * 100;
+
+  const missionTitle = t(`warriorPath.lessonTitles.${level}`, { defaultValue: lesson.titulo });
 
   const toggleAnswer = (index: number) => {
     if (answerState !== 'idle') return;
@@ -135,6 +143,13 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
 
   return (
     <ThemedView style={styles.container}>
+      <CaminoWorldDecor
+        world={worldNumber}
+        accent={accent}
+        contrast={colors.onAccent}
+        height={260}
+      />
+
       <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
         <TouchableOpacity
           style={styles.closeButton}
@@ -144,21 +159,21 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
         >
           <FontAwesome name="times" size={23} color={colors.text.primary} />
         </TouchableOpacity>
-        <View style={[styles.progressTrack, { backgroundColor: colors.divider }]}>
+        <View style={[styles.progressTrack, { backgroundColor: withAlpha(accent, 0.18) }]}>
           <View
             style={[
               styles.progressFill,
-              { width: `${progress}%`, backgroundColor: colors.primary.main },
+              { width: `${progress}%`, backgroundColor: accent },
             ]}
           />
         </View>
         <View style={styles.lives} accessibilityLabel={`${t('warriorPath.lives')}: ${lives}`}>
-          {[0, 1, 2].map((heart) => (
+          {[0, 1, 2].map((drop) => (
             <FontAwesome
-              key={heart}
-              name="heart"
-              size={17}
-              color={heart < lives ? colors.error.main : colors.text.disabled}
+              key={drop}
+              name="tint"
+              size={18}
+              color={drop < lives ? colors.error.main : colors.text.disabled}
             />
           ))}
         </View>
@@ -170,11 +185,30 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
         keyboardShouldPersistTaps="handled"
       >
         {questionIndex < 0 ? (
-          <View style={styles.videoSection}>
-            <ThemedText type="h6" style={styles.missionTitle}>
-              {t(`warriorPath.lessonTitles.${level}`, { defaultValue: lesson.titulo })}
-            </ThemedText>
-            <View style={[styles.videoContainer, { backgroundColor: colors.text.primary }]}>
+          <Card style={styles.missionCard}>
+            <View style={styles.missionHeader}>
+              <View
+                style={[
+                  styles.missionMedallion,
+                  {
+                    backgroundColor: withAlpha(accent, 0.14),
+                    borderColor: withAlpha(accent, 0.3),
+                  },
+                ]}
+              >
+                <FontAwesome name={world.icon} size={18} color={accent} />
+              </View>
+              <View style={styles.missionHeaderCopy}>
+                <ThemedText style={[styles.missionOverline, { color: accent }]}>
+                  {t('warriorPath.world', { number: worldNumber })} · {t('warriorPath.level', { number: level })}
+                </ThemedText>
+                <ThemedText type="h6" style={styles.missionTitle}>
+                  {missionTitle}
+                </ThemedText>
+              </View>
+            </View>
+
+            <View style={[styles.videoContainer, { backgroundColor: '#000000' }]}>
               <VideoView
                 player={player}
                 style={styles.video}
@@ -184,19 +218,20 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
                 playsInline
               />
               {videoLoading && (
-                <View style={styles.videoOverlay}>
-                  <ActivityIndicator size="large" color="#fff" />
+                <View style={[styles.videoOverlay, { backgroundColor: colors.overlay }]}>
+                  <ActivityIndicator size="large" color={colors.onAccent} />
                 </View>
               )}
               {videoError && (
-                <View style={styles.videoOverlay}>
-                  <ThemedText style={styles.videoErrorText}>
+                <View style={[styles.videoOverlay, { backgroundColor: colors.overlay }]}>
+                  <ThemedText style={[styles.videoErrorText, { color: colors.onAccent }]}>
                     {t('warriorPath.videoError')}
                   </ThemedText>
                   <Button title={t('warriorPath.retry')} onPress={retryVideo} />
                 </View>
               )}
             </View>
+
             <ThemedText muted style={styles.videoCaption}>
               {t('warriorPath.videoRequired')}
             </ThemedText>
@@ -204,85 +239,143 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
               title={t('warriorPath.continueToQuestions')}
               onPress={() => setQuestionIndex(0)}
               disabled={!videoEnded}
-              icon={<FontAwesome name="arrow-right" size={16} color={colors.primary.contrastText} />}
+              icon={
+                <FontAwesome
+                  name="arrow-right"
+                  size={16}
+                  color={colors.primary.contrastText}
+                />
+              }
             />
-          </View>
+          </Card>
         ) : currentQuestion ? (
           <View style={styles.quizSection}>
-            <ThemedText muted style={styles.questionCount}>
-              {t('warriorPath.question', {
-                current: questionIndex + 1,
-                total: lesson.preguntas.length,
-              })}
-            </ThemedText>
-            <ThemedText type="h6" style={styles.missionTitle}>
-              {t(`warriorPath.lessonTitles.${level}`, { defaultValue: lesson.titulo })}
-            </ThemedText>
-            {i18n.resolvedLanguage !== 'es' && (
-              <ThemedText muted style={styles.languageNotice}>
-                {t('warriorPath.lessonContentSpanishNotice')}
+            <View style={styles.quizTopline}>
+              <View style={[styles.questionPill, { backgroundColor: withAlpha(accent, 0.14) }]}>
+                <ThemedText style={[styles.questionPillText, { color: accent }]}>
+                  {t('warriorPath.question', {
+                    current: questionIndex + 1,
+                    total: lesson.preguntas.length,
+                  })}
+                </ThemedText>
+              </View>
+              <ThemedText muted numberOfLines={1} style={styles.quizMissionTitle}>
+                {missionTitle}
               </ThemedText>
-            )}
-            <ThemedText type="defaultSemiBold" style={styles.questionText}>
-              {currentQuestion.enunciado}
-            </ThemedText>
-
-            <View style={styles.options}>
-              {currentQuestion.opciones.map((option, index) => {
-                const selected = selectedAnswers.includes(index);
-                const revealed = answerState !== 'idle';
-                const correctAnswer = currentQuestion.correctas.includes(index);
-                const optionBorder = revealed && correctAnswer
-                  ? colors.success.main
-                  : revealed && selected
-                    ? colors.error.main
-                    : selected
-                      ? colors.primary.main
-                      : colors.border;
-                return (
-                  <TouchableOpacity
-                    key={`${currentQuestion.id}-${index}`}
-                    onPress={() => toggleAnswer(index)}
-                    disabled={revealed}
-                    activeOpacity={0.75}
-                    accessibilityRole={isMultiAnswer ? 'checkbox' : 'radio'}
-                    accessibilityState={{ selected, disabled: revealed }}
-                    style={[
-                      styles.option,
-                      {
-                        borderColor: optionBorder,
-                        backgroundColor: revealed && correctAnswer
-                          ? colors.success.light
-                          : revealed && selected
-                            ? colors.error.light
-                            : selected
-                              ? colors.primary[50]
-                              : colors.background.paper,
-                      },
-                    ]}
-                  >
-                    <FontAwesome
-                      name={selected ? (isMultiAnswer ? 'check-square' : 'dot-circle-o') : (isMultiAnswer ? 'square-o' : 'circle-o')}
-                      size={20}
-                      color={optionBorder}
-                    />
-                    <ThemedText style={styles.optionText}>{option}</ThemedText>
-                  </TouchableOpacity>
-                );
-              })}
             </View>
 
-            {showHint && (
-              <Card style={[styles.hintCard, { backgroundColor: colors.info.light }]}>
-                <ThemedText>{t('warriorPath.hintText')}</ThemedText>
-              </Card>
-            )}
+            <Card style={styles.questionCard}>
+              <ThemedText type="defaultSemiBold" style={styles.questionText}>
+                {currentQuestion.enunciado}
+              </ThemedText>
+
+              {i18n.resolvedLanguage !== 'es' && (
+                <ThemedText muted style={styles.languageNotice}>
+                  {t('warriorPath.lessonContentSpanishNotice')}
+                </ThemedText>
+              )}
+
+              <View style={styles.options}>
+                {currentQuestion.opciones.map((option, index) => {
+                  const selected = selectedAnswers.includes(index);
+                  const revealed = answerState !== 'idle';
+                  const correctAnswer = currentQuestion.correctas.includes(index);
+                  const optionBorder = revealed && correctAnswer
+                    ? colors.success.main
+                    : revealed && selected
+                      ? colors.error.main
+                      : selected
+                        ? accent
+                        : colors.border;
+                  const optionBackground = revealed && correctAnswer
+                    ? withAlpha(colors.success.main, 0.1)
+                    : revealed && selected
+                      ? withAlpha(colors.error.main, 0.1)
+                      : selected
+                        ? withAlpha(accent, 0.1)
+                        : colors.inputBackground;
+                  const markerFilled =
+                    selected || (revealed && correctAnswer);
+                  const markerColor = revealed && correctAnswer
+                    ? colors.success.main
+                    : revealed && selected
+                      ? colors.error.main
+                      : accent;
+                  const letter = String.fromCharCode(65 + index);
+
+                  return (
+                    <TouchableOpacity
+                      key={`${currentQuestion.id}-${index}`}
+                      onPress={() => toggleAnswer(index)}
+                      disabled={revealed}
+                      activeOpacity={0.75}
+                      accessibilityRole={isMultiAnswer ? 'checkbox' : 'radio'}
+                      accessibilityState={{ selected, disabled: revealed }}
+                      style={[
+                        styles.option,
+                        {
+                          borderColor: optionBorder,
+                          backgroundColor: optionBackground,
+                        },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.optionMarker,
+                          {
+                            borderColor: optionBorder,
+                            backgroundColor: markerFilled ? markerColor : 'transparent',
+                          },
+                        ]}
+                      >
+                        {markerFilled ? (
+                          <FontAwesome
+                            name="check"
+                            size={13}
+                            color={colors.text.inverse}
+                          />
+                        ) : (
+                          <ThemedText style={[styles.optionLetter, { color: optionBorder }]}>
+                            {letter}
+                          </ThemedText>
+                        )}
+                      </View>
+                      <ThemedText style={styles.optionText}>{option}</ThemedText>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {showHint && (
+                <View
+                  style={[
+                    styles.hintCard,
+                    {
+                      backgroundColor: withAlpha(colors.warning.main, 0.1),
+                      borderColor: withAlpha(colors.warning.main, 0.24),
+                    },
+                  ]}
+                >
+                  <FontAwesome name="lightbulb-o" size={18} color={colors.warning.main} />
+                  <ThemedText style={styles.hintText}>{t('warriorPath.hintText')}</ThemedText>
+                </View>
+              )}
+            </Card>
 
             {answerState !== 'idle' && (
               <Card
                 style={[
                   styles.feedback,
-                  { backgroundColor: answerState === 'correct' ? colors.success.light : colors.error.light },
+                  {
+                    backgroundColor: withAlpha(
+                      answerState === 'correct' ? colors.success.main : colors.error.main,
+                      0.08
+                    ),
+                    borderColor: withAlpha(
+                      answerState === 'correct' ? colors.success.main : colors.error.main,
+                      0.3
+                    ),
+                  },
                 ]}
               >
                 <View style={styles.feedbackRow}>
@@ -297,10 +390,16 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
                     <View style={styles.feedbackHeading}>
                       <FontAwesome
                         name={answerState === 'correct' ? 'check-circle' : 'times-circle'}
-                        size={24}
-                        color={answerState === 'correct' ? colors.success.dark : colors.error.dark}
+                        size={22}
+                        color={answerState === 'correct' ? colors.success.main : colors.error.main}
                       />
-                      <ThemedText type="defaultSemiBold">
+                      <ThemedText
+                        type="defaultSemiBold"
+                        style={{
+                          color: answerState === 'correct' ? colors.success.main : colors.error.main,
+                          flex: 1,
+                        }}
+                      >
                         {t(answerState === 'correct' ? 'warriorPath.correctTitle' : 'warriorPath.incorrectTitle')}
                       </ThemedText>
                     </View>
@@ -315,7 +414,15 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
             )}
 
             {saveError && (
-              <Card style={[styles.hintCard, { backgroundColor: colors.error.light }]}>
+              <Card
+                style={[
+                  styles.errorCard,
+                  {
+                    backgroundColor: withAlpha(colors.error.main, 0.08),
+                    borderColor: withAlpha(colors.error.main, 0.3),
+                  },
+                ]}
+              >
                 <ThemedText>{t('warriorPath.saveError')}</ThemedText>
               </Card>
             )}
@@ -406,14 +513,38 @@ export function PathMission({ level, onExit, onComplete }: PathMissionProps) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  topBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 10, gap: 12 },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+    gap: 12,
+  },
   closeButton: { width: 32, alignItems: 'center' },
-  progressTrack: { flex: 1, height: 12, borderRadius: 8, overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: 8 },
+  progressTrack: { flex: 1, height: 10, borderRadius: 6, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 6 },
   lives: { flexDirection: 'row', gap: 4 },
-  content: { flexGrow: 1, padding: 18, paddingBottom: 32 },
-  videoSection: { flex: 1, justifyContent: 'center', gap: 16 },
-  missionTitle: { textAlign: 'center', marginBottom: 8 },
+
+  content: { flexGrow: 1, padding: 16, paddingBottom: 32 },
+
+  missionCard: { padding: 16, gap: 14, marginTop: 4 },
+  missionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  missionMedallion: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  missionHeaderCopy: { flex: 1, minWidth: 0 },
+  missionOverline: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  missionTitle: { fontSize: 17, lineHeight: 22, marginTop: 2 },
   videoContainer: { width: '100%', aspectRatio: 16 / 9, borderRadius: 14, overflow: 'hidden' },
   video: { width: '100%', height: '100%' },
   videoOverlay: {
@@ -422,29 +553,63 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: 'rgba(0,0,0,0.72)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
     gap: 12,
   },
-  videoErrorText: { color: '#fff', textAlign: 'center' },
-  videoCaption: { textAlign: 'center', fontSize: 13 },
-  quizSection: { paddingBottom: 24 },
-  questionCount: { textAlign: 'center', marginBottom: 8 },
-  questionText: { textAlign: 'center', marginVertical: 18, lineHeight: 25 },
-  languageNotice: { fontSize: 13, textAlign: 'center' },
+  videoErrorText: { textAlign: 'center' },
+  videoCaption: { textAlign: 'center', fontSize: 12 },
+
+  quizSection: { paddingBottom: 20 },
+  quizTopline: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+  questionPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9 },
+  questionPillText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.4 },
+  quizMissionTitle: { flex: 1, fontSize: 12, textAlign: 'right' },
+  questionCard: { padding: 16 },
+  questionText: { fontSize: 16, lineHeight: 24, textAlign: 'center', marginBottom: 16 },
+  languageNotice: { fontSize: 12, textAlign: 'center', marginBottom: 12 },
   options: { gap: 10 },
-  option: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, borderWidth: 1.5, borderRadius: 12, padding: 14 },
-  optionText: { flex: 1, lineHeight: 22 },
-  hintCard: { padding: 14, marginTop: 16 },
-  feedback: { padding: 16, marginTop: 18 },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+  },
+  optionMarker: {
+    width: 28,
+    height: 28,
+    borderRadius: 9,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  optionLetter: { fontSize: 12, fontWeight: '700' },
+  optionText: { flex: 1, fontSize: 14, lineHeight: 21 },
+  hintCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    padding: 12,
+    marginTop: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  hintText: { flex: 1, fontSize: 13, lineHeight: 20 },
+
+  feedback: { padding: 14, marginTop: 14, borderWidth: 1 },
   feedbackRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  feedbackMascot: { width: 64, height: 72 },
-  feedbackCopy: { flex: 1, gap: 8 },
-  feedbackHeading: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  actions: { flexDirection: 'row', gap: 10, marginTop: 18 },
+  feedbackMascot: { width: 58, height: 66 },
+  feedbackCopy: { flex: 1, gap: 6 },
+  feedbackHeading: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  errorCard: { padding: 14, marginTop: 14, borderWidth: 1 },
+
+  actions: { flexDirection: 'row', gap: 10, marginTop: 16 },
   actionButton: { flex: 1 },
+
   dialog: { gap: 14, paddingBottom: 18 },
   dialogMascot: { width: 112, height: 112, alignSelf: 'center' },
   dialogTitle: { textAlign: 'center' },

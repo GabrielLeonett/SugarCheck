@@ -19,6 +19,7 @@
     "safetyTimer": "Cronômetro de segurança",
     "lastRapidInsulin": "Última insulina rápida",
     "hoursRemaining": "Horas restantes",
+    "hoursShort": "h",
     "safe": "Zona segura",
     "expiresSoon": "Perto de vencer",
     "shieldActive": "Escudo ativo",
