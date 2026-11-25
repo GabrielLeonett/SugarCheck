@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { glucoseApi, type GlucoseEntry } from '@/src/apis/glucose';
-import { imcApi } from '@/src/apis/imc';
+import { imcApi, sortPhysicalRecords } from '@/src/apis/imc';
 import { insulinaApi } from '@/src/apis/insulina';
 import { usePreferenceConfig } from '@/src/stores/preferenceStore';
 import { showErrorAlert } from '@/src/stores/systemAlertStore';
@@ -351,9 +351,7 @@ export function useDashboardData(): DashboardData {
       rangeStatus: getGlucoseRangeStatus(entry.nivel, { hypo, hiper }),
     }));
 
-  const sortedPhysical = [...physical].sort(
-    (a, b) => parseFecha(b.fecha) - parseFecha(a.fecha)
-  );
+  const sortedPhysical = sortPhysicalRecords(physical);
   const latestPhysical = sortedPhysical[0] ?? null;
   const previousPhysical = sortedPhysical[1] ?? null;
   const ultimoImc = latestPhysical?.imc ?? null;

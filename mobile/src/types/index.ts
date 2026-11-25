@@ -66,6 +66,8 @@ export interface PhysicalRecord {
   estatura: number;
   imc: number;
   estado: string;
+  /** Momento exacto de creación (ISO). Desempata mediciones del mismo día. */
+  createdAt?: string;
 }
 
 export interface GlucoseRecord {
