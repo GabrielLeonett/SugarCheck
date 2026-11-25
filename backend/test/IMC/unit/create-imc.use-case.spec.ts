@@ -52,7 +52,7 @@ describe('CreateImc UseCase', () => {
     expect(result.getError().message).toContain('posterior');
   });
 
-  test('rechaza un cambio de peso drástico (>5kg) respecto al último registro', async () => {
+  test('permite un cambio de peso drástico respecto al último registro', async () => {
     repository.items.push(
       ImcFactory.createInstance({
         userId: USER_ID,
@@ -60,9 +60,10 @@ describe('CreateImc UseCase', () => {
       }),
     );
 
-    const result = await useCase.run({ ...validParams, peso: 90 });
-    expect(result.isValid).toBe(false);
-    expect(result.getError().message.toLowerCase()).toContain('peso');
+    const result = await useCase.run({ ...validParams, peso: 120 });
+    expect(result.isValid).toBe(true);
+    expect(result.getValue().peso.value).toBe(120);
+    expect(repository.items).toHaveLength(2);
   });
 
   test('intenta crear la notificación de registro de IMC', async () => {
