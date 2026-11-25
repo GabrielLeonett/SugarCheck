@@ -25,8 +25,8 @@ export class AuthService {
     return await this.refreshAccessToken.run(token);
   }
 
-  async logout() {
-    return await this.Logout.run();
+  async logout(refreshToken?: string) {
+    return await this.Logout.run(refreshToken);
   }
 
   async loginFirebaseUser({

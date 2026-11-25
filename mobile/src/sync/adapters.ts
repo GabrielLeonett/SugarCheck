@@ -132,6 +132,7 @@ export function syncRecordToImc(rec: Record<string, unknown>): PhysicalRecord {
     estatura,
     imc: Number(imc.toFixed(1)),
     estado,
+    createdAt: rec.createdAt == null ? undefined : String(rec.createdAt),
   } as PhysicalRecord;
 }
 

@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { randomUUID } from 'crypto';
 import { Result } from '../../shared/result';
 import { ErrorAbstract } from '../../shared/error-abstract';
 import { InvalidCredentialsError } from '../core/errors/InvalidCredentialsError';
@@ -64,7 +65,12 @@ export class LoginFirebaseUser {
 
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: '15m' }),
-      this.jwtService.signAsync(payload, { expiresIn: '7d' }),
+      // `jwtid` permite revocar este refresh token concreto al cerrar sesión
+      // sin afectar a las sesiones de otros dispositivos.
+      this.jwtService.signAsync(payload, {
+        expiresIn: '7d',
+        jwtid: randomUUID(),
+      }),
     ]);
 
     return Result.ok({

@@ -46,20 +46,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: async () => {
+    // 1. El servidor debe intentar cerrar la sesión SIEMPRE. `signOut` de
+    //    Firebase va aparte para que un fallo suyo no lo impida.
     try {
-      await signOut(authFirebase);
       await authApi.logout();
     } catch (error) {
-      console.error('Error durante cierre de sesión:', error);
-    } finally {
-      try {
-        await useGuestStore.getState().setGuestMode(false);
-      } catch (error) {
-        console.error('No se pudo actualizar el modo invitado al cerrar sesión:', error);
-      }
-      preferenceStore.getState().reset();
-      set({ user: null, accessToken: null, isNewUser: false });
+      console.error('Error al cerrar la sesión en el servidor:', error);
     }
+
+    try {
+      await signOut(authFirebase);
+    } catch (error) {
+      console.error('Error al cerrar la sesión de Firebase:', error);
+    }
+
+    // 2. Limpiar el estado local.
+    try {
+      await useGuestStore.getState().setGuestMode(false);
+    } catch (error) {
+      console.error('No se pudo actualizar el modo invitado al cerrar sesión:', error);
+    }
+
+    preferenceStore.getState().reset();
+    set({ user: null, accessToken: null, isNewUser: false });
   },
 
   refresh: async () => {

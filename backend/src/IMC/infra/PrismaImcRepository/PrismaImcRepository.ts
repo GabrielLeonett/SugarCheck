@@ -54,7 +54,7 @@ export class PrismaImcRepository implements ImcRepository {
     try {
       const records = await this.prisma.imc.findMany({
         where: { userId: userId.value, deletedAt: null },
-        orderBy: { fecha: 'desc' },
+        orderBy: [{ fecha: 'desc' }, { createdAt: 'desc' }],
       });
       return Result.ok(records.map((r) => this.toDomain(r)));
     } catch (error) {

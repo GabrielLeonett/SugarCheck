@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Logger,
   Post,
   Req,
   Res,
@@ -21,17 +22,17 @@ import {
   ForgotPasswordRateLimitGuard,
   ResetPasswordRateLimitGuard,
 } from './auth-rate-limit.guard';
-import { cookieOptionsAccessToken, cookieOptionsRefreshToken } from './cookie-options';
+import { cookieOptionsAccessToken, cookieOptionsRefreshToken, clearAuthCookieOptions } from './cookie-options';
 
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private readonly authService: AuthService,
     private readonly firebaseAdminService: FirebaseAdminService,
     private readonly translationService: TranslationService,
   ) { }
-
-  private readonly isProduction = process.env.NODE_ENV === 'production';
 
   @Post('login')
   async login(
@@ -66,16 +67,16 @@ export class AuthController {
     const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
 
     if (!oldRefreshToken) {
-      res.clearCookie('access_token', { path: '/' });
-      res.clearCookie('refresh_token', { path: '/' });
+      res.clearCookie('access_token', clearAuthCookieOptions());
+      res.clearCookie('refresh_token', clearAuthCookieOptions());
       throw new UnauthorizedException(this.translationService.translate('MISSING_TOKEN', lang));
     }
     
     const result = await this.authService.refreshToken(oldRefreshToken);
     
     if (!result.isValid) {
-      res.clearCookie('access_token', { path: '/' });
-      res.clearCookie('refresh_token', { path: '/' });
+      res.clearCookie('access_token', clearAuthCookieOptions());
+      res.clearCookie('refresh_token', clearAuthCookieOptions());
       throw result.getError();
     }
     
@@ -98,21 +99,24 @@ export class AuthController {
   ) {
     const refreshToken = req.cookies['refresh_token'];
     
-    // Invalidar refresh token en el servidor si existe
+    // Revocar el refresh token en el servidor si existe. Si falla (token
+    // inválido, base de datos caída…) NO impedimos el borrado de las cookies:
+    // el usuario debe poder cerrar sesión siempre.
     if (refreshToken) {
-      await this.authService.logout();
+      try {
+        await this.authService.logout(refreshToken);
+      } catch (error) {
+        this.logger.warn(
+          `No se pudo revocar el refresh token al cerrar sesión: ${(error as Error)?.message}`,
+        );
+      }
     }
     
-    // Limpiar TODAS las cookies de autenticación
-    const clearCookieOptions = {
-      httpOnly: true,
-      secure: this.isProduction,
-      sameSite: this.isProduction ? 'strict' as const : 'lax' as const,
-      path: '/',
-    };
-    
-    res.clearCookie('access_token', clearCookieOptions);
-    res.clearCookie('refresh_token', clearCookieOptions);
+    // Limpiar TODAS las cookies de autenticación con exactamente los mismos
+    // atributos con los que se crearon. Si no coinciden, el navegador ignora
+    // el borrado en peticiones cross-site.
+    res.clearCookie('access_token', clearAuthCookieOptions());
+    res.clearCookie('refresh_token', clearAuthCookieOptions());
 
     const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     return { message: this.translationService.translate('LOGOUT_SUCCESS', lang) };

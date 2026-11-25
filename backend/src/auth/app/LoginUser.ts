@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { randomUUID } from 'crypto';
 import type { PasswordHasher } from '../../shared/application/ports/password-hasher.interface';
 import { Result } from '../../shared/result';
 import { ErrorAbstract } from '../../shared/error-abstract';
@@ -51,7 +52,12 @@ export class LoginUser {
 
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: '15m' }),
-      this.jwtService.signAsync(payload, { expiresIn: '7d' }),
+      // `jwtid` permite revocar este refresh token concreto al cerrar sesión
+      // sin afectar a las sesiones de otros dispositivos.
+      this.jwtService.signAsync(payload, {
+        expiresIn: '7d',
+        jwtid: randomUUID(),
+      }),
     ]);
 
     return Result.ok({

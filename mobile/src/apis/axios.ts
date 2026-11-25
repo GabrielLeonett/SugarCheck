@@ -35,7 +35,8 @@ apiPrivate.interceptors.response.use(
     if (
       error?.response?.status === 401 &&
       !prevRequest?.sent &&
-      !prevRequest?.url?.includes('/auth/refresh')
+      !prevRequest?.url?.includes('/auth/refresh') &&
+      !prevRequest?.url?.includes('/auth/logout')
     ) {
       prevRequest.sent = true;
       try {

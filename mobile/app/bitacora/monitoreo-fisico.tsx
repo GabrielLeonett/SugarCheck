@@ -13,17 +13,9 @@ import { Modal } from '@/components/Modal';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useTheme } from '@/contexts/ThemeContext';
-import { imcApi } from '@/src/apis/imc';
+import { imcApi, sortPhysicalRecords } from '@/src/apis/imc';
 import { showErrorAlert, showSuccessAlert } from '@/src/stores/systemAlertStore';
-
-interface PhysicalRecord {
-  id: string;
-  fecha: string;
-  peso: number;
-  estatura: number;
-  imc: number;
-  estado: string;
-}
+import type { PhysicalRecord } from '@/src/types';
 
 function withAlpha(hex: string, opacity: number) {
   const alpha = Math.round(opacity * 255)
@@ -81,7 +73,7 @@ export default function MonitoreoFisicoScreen() {
         estatura: estaturaNum,
         fecha: fecha.toISOString(),
       });
-      setRecords((previous) => [record, ...previous]);
+      setRecords((previous) => sortPhysicalRecords([record, ...previous]));
       setShowModal(false);
       setPeso('');
       setEstatura('');

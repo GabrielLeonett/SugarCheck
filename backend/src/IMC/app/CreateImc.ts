@@ -9,10 +9,8 @@ import { Altura } from '../core/value-objects/altura';
 import { Fecha } from '../core/value-objects/Fecha';
 import { GenerateUUIDInterface } from '../../shared/application/ports/generate-uuid.interface';
 import { CreateNotification } from '../../notification/app/CreateNotification';
-import { DrasticWeightChangeError } from '../core/errors/DrasticWeightChangeError';
 import { FechaInvalidaError } from '../core/errors/FechaInvalidError';
 
-const MAX_WEIGHT_CHANGE_KG = 5;
 const CATEGORY_KEYS: Record<string, string> = {
   underweight: 'IMC_CATEGORY_UNDERWEIGHT',
   normal: 'IMC_CATEGORY_NORMAL',
@@ -57,22 +55,6 @@ export class CreateImc {
       return Result.fail(
         new FechaInvalidaError('La fecha no puede ser posterior al día de hoy'),
       );
-    }
-
-    const lastImcResult = await this.repository.getAllByUserId(userIdRes.getValue());
-    if (lastImcResult.isValid) {
-      const records = lastImcResult.getValue();
-      if (records.length > 0) {
-        const lastWeight = records[0].peso.value;
-        const diff = Math.abs(data.peso - lastWeight);
-        if (diff > MAX_WEIGHT_CHANGE_KG) {
-          return Result.fail(
-            new DrasticWeightChangeError(
-              `El peso no puede cambiar más de ${MAX_WEIGHT_CHANGE_KG} kg de un registro a otro. Peso anterior: ${lastWeight} kg, peso ingresado: ${data.peso} kg`,
-            ),
-          );
-        }
-      }
     }
 
     const imc = new Imc({
