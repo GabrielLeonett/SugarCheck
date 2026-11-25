@@ -20,5 +20,20 @@ export function buildAuthCookieOptions(maxAge: number): CookieOptions {
   };
 }
 
+/**
+ * Opciones para *borrar* las cookies de autenticación.
+ *
+ * Deben coincidir exactamente con las usadas al crearlas (salvo `maxAge`):
+ * cuando el frontend y el backend están en dominios distintos, el navegador
+ * solo acepta el `Set-Cookie` de borrado si llega con `SameSite=None; Secure`.
+ * Si se envía con `SameSite=Strict` la cookie original sobrevive y la sesión
+ * se "resucita" al recargar la página.
+ */
+export function clearAuthCookieOptions(): CookieOptions {
+  const options = buildAuthCookieOptions(REFRESH_TOKEN_MAX_AGE_MS);
+  delete options.maxAge;
+  return options;
+}
+
 export const cookieOptionsAccessToken = buildAuthCookieOptions(ACCESS_TOKEN_MAX_AGE_MS);
 export const cookieOptionsRefreshToken = buildAuthCookieOptions(REFRESH_TOKEN_MAX_AGE_MS);

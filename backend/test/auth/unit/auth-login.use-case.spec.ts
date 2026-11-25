@@ -11,6 +11,7 @@ import {
   StubGetOneByEmailUser,
   StubGetOneByIdUser,
   StubSaveUser,
+  StubRevokedTokenStore,
 } from '../mocks/auth-ports.mock';
 
 const JWT_SECRET = 'test-secret';
@@ -127,25 +128,59 @@ describe('LoginFirebaseUser UseCase', () => {
 });
 
 describe('Logout UseCase', () => {
-  test('siempre retorna éxito', async () => {
-    const useCase = new Logout();
+  let jwtService: JwtService;
+  let revokedTokenStore: StubRevokedTokenStore;
+  let useCase: Logout;
+
+  beforeEach(() => {
+    jwtService = new JwtService({ secret: JWT_SECRET });
+    revokedTokenStore = new StubRevokedTokenStore();
+    useCase = new Logout(
+      jwtService,
+      { get: () => JWT_SECRET } as any,
+      revokedTokenStore,
+    );
+  });
+
+  test('revoca el refresh token presentado', async () => {
+    const rt = await jwtService.signAsync(
+      { sub: '11111111-1111-4111-8111-111111111111' },
+      { expiresIn: '7d', jwtid: 'jti-logout-1' },
+    );
+
+    const result = await useCase.run(rt);
+
+    expect(result.isValid).toBe(true);
+    expect(await revokedTokenStore.isRevoked('jti-logout-1')).toBe(true);
+  });
+
+  test('sin refresh token siempre retorna éxito', async () => {
     const result = await useCase.run();
     expect(result.isValid).toBe(true);
+  });
+
+  test('un token inválido no rompe el cierre de sesión', async () => {
+    const result = await useCase.run('token-basura');
+    expect(result.isValid).toBe(true);
+    expect(revokedTokenStore.revoked.size).toBe(0);
   });
 });
 
 describe('RefreshAccessToken UseCase', () => {
   let getOneById: StubGetOneByIdUser;
   let jwtService: JwtService;
+  let revokedTokenStore: StubRevokedTokenStore;
   let useCase: RefreshAccessToken;
 
   beforeEach(() => {
     getOneById = new StubGetOneByIdUser();
     jwtService = new JwtService({ secret: JWT_SECRET });
+    revokedTokenStore = new StubRevokedTokenStore();
     useCase = new RefreshAccessToken(
       jwtService,
       { get: () => JWT_SECRET } as any,
       getOneById as any,
+      revokedTokenStore,
     );
   });
 
@@ -175,5 +210,37 @@ describe('RefreshAccessToken UseCase', () => {
     const result = await useCase.run(rt);
     expect(result.isValid).toBe(false);
     expect(result.getError().message).toContain('inicia sesión');
+  });
+
+  test('falla si el refresh token fue revocado (logout)', async () => {
+    getOneById.response = Result.ok(makeFakeUser());
+    const rt = await jwtService.signAsync(
+      { sub: '11111111-1111-4111-8111-111111111111' },
+      { expiresIn: '7d', jwtid: 'jti-revocado' },
+    );
+
+    await revokedTokenStore.revoke({
+      jti: 'jti-revocado',
+      expiresAt: new Date(Date.now() + 60_000),
+    });
+
+    const result = await useCase.run(rt);
+
+    expect(result.isValid).toBe(false);
+    expect(result.getError().message).toContain('cerrada');
+  });
+
+  test('el nuevo refresh token incluye un jti distinto', async () => {
+    getOneById.response = Result.ok(makeFakeUser());
+    const rt = await jwtService.signAsync(
+      { sub: '11111111-1111-4111-8111-111111111111' },
+      { expiresIn: '7d', jwtid: 'jti-original' },
+    );
+
+    const result = await useCase.run(rt);
+    const payload = jwtService.verify(result.getValue().rt);
+
+    expect(typeof payload.jti).toBe('string');
+    expect(payload.jti).not.toBe('jti-original');
   });
 });

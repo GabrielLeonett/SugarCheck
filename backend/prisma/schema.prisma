@@ -29,6 +29,16 @@ model User {
   caminoProgreso    CaminoProgreso?
 }
 
+/// Refresh tokens revocados explícitamente (logout).
+/// Se guarda solo el `jti` hasta que el token expira de forma natural.
+model RevokedToken {
+  jti       String   @id
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
 model Preference {
   userId        String   @id
   profileImg    String   

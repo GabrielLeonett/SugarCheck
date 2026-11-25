@@ -58,6 +58,11 @@
   },
   "packageManager": "pnpm@9.12.3",
   "private": true,
+  "pnpm": {
+    "patchedDependencies": {
+      "@nozbe/watermelondb@0.28.0": "patches/@nozbe__watermelondb@0.28.0.patch"
+    }
+  },
   "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {

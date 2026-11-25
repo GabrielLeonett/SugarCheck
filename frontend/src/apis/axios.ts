@@ -52,6 +52,7 @@ apiPrivate.interceptors.request.use(
 // un 401 en ellos significa credenciales/token inválidos, no una sesión expirada.
 const AUTH_ENDPOINTS_WITHOUT_REFRESH = [
   '/auth/login',
+  '/auth/logout',
   '/auth/refresh',
   '/auth/firebase-login',
 ];
@@ -70,7 +71,10 @@ apiPrivate.interceptors.response.use(
       error?.response?.status === 401 &&
       prevRequest &&
       !prevRequest?.sent &&
-      !shouldSkipRefresh(prevRequest?.url)
+      !shouldSkipRefresh(prevRequest?.url) &&
+      // Nunca intentamos refrescar mientras se está cerrando sesión: el
+      // refresh volvería a crear cookies y resucitaría la sesión.
+      !useAuthStore.getState().isLoggingOut
     ) {
       prevRequest.sent = true;
       try {

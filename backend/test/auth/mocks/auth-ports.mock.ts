@@ -9,6 +9,7 @@ import { SaveUserInterface } from '../../../src/auth/app/ports/SaveUserInterface
 import { UpdatePasswordInterface } from '../../../src/auth/app/ports/UpdatePasswordInterface';
 import { SendEmailInterface } from '../../../src/auth/app/ports/SendEmailInterface';
 import { ResetCodeStoreInterface } from '../../../src/auth/app/ports/ResetCodeStoreInterface';
+import { RevokedTokenStoreInterface } from '../../../src/auth/app/ports/RevokedTokenStoreInterface';
 
 export function makeFakeUser(
   overrides: Partial<UserInterface['toPlain']> = {},
@@ -77,6 +78,24 @@ export class StubSaveUser implements SaveUserInterface {
     return Result.ok(
       makeFakeUser({ username: data.username, email: data.email }),
     );
+  }
+}
+
+export class StubRevokedTokenStore implements RevokedTokenStoreInterface {
+  public revoked = new Map<string, Date>();
+
+  async revoke({
+    jti,
+    expiresAt,
+  }: {
+    jti: string;
+    expiresAt: Date;
+  }): Promise<void> {
+    this.revoked.set(jti, expiresAt);
+  }
+
+  async isRevoked(jti: string): Promise<boolean> {
+    return this.revoked.has(jti);
   }
 }
 

@@ -7,6 +7,7 @@ interface PreferenceConfigState {
     save: (currentPrefs: Preference) => Promise<void>;
     changeAvatar: (img: string) => void;
     load: () => Promise<void>; 
+    reset: () => void;
 }
 
 // ➔ 1. Creamos el store base sin la palabra "use". Es un objeto JavaScript puro.
@@ -18,6 +19,10 @@ export const preferenceStore = create<PreferenceConfigState>((set) => ({
             ? { ...state.preference, profileImg: img }
             : null
     })),
+
+    // Limpia las preferencias del usuario que cierra sesión para que no se
+    // filtren a la siguiente cuenta que use el mismo dispositivo.
+    reset: () => set({ preference: null }),
 
     save: async (currentPrefs: Preference) => {
         try {

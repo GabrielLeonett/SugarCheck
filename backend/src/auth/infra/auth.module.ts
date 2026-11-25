@@ -19,6 +19,8 @@ import { ForgotPassword } from '../app/ForgotPassword';
 import { ResetPassword } from '../app/ResetPassword';
 import { NodemailerService } from './email/nodemailer.service';
 import { ResetCodeStore } from './ResetCodeStore';
+import { PrismaService } from '../../shared/infrastructure/prisma.service';
+import { PrismaRevokedTokenStore } from './PrismaRevokedTokenStore/PrismaRevokedTokenStore';
 import {
   ForgotPasswordRateLimitGuard,
   ResetPasswordRateLimitGuard,
@@ -41,9 +43,14 @@ import {
   ],
   controllers: [AuthController, OAuthController],
   providers: [
+    PrismaService,
     AuthGuard,
     OptionalAuthGuard,
     RolesGuard,
+    {
+      provide: 'RevokedTokenStore',
+      useClass: PrismaRevokedTokenStore,
+    },
     {
       provide: 'BcryptHasher',
       useClass: BcryptHasher,

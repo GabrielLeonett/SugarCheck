@@ -1,0 +1,15 @@
+diff --git a/native/android/build.gradle b/native/android/build.gradle
+index a45cfe0b6735e699ebc19cb0a3b255260011ffdf..612f7f1a19961a0630e974fc7bce5d44d3f316fd 100644
+--- a/native/android/build.gradle
++++ b/native/android/build.gradle
+@@ -32,6 +32,10 @@ android {
+         versionCode 1
+         versionName "1.0"
+     }
++
++    buildFeatures {
++        buildConfig true
++    }
+ }
+ 
+ dependencies {
