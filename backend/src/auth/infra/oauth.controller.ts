@@ -171,11 +171,18 @@ export class OAuthController {
     res.cookie('access_token', session.at, cookieOptionsAccessToken);
     res.cookie('refresh_token', session.rt, cookieOptionsRefreshToken);
 
+    const platform = req.headers['x-client-platform'];
+    const isMobile =
+      typeof platform === 'string' && platform.toLowerCase() === 'mobile';
+
     return {
       message: this.translationService.translate('OAUTH_LOGIN_SUCCESS', lang),
       user: session.user,
       accessToken: session.at,
       isNewUser: session.isNewUser,
+      // La app móvil guarda el refresh token en almacenamiento seguro; la web
+      // lo mantiene solo en la cookie httpOnly.
+      ...(isMobile ? { refreshToken: session.rt } : {}),
     };
   }
 

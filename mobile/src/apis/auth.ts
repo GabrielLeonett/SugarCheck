@@ -6,6 +6,8 @@ interface LoginResponse {
   user: User;
   accessToken: string;
   isNewUser?: boolean;
+  /** Solo lo devuelve el backend a la app móvil (la web usa cookie httpOnly). */
+  refreshToken?: string;
 }
 
 interface RegisterPayload {
@@ -23,13 +25,18 @@ export const authApi = {
     return response.data;
   },
 
-  async refresh(): Promise<LoginResponse> {
-    const response = await apiPrivate.post('/auth/refresh', {}, { timeout: 3000 });
+  async refresh(refreshToken?: string): Promise<LoginResponse> {
+    const response = await apiPrivate.post('/auth/refresh', {}, {
+      timeout: 10000,
+      headers: refreshToken ? { 'X-Refresh-Token': refreshToken } : undefined,
+    });
     return response.data;
   },
 
-  async logout(): Promise<void> {
-    await apiPrivate.post('/auth/logout', {});
+  async logout(refreshToken?: string): Promise<void> {
+    await apiPrivate.post('/auth/logout', {}, {
+      headers: refreshToken ? { 'X-Refresh-Token': refreshToken } : undefined,
+    });
   },
 
   async firebaseLogin(token: string): Promise<LoginResponse> {

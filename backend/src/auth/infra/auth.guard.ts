@@ -21,7 +21,18 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const lang = this.translationService.resolveLanguage(request.headers['accept-language'] as string);
 
-    const token = request.cookies['access_token'];
+    // La app móvil envía el token en `Authorization: Bearer`; la web usa la
+    // cookie httpOnly. Aceptamos ambos para no depender del cookie jar de
+    // React Native (que puede perder la cookie y cerrar la sesión).
+    const authorization = request.headers['authorization'];
+    const bearerToken =
+      typeof authorization === 'string' &&
+      authorization.toLowerCase().startsWith('bearer ')
+        ? authorization.slice(7).trim()
+        : null;
+
+    const cookieToken = request.cookies['access_token'];
+    const token = bearerToken || cookieToken;
 
     if (!token) {
       throw new UnauthorizedException(this.translationService.translate('MISSING_TOKEN', lang));

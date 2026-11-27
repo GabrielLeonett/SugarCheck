@@ -1,17 +1,20 @@
 import { create } from 'axios';
+import { Platform } from 'react-native';
 import i18n from '@/src/i18n';
 
 export const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
+const clientPlatform = Platform.OS === 'web' ? 'web' : 'mobile';
+
 export const apiPrivate = create({
   baseURL: BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 'Content-Type': 'application/json', 'X-Client-Platform': clientPlatform },
   withCredentials: true,
 });
 
 export const apiPublic = create({
   baseURL: BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 'Content-Type': 'application/json', 'X-Client-Platform': clientPlatform },
 });
 
 apiPrivate.interceptors.request.use(
@@ -43,9 +46,12 @@ apiPrivate.interceptors.response.use(
         const { useAuthStore } = await import('../stores/authStore');
         const refreshFunction = useAuthStore.getState().refresh;
         const newAccessToken = await refreshFunction();
-        if (newAccessToken) {
-          prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        if (!newAccessToken) {
+          // No hay sesión válida (o fue un fallo transitorio): no reintentamos
+          // una petición que volvería a fallar con 401.
+          return Promise.reject(error);
         }
+        prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
         return apiPrivate(prevRequest);
       } catch (refreshError) {
         return Promise.reject(refreshError);
