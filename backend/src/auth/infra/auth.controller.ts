@@ -54,6 +54,7 @@ export class AuthController {
       message: this.translationService.translate('LOGIN_SUCCESS', lang),
       user,
       accessToken: at,
+      ...this.mobileRefreshTokenPayload(req, rt),
     };
   }
   
@@ -62,7 +63,9 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const oldRefreshToken = req.cookies['refresh_token'];
+    // Web: cookie httpOnly. Mobile: header `X-Refresh-Token`, porque el cookie
+    // jar de React Native no siempre conserva las cookies entre sesiones.
+    const oldRefreshToken = this.getRefreshToken(req);
     
     const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
 
@@ -89,6 +92,7 @@ export class AuthController {
       message: this.translationService.translate('TOKEN_REFRESHED', lang),
       user,
       accessToken: at,
+      ...this.mobileRefreshTokenPayload(req, rt),
     };
   }
 
@@ -97,7 +101,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies['refresh_token'];
+    const refreshToken = this.getRefreshToken(req);
     
     // Revocar el refresh token en el servidor si existe. Si falla (token
     // inválido, base de datos caída…) NO impedimos el borrado de las cookies:
@@ -155,6 +159,7 @@ export class AuthController {
       user,
       accessToken: at,
       isNewUser,
+      ...this.mobileRefreshTokenPayload(req, rt),
     };
   }
 
@@ -185,5 +190,39 @@ export class AuthController {
     const lang = this.translationService.resolveLanguage(req.headers['accept-language'] as string);
     return { message: this.translationService.translate('PASSWORD_RESET_SUCCESS', lang) };
   }
-  
+
+  /**
+   * El refresh token se entrega en el JSON solo a la app móvil, que lo guarda
+   * en almacenamiento seguro. La web sigue usando únicamente la cookie
+   * httpOnly y nunca recibe el token en el cuerpo de la respuesta.
+   */
+  private isMobileClient(req: Request): boolean {
+    const platform = req.headers['x-client-platform'];
+    const value = Array.isArray(platform) ? platform[0] : platform;
+    return typeof value === 'string' && value.toLowerCase() === 'mobile';
+  }
+
+  private getRefreshToken(req: Request): string | undefined {
+    // La app móvil manda el token explícito; tiene prioridad sobre la cookie,
+    // que puede haberse quedado con una versión anterior tras una rotación.
+    const header = req.headers['x-refresh-token'];
+    const value = Array.isArray(header) ? header[0] : header;
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+
+    const cookieToken = req.cookies?.['refresh_token'];
+    return typeof cookieToken === 'string' && cookieToken.length > 0
+      ? cookieToken
+      : undefined;
+  }
+
+  private mobileRefreshTokenPayload(
+    req: Request,
+    refreshToken: string,
+  ): { refreshToken?: string } {
+    const header = req.headers['x-refresh-token'];
+    const hasHeader = typeof header === 'string' && header.length > 0;
+    return this.isMobileClient(req) || hasHeader ? { refreshToken } : {};
+  }
 }
